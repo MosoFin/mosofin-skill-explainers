@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill Explainers</title>
+<meta name="description" content="Each MosoFin finance skill explained in plain words, step by step, and how it is built.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--ground:#f7f8f6;--panel:#fff;--sunk:#f1f4f2;--ink:#14201b;--muted:#56655f;--faint:#86948e;
+ --rule:#dfe6e2;--rule-strong:#c6d1cb;--green:#0b8f5a;--green-soft:#e3f3ea;--blue:#3f6d96;--blue-soft:#e7eff6;
+ --hold:#a06a12;--hold-soft:#f7eedb;--shadow:0 1px 2px rgba(20,32,27,.05),0 10px 28px -18px rgba(20,32,27,.3)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0d1210;--panel:#151c19;--sunk:#111815;
+ --ink:#e8eeea;--muted:#9eaba5;--faint:#76857e;--rule:#26312c;--rule-strong:#34413b;--green:#43c78e;--green-soft:#123024;
+ --blue:#8db3d8;--blue-soft:#15202b;--hold:#dba657;--hold-soft:#2d2413;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8)}}
+:root[data-theme="dark"]{--ground:#0d1210;--panel:#151c19;--sunk:#111815;--ink:#e8eeea;--muted:#9eaba5;--faint:#76857e;
+ --rule:#26312c;--rule-strong:#34413b;--green:#43c78e;--green-soft:#123024;--blue:#8db3d8;--blue-soft:#15202b;
+ --hold:#dba657;--hold-soft:#2d2413;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:48px 16px 88px;display:flex;flex-direction:column;gap:44px}
+@media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+a{color:var(--green)} a:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
+.label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+h1{margin:0;font-size:clamp(32px,5.5vw,50px);line-height:1.05;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.015em}
+p{margin:0;max-width:66ch}
+.lede{font-size:19px;color:var(--muted)}
+header,section{display:flex;flex-direction:column;gap:14px}
+.crumb{font-size:14px;color:var(--muted)} .crumb a{color:inherit}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--sunk);color:var(--muted)}
+.pill.ok{background:var(--green-soft);color:var(--green)} .pill.int{background:var(--hold-soft);color:var(--hold)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);text-decoration:none;color:inherit;border-top:4px solid var(--green)}
+.card:hover{border-color:var(--green)} .card.todo{border-top-color:var(--rule-strong);box-shadow:none;opacity:.75}
+.card b{font-size:18px} .card .who{font-size:13.5px;color:var(--faint)} .card p{font-size:15px;color:var(--muted)}
+.card .go{font-weight:600;color:var(--green);font-size:15px;margin-top:auto}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px}
+pre{margin:0;background:var(--sunk);border-radius:8px;padding:12px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.stat .v{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .s{font-size:14px;color:var(--muted)}
+.tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+tbody tr:last-child td{border-bottom:none}
+td.c{text-align:center} .dash{color:var(--faint)}
+footer{border-top:1px solid var(--rule);padding-top:18px;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="label">MosoFin finance skills</span>
+  <h1>Skill explainers</h1>
+  <p class="lede">Each finance skill, explained three ways: in plain words for business owners, step by step with
+  worked examples and cited sources, and how it is built. Generated from <code>tracker.tsv</code>.</p>
+</header>
+<section>
+  <div class="stats">
+    <div class="stat"><span class="label">Skills tracked</span><span class="v">32</span><span class="s">in the tracker</span></div>
+    <div class="stat"><span class="label">With explainers</span><span class="v">1</span><span class="s">at least one page</span></div>
+    <div class="stat"><span class="label">Pages</span><span class="v">3</span><span class="s">of 96 possible</span></div>
+  </div>
+</section>
+<section>
+  <h2>All skills</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Skill</th><th>Genre</th><th class="c">Plain-language overview</th><th class="c">Learn it step by step</th><th class="c">How it&#x27;s built</th></tr></thead>
+    <tbody><tr><td><a href="skills/merchant-and-payment-processor-rec/">Payment processor reconciliation</a><br><code style="font-size:12px;color:var(--faint)">merchant-and-payment-processor-rec</code></td><td>analysis</td><td class="c"><a href="skills/merchant-and-payment-processor-rec/plain.html"><span class="pill ok">view</span></a></td><td class="c"><a href="skills/merchant-and-payment-processor-rec/learn.html"><span class="pill ok">view</span></a></td><td class="c"><a href="skills/merchant-and-payment-processor-rec/anatomy.html"><span class="pill ok">view</span></a></td></tr><tr><td>Accruals and deferrals<br><code style="font-size:12px;color:var(--faint)">accruals-and-deferrals</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Ap accrual cutoff<br><code style="font-size:12px;color:var(--faint)">ap-accrual-cutoff</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Ap aging and payment runs<br><code style="font-size:12px;color:var(--faint)">ap-aging-and-payment-runs</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Ar aging and collections<br><code style="font-size:12px;color:var(--faint)">ar-aging-and-collections</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Balance sheet reconciliations<br><code style="font-size:12px;color:var(--faint)">balance-sheet-reconciliations</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Bank reconciliation<br><code style="font-size:12px;color:var(--faint)">bank-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Budget vs actual analysis<br><code style="font-size:12px;color:var(--faint)">budget-vs-actual-analysis</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Cash application<br><code style="font-size:12px;color:var(--faint)">cash-application</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Cash flow forecast 13 week<br><code style="font-size:12px;color:var(--faint)">cash-flow-forecast-13-week</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Closing entries and trial balance<br><code style="font-size:12px;color:var(--faint)">closing-entries-and-trial-balance</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Credit card reconciliation<br><code style="font-size:12px;color:var(--faint)">credit-card-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Credit memo and refund handler<br><code style="font-size:12px;color:var(--faint)">credit-memo-and-refund-handler</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Customer invoicing<br><code style="font-size:12px;color:var(--faint)">customer-invoicing</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Duplicate invoice detection<br><code style="font-size:12px;color:var(--faint)">duplicate-invoice-detection</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Expense report processor<br><code style="font-size:12px;color:var(--faint)">expense-report-processor</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Financial statement builder<br><code style="font-size:12px;color:var(--faint)">financial-statement-builder</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Fixed asset register and depreciation<br><code style="font-size:12px;color:var(--faint)">fixed-asset-register-and-depreciation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Gl coding assistant<br><code style="font-size:12px;color:var(--faint)">gl-coding-assistant</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Inventory to gl reconciliation<br><code style="font-size:12px;color:var(--faint)">inventory-to-gl-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Invoice data extractor<br><code style="font-size:12px;color:var(--faint)">invoice-data-extractor</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Journal entry builder<br><code style="font-size:12px;color:var(--faint)">journal-entry-builder</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Journal entry review<br><code style="font-size:12px;color:var(--faint)">journal-entry-review</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Month end close checklist<br><code style="font-size:12px;color:var(--faint)">month-end-close-checklist</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Payroll clearing reconciliation<br><code style="font-size:12px;color:var(--faint)">payroll-clearing-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Payroll journal entry builder<br><code style="font-size:12px;color:var(--faint)">payroll-journal-entry-builder</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Payroll reconciliation<br><code style="font-size:12px;color:var(--faint)">payroll-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Prepaid amortization schedule<br><code style="font-size:12px;color:var(--faint)">prepaid-amortization-schedule</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Recurring transaction builder<br><code style="font-size:12px;color:var(--faint)">recurring-transaction-builder</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Three way match<br><code style="font-size:12px;color:var(--faint)">three-way-match</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Vendor statement reconciliation<br><code style="font-size:12px;color:var(--faint)">vendor-statement-reconciliation</code></td><td>analysis</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr><tr><td>Multi entity forecast dashboard<br><code style="font-size:12px;color:var(--faint)">multi-entity-forecast-dashboard</code></td><td>dashboard</td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td><td class="c"><span class="dash">—</span></td></tr></tbody>
+  </table></div>
+</section>
+<footer>The skills themselves live in <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a>. Explainers live here, separately, so nothing on this site is installed with a skill.</footer>
+</div>
+</body>
+</html>

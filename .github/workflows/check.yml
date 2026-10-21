@@ -1,0 +1,14 @@
+name: check
+on:
+  push:
+  pull_request:
+jobs:
+  tracker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tracker and site agree
+        run: python3 build.py --check
+      - name: No .DS_Store committed
+        run: |
+          if git ls-files | grep -q '\.DS_Store$'; then echo "::error::.DS_Store committed"; exit 1; fi
