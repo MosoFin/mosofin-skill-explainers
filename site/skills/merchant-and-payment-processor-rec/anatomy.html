@@ -96,9 +96,9 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payment processor reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">merchant-and-payment-processor-rec · branch proto/lightweight-card · fixes applied</div>
+  <div class="eyebrow">merchant-and-payment-processor-rec · shipped on main · fixes applied</div>
   <h1>How the processor reconciliation is built, and what it does</h1>
-  <p class="lede">The prototype splits one 862-line file into a 119-line card and seven reference files. This page shows how they connect, the run stage by stage, and how each audit finding was fixed — with the published source behind each fix.</p>
+  <p class="lede">The skill splits one 862-line file into a 121-line card and seven reference files. This page shows how they connect, the run stage by stage, and how each audit finding was fixed — with the published source behind each fix.</p>
 </header>
 
 <section>
@@ -115,7 +115,7 @@
   <p class="sec-title">One card, seven files behind it</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 119-line card with rules and six steps. Each step points to one reference file: rules to mosofin-protocol.md, step 2 to gates.md, steps 3 to 6 to method.md, step 3 also to edge-cases.md, step 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 400 lines.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 121-line card with rules and six steps. Each step points to one reference file: rules to mosofin-protocol.md, step 2 to gates.md, steps 3 to 6 to method.md, step 3 also to edge-cases.md, step 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 453 lines.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
 
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
@@ -134,11 +134,11 @@
 
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
           <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
-             <rect x="580" y="24" width="171" height="40" rx="7" fill="var(--mosofin-soft)"/>
-             <text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">250</text></g>
+             <rect x="580" y="24" width="175" height="40" rx="7" fill="var(--mosofin-soft)"/>
+             <text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">256</text></g>
           <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
-             <rect x="580" y="78" width="86" height="40" rx="7" fill="var(--mosofin-soft)"/>
-             <text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">125</text></g>
+             <rect x="580" y="78" width="100" height="40" rx="7" fill="var(--mosofin-soft)"/>
+             <text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">146</text></g>
           <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
              <rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/>
              <text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">453</text></g>
@@ -339,10 +339,13 @@
     <li><span class="ok">PASS</span><span>No write-directing language outside the protocol file.</span></li>
     <li><span class="ok">PASS</span><span>The intake covers all 7 inputs the original marked Required.</span></li>
     <li><span class="ok">PASS</span><span>The mock flag is checked on both sides, so fixture processor data can't pass as real.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes — 31 skills, 0 failures. For a card-format skill it reads SKILL.md and every reference file together.</span></li>
+    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks sit in mosofin-protocol.md and stay in sync with the repository's single copy; an edited line is caught as drift.</span></li>
+    <li><span class="ok">PASS</span><span>gates.md carries the same ONBOARDING and PART A framing as the other 30 skills, word for word.</span></li>
   </ul>
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run, and the processor's own tool names — no Stripe or Square catalogue has been read. One claim is the skill's own and not independently sourced here: that revenue net of fees is an error. The search turned up practitioner guides, not the accounting standard, so it isn't cited.</p>
 </section>
 
-<footer>Prototype fixes: local branch <code>proto/lightweight-card</code>, commit ef5b11a, not pushed. The approved=true fix is on <code>main</code> as d86fa27. The card still can't ship until the validator reads the whole skill folder rather than SKILL.md alone.</footer>
+<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">MosoFin/mosofin-finance-skills</a> as e4a34f4, with the card (c2adc10) and the audit fixes (ef5b11a). The approved=true fix is d86fa27. Still to do: a live run against QuickBooks and Stripe.</footer>
 
 </div>
