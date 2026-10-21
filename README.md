@@ -21,7 +21,9 @@ kind — `published`, `internal` or `todo` — plus whether the skill itself is 
 `build.py` generates the site index and each skill's landing page from it. The explainer pages
 themselves are hand-made.
 
-**`internal` pages stay in this repository but are never published or linked.** The Pages
+**`internal` pages stay in this repository and never appear on the site** — not published, not
+linked, no card on the skill's page. The index shows a kind's column only once some skill has a
+published page of that kind, so an internal-only kind doesn't look like missing work. The Pages
 workflow runs `build.py --stage`, which copies `site/` without them. Because the repository is
 public, an internal page is still readable here in the source — use `internal` for pages meant
 for reviewers, not for anything confidential.

@@ -184,10 +184,7 @@ def landing(r):
             continue
         pt = page_title(os.path.join(SITE, "skills", s, f"{k}.html"))
         if st == "internal":
-            cards.append(f'<div class="card todo"><span class="label">{e(label)} <span class="pill int">internal</span></span>'
-                         f'<b>{e(pt)}</b><span class="who">For {e(who.lower())}</span>'
-                         f'<p>Kept for reviewers in the repository; not published on this site.</p></div>')
-            continue
+            continue  # reviewers read it in the repository; the public site doesn't mention it
         cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
                      f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p><span class="go">Open →</span></a>')
     if r["skill_status"] == "shipped":
@@ -223,35 +220,47 @@ def landing(r):
 def chip(r, k):
     st = r[k]
     if st == "todo": return '<td class="c"><span class="dash">—</span></td>'
-    if st == "internal": return '<td class="c"><span class="pill int">internal</span></td>'
+    if st == "internal": return '<td class="c"><span class="dash">—</span></td>'
     return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill ok">view</span></a></td>'
+
+# A kind gets a column on the public index once some skill has a published page of
+# that kind, so a kind that is only ever internal never shows up as a gap.
+def shown_kinds(rows):
+    return [K for K in KINDS if any(r[K[0]] == "published" for r in rows)]
+
+WAYS = {"plain": "in plain words for business owners",
+        "learn": "step by step with worked examples and cited sources",
+        "anatomy": "how it is built"}
 
 def index(rows):
     n = len(rows)
+    kinds = shown_kinds(rows)
+    ways = [WAYS[k] for k, *_ in kinds]
+    ways = ways[0] if len(ways) == 1 else ", ".join(ways[:-1]) + " and " + ways[-1]
+    count = {1: "one way", 2: "two ways", 3: "three ways"}.get(len(kinds), f"{len(kinds)} ways")
     with_any = [r for r in rows if any(r[k] != "todo" for k, *_ in KINDS)]
     pages = sum(1 for r in rows for k, *_ in KINDS if r[k] == "published")
     trs = []
     for r in rows:
         name = (f'<a href="skills/{e(r["skill"])}/">{e(title_of(r))}</a>' if r in with_any else e(title_of(r)))
         trs.append(f'<tr><td>{name}<br><code style="font-size:12px;color:var(--faint)">{e(r["skill"])}</code></td>'
-                   f'<td>{e(r["genre"])}</td>' + "".join(chip(r, k) for k, *_ in KINDS) + "</tr>")
+                   f'<td>{e(r["genre"])}</td>' + "".join(chip(r, k) for k, *_ in kinds) + "</tr>")
     body = f"""<header>
   <span class="label">MosoFin finance skills</span>
   <h1>Skill explainers</h1>
-  <p class="lede">Each finance skill, explained three ways: in plain words for business owners, step by step with
-  worked examples and cited sources, and how it is built. Generated from <code>tracker.tsv</code>.</p>
+  <p class="lede">Each finance skill, explained {count}: {ways}. Generated from <code>tracker.tsv</code>.</p>
 </header>
 <section>
   <div class="stats">
     <div class="stat"><span class="label">Skills tracked</span><span class="v">{n}</span><span class="s">in the tracker</span></div>
     <div class="stat"><span class="label">With explainers</span><span class="v">{len(with_any)}</span><span class="s">at least one page</span></div>
-    <div class="stat"><span class="label">Pages</span><span class="v">{pages}</span><span class="s">published, of {n * len(KINDS)} possible</span></div>
+    <div class="stat"><span class="label">Pages</span><span class="v">{pages}</span><span class="s">published, of {n * len(kinds)} possible</span></div>
   </div>
 </section>
 <section>
   <h2>All skills</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Skill</th><th>Genre</th>{"".join(f'<th class="c">{e(l)}</th>' for _, l, *__ in KINDS)}</tr></thead>
+    <thead><tr><th>Skill</th><th>Genre</th>{"".join(f'<th class="c">{e(l)}</th>' for _, l, *__ in kinds)}</tr></thead>
     <tbody>{"".join(trs)}</tbody>
   </table></div>
 </section>
