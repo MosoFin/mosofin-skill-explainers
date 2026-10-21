@@ -8,7 +8,7 @@ Every skill can have three explainers:
 
 | Kind | File | For | What it is |
 |---|---|---|---|
-| `plain` | `site/skills/<skill>/plain.html` | Business owners | What the skill checks and the mistake it catches, in everyday terms |
+| `plain` | `site/skills/<skill>/plain.html` | Business owners | What the skill checks and the mistake it catches, in everyday terms; facts cited to an authority |
 | `learn` | `site/skills/<skill>/learn.html` | Owners and bookkeepers | Worked levels, simple to cross-source; rules quoted from the skill, facts cited to an authority, examples worked out on published figures; a calculator |
 | `anatomy` | `site/skills/<skill>/anatomy.html` | Reviewers and builders | How the skill is built, the stages it runs, and its audit |
 
@@ -43,9 +43,11 @@ Python; no build step beyond that.
 2. Set that kind to `published` (or `internal`) in `tracker.tsv`, and fill in `sources` and `verified`.
 3. Run `python3 build.py`, then commit both.
 
-## Standard for `learn` pages
+## Standard for `plain` and `learn` pages
 
-- **Rules** are quoted word for word from the skill, with the file and step.
+`build.py --check` fails a `plain` or `learn` page that has no `id="sources"` section with outside links.
+
+- **Rules** (`learn`) are quoted word for word from the skill, with the file and step.
 - **Facts** are cited to an outside authority — the payment apps' own documentation, regulators,
   standard-setters — numbered and linked. Paraphrased, not copied.
 - **Examples** are made-up figures, worked out on the published rates so a reader can check them.

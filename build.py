@@ -59,6 +59,15 @@ def page_title(path):
     return m.group(1).strip() if m else ""
 
 
+# Explainer kinds that state facts, so must cite them: a section id="sources" and at least one outside link.
+CITED = {"plain", "learn"}
+
+def cited(path):
+    h = open(path).read()
+    links = [u for u in re.findall(r"https://[^\s\"'`<>)]+", h) if "fonts.g" not in u]
+    return 'id="sources"' in h and bool(links)
+
+
 # --------------------------------------------------------------------------- checks
 def problems(rows):
     out = []
@@ -80,6 +89,8 @@ def problems(rows):
                 out.append(f"{s}: tracker says {k} is {st} but site/skills/{s}/{k}.html is missing")
             elif st != "todo" and not page_title(p):
                 out.append(f"{s}: {k}.html has no <title>")
+            elif st != "todo" and k in CITED and not cited(p):
+                out.append(f"{s}: {k}.html has no Sources section with outside links — every fact needs a cited authority")
     # every explainer file on disk must be tracked
     base = os.path.join(SITE, "skills")
     for s in sorted(os.listdir(base)) if os.path.isdir(base) else []:
@@ -184,8 +195,10 @@ def landing(r):
 <pre>curl -sL {SKILLS_REPO}/archive/refs/heads/main.tar.gz | tar -xz -C ~/.claude/skills --strip-components=2 mosofin-finance-skills-main/skills/{e(s)}</pre>
 <p><a href="{SKILLS_REPO}/tree/main/skills/{e(s)}">Read the skill on GitHub →</a></p>"""
     else:
-        use = ("<p><b>In review.</b> This skill is not in the skills repository yet, so there is nothing to install. "
-               "The explainers describe the version under review.</p>")
+        use = (f'<p><b>In review.</b> This skill belongs to the MosoFin finance skills library, '
+               f'<a href="{SKILLS_REPO}">MosoFin/mosofin-finance-skills</a>. The improved version these explainers '
+               f'describe is not on the repository yet, so there is nothing to install. Once merged it will be at '
+               f'<code>skills/{e(s)}</code>.</p>')
     meta = []
     if r["sources"]: meta.append(f'{e(r["sources"])} outside sources cited')
     if r["verified"]: meta.append(f'last verified {e(r["verified"])}')
