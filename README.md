@@ -45,6 +45,13 @@ Python; no build step beyond that.
 2. Set that kind to `published` (or `internal`) in `tracker.tsv`, and fill in `sources` and `verified`.
 3. Run `python3 build.py`, then commit both.
 
+## Writing a new explainer with Claude
+
+The workflow — read the skill, collect and verify sources, write the three pages in order,
+register, build, check, publish — is packaged as a Claude Code skill in
+[`.claude/skills/write-skill-explainers/`](.claude/skills/write-skill-explainers/SKILL.md).
+It loads automatically in a Claude Code session opened in this repository.
+
 ## Standard for `plain` and `learn` pages
 
 `build.py --check` fails a `plain` or `learn` page that has no `id="sources"` section with outside links.
