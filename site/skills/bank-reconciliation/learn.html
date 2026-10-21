@@ -262,7 +262,7 @@
 </section>
 
 <footer>
-  <span>Rules are quoted from the skill's own file, <code>SKILL.md</code> — Steps 1–6, Quality checks, Both entity scenarios and Edge Cases. Facts are cited to the sources above. All dollar figures are worked examples, not your data. The funds-availability and unclaimed-property sources are US rules and vary by state; confirm with your accountant what applies to you. This page explains <code>bank-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">read it on GitHub</a>).</span>
+  <span>Rules are quoted from the skill's own files: <code>references/method.md</code> (Steps 0–7, Quality checks, Both entity scenarios) and <code>references/edge-cases.md</code>. Facts are cited to the sources above. All dollar figures are worked examples, not your data. The funds-availability and unclaimed-property sources are US rules and vary by state; confirm with your accountant what applies to you. This page explains <code>bank-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">read it on GitHub</a>).</span>
 </footer>
 
 </div>
@@ -284,27 +284,27 @@ const RULES = [
   { id:"1", kind:"", title:"Two ladders that must meet",
     formula:"Bank ending balance\n+ deposits in transit − outstanding cheques ± bank errors\n= adjusted bank\n\nBook balance\n+ interest not recorded − fees not recorded ± book errors\n= adjusted book",
     plain:"Walk the bank's number and your number towards each other, one named step at a time. If they meet, every difference has a reason.",
-    where:"SKILL.md · Step 2", cites:[1,3],
+    where:"references/method.md · Step 2", cites:[1,3],
     backed:"The IRS describes the same monthly comparison of statement, chequebook and books, and QuickBooks' own reconcile screen finishes only when the difference reaches $0.00." },
   { id:"2", kind:"", title:"Timing is not an error",
     formula:"Banked, not yet credited → deposit in transit\nWritten, not yet cashed → outstanding cheque",
     plain:"Both sides are right; they just haven't caught up with each other. These go on the bank ladder, not in the books.",
-    where:"SKILL.md · Step 2", cites:[2],
+    where:"references/method.md · Step 2", cites:[2],
     backed:"US funds-availability rules give banks until the next or second business day to credit most deposits, so a deposit banked at month end is expected to land in the next month." },
   { id:"3", kind:"", title:"Tie to the cent",
     formula:"adjusted bank − adjusted book = 0.00\nanything else = an item you haven't found",
     plain:"\"Close enough\" is where errors and fraud live. A $25 leftover is not rounding; it is something with a name you don't know yet.",
-    where:"SKILL.md · Quality checks", cites:[3],
+    where:"references/method.md · Quality checks", cites:[3],
     backed:"Intuit advises talking to your accountant before accepting an adjusting entry to close a gap, and says it is usually better to resolve the difference." },
   { id:"W", kind:"w", title:"Age the leftovers",
     formula:"deposit in transit > 10 business days → escalate\nuncashed cheque > 90 days → escalate",
     plain:"Timing differences should clear in days. One that lingers is a lost deposit, a booking error, or a cheque that may be paid twice.",
-    where:"SKILL.md · Quality checks", cites:[2,4], practice:true,
+    where:"references/method.md · Quality checks", cites:[2,4], practice:true,
     backed:"Most deposits must be available within two business days, so a deposit still missing after weeks is not timing; and a cheque nobody cashes eventually becomes unclaimed property owed to the state. The 10-day and 90-day ages themselves are the skill's practice." },
   { id:"S", kind:"s", title:"Per account, per company — and both legs of every transfer",
     formula:"Operating ↔ Payroll: one transfer, two entries\nGroup: each company's books carry the balance\nthe group total cancels",
     plain:"A transfer recorded once looks like an error on two accounts at once. Two companies in one bank account can only be reconciled together.",
-    where:"SKILL.md · Both entity scenarios · Edge Cases", cites:[8],
+    where:"references/method.md · Both entity scenarios · references/edge-cases.md", cites:[8],
     backed:"IFRS 10 treats the group, not each company, as the single economic entity — so intercompany balances cancel at group level and must still be recorded by each company." },
 ];
 
@@ -317,7 +317,7 @@ const LEVELS = [
     situation:"On 28 September Northbrook wrote cheque #1043 for $1,860 to a supplier. On 30 September it banked $1,250 of takings after the bank's cutoff. The statement ends at $12,480.00; the books say $11,870.00.",
     facts:["Most cheques become available by the second business day after deposit, and cash and certain cheques the next business day "+C(2)+" — so a deposit banked late on the 30th is credited in October.","QuickBooks' reconcile screen is this same exercise: enter the statement's ending balance and date, tick what appears on the statement, finish at a difference of $0.00 "+C(3)+"."],
     visual:{type:"wf", start:["Statement ending balance",12480], steps:[["Deposit in transit (banked 30 Sep)",1250],["Cheque #1043 not yet cashed",-1860]], end:["Adjusted bank balance",11870], dec:2},
-    rule:{q:"Deposits in transit — money you banked that the bank hasn't credited yet. … Outstanding cheques / payments — payments you issued that haven't been cashed.", w:"SKILL.md · Step 2"},
+    rule:{q:"Deposits in transit — money you banked that the bank hasn't credited yet. … Outstanding cheques / payments — payments you issued that haven't been cashed.", w:"references/method.md · Step 2"},
     math:[["Statement ending balance","$12,480.00"],["+ deposit in transit","$1,250.00"],["− outstanding cheque #1043","$1,860.00"],["= adjusted bank balance","$11,870.00",1],["Book balance","$11,870.00"],["Difference","$0.00",1]],
     verdict:["ok","Ties. Both differences are timing: the bank hasn't seen the cheque, and it hasn't credited the deposit. Nothing in the books needs to change."] },
 
@@ -326,8 +326,8 @@ const LEVELS = [
     situation:"Same month, but the statement also shows a $15.00 monthly fee, $4.50 of interest, and a $300 customer cheque that bounced after it was deposited. The books, which know none of this, say $12,180.50.",
     facts:["The IRS lists bank charges not yet recorded as a normal source of difference between the statement and the books "+C(1)+".","A returned deposited item is a cheque you deposited that was sent back because it couldn't be processed against the writer's account "+C(5)+" — the bank takes the $300 back out."],
     visual:{type:"wf", start:["Book balance",12180.50], steps:[["Bank fee not recorded",-15],["Interest not recorded",4.50],["Customer cheque returned",-300]], end:["Adjusted book balance",11870], dec:2},
-    rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"SKILL.md · Step 2"},
-    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"SKILL.md · Step 5"},
+    rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"references/method.md · Step 2"},
+    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"references/method.md · Step 5"},
     math:[["Book balance","$12,180.50"],["− bank fee (statement line 14 Sep)","$15.00"],["+ interest (statement line 30 Sep)","$4.50"],["− returned deposit (statement line 19 Sep)","$300.00"],["= adjusted book balance","$11,870.00",1],["Adjusted bank balance (Level 1)","$11,870.00"],["Difference","$0.00",1]],
     verdict:["ok","Ties — after three entries the skill proposes, each pointing at its statement line: record the fee, record the interest, reverse the bounced receipt and chase the customer. A person posts them."] },
 
@@ -338,8 +338,8 @@ const LEVELS = [
     visual:{type:"table",
       head:["Date","Payee","Type","Amount","Reference"],
       rows:[["12 Sep","Acme Supplies","Bill payment","$25.00","#1031"],["12 Sep","Acme Supplies","Bill payment",["$25.00","bad"],["#1031","bad"]],["12 Sep","Acme Supplies","Bill payment","$25.00","#1032"]]},
-    rule:{q:"Adjusted balances tie to the cent — not to materiality. A bridge that nearly balances has an unidentified item in it", w:"SKILL.md · Quality checks"},
-    rule2:{q:"[auto] even without a statement: run the book side against itself to find duplicates — the same amount, counterparty and date recorded twice.", w:"SKILL.md · Step 3"},
+    rule:{q:"Adjusted balances tie to the cent — not to materiality. A bridge that nearly balances has an unidentified item in it", w:"references/method.md · Quality checks"},
+    rule2:{q:"[auto] even without a statement: run the book side against itself to find duplicates — the same amount, counterparty and date recorded twice.", w:"references/method.md · Step 3"},
     math:[["Adjusted bank balance","$11,870.00"],["Adjusted book balance","$11,895.00"],["Unexplained","$25.00",1],["Book entries: same payee, date, amount, reference","2 × #1031"],["One is a duplicate; remove it","−$25.00"],["Adjusted book balance after fix","$11,870.00",1]],
     verdict:["flag","Found. Cheque #1031 was recorded twice. Written off as \"miscellaneous\", the duplicate would have stayed in the books — and if #1031 were ever reissued, the supplier would be paid twice."] },
 
@@ -350,8 +350,8 @@ const LEVELS = [
     visual:{type:"table",
       head:["Statement line","Book entry","Method","Confidence"],
       rows:[["18 Sep · $742.10 · ACH","18 Sep · $742.10 · Bill payment","1 · exact amount + date","strongest"],["20 Sep · $1,100.00 · \"NORTHBRK INS PREM\"","19 Sep · $1,100.00 · \"Insurance premium\"","2 · amount + similar wording","good"],["22 Sep · $1,860.00 · CHK 1043","28 Sep · $1,860.00 · cheque #1043","3 · reference","strong where the reference survives"],["25 Sep · $3,420.00 · deposit","$1,200 + $1,500 + $720 · three receipts","4 · split / combined",["look closely","bad"]]]},
-    rule:{q:"Work down the methods; record which one produced each match, because a level-1 match and a level-4 match carry very different confidence.", w:"SKILL.md · Step 3"},
-    rule2:{q:"Split / combined matches — one bank line covering several book entries, or vice versa. Common with batched deposits and card settlements, and the level where false matches start.", w:"SKILL.md · Step 3"},
+    rule:{q:"Work down the methods; record which one produced each match, because a level-1 match and a level-4 match carry very different confidence.", w:"references/method.md · Step 3"},
+    rule2:{q:"Split / combined matches — one bank line covering several book entries, or vice versa. Common with batched deposits and card settlements, and the level where false matches start.", w:"references/method.md · Step 3"},
     math:[["Method 4: 1,200 + 1,500 + 720","$3,420.00"],["Statement deposit 25 Sep","$3,420.00"],["Difference","$0.00",1],["But: could 1,200 + 1,500 + 720 be a different three receipts?","check the deposit slip"]],
     verdict:["note","All four tie. The skill records the method next to every match so the reviewer knows which ones to look at twice — the split match is right, but only the deposit slip proves which three receipts it covers."] },
 
@@ -362,8 +362,8 @@ const LEVELS = [
     visual:{type:"table",
       head:["Item","Recorded","Age at 30 Sep","Threshold","Status"],
       rows:[["Deposit $980 — \"Till, 14 Aug\"","14 Aug","33 business days","10 business days",["escalate","bad"]],["Cheque #0988 $640 — J. Ortega","2 Jun","120 days","90 days",["escalate","bad"]],["Deposit $1,250 — \"Till, 30 Sep\"","30 Sep","0 business days","10 business days","timing"],["Cheque #1043 $1,860","28 Sep","2 days","90 days","timing"]]},
-    rule:{q:"Deposits-in-transit older than 10 business days escalated — money banked that the bank has not credited after two weeks is usually a lost deposit or a booking error, not timing", w:"SKILL.md · Quality checks"},
-    rule2:{q:"A duplicate payment about to be reissued — an old outstanding cheque that is really lost will be reissued, and if the original then clears the entity pays twice. Escalate cheques over 90 days rather than rolling them forward.", w:"SKILL.md · Edge Cases"},
+    rule:{q:"Deposits-in-transit older than 10 business days escalated — money banked that the bank has not credited after two weeks is usually a lost deposit or a booking error, not timing", w:"references/method.md · Quality checks"},
+    rule2:{q:"A duplicate payment about to be reissued — an old outstanding cheque that is really lost will be reissued, and if the original then clears the entity pays twice. Escalate cheques over 90 days rather than rolling them forward.", w:"references/edge-cases.md"},
     math:[["14 Aug → 30 Sep, weekdays only","33 business days"],["Skill's threshold","10 business days"],["Over by","23 business days",1],["2 Jun → 30 Sep","120 days"],["Skill's threshold","90 days"],["Over by","30 days",1]],
     verdict:["flag","Two escalations with an owner and a date each. The $980 is probably a deposit that never happened or was booked to the wrong account; the $640 cheque should be stopped before anyone reissues it — and if it is never claimed, the state eventually gets it."] },
 
@@ -376,7 +376,7 @@ const LEVELS = [
       head:["Account","Adjusted bank","Adjusted book","Difference"],
       rows:[["Operating (…4471)","$11,870.00","$11,870.00","$0.00"],["Payroll (…8820)","$9,400.00",["$4,400.00","bad"],["$5,000.00","bad"]]],
       total:["Both accounts","$21,270.00","$16,270.00","$5,000.00"]},
-    rule:{q:"A transfer between the entity's own accounts recorded once — appears as an unexplained debit on one account and an unexplained credit on another. Always check transfers on both accounts before classifying either as an error.", w:"SKILL.md · Edge Cases"},
+    rule:{q:"A transfer between the entity's own accounts recorded once — appears as an unexplained debit on one account and an unexplained credit on another. Always check transfers on both accounts before classifying either as an error.", w:"references/edge-cases.md"},
     math:[["Payroll: bank says","$9,400.00"],["Payroll: books say","$4,400.00"],["Unexplained credit","$5,000.00",1],["Operating: transfer out on 26 Sep","$5,000.00"],["Same amount, same day, own account","the other leg"],["Record the transfer in to Payroll","+$5,000.00",1]],
     verdict:["flag","Not a bank error and not a mystery deposit — the missing leg of a transfer. The skill checks every transfer on both accounts before it lets either side be called an error."] },
 
@@ -388,7 +388,7 @@ const LEVELS = [
       head:["Company","Book balance in this account","Reconciles to the statement alone?"],
       rows:[["Northbrook Trading","$7,300.00",["no — $4,570 short","bad"]],["Southbrook Ltd","$4,570.00",["no — $7,300 short","bad"]]],
       total:["Combined","$11,870.00","yes — ties to the adjusted bank balance"]},
-    rule:{q:"A bank account shared across entities — where several entities genuinely transact through one account, no single entity's GL can reconcile to the full statement. Say so explicitly, reconcile the statement to the combined book activity, and treat the per-entity split as an allocation question, not a reconciliation.", w:"SKILL.md · Both entity scenarios"},
+    rule:{q:"A bank account shared across entities — where several entities genuinely transact through one account, no single entity's GL can reconcile to the full statement. Say so explicitly, reconcile the statement to the combined book activity, and treat the per-entity split as an allocation question, not a reconciliation.", w:"references/method.md · Both entity scenarios"},
     math:[["Northbrook books","$7,300.00"],["Southbrook books","$4,570.00"],["Combined: 7,300 + 4,570","$11,870.00",1],["Adjusted bank balance","$11,870.00"],["Difference","$0.00",1],["Each company's share","an allocation, agreed between them"]],
     verdict:["note","The statement reconciles to the two companies together. How much of the $11,870 belongs to each is a question for the group's intercompany records — the skill says so rather than forcing one company's books to tie."] },
 ];
