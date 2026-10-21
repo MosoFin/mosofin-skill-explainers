@@ -96,7 +96,7 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Bank reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">bank-reconciliation · shipped on main · audited 21 Oct 2026 · findings open</div>
+  <div class="eyebrow">bank-reconciliation · shipped on main · audited 21 Oct 2026 · 3 of 4 findings fixed</div>
   <h1>How the bank reconciliation is built, and what it does</h1>
   <p class="lede">One 865-line file in the standard (non-card) format: the shared onboarding and write guardrail, four gates, eight steps, then outputs, quality checks, scenarios, tools, glossary and edge cases. This page shows where the weight sits, the run step by step, what the audit found, and what checked out against the live QuickBooks catalogue.</p>
 </header>
@@ -106,7 +106,7 @@
     <div class="stat"><span class="k">File</span><span class="v">865</span><span class="s">lines in SKILL.md, no references/</span></div>
     <div class="stat"><span class="k">Verdicts</span><span class="v">28 · 9 · 21</span><span class="s">[auto] · [gated] · [manual] tasks</span></div>
     <div class="stat"><span class="k">Tool names</span><span class="v">21/21</span><span class="s">QuickBooks tools exist in the live catalogue</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">0/4</span><span class="s">fixed — all four are open recommendations</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">3/4</span><span class="s">fixed on main (79f7a93); the card-format split is open</span></div>
   </div>
 </section>
 
@@ -228,13 +228,13 @@
 
 <section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Four open findings, none blocking, with the published guidance behind each</p>
+  <p class="sec-title">Four findings; three fixed the same day, one open</p>
   <div class="findings">
-    <div class="f med"><span class="sev">Medium · open</span><div class="body">
-      <h3>Two cross-references point at skills that are not in the repository</h3>
-      <p>Step 2 sends the reader to <code>bank-fee-and-interest-analysis</code> and the FX edge case to <code>multicurrency-fx-revaluation</code>. Both are in <code>deploy-queue.tsv</code> but not yet under <code>skills/</code>, so a user installing this skill alone follows a name to nothing. Either ship them, or reword the two sentences so they stand without the link.</p>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Two cross-references pointed at skills that are not in the repository</h3>
+      <p>Step 2 sends the reader to <code>bank-fee-and-interest-analysis</code> and the FX edge case to <code>multicurrency-fx-revaluation</code>. Both are in <code>deploy-queue.tsv</code> but not yet under <code>skills/</code>, so a user installing this skill alone follows a name to nothing. Both sentences now stand on their own without naming a skill; the links can return when those skills ship.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">SKILL.md · Step 2 · Edge Cases</span>
+      <span class="where">SKILL.md · Step 2 · Edge Cases · main 79f7a93</span>
     </div></div>
     <div class="f med"><span class="sev">Medium · open</span><div class="body">
       <h3>865 lines in one file, against a 500-line guide</h3>
@@ -242,15 +242,15 @@
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md</span>
     </div></div>
-    <div class="f low"><span class="sev">Low · open</span><div class="body">
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>A sandbox-only path for the spreadsheet helper</h3>
-      <p>Outputs says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else; on a laptop or another client it is a dead instruction. Say "use the host's spreadsheet skill if one is available" instead.</p>
-      <span class="where">SKILL.md · Outputs</span>
+      <p>Outputs says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else; on a laptop or another client it is a dead instruction. It now says to use the host's spreadsheet skill where one exists, names the Claude.ai path as one example, and falls back to CSV.</p>
+      <span class="where">SKILL.md · Outputs · main 79f7a93</span>
     </div></div>
-    <div class="f low"><span class="sev">Low · open</span><div class="body">
-      <h3>The escalation ages are stated as rules without saying they are practice</h3>
-      <p>"Deposits in transit older than 10 business days" and "outstanding cheques older than 90 days" are sound bookkeeping convention, but the skill presents them beside funds-availability and unclaimed-property rules that <i>are</i> published. One clause — "these ages are practice; adjust to the entity's bank and state" — would keep the distinction the explainer pages already draw.</p>
-      <span class="where">SKILL.md · Quality checks</span>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>The escalation ages were stated as rules without saying they are practice</h3>
+      <p>"Deposits in transit older than 10 business days" and "outstanding cheques older than 90 days" are sound bookkeeping convention, but the skill presents them beside funds-availability and unclaimed-property rules that <i>are</i> published. One clause — "these ages are practice; adjust to the entity's bank and state" — now follows the two bullets, and asks for the chosen ages to be saved as a preference in Step 7. The quoted bullets themselves are unchanged.</p>
+      <span class="where">SKILL.md · Quality checks · main 79f7a93</span>
     </div></div>
   </div>
 </section>
@@ -270,6 +270,6 @@
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real statement. The intercompany and shared-account scenarios are described in the skill and worked on the learn page, but not exercised against data.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; the four findings above are open. Still to do: a live run with a bank statement.</footer>
+<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; three findings fixed in 79f7a93, the card-format split is open. Still to do: a live run with a bank statement.</footer>
 
 </div>
