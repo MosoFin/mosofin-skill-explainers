@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From One Cheque to Two Companies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule .badge.w{background:var(--hold-soft);color:var(--hold)}
+  .rule .badge.s{background:var(--blue-soft);color:var(--blue)}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .tag-x{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--hold-soft);color:var(--hold);margin-left:6px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Bank reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · bank-reconciliation · learning guide</span>
+  <h1>From one cheque to two companies sharing a bank account</h1>
+  <p class="lede">How this skill proves your bank and your books agree — shown <b>one level at a time</b>, from a single uncashed cheque up to two companies transacting through one account. Every rule is quoted from the skill itself, and every number is worked through in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>Each one is quoted with the step it comes from, so you can read it yourself.</span></div>
+    <div><b>Each rule is backed by an authority</b><span>The IRS, US banking regulators, the GAO's internal-control standard, QuickBooks' own documentation — numbered and linked.</span></div>
+    <div><b>The math is shown</b><span>Open "Check it yourself" on any level and follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, put in your own month and watch the same rules run.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule — quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact — from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example — made-up figures, worked out in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Five rules the whole skill runs on</h2>
+  <p class="muted">Everything on this page is one of these rules applied to a bigger situation. The examples use one company, Northbrook Trading, its Operating account (…4471), and the month of September.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Seven levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in your own month</h2>
+  <p class="muted">Fill in one month from your bank statement and your books, or load one of the levels above. The page builds the bridge and ages the leftovers as you type. Nothing is sent anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="clean">Level 1 · timing only</button>
+      <button type="button" data-p="bank">Level 2 · bank-only items</button>
+      <button type="button" data-p="dup">Level 3 · the $25</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>From the bank statement</legend>
+        <label class="field"><span>Statement ending balance</span><input data-k="bank" inputmode="decimal"></label>
+        <label class="field"><span>Deposits you banked, not yet credited</span><input data-k="dit" inputmode="decimal"></label>
+        <label class="field"><span>Cheques you wrote, not yet cashed</span><input data-k="oc" inputmode="decimal"></label>
+        <label class="field"><span>Bank's own errors (+ / −)</span><input data-k="berr" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>From your books</legend>
+        <label class="field"><span>Cash balance in the books</span><input data-k="book" inputmode="decimal"></label>
+        <label class="field"><span>Bank fees not yet recorded</span><input data-k="fees" inputmode="decimal"></label>
+        <label class="field"><span>Interest not yet recorded</span><input data-k="int" inputmode="decimal"></label>
+        <label class="field"><span>Returned (bounced) deposits not yet recorded</span><input data-k="ret" inputmode="decimal"></label>
+        <label class="field"><span>Errors found in the books (+ / −)</span><input data-k="kerr" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <fieldset><legend>Age the leftovers</legend>
+      <label class="field"><span>Oldest deposit still in transit (business days)</span><input data-k="ditage" inputmode="numeric"></label>
+      <label class="field"><span>Oldest uncashed cheque (days)</span><input data-k="ocage" inputmode="numeric"></label>
+    </fieldset>
+    <div class="results" id="results" aria-live="polite"></div>
+    <p class="fine">The bridge is the skill's Step 2 ladders. The escalation ages — <b>10 business days</b> for a deposit in transit, <b>90 days</b> for an uncashed cheque — are the skill's own quality rules, common practice rather than a published standard; your bank's cutoffs and your state's unclaimed-property rules<sup class="c"><a href="#src4">4</a></sup> may call for different ones.</p>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">Rules are the skill's own. Facts below come from regulators, the US internal-control standard, a standard-setter and the accounting software's own documentation, as published when checked on 21 October 2026 — follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine">Not backed by an outside authority: the <b>10-business-day</b> and <b>90-day</b> escalation ages, and <b>tying to the cent</b> rather than to a materiality threshold, are the skill's own quality rules. The page marks them as practice where they appear.</p>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Mosofin or upload? Which account(s)? Which period? The bank statement. When was it last reconciled? How small a difference is worth chasing?</div>
+    <div><b>Needs</b>Your books' cash activity and ending balance — connected or exported — and the bank statement, always. Last month's reconciliation helps.</div>
+    <div><b>Gives back</b>The two ladders, every match with the method that made it, the unmatched items sorted, proposed entries tied to statement lines, and a sign-off line for two different people<sup class="c"><a href="#src7">7</a></sup>.</div>
+    <div><b>Never</b>Changes your books, marks anything cleared, signs off, calls a book-side total "reconciled", or shows a full account number. It reads nothing before you say yes.</div>
+  </div>
+</section>
+
+<footer>
+  <span>Rules are quoted from the skill's own file, <code>SKILL.md</code> — Steps 1–6, Quality checks, Both entity scenarios and Edge Cases. Facts are cited to the sources above. All dollar figures are worked examples, not your data. The funds-availability and unclaimed-property sources are US rules and vary by state; confirm with your accountant what applies to you. This page explains <code>bank-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">read it on GitHub</a>).</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"IRS — Publication 583, Starting a Business and Keeping Records", u:"https://www.irs.gov/publications/p583", w:"Reconcile the business bank account every month against the statement and the books; differences arise from bank charges not yet recorded and from deposits and cheques outside the statement date. Keep deposit slips, cancelled cheques and statements as supporting records."},
+  {t:"FDIC — Consumer Compliance Examination Manual, Expedited Funds Availability Act (Regulation CC)", u:"https://www.fdic.gov/consumer-compliance-examination-manual/vi-1-expedited-funds-availability-act", w:"Cash, electronic payments and certain cheques (cashier's, certified, government, on-us) must generally be available the next business day; other local cheques by the second business day after deposit."},
+  {t:"Intuit — Reconcile an account in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US", w:"Enter the statement's ending balance and date, tick each transaction that appears on the statement, and finish when the difference is $0.00. If a difference remains, talk to your accountant before accepting an adjusting entry — it is usually better to resolve it."},
+  {t:"NAUPA — What is unclaimed property?", u:"https://unclaimed.org/what-is-unclaimed-property/", w:"Uncashed cheques are a type of unclaimed property. After a dormancy period with no owner activity or contact — usually a year or longer, set by each state — the holder must turn the property over to the state."},
+  {t:"CFPB — Bulletin 2022-06, Returned Deposited Item fee practices", u:"https://www.consumerfinance.gov/compliance/supervisory-guidance/cfpb-bulletin-2022-06-unfair-returned-deposited-item-fee-assessment-practices/", w:"A returned deposited item is a deposited cheque sent back because it could not be processed against the writer's account; the depositor's bank may charge a fee for it."},
+  {t:"Stripe — Payout reconciliation report", u:"https://docs.stripe.com/reports/payout-reconciliation", w:"One bank payout settles many transactions, grouped into charges, refunds and fees — so a single bank line can stand for several book entries, net of fees."},
+  {t:"GAO — Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23", u:"https://www.gao.gov/greenbook", w:"Segregate duties so that authority, custody and accounting are not in one pair of hands; where that is not practical, design alternative controls to mitigate the risk."},
+  {t:"IFRS Foundation — IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/", w:"Consolidated statements present a parent and its subsidiaries as a single economic entity — which is why a balance between two group companies disappears in the group total but must still appear in each company's own books."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+
+const RULES = [
+  { id:"1", kind:"", title:"Two ladders that must meet",
+    formula:"Bank ending balance\n+ deposits in transit − outstanding cheques ± bank errors\n= adjusted bank\n\nBook balance\n+ interest not recorded − fees not recorded ± book errors\n= adjusted book",
+    plain:"Walk the bank's number and your number towards each other, one named step at a time. If they meet, every difference has a reason.",
+    where:"SKILL.md · Step 2", cites:[1,3],
+    backed:"The IRS describes the same monthly comparison of statement, chequebook and books, and QuickBooks' own reconcile screen finishes only when the difference reaches $0.00." },
+  { id:"2", kind:"", title:"Timing is not an error",
+    formula:"Banked, not yet credited → deposit in transit\nWritten, not yet cashed → outstanding cheque",
+    plain:"Both sides are right; they just haven't caught up with each other. These go on the bank ladder, not in the books.",
+    where:"SKILL.md · Step 2", cites:[2],
+    backed:"US funds-availability rules give banks until the next or second business day to credit most deposits, so a deposit banked at month end is expected to land in the next month." },
+  { id:"3", kind:"", title:"Tie to the cent",
+    formula:"adjusted bank − adjusted book = 0.00\nanything else = an item you haven't found",
+    plain:"\"Close enough\" is where errors and fraud live. A $25 leftover is not rounding; it is something with a name you don't know yet.",
+    where:"SKILL.md · Quality checks", cites:[3],
+    backed:"Intuit advises talking to your accountant before accepting an adjusting entry to close a gap, and says it is usually better to resolve the difference." },
+  { id:"W", kind:"w", title:"Age the leftovers",
+    formula:"deposit in transit > 10 business days → escalate\nuncashed cheque > 90 days → escalate",
+    plain:"Timing differences should clear in days. One that lingers is a lost deposit, a booking error, or a cheque that may be paid twice.",
+    where:"SKILL.md · Quality checks", cites:[2,4], practice:true,
+    backed:"Most deposits must be available within two business days, so a deposit still missing after weeks is not timing; and a cheque nobody cashes eventually becomes unclaimed property owed to the state. The 10-day and 90-day ages themselves are the skill's practice." },
+  { id:"S", kind:"s", title:"Per account, per company — and both legs of every transfer",
+    formula:"Operating ↔ Payroll: one transfer, two entries\nGroup: each company's books carry the balance\nthe group total cancels",
+    plain:"A transfer recorded once looks like an error on two accounts at once. Two companies in one bank account can only be reconciled together.",
+    where:"SKILL.md · Both entity scenarios · Edge Cases", cites:[8],
+    backed:"IFRS 10 treats the group, not each company, as the single economic entity — so intercompany balances cancel at group level and must still be recorded by each company." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const LEVELS = [
+  { tier:"Single account · Northbrook Trading, Operating account (…4471), September" },
+  { n:1, title:"One cheque, one deposit, one month end",
+    chips:["Bank statement","Books"], src:"Rules 1 and 2", cites:[2,3],
+    situation:"On 28 September Northbrook wrote cheque #1043 for $1,860 to a supplier. On 30 September it banked $1,250 of takings after the bank's cutoff. The statement ends at $12,480.00; the books say $11,870.00.",
+    facts:["Most cheques become available by the second business day after deposit, and cash and certain cheques the next business day "+C(2)+" — so a deposit banked late on the 30th is credited in October.","QuickBooks' reconcile screen is this same exercise: enter the statement's ending balance and date, tick what appears on the statement, finish at a difference of $0.00 "+C(3)+"."],
+    visual:{type:"wf", start:["Statement ending balance",12480], steps:[["Deposit in transit (banked 30 Sep)",1250],["Cheque #1043 not yet cashed",-1860]], end:["Adjusted bank balance",11870], dec:2},
+    rule:{q:"Deposits in transit — money you banked that the bank hasn't credited yet. … Outstanding cheques / payments — payments you issued that haven't been cashed.", w:"SKILL.md · Step 2"},
+    math:[["Statement ending balance","$12,480.00"],["+ deposit in transit","$1,250.00"],["− outstanding cheque #1043","$1,860.00"],["= adjusted bank balance","$11,870.00",1],["Book balance","$11,870.00"],["Difference","$0.00",1]],
+    verdict:["ok","Ties. Both differences are timing: the bank hasn't seen the cheque, and it hasn't credited the deposit. Nothing in the books needs to change."] },
+
+  { n:2, title:"Things only the bank knows",
+    chips:["Bank statement","Books"], src:"Rule 1", cites:[1,5],
+    situation:"Same month, but the statement also shows a $15.00 monthly fee, $4.50 of interest, and a $300 customer cheque that bounced after it was deposited. The books, which know none of this, say $12,180.50.",
+    facts:["The IRS lists bank charges not yet recorded as a normal source of difference between the statement and the books "+C(1)+".","A returned deposited item is a cheque you deposited that was sent back because it couldn't be processed against the writer's account "+C(5)+" — the bank takes the $300 back out."],
+    visual:{type:"wf", start:["Book balance",12180.50], steps:[["Bank fee not recorded",-15],["Interest not recorded",4.50],["Customer cheque returned",-300]], end:["Adjusted book balance",11870], dec:2},
+    rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"SKILL.md · Step 2"},
+    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"SKILL.md · Step 5"},
+    math:[["Book balance","$12,180.50"],["− bank fee (statement line 14 Sep)","$15.00"],["+ interest (statement line 30 Sep)","$4.50"],["− returned deposit (statement line 19 Sep)","$300.00"],["= adjusted book balance","$11,870.00",1],["Adjusted bank balance (Level 1)","$11,870.00"],["Difference","$0.00",1]],
+    verdict:["ok","Ties — after three entries the skill proposes, each pointing at its statement line: record the fee, record the interest, reverse the bounced receipt and chase the customer. A person posts them."] },
+
+  { n:3, title:"The $25 that won't go away",
+    chips:["Books vs books"], src:"Rule 3", cites:[3],
+    situation:"Same month, but the adjusted book balance comes to $11,895.00 — $25.00 more than the bank. Every statement line is matched. The gap is inside the books.",
+    facts:["Intuit's advice when a difference remains is to resolve it rather than accept an adjusting entry, and to talk to your accountant first "+C(3)+".","The skill goes one step further before the statement is even needed: it runs the book side against itself for duplicates."],
+    visual:{type:"table",
+      head:["Date","Payee","Type","Amount","Reference"],
+      rows:[["12 Sep","Acme Supplies","Bill payment","$25.00","#1031"],["12 Sep","Acme Supplies","Bill payment",["$25.00","bad"],["#1031","bad"]],["12 Sep","Acme Supplies","Bill payment","$25.00","#1032"]]},
+    rule:{q:"Adjusted balances tie to the cent — not to materiality. A bridge that nearly balances has an unidentified item in it", w:"SKILL.md · Quality checks"},
+    rule2:{q:"[auto] even without a statement: run the book side against itself to find duplicates — the same amount, counterparty and date recorded twice.", w:"SKILL.md · Step 3"},
+    math:[["Adjusted bank balance","$11,870.00"],["Adjusted book balance","$11,895.00"],["Unexplained","$25.00",1],["Book entries: same payee, date, amount, reference","2 × #1031"],["One is a duplicate; remove it","−$25.00"],["Adjusted book balance after fix","$11,870.00",1]],
+    verdict:["flag","Found. Cheque #1031 was recorded twice. Written off as \"miscellaneous\", the duplicate would have stayed in the books — and if #1031 were ever reissued, the supplier would be paid twice."] },
+
+  { n:4, title:"Matching, four ways — and how much to trust each",
+    chips:["Bank statement","Books"], src:"Rule 1", cites:[6],
+    situation:"Four statement lines, four ways of matching them to the books. The last is one bank deposit of $3,420 that covers three customer receipts.",
+    facts:["A single bank line can settle many transactions at once — a card processor's payout groups many charges, refunds and fees into one deposit "+C(6)+". Matching one line to several entries is normal, and it is where false matches begin."],
+    visual:{type:"table",
+      head:["Statement line","Book entry","Method","Confidence"],
+      rows:[["18 Sep · $742.10 · ACH","18 Sep · $742.10 · Bill payment","1 · exact amount + date","strongest"],["20 Sep · $1,100.00 · \"NORTHBRK INS PREM\"","19 Sep · $1,100.00 · \"Insurance premium\"","2 · amount + similar wording","good"],["22 Sep · $1,860.00 · CHK 1043","28 Sep · $1,860.00 · cheque #1043","3 · reference","strong where the reference survives"],["25 Sep · $3,420.00 · deposit","$1,200 + $1,500 + $720 · three receipts","4 · split / combined",["look closely","bad"]]]},
+    rule:{q:"Work down the methods; record which one produced each match, because a level-1 match and a level-4 match carry very different confidence.", w:"SKILL.md · Step 3"},
+    rule2:{q:"Split / combined matches — one bank line covering several book entries, or vice versa. Common with batched deposits and card settlements, and the level where false matches start.", w:"SKILL.md · Step 3"},
+    math:[["Method 4: 1,200 + 1,500 + 720","$3,420.00"],["Statement deposit 25 Sep","$3,420.00"],["Difference","$0.00",1],["But: could 1,200 + 1,500 + 720 be a different three receipts?","check the deposit slip"]],
+    verdict:["note","All four tie. The skill records the method next to every match so the reviewer knows which ones to look at twice — the split match is right, but only the deposit slip proves which three receipts it covers."] },
+
+  { n:5, title:"When timing stops being timing",
+    chips:["Aging"], src:"Age the leftovers", cites:[2,4],
+    situation:"At 30 September two items are still outstanding from earlier months: a $980 deposit recorded on 14 August that the bank never credited, and cheque #0988 for $640 written on 2 June and never cashed.",
+    facts:["Deposits must generally be available by the second business day "+C(2)+" — a deposit missing after 33 business days is not timing.","A cheque nobody cashes becomes unclaimed property after a state-set dormancy period, often a year or more, and the holder must then turn it over to the state "+C(4)+"."],
+    visual:{type:"table",
+      head:["Item","Recorded","Age at 30 Sep","Threshold","Status"],
+      rows:[["Deposit $980 — \"Till, 14 Aug\"","14 Aug","33 business days","10 business days",["escalate","bad"]],["Cheque #0988 $640 — J. Ortega","2 Jun","120 days","90 days",["escalate","bad"]],["Deposit $1,250 — \"Till, 30 Sep\"","30 Sep","0 business days","10 business days","timing"],["Cheque #1043 $1,860","28 Sep","2 days","90 days","timing"]]},
+    rule:{q:"Deposits-in-transit older than 10 business days escalated — money banked that the bank has not credited after two weeks is usually a lost deposit or a booking error, not timing", w:"SKILL.md · Quality checks"},
+    rule2:{q:"A duplicate payment about to be reissued — an old outstanding cheque that is really lost will be reissued, and if the original then clears the entity pays twice. Escalate cheques over 90 days rather than rolling them forward.", w:"SKILL.md · Edge Cases"},
+    math:[["14 Aug → 30 Sep, weekdays only","33 business days"],["Skill's threshold","10 business days"],["Over by","23 business days",1],["2 Jun → 30 Sep","120 days"],["Skill's threshold","90 days"],["Over by","30 days",1]],
+    verdict:["flag","Two escalations with an owner and a date each. The $980 is probably a deposit that never happened or was booked to the wrong account; the $640 cheque should be stopped before anyone reissues it — and if it is never claimed, the state eventually gets it."] },
+
+  { tier:"Cross account · cross company" },
+  { n:6, title:"A transfer recorded once",
+    chips:["Operating","Payroll"], src:"Per account", cites:[2],
+    situation:"Northbrook moved $5,000 from Operating to its Payroll account on 26 September. The bookkeeper recorded the money leaving Operating, but not arriving in Payroll. Operating reconciles perfectly. Payroll doesn't.",
+    facts:["An electronic transfer between your own accounts is credited by the next business day "+C(2)+", so by month end both bank statements show it — one side out, one side in."],
+    visual:{type:"table",
+      head:["Account","Adjusted bank","Adjusted book","Difference"],
+      rows:[["Operating (…4471)","$11,870.00","$11,870.00","$0.00"],["Payroll (…8820)","$9,400.00",["$4,400.00","bad"],["$5,000.00","bad"]]],
+      total:["Both accounts","$21,270.00","$16,270.00","$5,000.00"]},
+    rule:{q:"A transfer between the entity's own accounts recorded once — appears as an unexplained debit on one account and an unexplained credit on another. Always check transfers on both accounts before classifying either as an error.", w:"SKILL.md · Edge Cases"},
+    math:[["Payroll: bank says","$9,400.00"],["Payroll: books say","$4,400.00"],["Unexplained credit","$5,000.00",1],["Operating: transfer out on 26 Sep","$5,000.00"],["Same amount, same day, own account","the other leg"],["Record the transfer in to Payroll","+$5,000.00",1]],
+    verdict:["flag","Not a bank error and not a mystery deposit — the missing leg of a transfer. The skill checks every transfer on both accounts before it lets either side be called an error."] },
+
+  { n:7, title:"Two companies, one bank account",
+    chips:["Northbrook","Southbrook","One statement"], src:"Per company", cites:[8],
+    situation:"Northbrook and its subsidiary Southbrook both pay and receive through the Operating account. Northbrook's books show $7,300 of cash in it; Southbrook's show $4,570. The adjusted bank balance is $11,870.",
+    facts:["Consolidated accounts treat the parent and its subsidiaries as a single economic entity "+C(8)+" — so the bank statement, which sees one account, matches the group's combined books, not either company's alone."],
+    visual:{type:"table",
+      head:["Company","Book balance in this account","Reconciles to the statement alone?"],
+      rows:[["Northbrook Trading","$7,300.00",["no — $4,570 short","bad"]],["Southbrook Ltd","$4,570.00",["no — $7,300 short","bad"]]],
+      total:["Combined","$11,870.00","yes — ties to the adjusted bank balance"]},
+    rule:{q:"A bank account shared across entities — where several entities genuinely transact through one account, no single entity's GL can reconcile to the full statement. Say so explicitly, reconcile the statement to the combined book activity, and treat the per-entity split as an allocation question, not a reconciliation.", w:"SKILL.md · Both entity scenarios"},
+    math:[["Northbrook books","$7,300.00"],["Southbrook books","$4,570.00"],["Combined: 7,300 + 4,570","$11,870.00",1],["Adjusted bank balance","$11,870.00"],["Difference","$0.00",1],["Each company's share","an allocation, agreed between them"]],
+    verdict:["note","The statement reconciles to the two companies together. How much of the $11,870 belongs to each is a question for the group's intercompany records — the skill says so rather than forcing one company's books to tie."] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge ${r.kind}">${r.id}</span><h3>${esc(r.title)}${r.practice?'<span class="tag-x">practice</span>':''}</h3></div>
+       <div class="formula">${esc(r.formula)}</div>
+       <p class="plain">${esc(r.plain)}</p>
+       <span class="where">Rule from the skill: ${esc(r.where)}</span>
+       <p class="backed"><b>Backed by</b> ${esc(r.backed)} ${C(...r.cites)}</p>`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function wf(v){
+  const pts=[v.start[1]]; let run=v.start[1];
+  v.steps.forEach(s=>{run+=s[1]; pts.push(run);});
+  const max=Math.max(...pts, v.start[1]);
+  const pct=x=>(x/max*100).toFixed(2)+"%";
+  let h=`<div class="wf">`;
+  h+=row(v.start[0], 0, v.start[1], "start", fmt(v.start[1], v.dec));
+  run=v.start[1];
+  v.steps.forEach(s=>{ const a=run, b=run+s[1]; h+=row(s[0], Math.min(a,b), Math.abs(s[1]), s[1]<0?"minus":"plus", (s[1]<0?"− ":"+ ")+fmt(Math.abs(s[1]), v.dec)); run=b; });
+  h+=row(v.end[0], 0, v.end[1], "end"+(v.warn?" warn":""), fmt(v.end[1], v.dec), true);
+  return h+"</div>";
+  function row(lbl, left, width, cls, amt, total){
+    return `<div class="wf-row${total?" total":""}"><span>${esc(lbl)}</span><div class="wf-track"><div class="wf-bar ${cls}" style="left:${pct(left)};width:${pct(Math.max(width,max*0.004))}"></div></div><span class="amt">${amt}</span></div>`;
+  }
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = L.visual.type==="wf" ? wf(L.visual) : table(L.visual);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    const rule = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const ic={ok:"TIES",flag:"FLAG",note:"NOTE"}[L.verdict[0]];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n},
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · sources ${L.cites.join(", ")}</span><h3>${esc(L.title)}</h3>
+         <div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>
+       <div class="block"><span class="label">The situation</span><p>${esc(L.situation)}</p></div>
+       <div class="block"><span class="label">The facts it rests on</span><div class="facts">${L.facts.map(f=>`<div class="fact">${f}</div>`).join("")}</div></div>
+       <div class="block"><span class="label">What the skill sees</span>${vis}</div>
+       <div class="block"><span class="label">The rule it applies</span>${rule(L.rule)}${L.rule2?rule(L.rule2):""}</div>
+       <details><summary>Check it yourself</summary><div class="math num">${math}</div></details>
+       <div class="verdict ${L.verdict[0]}"><span class="ic">${ic}</span><span>${esc(L.verdict[1])}</span></div>`));
+  });
+}
+
+/* --- calculator: the bridge (Rules 1–3) and aging (Rule W) on the reader's own numbers --- */
+const PRESETS = {
+  clean: {bank:12480,dit:1250,oc:1860,berr:0,book:11870,   fees:0, int:0,   ret:0,  kerr:0,  ditage:0, ocage:2},
+  bank:  {bank:12480,dit:1250,oc:1860,berr:0,book:12180.50,fees:15,int:4.50,ret:300,kerr:0,  ditage:0, ocage:2},
+  dup:   {bank:12480,dit:1250,oc:1860,berr:0,book:12205.50,fees:15,int:4.50,ret:300,kerr:0,  ditage:0, ocage:2},
+  blank: {bank:"",dit:"",oc:"",berr:"",book:"",fees:"",int:"",ret:"",kerr:"",ditage:"",ocage:""},
+};
+const inputs=[...document.querySelectorAll("[data-k]")];
+const num = k => { const v=parseFloat(String(document.querySelector(`[data-k="${k}"]`).value).replace(/[$,\s]/g,"")); return isFinite(v)?v:0; };
+function load(p){ inputs.forEach(i=>i.value=PRESETS[p][i.dataset.k]); document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p)); run(); }
+function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const bank=num("bank"), dit=num("dit"), oc=num("oc"), berr=num("berr"), book=num("book"), fees=num("fees"), int=num("int"), ret=num("ret"), kerr=num("kerr");
+  const box=document.getElementById("results");
+  if(!bank && !book){ box.innerHTML=res("", "Waiting", "—", "Enter the statement ending balance and the book balance to start."); return; }
+  const abank = bank + dit - oc + berr, abook = book - fees + int - ret + kerr, diff = Math.round((abook-abank)*100)/100;
+  let h = res("", "Rule 1 · adjusted bank", fmt(abank), `${fmt(bank)} + ${fmt(dit)} in transit − ${fmt(oc)} outstanding ${berr?`${berr>0?"+":"−"} ${fmt(Math.abs(berr))} bank errors`:""}`);
+  h += res("", "Rule 1 · adjusted book", fmt(abook), `${fmt(book)} − ${fmt(fees)} fees + ${fmt(int)} interest − ${fmt(ret)} returned ${kerr?`${kerr>0?"+":"−"} ${fmt(Math.abs(kerr))} book errors`:""}`);
+  h += Math.abs(diff)<0.005
+    ? res("ok","Rule 3 · do they meet?", "Yes", "To the cent. Every difference has a name.")
+    : res("flag","Rule 3 · do they meet?", fmt(Math.abs(diff))+" apart", `Books are ${fmt(Math.abs(diff))} ${diff>0?"higher":"lower"} than the bank after every named item. That is an unidentified item — start with duplicates in the books, then unmatched statement lines. Don't post it to "miscellaneous".`);
+  const da=num("ditage"), oa=num("ocage");
+  if(da>10) h += res("flag","Rule W · deposit in transit", da+" business days", "Over the skill's 10-business-day age. A lost deposit or a booking error, not timing — give it an owner and a date.");
+  else if(dit>0) h += res("ok","Rule W · deposit in transit", (da||0)+" business days", "Within the 10-business-day window the skill treats as timing.");
+  if(oa>90) h += res("flag","Rule W · uncashed cheque", oa+" days", "Over the skill's 90-day age. Stop it before anyone reissues it; left long enough it becomes unclaimed property.");
+  else if(oc>0) h += res("ok","Rule W · uncashed cheque", (oa||0)+" days", "Within the 90-day window the skill treats as timing.");
+  box.innerHTML=h;
+}
+inputs.forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("clean");
+</script>

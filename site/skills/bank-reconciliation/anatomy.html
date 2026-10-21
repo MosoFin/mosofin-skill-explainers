@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank Rec Anatomy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Bank reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">bank-reconciliation · shipped on main · audited 21 Oct 2026 · findings open</div>
+  <h1>How the bank reconciliation is built, and what it does</h1>
+  <p class="lede">One 865-line file in the standard (non-card) format: the shared onboarding and write guardrail, four gates, eight steps, then outputs, quality checks, scenarios, tools, glossary and edge cases. This page shows where the weight sits, the run step by step, what the audit found, and what checked out against the live QuickBooks catalogue.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">File</span><span class="v">865</span><span class="s">lines in SKILL.md, no references/</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">28 · 9 · 21</span><span class="s">[auto] · [gated] · [manual] tasks</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">21/21</span><span class="s">QuickBooks tools exist in the live catalogue</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">0/4</span><span class="s">fixed — all four are open recommendations</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One file, eleven parts — where the lines go</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 470" role="img" aria-label="Eleven horizontal bars, one per part of SKILL.md, sized by line count. Shared blocks 72 lines. Intro and the defining limitation 52. Onboarding with gates 0 and 1, 179. Part A with gates 2 and 3, 111. Part B steps 0 to 7, 227 — the largest. Outputs 34. Quality checks 42. Both entity scenarios 26. Tool reference 37. Glossary 26. Edge cases 53.">
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><text x="20" y="38" fill="var(--muted)">shared blocks · with/without Mosofin, strict rule</text><rect x="420" y="24" width="155" height="22" rx="5" fill="var(--low-soft)"/><text x="585" y="40" fill="var(--faint)">72</text></g>
+          <g><text x="20" y="76" fill="var(--muted)">intro · the defining limitation</text><rect x="420" y="62" width="112" height="22" rx="5" fill="var(--high-soft)"/><text x="542" y="78" fill="var(--faint)">52</text></g>
+          <g><text x="20" y="114" fill="var(--muted)">ONBOARDING · Gates 0–1 (shared scope protocol)</text><rect x="420" y="100" width="385" height="22" rx="5" fill="var(--low-soft)"/><text x="815" y="116" fill="var(--faint)">179</text></g>
+          <g><text x="20" y="152" fill="var(--muted)">PART A · Gates 2–3 (write guardrail, interview)</text><rect x="420" y="138" width="239" height="22" rx="5" fill="var(--low-soft)"/><text x="669" y="154" fill="var(--faint)">111</text></g>
+          <g><text x="20" y="190" fill="var(--ink)" font-weight="600">PART B · Steps 0–7, the accounting</text><rect x="420" y="176" width="488" height="22" rx="5" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/><text x="890" y="192" fill="var(--mosofin)" text-anchor="end">227</text></g>
+          <g><text x="20" y="228" fill="var(--muted)">Outputs · coverage sheet, file naming</text><rect x="420" y="214" width="73" height="22" rx="5" fill="var(--mosofin-soft)"/><text x="503" y="230" fill="var(--faint)">34</text></g>
+          <g><text x="20" y="266" fill="var(--muted)">Quality checks · tie to the cent, ages</text><rect x="420" y="252" width="90" height="22" rx="5" fill="var(--mosofin-soft)"/><text x="520" y="268" fill="var(--faint)">42</text></g>
+          <g><text x="20" y="304" fill="var(--muted)">Both entity scenarios</text><rect x="420" y="290" width="56" height="22" rx="5" fill="var(--mosofin-soft)"/><text x="486" y="306" fill="var(--faint)">26</text></g>
+          <g><text x="20" y="342" fill="var(--muted)">Tool reference</text><rect x="420" y="328" width="80" height="22" rx="5" fill="var(--panel)" stroke="var(--rule-strong)"/><text x="510" y="344" fill="var(--faint)">37</text></g>
+          <g><text x="20" y="380" fill="var(--muted)">Plain-language glossary</text><rect x="420" y="366" width="56" height="22" rx="5" fill="var(--panel)" stroke="var(--rule-strong)"/><text x="486" y="382" fill="var(--faint)">26</text></g>
+          <g><text x="20" y="418" fill="var(--muted)">Edge cases</text><rect x="420" y="404" width="114" height="22" rx="5" fill="var(--mosofin-soft)"/><text x="544" y="420" fill="var(--faint)">53</text></g>
+          <text x="20" y="456" fill="var(--faint)" font-size="11">blue: protocol shared with every skill (362 lines, 42%) · green: this skill's own accounting (382 lines, 44%) · red: the honesty clause</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Just over two-fifths of the file is protocol every skill carries — onboarding, scope confirmation, the write guardrail — kept in sync from the repository's single copy. The accounting itself is Part B plus quality checks and edge cases. The 35-line <b>defining limitation</b> is the part that makes this skill honest: Mosofin can read the books, never the bank, so a run without a statement is labelled a preparation, not a reconciliation.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1010" role="img" aria-label="Gate 3 asks six intake questions in one batch. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and the read-only tool catalogue; otherwise the user gets an upload checklist. Both paths read back and wait for a yes. Step 0 batches the reads. Step 1 captures both ending balances and stops if there is no statement. Step 2 builds the two ladders. Step 3 matches four ways and checks the books for duplicates. Step 4 classifies unmatched items. Step 5 proposes entries tied to statement lines. Step 6 closes with a sign-off for two people. Step 7 offers to save, only after results and only on an explicit yes.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="640" x2="460" y2="670" marker-end="url(#a2)"/>
+          <line x1="460" y1="750" x2="460" y2="780" marker-end="url(#a2)"/>
+          <line x1="460" y1="860" x2="460" y2="890" marker-end="url(#a2)"/>
+          <line x1="460" y1="938" x2="460" y2="958" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">GATE 3 · INTERVIEW · ONE SHORT BATCH, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> Which account(s)? masked</text>
+            <text x="600" y="74"><tspan font-weight="600">C</tspan> Which period? never defaulted</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> The bank statement — always</text>
+            <text x="330" y="100"><tspan font-weight="600">E</tspan> Last reconciled when?</text>
+            <text x="600" y="100"><tspan font-weight="600">F</tspan> Materiality for chasing</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · a bank feed connected?</text>
+            <text x="98" y="364">G2  tool catalogue · writes out of scope</text>
+            <text x="98" y="388">     policies resolved per company, this run</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Bank statement (PDF/CSV) — required</text>
+            <text x="558" y="340">GL cash activity + ending balance</text>
+            <text x="558" y="364">Prior reconciliation, or its date</text>
+            <text x="558" y="388">Each file labelled as user-supplied</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · FETCH, THEN TWO STARTING POINTS</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">QuickBooks, one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="584">search_accounts · get_trial_balance · get_general_ledger</text>
+            <text x="80" y="604">search_deposits · search_bill_payments · search_purchases</text>
+            <text x="80" y="624">search_payments · search_transfers · search_journal_entries</text>
+          </g>
+          <rect x="640" y="552" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="576" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No statement balance?</text>
+          <text x="741" y="596" text-anchor="middle" font-size="12" fill="var(--ink)">stop and say so — book-side</text>
+          <text x="741" y="614" text-anchor="middle" font-size="12" fill="var(--ink)">preparation, not a reconciliation</text>
+
+          <rect x="60" y="672" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="698" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–3 · THE BRIDGE, THEN MATCHING FOUR WAYS</text>
+          <text x="80" y="726" font-size="13.5" fill="var(--ink)">Two ladders to one adjusted figure · exact, fuzzy, reference, split matches, method recorded · books checked against themselves for duplicates [auto]</text>
+
+          <rect x="60" y="782" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="808" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 4–5 · CLASSIFY, THEN PROPOSE</text>
+          <text x="80" y="836" font-size="13.5" fill="var(--ink)">Fees, interest, NSF, chargebacks, loan debits, "unknown" with an owner · entries in real account names, each tied to a statement line, never posted</text>
+
+          <rect x="60" y="892" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="921" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6 · Close out</tspan> — summary, matched and unmatched lists, exception log, coverage sheet, sign-off by two named people</text>
+
+          <rect x="60" y="960" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="986" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 7 · Offer to save</tspan> — policy, thresholds, account names; never balances, items or account numbers · explicit yes, after results</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: without a statement balance, Step 1 stops and the output is labelled a book-side preparation. The duplicate check in Step 3 is the one part of matching that runs without the statement at all.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Four open findings, none blocking, with the published guidance behind each</p>
+  <div class="findings">
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>Two cross-references point at skills that are not in the repository</h3>
+      <p>Step 2 sends the reader to <code>bank-fee-and-interest-analysis</code> and the FX edge case to <code>multicurrency-fx-revaluation</code>. Both are in <code>deploy-queue.tsv</code> but not yet under <code>skills/</code>, so a user installing this skill alone follows a name to nothing. Either ship them, or reword the two sentences so they stand without the link.</p>
+      <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md · Step 2 · Edge Cases</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>865 lines in one file, against a 500-line guide</h3>
+      <p>The processor-rec skill was split into a 121-line card plus references for exactly this reason. The same split fits here: a card with the six intake questions and the defining limitation, with gates, method, quality checks and edge cases in <code>references/</code>. The repository's validator and shared-block sync already handle the card format.</p>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A sandbox-only path for the spreadsheet helper</h3>
+      <p>Outputs says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else; on a laptop or another client it is a dead instruction. Say "use the host's spreadsheet skill if one is available" instead.</p>
+      <span class="where">SKILL.md · Outputs</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>The escalation ages are stated as rules without saying they are practice</h3>
+      <p>"Deposits in transit older than 10 business days" and "outstanding cheques older than 90 days" are sound bookkeeping convention, but the skill presents them beside funds-availability and unclaimed-property rules that <i>are</i> published. One clause — "these ages are practice; adjust to the entity's bank and state" — would keep the distinction the explainer pages already draw.</p>
+      <span class="where">SKILL.md · Quality checks</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>Every QuickBooks tool named — 21 — exists in the live catalogue read on 21 Oct 2026 (workspace Online Shop, company file Northwood). 73 tools listed, none write-capable.</span></li>
+    <li><span class="ok">PASS</span><span>Policies are read per run, as the skill says: in that workspace <code>get_account</code> is <code>permission</code>-gated, not the "usually [auto]" the text suggests — Gate 2 resolves it correctly.</span></li>
+    <li><span class="ok">PASS</span><span>The bank statement is Required and [manual] in Gate 3, and Step 1 stops without it. No path produces a "reconciled" label from the books alone.</span></li>
+    <li><span class="ok">PASS</span><span>Every proposed entry must name the statement line that evidences it, and uses the real account names from the chart of accounts.</span></li>
+    <li><span class="ok">PASS</span><span>Full bank account numbers are never displayed or persisted; Step 7 persists policy and names, never balances or item lists.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures); the shared onboarding, scope and write-guardrail blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page — 11 — matches the skill text word for word, checked by script.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real statement. The intercompany and shared-account scenarios are described in the skill and worked on the learn page, but not exercised against data.</p>
+</section>
+
+<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; the four findings above are open. Still to do: a live run with a bank statement.</footer>
+
+</div>

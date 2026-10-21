@@ -68,3 +68,10 @@ Reuse these before searching; re-check each the day you cite it.
 | IRS — Instructions for Form 1099-K | https://www.irs.gov/instructions/i1099k | gross before fees and refunds |
 | IRS — What to do with Form 1099-K | https://www.irs.gov/businesses/what-to-do-with-form-1099-k | fees and refunds handled on the return |
 | IFRS 10 | https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/ | single economic entity; intercompany eliminated |
+| IRS — Publication 583 | https://www.irs.gov/publications/p583 | reconcile the bank account monthly; keep slips, cheques, statements (checked 2026-10-21) |
+| FDIC — Reg CC / EFAA manual | https://www.fdic.gov/consumer-compliance-examination-manual/vi-1-expedited-funds-availability-act | next-day items; other cheques by the second business day (2026-10-21; ecfr.gov blocks fetch tools) |
+| Intuit — Reconcile in QuickBooks Online | https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US | difference must reach $0.00; don't force an adjustment (2026-10-21; blocks curl, use the fetch tool) |
+| NAUPA — What is unclaimed property? | https://unclaimed.org/what-is-unclaimed-property/ | uncashed cheques; dormancy; holder turns over to the state (2026-10-21) |
+| CFPB — Bulletin 2022-06 | https://www.consumerfinance.gov/compliance/supervisory-guidance/cfpb-bulletin-2022-06-unfair-returned-deposited-item-fee-assessment-practices/ | returned deposited item definition (2026-10-21) |
+| GAO — Green Book GAO-25-107721 ¶10.21–10.23 | https://www.gao.gov/greenbook | segregation of duties; alternatives when impractical (2026-10-21; 403 to curl, PDF opens via fetch tool) |
+| Anthropic — Skill authoring best practices | https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices | SKILL.md under 500 lines; references one level deep (for anatomy findings) |
