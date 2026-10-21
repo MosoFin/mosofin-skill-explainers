@@ -21,9 +21,15 @@ kind — `published`, `internal` or `todo` — plus whether the skill itself is 
 `build.py` generates the site index and each skill's landing page from it. The explainer pages
 themselves are hand-made.
 
+**`internal` pages stay in this repository but are never published or linked.** The Pages
+workflow runs `build.py --stage`, which copies `site/` without them. Because the repository is
+public, an internal page is still readable here in the source — use `internal` for pages meant
+for reviewers, not for anything confidential.
+
 ```bash
 python3 build.py                              # rebuild the index and landing pages
 python3 build.py --check                      # what CI runs: tracker and site must agree
+python3 build.py --stage                      # copy the public site to _site/, internal pages left out
 python3 build.py --sync ../mosofin-finance-skills   # add any new skill as todo; refresh shipped status
 ```
 

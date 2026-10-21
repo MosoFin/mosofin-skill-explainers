@@ -3,6 +3,7 @@
 
     python3 build.py                     write site/index.html and each skill's landing page
     python3 build.py --check             fail if the site or the tracker has drifted (CI runs this)
+    python3 build.py --stage [DIR]       copy site/ to DIR (default _site/) without internal pages, for Pages
     python3 build.py --sync PATH [REF]   add any skill in a mosofin-finance-skills checkout that the
                                          tracker is missing, and refresh title-less summaries.
                                          REF is the branch that counts as shipped (default mosofin/main)
@@ -171,8 +172,12 @@ def landing(r):
                          f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p></div>')
             continue
         pt = page_title(os.path.join(SITE, "skills", s, f"{k}.html"))
-        flag = ' <span class="pill int">internal</span>' if st == "internal" else ""
-        cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}{flag}</span><b>{e(pt)}</b>'
+        if st == "internal":
+            cards.append(f'<div class="card todo"><span class="label">{e(label)} <span class="pill int">internal</span></span>'
+                         f'<b>{e(pt)}</b><span class="who">For {e(who.lower())}</span>'
+                         f'<p>Kept for reviewers in the repository; not published on this site.</p></div>')
+            continue
+        cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
                      f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p><span class="go">Open →</span></a>')
     if r["skill_status"] == "shipped":
         use = f"""<p>Install just this skill — no clone needed:</p>
@@ -205,13 +210,13 @@ def landing(r):
 def chip(r, k):
     st = r[k]
     if st == "todo": return '<td class="c"><span class="dash">—</span></td>'
-    cls = "ok" if st == "published" else "int"
-    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill {cls}">{"view" if st == "published" else "internal"}</span></a></td>'
+    if st == "internal": return '<td class="c"><span class="pill int">internal</span></td>'
+    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill ok">view</span></a></td>'
 
 def index(rows):
     n = len(rows)
     with_any = [r for r in rows if any(r[k] != "todo" for k, *_ in KINDS)]
-    pages = sum(1 for r in rows for k, *_ in KINDS if r[k] != "todo")
+    pages = sum(1 for r in rows for k, *_ in KINDS if r[k] == "published")
     trs = []
     for r in rows:
         name = (f'<a href="skills/{e(r["skill"])}/">{e(title_of(r))}</a>' if r in with_any else e(title_of(r)))
@@ -227,7 +232,7 @@ def index(rows):
   <div class="stats">
     <div class="stat"><span class="label">Skills tracked</span><span class="v">{n}</span><span class="s">in the tracker</span></div>
     <div class="stat"><span class="label">With explainers</span><span class="v">{len(with_any)}</span><span class="s">at least one page</span></div>
-    <div class="stat"><span class="label">Pages</span><span class="v">{pages}</span><span class="s">of {n * len(KINDS)} possible</span></div>
+    <div class="stat"><span class="label">Pages</span><span class="v">{pages}</span><span class="s">published, of {n * len(KINDS)} possible</span></div>
   </div>
 </section>
 <section>
@@ -277,8 +282,27 @@ def sync(path, ref):
     print(f"sync: {added} added, {len(rows)} tracked")
 
 
+# --------------------------------------------------------------------------- stage
+def stage(dest):
+    import shutil
+    rows = read_tracker()
+    internal = {os.path.join("skills", r["skill"], f"{k}.html") for r in rows for k, *_ in KINDS if r[k] == "internal"}
+    if os.path.exists(dest): shutil.rmtree(dest)
+    kept = dropped = 0
+    for d, _, files in os.walk(SITE):
+        for fn in files:
+            if fn == ".DS_Store": continue
+            rel = os.path.relpath(os.path.join(d, fn), SITE)
+            if rel in internal: dropped += 1; continue
+            os.makedirs(os.path.join(dest, os.path.dirname(rel)), exist_ok=True)
+            shutil.copy2(os.path.join(d, fn), os.path.join(dest, rel)); kept += 1
+    print(f"staged {kept} file(s) to {dest}; left out {dropped} internal page(s)")
+
+
 # --------------------------------------------------------------------------- main
 def main(argv):
+    if argv[:1] == ["--stage"]:
+        stage(argv[1] if len(argv) > 1 else os.path.join(ROOT, "_site")); return
     if argv[:1] == ["--sync"]:
         if len(argv) < 2: sys.exit("usage: build.py --sync PATH [REF]")
         sync(argv[1], argv[2] if len(argv) > 2 else "mosofin/main"); return
