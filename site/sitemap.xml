@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mosofin.github.io/mosofin-skill-explainers/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/</loc>
@@ -15,6 +15,18 @@
   <url>
     <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/learn.html</loc>
     <lastmod>2026-10-21</lastmod>
+  </url>
+  <url>
+    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/plain.html</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/learn.html</loc>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/</loc>
