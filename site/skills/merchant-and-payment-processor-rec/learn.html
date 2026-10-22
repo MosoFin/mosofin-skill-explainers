@@ -423,7 +423,7 @@ const LEVELS = [
     situation:"August on Stripe: 100 charges totalling $48,000, $1,200 refunded and $300 lost to chargebacks. Stripe paid $45,078 into your bank.",
     facts:["At 2.9% + 30¢ "+C(1)+", 100 charges on $48,000 cost $1,392 + $30 = $1,422.","Stripe's payout report breaks every payout into charges, refunds and fees "+C(3)+", the same parts the skill rebuilds from your books."],
     visual:{type:"wf", start:["Gross charges",48000], steps:[["Refunds",-1200],["Chargebacks",-300],["Processing fees",-1422]], end:["Net settled",45078], dec:0},
-    rule:{q:"Each of A through F has a corresponding GL account, so the same decomposition can be built from the books and the two compared. That comparison is the reconciliation.", w:"method.md · Step 2"},
+    rule:{q:"each of A through F has a corresponding GL account, so the same decomposition can be built from the books and the two compared. That comparison is the reconciliation", w:"method.md · Step 2"},
     math:[["Gross charges","$48,000.00"],["− refunds","$1,200.00"],["− chargebacks","$300.00"],["− fees: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["= net settled","$45,078.00",1],["Payouts received in August","$45,078.00"],["Difference","$0.00",1],["Fee rate: 1,422 ÷ 48,000","2.96%"]],
     verdict:["ok","Ties to the cent. The fee rate, 2.96%, is just above 2.9% because of the 30¢ per charge, which is exactly what the published price predicts."] },
 
@@ -454,7 +454,7 @@ const LEVELS = [
     visual:{type:"table",
       head:["Month","Gross","Charges","Expected fee","Charged","Payout delay"],
       rows:[["June","$44,000","92","$1,303.60","$1,303.60","2 days"],["July","$46,000","96","$1,362.80","$1,362.80","2 days"],["August","$48,000","100","$1,422.00",["$1,632.00","bad"],["5 days","bad"]]]},
-    rule:{q:"A lengthening lag is the earliest visible sign of a payout pause or a risk review.", w:"method.md · Step 3"},
+    rule:{q:"A lengthening lag is the earliest visible sign of a payout pause or a risk review", w:"method.md · Step 3"},
     rule2:{q:"The fee rate has drifted with no contract change … A measurable Step 9 exception.", w:"edge-cases.md"},
     math:[["June expected: 2.9% × 44,000 + 30¢ × 92","$1,303.60"],["July expected: 2.9% × 46,000 + 30¢ × 96","$1,362.80"],["August expected: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["August charged","$1,632.00"],["Overcharge against the published price","$210.00",1],["August fee rate: 1,632 ÷ 48,000","3.40%"]],
     verdict:["flag","Two flags. Fees ran $210 over the published price, and payouts slowed from 2 business days to 5. Worth a call to Stripe before a hold builds up."] },
