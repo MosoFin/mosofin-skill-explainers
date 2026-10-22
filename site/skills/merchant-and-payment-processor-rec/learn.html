@@ -269,17 +269,17 @@
 <header>
   <span class="label">MosoFin skill · merchant-and-payment-processor-rec · learning guide</span>
   <h1>From one sale to three payment apps</h1>
-  <p class="lede">How this skill checks your payment app against your books — shown <b>one level at a time</b>, from a single $100 sale up to Stripe, Square and PayPal feeding one bank account. Every rule is quoted from the skill itself, and every number is worked through in front of you.</p>
+  <p class="lede">How this skill checks your payment app against your books, shown <b>one level at a time</b>, from a single $100 sale up to Stripe, Square and PayPal feeding one bank account. Every rule is quoted from the skill itself, and every number is worked through in front of you.</p>
   <div class="trust">
     <div><b>The rules are the skill's own</b><span>Each one is quoted with the file and step it comes from, so you can read it yourself.</span></div>
-    <div><b>Each rule is backed by an authority</b><span>Stripe, Square and PayPal's own documentation, the IRS and the IFRS Foundation — numbered and linked.</span></div>
+    <div><b>Each rule is backed by an authority</b><span>Stripe, Square and PayPal's own documentation, the IRS and the IFRS Foundation, numbered and linked.</span></div>
     <div><b>The math is shown</b><span>Open "Check it yourself" on any level and follow every line on a calculator.</span></div>
     <div><b>Your numbers, your check</b><span>At the end, put in your own month and watch the same rules run.</span></div>
   </div>
   <div class="legend" aria-label="How to read this page">
-    <span><i style="background:var(--green)"></i>Rule — quoted from the skill</span>
-    <span><i style="background:var(--blue)"></i>Fact — from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
-    <span><i style="background:var(--hold)"></i>Example — made-up figures, worked out on published rates</span>
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, worked out on published rates</span>
   </div>
 </header>
 
@@ -333,14 +333,14 @@
       <label class="field"><span>Number of charges in the month</span><input data-k="charges" inputmode="numeric"></label>
     </fieldset>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">Published US rates as listed by Stripe<sup class="c"><a href="#src1">1</a></sup>, Square<sup class="c"><a href="#src5">5</a></sup> and PayPal<sup class="c"><a href="#src7">7</a></sup>, checked 20 October 2026. Your contract may differ — international cards, currency conversion and other plans cost more. The skill says "revenue ≈ net payouts" and "a near-empty fee account" without fixing a number. This page treats <b>within 1%</b> as "≈" and <b>under 10% of the actual fees</b> as "near-empty" — your own judgement may differ.</p>
+    <p class="fine">Published US rates as listed by Stripe<sup class="c"><a href="#src1">1</a></sup>, Square<sup class="c"><a href="#src5">5</a></sup> and PayPal<sup class="c"><a href="#src7">7</a></sup>, checked 20 October 2026. Your contract may differ, and international cards, currency conversion and other plans cost more. The skill says "revenue ≈ net payouts" and "a near-empty fee account" without fixing a number. This page treats <b>within 1%</b> as "≈" and <b>under 10% of the actual fees</b> as "near-empty". Your own judgement may differ.</p>
   </div>
 </section>
 
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where every fact on this page comes from</h2>
-  <p class="muted">Rules are the skill's own. Facts below come from the payment apps' own documentation and from regulators and standard-setters. Rates and timings are as published when checked on 20 October 2026 — follow the link for today's figure.</p>
+  <p class="muted">Rules are the skill's own. Facts below come from the payment apps' own documentation and from regulators and standard-setters. Rates and timings are as published when checked on 20 October 2026. Follow the link for today's figure.</p>
   <ol class="srcs" id="srclist"></ol>
   <p class="fine">Not backed by an outside authority: keeping a <b>separate clearing account for each payment app</b> is bookkeeping practice that the skill requires, not a published standard. The page marks it as such where it appears.</p>
 </section>
@@ -350,7 +350,7 @@
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
     <div><b>Asks first</b>Mosofin or upload? Which payment app? Which month? Each sale or one entry per payout? Any money held back?</div>
-    <div><b>Needs</b>Your books — connected or exported — the payment app's payout report, and the bank statement.</div>
+    <div><b>Needs</b>Your books, connected or exported, the payment app's payout report, and the bank statement.</div>
     <div><b>Gives back</b>Does it match, what's off and why, suggested corrections, and where every number came from.</div>
     <div><b>Never</b>Changes your books, moves money, or guesses a number. It reads nothing before you say yes.</div>
   </div>
@@ -364,16 +364,16 @@
 
 <script>
 const SOURCES = [
-  {t:"Stripe — Pricing", u:"https://stripe.com/pricing", w:"Standard US card price: 2.9% + 30¢ per successful charge; extra for international cards and currency conversion."},
-  {t:"Stripe — The Balance Transaction object", u:"https://docs.stripe.com/api/balance_transactions/object", w:"Each transaction carries a gross amount, a fee and a net amount, where net is the amount minus the fee; funds are either pending or available."},
-  {t:"Stripe — Payout reconciliation report", u:"https://docs.stripe.com/reports/payout-reconciliation", w:"Matches each bank payout to the transactions it settles, grouped into charges, refunds and fees. Its balance summary takes the starting balance, adds the period's activity and subtracts payouts to give the ending balance; a separate section lists transactions not yet settled at the end date."},
-  {t:"Stripe — Payouts", u:"https://docs.stripe.com/payouts", w:"US settlement timing is 2 business days; the payout schedule controls when funds are sent, not how long pending funds take to become available."},
-  {t:"Square — Our fees", u:"https://squareup.com/us/en/payments/our-fees", w:"US card rates depend on plan: in person 2.4%–2.6% + 15¢, online 2.9%–3.3% + 30¢."},
-  {t:"Square Help — Set up and edit transfer options", u:"https://squareup.com/help/us/en/article/3807-deposit-options-with-square", w:"Standard transfers: payments taken before 5 PM PT reach the bank the next business day; Friday payments typically arrive Monday."},
-  {t:"PayPal — Business fees", u:"https://www.paypal.com/us/business/paypal-business-fees", w:"US commercial rate for PayPal Checkout: 3.49% plus a fixed fee of $0.49 per transaction."},
-  {t:"IRS — Instructions for Form 1099-K", u:"https://www.irs.gov/instructions/i1099k", w:"The gross amount payment processors report is the total of payments before any adjustment for fees, refunds, credits or discounts."},
-  {t:"IRS — What to do with Form 1099-K", u:"https://www.irs.gov/businesses/what-to-do-with-form-1099-k", w:"Report all gross receipts from your books; fees and refunds are not taxable income and are subtracted from the gross amount, not left out of it."},
-  {t:"IFRS Foundation — IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/", w:"Consolidated statements present a parent and its subsidiaries as a single economic entity."},
+  {t:"Stripe: Pricing", u:"https://stripe.com/pricing", w:"Standard US card price: 2.9% + 30¢ per successful charge; extra for international cards and currency conversion."},
+  {t:"Stripe: The Balance Transaction object", u:"https://docs.stripe.com/api/balance_transactions/object", w:"Each transaction carries a gross amount, a fee and a net amount, where net is the amount minus the fee; funds are either pending or available."},
+  {t:"Stripe: Payout reconciliation report", u:"https://docs.stripe.com/reports/payout-reconciliation", w:"Matches each bank payout to the transactions it settles, grouped into charges, refunds and fees. Its balance summary takes the starting balance, adds the period's activity and subtracts payouts to give the ending balance; a separate section lists transactions not yet settled at the end date."},
+  {t:"Stripe: Payouts", u:"https://docs.stripe.com/payouts", w:"US settlement timing is 2 business days; the payout schedule controls when funds are sent, not how long pending funds take to become available."},
+  {t:"Square: Our fees", u:"https://squareup.com/us/en/payments/our-fees", w:"US card rates depend on plan: in person 2.4%–2.6% + 15¢, online 2.9%–3.3% + 30¢."},
+  {t:"Square Help: Set up and edit transfer options", u:"https://squareup.com/help/us/en/article/3807-deposit-options-with-square", w:"Standard transfers: payments taken before 5 PM PT reach the bank the next business day; Friday payments typically arrive Monday."},
+  {t:"PayPal: Business fees", u:"https://www.paypal.com/us/business/paypal-business-fees", w:"US commercial rate for PayPal Checkout: 3.49% plus a fixed fee of $0.49 per transaction."},
+  {t:"IRS: Instructions for Form 1099-K", u:"https://www.irs.gov/instructions/i1099k", w:"The gross amount payment processors report is the total of payments before any adjustment for fees, refunds, credits or discounts."},
+  {t:"IRS: What to do with Form 1099-K", u:"https://www.irs.gov/businesses/what-to-do-with-form-1099-k", w:"Report all gross receipts from your books; fees and refunds are not taxable income and are subtracted from the gross amount, not left out of it."},
+  {t:"IFRS Foundation: IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/", w:"Consolidated statements present a parent and its subsidiaries as a single economic entity."},
 ];
 const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
 
@@ -387,15 +387,15 @@ const RULES = [
     formula:"Opening balance\n+ gross charges − refunds − chargebacks − fees\n− payouts to your bank\n= closing balance",
     plain:"The closing balance should match what the payment app says it still holds. Anything left too long is a warning.",
     where:"method.md · Step 4", cites:[3,4],
-    backed:"Stripe's own balance summary uses the same roll-forward — starting balance, plus activity, minus payouts — and lists what is still unsettled at the end date." },
+    backed:"Stripe's own balance summary uses the same roll-forward (starting balance, plus activity, minus payouts) and lists what is still unsettled at the end date." },
   { id:"3", kind:"", title:"Sales booked net of fees",
     formula:"Sales ≈ payouts\nand fees ≈ $0\n→ sales were recorded net",
     plain:"Profit still comes out right, which is why nobody notices. Sales and costs are both understated.",
     where:"edge-cases.md · Revenue recorded net of fees", cites:[8,9],
-    backed:"For US tax reporting, the IRS treats gross receipts as the payments before fees and refunds, and has fees subtracted separately — not left out of sales." },
+    backed:"For US tax reporting, the IRS treats gross receipts as the payments before fees and refunds, and has fees subtracted separately rather than left out of sales." },
   { id:"W", kind:"w", title:"Watch the trends",
     formula:"fee rate = fees ÷ gross\nlag = days from charge to payout",
-    plain:"A fee rate that moves with no contract change, or a lag that grows, is an early warning — often of a payout hold.",
+    plain:"A fee rate that moves with no contract change, or a lag that grows, is an early warning, often of a payout hold.",
     where:"method.md · Step 3 · edge-cases.md", cites:[1,5,7,4,6],
     backed:"Each payment app publishes its price and its normal payout timing, so both have a benchmark to compare against." },
   { id:"S", kind:"s", title:"One waiting room per payment app, per company",
@@ -412,7 +412,7 @@ const LEVELS = [
   { n:1, title:"One sale, one payout",
     chips:["Stripe"], src:"Rule 1", cites:[1,2],
     situation:"A customer pays you $100 by card. Stripe keeps its fee and sends you the rest.",
-    facts:["Stripe's standard US card price is 2.9% + 30¢ per charge "+C(1)+" — so the fee on $100 is $2.90 + $0.30 = $3.20.","Stripe records net as the amount minus the fee "+C(2)+"."],
+    facts:["Stripe's standard US card price is 2.9% + 30¢ per charge "+C(1)+", so the fee on $100 is $2.90 + $0.30 = $3.20.","Stripe records net as the amount minus the fee "+C(2)+"."],
     visual:{type:"wf", start:["Customer pays",100], steps:[["Stripe's fee",-3.20]], end:["Stripe pays you",96.80], dec:2},
     rule:{q:"Gross customer charges … Less: Processor fees … Equals: Net settled to entity", w:"method.md · Step 2"},
     math:[["Gross charge","$100.00"],["Fee: 2.9% × $100 + 30¢","$3.20"],["= net settled","$96.80",1],["Payout that reached the bank","$96.80"],["Difference","$0.00",1]],
@@ -421,35 +421,35 @@ const LEVELS = [
   { n:2, title:"A whole month, everything clean",
     chips:["Stripe","1 month"], src:"Rule 1", cites:[1,3],
     situation:"August on Stripe: 100 charges totalling $48,000, $1,200 refunded and $300 lost to chargebacks. Stripe paid $45,078 into your bank.",
-    facts:["At 2.9% + 30¢ "+C(1)+", 100 charges on $48,000 cost $1,392 + $30 = $1,422.","Stripe's payout report breaks every payout into charges, refunds and fees "+C(3)+" — the same parts the skill rebuilds from your books."],
+    facts:["At 2.9% + 30¢ "+C(1)+", 100 charges on $48,000 cost $1,392 + $30 = $1,422.","Stripe's payout report breaks every payout into charges, refunds and fees "+C(3)+", the same parts the skill rebuilds from your books."],
     visual:{type:"wf", start:["Gross charges",48000], steps:[["Refunds",-1200],["Chargebacks",-300],["Processing fees",-1422]], end:["Net settled",45078], dec:0},
     rule:{q:"Each of A through F has a corresponding GL account, so the same decomposition can be built from the books and the two compared. That comparison is the reconciliation.", w:"method.md · Step 2"},
     math:[["Gross charges","$48,000.00"],["− refunds","$1,200.00"],["− chargebacks","$300.00"],["− fees: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["= net settled","$45,078.00",1],["Payouts received in August","$45,078.00"],["Difference","$0.00",1],["Fee rate: 1,422 ÷ 48,000","2.96%"]],
-    verdict:["ok","Ties to the cent. The fee rate, 2.96%, is just above 2.9% because of the 30¢ per charge — exactly what the published price predicts."] },
+    verdict:["ok","Ties to the cent. The fee rate, 2.96%, is just above 2.9% because of the 30¢ per charge, which is exactly what the published price predicts."] },
 
   { n:3, title:"Month-end timing",
     chips:["Stripe","2 months"], src:"Rule 2", cites:[3,4],
     situation:"Same August, but $2,100 of late-July sales were paid out in August, and $2,580 of sales from 30–31 August won't arrive until September. Stripe paid $44,598 in August.",
-    facts:["Stripe's US settlement timing is 2 business days "+C(4)+", so sales from the last two days of a month are paid out in the next.","Stripe's report has its own section for transactions not yet settled at the end date "+C(3)+" — the same money the skill finds in the waiting room."],
+    facts:["Stripe's US settlement timing is 2 business days "+C(4)+", so sales from the last two days of a month are paid out in the next.","Stripe's report has its own section for transactions not yet settled at the end date "+C(3)+", the same money the skill finds in the waiting room."],
     visual:{type:"wf", start:["Opening balance (1 Aug)",2100], steps:[["Gross charges",48000],["Refunds",-1200],["Chargebacks",-300],["Fees",-1422],["Payouts to bank",-44598]], end:["Closing balance (31 Aug)",2580], dec:0, warn:true},
     rule:{q:"Should match the processor's reported \"Available Balance\" at period end — plus any \"Pending\" / \"In Transit\" amounts depending on definition.", w:"method.md · Step 4"},
     math:[["Opening balance","$2,100.00"],["+ gross charges","$48,000.00"],["− refunds, chargebacks, fees","$2,922.00"],["− payouts to bank","$44,598.00"],["= closing balance","$2,580.00",1],["Stripe says it still holds","$2,580.00"],["Difference","$0.00",1],["Why payouts ($44,598) ≠ net ($45,078)","$480 more stayed in the waiting room"]],
-    verdict:["ok","Ties. The $2,580 left over isn't missing — it's 30–31 August sales inside Stripe's 2-day settlement window."] },
+    verdict:["ok","Ties. The $2,580 left over isn't missing. It's 30–31 August sales inside Stripe's 2-day settlement window."] },
 
   { n:4, title:"The mistake: sales booked net of fees",
     chips:["Stripe","Your books"], src:"Rule 3", cites:[8,9],
-    situation:"Same clean August as Level 2 — but your bookkeeper recorded each bank deposit as the sale. The books show sales of $45,078 and no processing fees at all.",
-    facts:["Payment processors report gross payments before any fees or refunds "+C(8)+".","The IRS has you report gross receipts and subtract fees and refunds separately "+C(9)+" — the fees are a cost, not missing sales."],
+    situation:"Same clean August as Level 2, but your bookkeeper recorded each bank deposit as the sale. The books show sales of $45,078 and no processing fees at all.",
+    facts:["Payment processors report gross payments before any fees or refunds "+C(8)+".","The IRS has you report gross receipts and subtract fees and refunds separately "+C(9)+". The fees are a cost, not missing sales."],
     visual:{type:"compare",
       head:["","Should be","Your books"],
       rows:[["Gross sales","$48,000","—"],["Refunds & chargebacks","($1,500)","—"],["Net sales","$46,500",["$45,078","bad"]],["Processing fees","$1,422",["$0","bad"]],["Profit from these sales","$45,078","$45,078"]]},
     rule:{q:"Revenue ≈ net payouts, a near-empty fee account, or no clearing account at all. Understates revenue and expense equally, so profit hides it.", w:"edge-cases.md · Revenue recorded net of fees"},
     math:[["Sales in your books","$45,078.00"],["Payouts that month","$45,078.00"],["Sales ≈ payouts?","yes"],["Fees in your books","$0.00"],["Fee account near-empty?","yes",1],["Net sales should be: 48,000 − 1,500","$46,500.00"],["Understated by: 46,500 − 45,078","$1,422.00"],["…which is exactly the fees","$1,422.00",1]],
-    verdict:["flag","Flagged. Sales are $1,422 too low and $1,422 of fees are invisible. Profit is the same either way — that's why it goes unnoticed."] },
+    verdict:["flag","Sales are $1,422 too low and $1,422 of fees are invisible. Profit is the same either way, which is why it goes unnoticed."] },
 
   { n:5, title:"Early warnings: fee rate and payout delay",
     chips:["Stripe","3 months"], src:"Watch the trends", cites:[1,4],
-    situation:"Three months on Stripe, same contract. June and July cost exactly the published price. In August Stripe charged $1,632 — and payouts started taking 5 business days instead of 2.",
+    situation:"Three months on Stripe, same contract. June and July cost exactly the published price. In August Stripe charged $1,632, and payouts started taking 5 business days instead of 2.",
     facts:["The published price, 2.9% + 30¢ "+C(1)+", sets the expected fee for any month: 2.9% of gross plus 30¢ per charge.","Stripe's US settlement timing is 2 business days "+C(4)+", so 5 is well outside the norm."],
     visual:{type:"table",
       head:["Month","Gross","Charges","Expected fee","Charged","Payout delay"],
@@ -457,13 +457,13 @@ const LEVELS = [
     rule:{q:"A lengthening lag is the earliest visible sign of a payout pause or a risk review.", w:"method.md · Step 3"},
     rule2:{q:"The fee rate has drifted with no contract change … A measurable Step 9 exception.", w:"edge-cases.md"},
     math:[["June expected: 2.9% × 44,000 + 30¢ × 92","$1,303.60"],["July expected: 2.9% × 46,000 + 30¢ × 96","$1,362.80"],["August expected: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["August charged","$1,632.00"],["Overcharge against the published price","$210.00",1],["August fee rate: 1,632 ÷ 48,000","3.40%"]],
-    verdict:["flag","Two flags. $210 more than the published price, and payouts slowed from 2 business days to 5 — worth a call to Stripe before a hold builds up."] },
+    verdict:["flag","Two flags. Fees ran $210 over the published price, and payouts slowed from 2 business days to 5. Worth a call to Stripe before a hold builds up."] },
 
   { tier:"Cross source · several payment apps, or several companies" },
   { n:6, title:"Stripe, Square and PayPal into one bank",
     chips:["Stripe","Square","PayPal","Bank"], src:"One waiting room per app", cites:[1,5,7,3,6],
     situation:"You take card payments online through Stripe, in person through Square and at checkout through PayPal, and all three pay into the same bank. In August a $1,800 Square payout was recorded against Stripe by mistake.",
-    facts:["Published prices: Stripe 2.9% + 30¢ "+C(1)+", Square in person 2.6% + 15¢ on its listed rates "+C(5)+", PayPal Checkout 3.49% + 49¢ "+C(7)+". Each fee below is that price applied to the month's charges.","Each app reports its payouts against its own transactions "+C(3)+C(6)+" — so each needs its own waiting room to match against."],
+    facts:["Published prices: Stripe 2.9% + 30¢ "+C(1)+", Square in person 2.6% + 15¢ on its listed rates "+C(5)+", PayPal Checkout 3.49% + 49¢ "+C(7)+". Each fee below is that price applied to the month's charges.","Each app reports its payouts against its own transactions "+C(3)+C(6)+", so each needs its own waiting room to match against."],
     visual:{type:"table",
       head:["Payment app","Gross","Charges","Fees","Fee rate","Net settled","Waiting room 31 Aug"],
       rows:[["Stripe","$48,000","100","$1,422.00","2.96%","$45,078.00",["−$1,800","bad"]],["Square","$22,000","400","$632.00","2.87%","$20,968.00",["$1,800","bad"]],["PayPal","$9,500","50","$356.05","3.75%","$8,993.95","$0"]],
@@ -471,12 +471,12 @@ const LEVELS = [
     pair:[["bad","All three in one account","$0","Looks fine. The mistake has cancelled itself out."],["ok","One account per payment app","2 problems","Stripe shows money it was never owed; Square shows money that never arrived."]],
     rule:{q:"Single-entity — one company file, one clearing account per processor.", w:"gates.md · Gate 1"},
     math:[["Square fee: 2.6% × 22,000 + 15¢ × 400","$632.00"],["PayPal fee: 3.49% × 9,500 + 49¢ × 50","$356.05"],["Stripe: payouts recorded","$46,878.00"],["Stripe: net actually owed","$45,078.00"],["Stripe waiting room","−$1,800.00",1],["Square: net owed","$20,968.00"],["Square: payouts recorded","$19,168.00"],["Square waiting room","+$1,800.00",1],["Combined: −1,800 + 1,800 + 0","$0.00",1]],
-    verdict:["flag","Found — but only because each payment app is checked on its own. A negative waiting room means more money was recorded as arriving than that app ever owed you."] },
+    verdict:["flag","The skill finds this only because each payment app is checked on its own. A negative waiting room means more money was recorded as arriving than that app ever owed you."] },
 
   { n:7, title:"One Stripe account, two companies",
     chips:["Stripe","Riverside","Lakeshore"], src:"One waiting room per company", cites:[10],
     situation:"Two of your companies sell through one Stripe account, and Stripe pays everything into Riverside's bank. In August, $6,200 of Lakeshore's sales landed in Riverside.",
-    facts:["Group accounts present the parent and its subsidiaries as a single economic entity "+C(10)+".","That is why a balance between two of your companies disappears in the group total — and why each company's own books still have to show it."],
+    facts:["Group accounts present the parent and its subsidiaries as a single economic entity "+C(10)+".","That is why a balance between two of your companies disappears in the group total, and why each company's own books still have to show it."],
     visual:{type:"table",
       head:["Company","Net settled","Payouts received","Waiting room 31 Aug"],
       rows:[["Riverside","$30,000","$36,200",["−$6,200","bad"]],["Lakeshore","$18,000","$11,800",["$6,200","bad"]]],
@@ -484,7 +484,7 @@ const LEVELS = [
     rule:{q:"Two entities' clearing accounts can be wrong in opposite directions and still net. Run it per entity.", w:"edge-cases.md"},
     rule2:{q:"A payout landing in one entity for another's sales … An intercompany balance, and both sides must agree.", w:"edge-cases.md"},
     math:[["Riverside: 30,000 − 36,200","−$6,200.00",1],["Lakeshore: 18,000 − 11,800","+$6,200.00",1],["Group total","$0.00"],["What it really is","Riverside owes Lakeshore $6,200"]],
-    verdict:["note","Not an error to delete — an intercompany balance to record. Riverside owes Lakeshore $6,200; the two cancel only in the group accounts."] },
+    verdict:["note","Riverside owes Lakeshore $6,200, an intercompany balance for both companies to record. The two cancel only in the group accounts."] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -571,7 +571,7 @@ function run(){
   let h = res("ok","Rule 1 · net settled", fmt(net), `${fmt(g)} − ${fmt(r+c)} refunds & chargebacks − ${fmt(f)} fees`);
   h += Math.abs(diff)<0.005
     ? res("ok","Rule 2 · waiting room", fmt(close), "Matches what the payment app says it holds.")
-    : res("flag","Rule 2 · waiting room", fmt(close), `Payment app says ${fmt(ab)} — ${fmt(Math.abs(diff))} ${diff>0?"more in your books":"less in your books"}. Find the missing piece.`);
+    : res("flag","Rule 2 · waiting room", fmt(close), `Payment app says ${fmt(ab)}; that is ${fmt(Math.abs(diff))} ${diff>0?"more in your books":"less in your books"}. Find the missing piece.`);
   const near = p>0 && Math.abs(s-p)<=0.01*p, empty = f>0 && fb < 0.10*f;
   if(s && near && empty) h += res("flag","Rule 3 · sales booked net?", "Yes", `Sales ${fmt(s)} ≈ payouts ${fmt(p)}, and fees recorded are ${fmt(fb)}. Sales look ${fmt(Math.max(netSales-s,0))} too low.`);
   else if(s && Math.abs(s-netSales)<=0.005*netSales) h += res("ok","Rule 3 · sales booked net?", "No", `Sales ${fmt(s)} match gross less refunds and chargebacks (${fmt(netSales)}).`);
@@ -581,8 +581,8 @@ function run(){
   const n=num("charges");
   if(n>0){ const exp=Math.round((g*PLAN[0]+n*PLAN[1])*100)/100, d=Math.round((f-exp)*100)/100;
     h += Math.abs(d)<0.005
-      ? res("ok","Fees vs published price", fmt(exp), `${PLAN[3]}'s published price on ${n} charges — matches what you were charged.`)
-      : res(d>0?"flag":"note","Fees vs published price", fmt(exp), `${PLAN[3]}'s published price on ${n} charges. You were charged ${fmt(f)} — ${fmt(Math.abs(d))} ${d>0?"more":"less"}. Check your contract and card mix.`); }
+      ? res("ok","Fees vs published price", fmt(exp), `${PLAN[3]}'s published price on ${n} charges. It matches what you were charged.`)
+      : res(d>0?"flag":"note","Fees vs published price", fmt(exp), `${PLAN[3]}'s published price on ${n} charges. You were charged ${fmt(f)}, which is ${fmt(Math.abs(d))} ${d>0?"more":"less"}. Check your contract and card mix.`); }
   box.innerHTML=h;
 }
 inputs.forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));

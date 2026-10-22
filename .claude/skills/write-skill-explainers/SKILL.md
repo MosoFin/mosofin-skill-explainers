@@ -61,6 +61,9 @@ for this page: a shop owner with no bookkeeping background reads it in five minu
 say what the skill checks, what mistake it catches, what it will ask them, and what it will
 never do.
 
+Read `references/voice.md` before writing prose for either public page; it is short, and `--check` fails the
+build on em dashes and filler words.
+
 ### 4. Write the learn page
 
 Read `references/learn-page.md`. Levels run from one transaction on one source to several
@@ -97,6 +100,7 @@ A page that says "in review" about a shipped skill is wrong, not merely stale.
 - Describing a step the skill does not have, or softening a Required input.
 - Explainer HTML inside the skill's own folder, or in the skills repository at all.
 - Editing `site/index.html` or a skill's `index.html` by hand — `build.py` generates them.
+- Em dashes in prose, "not X, it's Y" lines, one-word verdicts, filler words (`references/voice.md`).
 - Editing the generated `seo` block, or a page's title past 65 characters or description past 160.
 - Marking a page `published` to make a gap disappear. `todo` is honest; `internal` hides it.
 - Three pages written at once from memory. Write them in order; each one checks the last.

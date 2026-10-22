@@ -284,7 +284,7 @@ def landing(r):
         cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
                      f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p><span class="go">Open →</span></a>')
     if r["skill_status"] == "shipped":
-        use = f"""<p>Install just this skill — no clone needed:</p>
+        use = f"""<p>Install just this skill, no clone needed:</p>
 <pre>curl -sL {SKILLS_REPO}/archive/refs/heads/main.tar.gz | tar -xz -C ~/.claude/skills --strip-components=2 mosofin-finance-skills-main/skills/{e(s)}</pre>
 <p><a href="{SKILLS_REPO}/tree/main/skills/{e(s)}">Read the skill on GitHub →</a></p>"""
     else:
@@ -400,6 +400,24 @@ def outputs(rows):
     out[os.path.join(SITE, "sitemap.xml")] = sitemap(rows)
     return out
 
+# Voice. Public explainers are written for people, so the habits that make prose read as machine-made fail the build.
+BANNED = ["delv", "leverag", "utilis", "utiliz", "robust", "seamless", "streamlin", "empower", "foster", "pivotal",
+          "game.?changer", "paradigm", "cutting.edge", "tapestr", "ever.evolving", "supercharg"]
+
+def voice_problems(outs):
+    """Em dashes and filler words in the prose of public pages. Quoted skill rules and empty-cell markers are exempt."""
+    bad = []
+    for p, h in sorted(outs.items()):
+        rel = os.path.relpath(p, SITE)
+        if not re.match(r"skills/[^/]+/(plain|learn)\.html$", rel): continue
+        t = re.sub(r'<script type="application/ld\+json">.*?</script>|<style>.*?</style>|<!-- seo:start.*?seo:end -->|<blockquote>.*?</blockquote>', "", h, flags=re.S)
+        t = re.sub(r'\bq:"(?:[^"\\]|\\.)*"', 'q:""', t)
+        n = len(re.findall(r" — ", t))
+        if n: bad.append(f"{rel}: {n} em dash(es) in prose. Use a comma, colon, brackets or a full stop; quoted skill rules are exempt")
+        words = [w for w in BANNED if re.search(r"\b" + w + r"\w*", re.sub(r"<[^>]+>", " ", t), re.I)]
+        if words: bad.append(f"{rel}: filler words {', '.join(words)}")
+    return bad
+
 def seo_problems(outs):
     """Search-facing checks on every page that will be published."""
     bad, titles, descs = [], {}, {}
@@ -486,7 +504,7 @@ def main(argv):
     if bad:
         print("\n".join("  FAIL  " + b for b in bad)); print(f"\n{len(bad)} problem(s)"); sys.exit(1)
     outs = outputs(rows)
-    seo_bad = seo_problems(outs)
+    seo_bad = seo_problems(outs) + voice_problems(outs)
     if seo_bad:
         print("\n".join("  FAIL  " + b for b in seo_bad)); print(f"\n{len(seo_bad)} search problem(s)"); sys.exit(1)
     if argv[:1] == ["--check"]:

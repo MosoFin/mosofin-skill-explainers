@@ -45,6 +45,12 @@ Python; no build step beyond that.
 2. Set that kind to `published` (or `internal`) in `tracker.tsv`, and fill in `sources` and `verified`.
 3. Run `python3 build.py`, then commit both.
 
+## Voice
+
+Public pages are written for people. `build.py --check` fails a plain or learn page with an em dash in its
+prose (quoted skill rules and empty table cells are exempt) or a filler word such as "leverage" or "robust".
+The rest of the style rules are in `.claude/skills/write-skill-explainers/references/voice.md`.
+
 ## Search
 
 Each page's `<title>` and meta description are written by hand (25–65 and 70–160 characters, unique).

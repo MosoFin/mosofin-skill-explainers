@@ -269,17 +269,17 @@
 <header>
   <span class="label">MosoFin skill · three-way-match · learning guide</span>
   <h1>From one invoice to a whole month of them</h1>
-  <p class="lede">How this skill decides whether a supplier's bill should be paid — shown <b>one level at a time</b>, from a single order that matches perfectly up to a month where the delivery records live in a different system. Every rule is quoted from the skill itself, and every number is worked through in front of you.</p>
+  <p class="lede">How this skill decides whether a supplier's bill should be paid, shown <b>one level at a time</b>, from a single order that matches perfectly up to a month where the delivery records live in a different system. Every rule is quoted from the skill itself, and every number is worked through in front of you.</p>
   <div class="trust">
     <div><b>The rules are the skill's own</b><span>Each one is quoted with the step it comes from, so you can read it yourself.</span></div>
-    <div><b>Each rule is backed by an authority</b><span>US procurement rules, the GAO's internal-control standard, the fraud examiners' association, the IFRS Foundation, QuickBooks' own documentation — numbered and linked.</span></div>
+    <div><b>Each rule is backed by an authority</b><span>US procurement rules, the GAO's internal-control standard, the fraud examiners' association, the IFRS Foundation, QuickBooks' own documentation, numbered and linked.</span></div>
     <div><b>The math is shown</b><span>Open "Check it yourself" on any level and follow every line on a calculator.</span></div>
     <div><b>Your numbers, your check</b><span>At the end, put in your own order, delivery and invoice and watch the same rules run.</span></div>
   </div>
   <div class="legend" aria-label="How to read this page">
-    <span><i style="background:var(--green)"></i>Rule — quoted from the skill</span>
-    <span><i style="background:var(--blue)"></i>Fact — from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
-    <span><i style="background:var(--hold)"></i>Example — made-up figures, worked out in full</span>
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, worked out in full</span>
   </div>
 </header>
 
@@ -326,14 +326,14 @@
       <label class="field"><span>Quantity tolerance, %</span><input data-k="tq" inputmode="decimal"></label>
     </fieldset>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">The split follows the skill's Step 5: pay the matched portion, dispute the remainder. "Matched portion" here means the smaller of received and billed quantity, at the agreed price. The skill's default with no tolerance is exact match — any difference is an exception. The fifteen exception types and their severities are the skill's own rules, not a published standard.</p>
+    <p class="fine">The split follows the skill's Step 5: pay the matched portion, dispute the remainder. "Matched portion" here means the smaller of received and billed quantity, at the agreed price. The skill's default with no tolerance is exact match, so any difference is an exception. The fifteen exception types and their severities are the skill's own rules, not a published standard.</p>
   </div>
 </section>
 
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where every fact on this page comes from</h2>
-  <p class="muted">Rules are the skill's own. Facts below come from procurement regulation, the US internal-control standard, the fraud examiners' association, an accounting standard-setter and the accounting software's own documentation, as published when checked on 21 October 2026 — follow the link for today's wording.</p>
+  <p class="muted">Rules are the skill's own. Facts below come from procurement regulation, the US internal-control standard, the fraud examiners' association, an accounting standard-setter and the accounting software's own documentation, as published when checked on 21 October 2026. Follow the link for today's wording.</p>
   <ol class="srcs" id="srclist"></ol>
   <p class="fine">Not backed by an outside authority: the <b>fifteen exception types</b> and their severities, the <b>exact-match default</b>, and the <b>matching precedence</b> (line number, then SKU, then description) are the skill's own rules. The page marks them as the skill's where they appear.</p>
 </section>
@@ -343,51 +343,51 @@
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
     <div><b>Asks first</b>Mosofin or upload? Your tolerance? Who may approve what? Services in scope, and what stands in for a receipt? Foreign-currency policy? Who owns exceptions?</div>
-    <div><b>Needs</b>The invoices — always in the books; purchase orders where the system holds them; delivery records, which it usually has to ask for.</div>
+    <div><b>Needs</b>The invoices, which are always in the books; purchase orders where the system holds them; delivery records, which it usually has to ask for.</div>
     <div><b>Gives back</b>Pay / Hold / Reject per invoice, every line side by side with its match basis, every exception with an owner, the tests that could not run, and the month's patterns.</div>
     <div><b>Never</b>Pays, holds or releases money; invents a tolerance; lets an untested check read as a pass; concludes fraud. It reads nothing before you say yes.</div>
   </div>
 </section>
 
 <footer>
-  <span>Rules are quoted from the skill's own file, <code>SKILL.md</code> — the opening section on which legs exist, Steps 2–5, the exception table and the Edge Cases. Facts are cited to the sources above. All dollar figures are worked examples, not your data. This page explains <code>three-way-match</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>Rules are quoted from the skill's own file, <code>SKILL.md</code>: the opening section on which legs exist, Steps 2–5, the exception table and the Edge Cases. Facts are cited to the sources above. All dollar figures are worked examples, not your data. This page explains <code>three-way-match</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
 
 <script>
 const SOURCES = [
-  {t:"Federal Acquisition Regulation 32.905 — Payment documentation and process", u:"https://www.acquisition.gov/far/32.905", w:"Invoice payments must be supported by a receiving report or other authorisation showing the quantities received and accepted and the date; a proper invoice carries the order number, description, quantity, unit price and extended price. Interim payments on cost-reimbursement service contracts are the exception."},
-  {t:"Intuit — Create and send purchase orders in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/purchase-orders/create-send-purchase-orders-quickbooks-online/L2mVpjOoq_US_en_US", w:"Purchase orders are available on the Plus and Advanced plans only. A new PO is Open; adding it to a bill or expense closes it. The article does not cover recording goods received or partial receipts."},
-  {t:"ACFE — Occupational Fraud 2024: A Report to the Nations, key findings", u:"https://www.acfe.com/-/media/files/ACFE/PDFs/RTTN/2024/Infographics/Key-Findings.pdf", w:"1,921 cases in 138 countries, median loss $145,000. Asset misappropriation in 89% of cases (median $120,000); billing schemes the most common of these, 22% of cases with a $100,000 median loss. 32% of frauds occurred where internal controls were lacking, 19% where existing controls were overridden."},
-  {t:"GAO — Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23", u:"https://www.gao.gov/greenbook", w:"Segregate duties so that authority, custody and accounting are not in one pair of hands; where that is not practical, design alternative controls to mitigate the risk."},
-  {t:"IFRS Foundation — Conceptual Framework for Financial Reporting, project summary (2018)", u:"https://www.ifrs.org/content/dam/ifrs/project/conceptual-framework/fact-sheet-project-summary-and-feedback-statement/conceptual-framework-project-summary.pdf", w:"A liability is a present obligation of the entity to transfer an economic resource as a result of past events; an obligation is a duty or responsibility the entity has no practical ability to avoid."},
-  {t:"New York State Department of Taxation and Finance — Use Tax for Businesses", u:"https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/use_tax_for_businesses.htm", w:"A business that buys taxable goods or services without paying New York sales tax and then uses them in New York owes use tax itself, reported on its sales tax return or a purchaser's report."},
+  {t:"Federal Acquisition Regulation 32.905: Payment documentation and process", u:"https://www.acquisition.gov/far/32.905", w:"Invoice payments must be supported by a receiving report or other authorisation showing the quantities received and accepted and the date; a proper invoice carries the order number, description, quantity, unit price and extended price. Interim payments on cost-reimbursement service contracts are the exception."},
+  {t:"Intuit: Create and send purchase orders in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/purchase-orders/create-send-purchase-orders-quickbooks-online/L2mVpjOoq_US_en_US", w:"Purchase orders are available on the Plus and Advanced plans only. A new PO is Open; adding it to a bill or expense closes it. The article does not cover recording goods received or partial receipts."},
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations, key findings", u:"https://www.acfe.com/-/media/files/ACFE/PDFs/RTTN/2024/Infographics/Key-Findings.pdf", w:"1,921 cases in 138 countries, median loss $145,000. Asset misappropriation in 89% of cases (median $120,000); billing schemes the most common of these, 22% of cases with a $100,000 median loss. 32% of frauds occurred where internal controls were lacking, 19% where existing controls were overridden."},
+  {t:"GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23", u:"https://www.gao.gov/greenbook", w:"Segregate duties so that authority, custody and accounting are not in one pair of hands; where that is not practical, design alternative controls to mitigate the risk."},
+  {t:"IFRS Foundation: Conceptual Framework for Financial Reporting, project summary (2018)", u:"https://www.ifrs.org/content/dam/ifrs/project/conceptual-framework/fact-sheet-project-summary-and-feedback-statement/conceptual-framework-project-summary.pdf", w:"A liability is a present obligation of the entity to transfer an economic resource as a result of past events; an obligation is a duty or responsibility the entity has no practical ability to avoid."},
+  {t:"New York State Department of Taxation and Finance: Use Tax for Businesses", u:"https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/use_tax_for_businesses.htm", w:"A business that buys taxable goods or services without paying New York sales tax and then uses them in New York owes use tax itself, reported on its sales tax return or a purchaser's report."},
 ];
 const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
 
 const RULES = [
   { id:"1", kind:"", title:"Count the legs, and say which match you ran",
     formula:"invoice only → an invoice review\ninvoice + PO → two-way match\ninvoice + PO + receipt → three-way match",
-    plain:"The receipt is the leg that proves the goods arrived. Without it, five of the fifteen tests cannot run — and the report has to say so, not stay quiet.",
+    plain:"The receipt is the leg that proves the goods arrived. Without it, five of the fifteen tests cannot run, and the report has to say so instead of staying quiet.",
     where:"SKILL.md · Everything depends on which legs the system actually holds", cites:[1,2],
-    backed:"Federal buyers may not pay without a receiving report, and QuickBooks Online holds purchase orders only on some plans and does not record goods received in its PO workflow — so the receipt leg genuinely is the one most often missing." },
+    backed:"Federal buyers may not pay without a receiving report, and QuickBooks Online holds purchase orders only on some plans and does not record goods received in its PO workflow, so the receipt leg genuinely is the one most often missing." },
   { id:"2", kind:"", title:"Match every line: quantity, price, item",
     formula:"quantity: ordered vs received vs billed\nprice: ordered vs billed\nitem: line no. → SKU → description",
-    plain:"One invoice line, one PO line, one or more receipt lines. If a line can't be matched with confidence, it's left unmatched — a wrong match makes two false variances.",
+    plain:"One invoice line, one PO line, one or more receipt lines. If a line can't be matched with confidence, it's left unmatched, because a wrong match makes two false variances.",
     where:"SKILL.md · Step 2", cites:[1],
-    backed:"The same fields a proper invoice must carry under federal rules — order number, description, quantity, unit price, extended price — are what the match compares." },
+    backed:"The same fields a proper invoice must carry under federal rules (order number, description, quantity, unit price, extended price) are what the match compares." },
   { id:"3", kind:"", title:"No tolerance given? Exact match",
     formula:"|billed − ordered| ≤ tolerance → match\notherwise → exception, resolve before pay",
     plain:"How much overbilling is acceptable is a business decision. The skill never picks a number for you; with none, every difference is flagged.",
     where:"SKILL.md · Step 3", cites:[3],
-    backed:"Billing schemes are the most common way assets are stolen, in 22% of occupational fraud cases — small, tolerated differences are exactly how they survive." },
+    backed:"Billing schemes are the most common way assets are stolen, in 22% of occupational fraud cases, and small tolerated differences are exactly how they survive." },
   { id:"W", kind:"w", title:"Watch the month, not just the invoice",
     formula:"always 1.8% over, against 2% → a pattern\nreceipts posted in bulk on one date → a signature\nsame name orders, receives, approves → a finding",
-    plain:"Each instance passes. Only the population shows the shape. The skill reports patterns with counts and totals — never as an accusation.",
+    plain:"Each instance passes. Only the population shows the shape. The skill reports patterns with counts and totals, never as an accusation.",
     where:"SKILL.md · Step 3 · Step 4 · Sheet 5", cites:[3,4],
     backed:"A third of frauds happen where controls are lacking and a fifth where they are overridden; separating who authorises, who holds and who records is the basic defence." },
-  { id:"S", kind:"s", title:"Matched is not approved — and received is already owed",
+  { id:"S", kind:"s", title:"Matched is not approved, and received is already owed",
     formula:"clean match + unapproved PO → still unauthorised\nreceived + no invoice → a liability to accrue",
     plain:"Arithmetic can't see authority, and an invoice that hasn't arrived doesn't mean you don't owe. Both are findings a tidy match would hide.",
     where:"SKILL.md · Three near-substitutes · Step 4, exception 7", cites:[5,4],
@@ -398,42 +398,42 @@ const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-
 
 const LEVELS = [
   { tier:"Single trio · Northbrook Trading buys chairs from Ashford Seating, September" },
-  { n:1, title:"One order, one delivery, one bill — all agree",
+  { n:1, title:"One order, one delivery, one bill: all agree",
     chips:["PO","Receipt","Invoice"], src:"Rules 1 and 2", cites:[1,2],
     situation:"Northbrook orders 100 chairs at $42 on PO-1041. The warehouse signs for 100 on 12 September. Ashford's invoice bills 100 at $42 and quotes PO-1041.",
-    facts:["Federal rules will not let an agency pay without a receiving report showing what was received and accepted "+C(1)+" — the receipt is what turns an invoice into a payable.","In QuickBooks Online the PO is Open until it is added to a bill, then Closed "+C(2)+"; the skill reads both records and the receipt, where one exists."],
+    facts:["Federal rules will not let an agency pay without a receiving report showing what was received and accepted "+C(1)+". The receipt is what turns an invoice into a payable.","In QuickBooks Online the PO is Open until it is added to a bill, then Closed "+C(2)+"; the skill reads both records and the receipt, where one exists."],
     visual:{type:"table",
       head:["","Quantity","Unit price","Total"],
       rows:[["Purchase order","100","$42.00","$4,200.00"],["Goods receipt","100","—","—"],["Invoice","100","$42.00","$4,200.00"]]},
     rule:{q:"Compare the three values: … Quantity: PO ordered vs. GRN received vs. invoice billed … Price: PO unit price vs. invoice unit price", w:"SKILL.md · Step 2"},
     math:[["Quantity: ordered 100, received 100, billed 100","match"],["Price: ordered $42.00, billed $42.00","match"],["Item: PO line 1 ↔ invoice line 1, by line number","match"],["Invoice total: 100 × $42","$4,200.00",1],["Recommendation","Pay $4,200.00",1]],
-    verdict:["ok","Ties on all three. Header checks pass too — same PO reference, same vendor, same currency, same company. Recommendation: Pay."] },
+    verdict:["ok","Ties on all three. Header checks pass too: same PO reference, same vendor, same currency, same company. Recommendation: Pay."] },
 
   { n:2, title:"The price crept up",
     chips:["PO","Invoice"], src:"Rule 3", cites:[3],
-    situation:"Same order, same delivery — but the invoice bills 100 chairs at $43.50. No tolerance policy has been given.",
-    facts:["Billing schemes are the most common asset-misappropriation fraud, in 22% of cases with a $100,000 median loss "+C(3)+". Most price differences are innocent — but each one that passes unexamined is how the others hide."],
+    situation:"Same order, same delivery, but the invoice bills 100 chairs at $43.50. No tolerance policy has been given.",
+    facts:["Billing schemes are the most common asset-misappropriation fraud, in 22% of cases with a $100,000 median loss "+C(3)+". Most price differences are innocent, but an unexamined one gives the others somewhere to hide."],
     visual:{type:"table",
       head:["","Quantity","Unit price","Total"],
       rows:[["Purchase order","100","$42.00","$4,200.00"],["Invoice","100",["$43.50","bad"],["$4,350.00","bad"]]]},
     rule:{q:"If no tolerance is provided, default to exact match (zero tolerance) and flag every variance.", w:"SKILL.md · Step 3"},
     rule2:{q:"Price overbilling … Invoice price > PO price … High", w:"SKILL.md · Step 4, exception 1"},
     math:[["Price variance per unit: 43.50 − 42.00","$1.50"],["As a percentage: 1.50 ÷ 42.00","3.57%"],["Tolerance given","none → exact match"],["Line variance: 1.50 × 100","$150.00",1],["Matched portion: 100 × $42.00","$4,200.00"],["Recommendation","Pay $4,200, dispute $150",1]],
-    verdict:["flag","Exception 1, high severity: $150 of price overbilling. Even with a 2% tolerance it would still be flagged — 3.57% is outside. Owner: AP, to request a credit note or confirm a price change."] },
+    verdict:["flag","Exception 1, high severity: $150 of price overbilling. Even with a 2% tolerance it would still be flagged, because 3.57% is outside it. Owner: AP, to request a credit note or confirm a price change."] },
 
   { n:3, title:"Fewer arrived than were billed",
     chips:["PO","Receipt","Invoice"], src:"Rules 2 and 3", cites:[1],
     situation:"Now the receipt says 96 chairs accepted and 4 rejected as damaged, while the invoice still bills 100 at $43.50.",
-    facts:["A receiving report records quantities received and accepted "+C(1)+" — the 'accepted' part is what lets the four damaged chairs be excluded."],
+    facts:["A receiving report records quantities received and accepted "+C(1)+". The 'accepted' part is what lets the four damaged chairs be excluded."],
     visual:{type:"table",
       head:["","Quantity","Unit price","Total"],
       rows:[["Purchase order","100","$42.00","$4,200.00"],["Goods receipt",["96 accepted · 4 damaged","bad"],"—","—"],["Invoice",["100","bad"],["$43.50","bad"],["$4,350.00","bad"]]]},
     rule:{q:"Partial payment — pay the matched portion, dispute the remainder", w:"SKILL.md · Step 5"},
     rule2:{q:"Damaged goods on GRN but full billing … GRN flagged damage or rejection, invoice billed full … High", w:"SKILL.md · Step 4, exception 15"},
     math:[["Quantity variance: billed 100 − accepted 96","4 chairs"],["Price variance: 1.50 × 100","$150.00"],["Matched portion: 96 × $42.00","$4,032.00",1],["Invoice total","$4,350.00"],["Disputed: 4,350 − 4,032","$318.00",1],["…of which price $150, quantity 4 × $42","$168.00"]],
-    verdict:["flag","Three exceptions on one invoice: price overbilling, quantity overbilling, and damaged goods billed in full. Recommendation: pay $4,032, dispute $318. The damaged-goods test only ran because the receipt recorded condition — a field the skill says is rarely digitised."] },
+    verdict:["flag","Three exceptions on one invoice: price overbilling, quantity overbilling, and damaged goods billed in full. Recommendation: pay $4,032, dispute $318. The damaged-goods test only ran because the receipt recorded condition, a field the skill says is rarely digitised."] },
 
-  { n:4, title:"The PO number is on the invoice — but the PO was never approved",
+  { n:4, title:"The PO number is on the invoice, but the PO was never approved",
     chips:["PO","Invoice","Approval"], src:"Matched is not approved", cites:[4],
     situation:"A clean match: 100 chairs, $42, received, billed. But PO-1041 was raised by the office manager, who is also the approver of record, and the approval field is empty. The approval matrix says orders over $2,500 need a director.",
     facts:["Separating authority, custody and accounting is the basic control; where one person must do several steps, something else has to compensate "+C(4)+"."],
@@ -443,44 +443,44 @@ const LEVELS = [
     rule:{q:"Matched is not approved. A perfectly matching invoice from an unapproved PO is still unauthorised spending.", w:"SKILL.md · Three near-substitutes"},
     rule2:{q:"A PO number written on an invoice is not a match.", w:"SKILL.md · Three near-substitutes"},
     math:[["Arithmetic exceptions","0"],["Authority exceptions: 11 (not approved), 12 (wrong authority)","2, both Critical"],["PO total vs approver limit: 4,200 > 2,500","director needed"],["Recommendation","Hold until approved",1]],
-    verdict:["flag","Nothing is wrong with the numbers, and that is the point: the two critical exceptions are about who said yes, not what it cost. Recommendation: Hold, pending retroactive approval by someone with the authority."] },
+    verdict:["flag","The numbers are fine. The two critical exceptions are about who said yes, not what it cost. Recommendation: Hold, pending retroactive approval by someone with the authority."] },
 
   { n:5, title:"Always just inside tolerance",
     chips:["12 invoices","2% tolerance"], src:"Watch the month", cites:[3],
-    situation:"Northbrook sets a 2% price tolerance. Over a year Ashford bills twelve orders of 100 chairs, each at $42.75 against a $42.00 PO — 1.79% over, every time. Every invoice passes.",
+    situation:"Northbrook sets a 2% price tolerance. Over a year Ashford bills twelve orders of 100 chairs, each at $42.75 against a $42.00 PO, 1.79% over every time. Every invoice passes.",
     facts:["Nearly a third of frauds occur where internal controls are lacking "+C(3)+". A control that passes each instance and never looks at the set is a control with a gap in it."],
     visual:{type:"table",
       head:["Month","PO price","Billed","Over by","Within 2%?"],
       rows:[["Jan","$42.00","$42.75","1.79%","yes"],["Feb","$42.00","$42.75","1.79%","yes"],["…","","","",""],["Dec","$42.00","$42.75","1.79%","yes"]],
       total:["12 months","$50,400","$51,300",["$900","bad"],"all pass"]},
     rule:{q:"variances that sit consistently just inside tolerance. A vendor whose prices are always 1.8% above PO, against a 2% tolerance, is not producing random variances — and each instance passes, which is precisely why nobody notices.", w:"SKILL.md · Step 3"},
-    math:[["Per chair: 42.75 − 42.00","$0.75"],["Per invoice: 0.75 × 100","$75.00"],["As %: 0.75 ÷ 42.00","1.79% — inside 2%"],["Exceptions raised","0"],["Over a year: 75 × 12","$900.00",1]],
-    verdict:["flag","No exception on any invoice; $900 over the year. Reported in Sheet 5 as a pattern — vendor, count, total — for someone to raise with Ashford. As a pattern with figures, never as an allegation."] },
+    math:[["Per chair: 42.75 − 42.00","$0.75"],["Per invoice: 0.75 × 100","$75.00"],["As %: 0.75 ÷ 42.00","1.79%, inside 2%"],["Exceptions raised","0"],["Over a year: 75 × 12","$900.00",1]],
+    verdict:["flag","No exception on any invoice; $900 over the year. Reported in Sheet 5 as a pattern (vendor, count, total) for someone to raise with Ashford, never as an allegation."] },
 
   { tier:"Population · the whole month, and more than one system" },
-  { n:6, title:"Received, never billed — the liability you haven't booked",
+  { n:6, title:"Received, never billed: the liability you haven't booked",
     chips:["Receipts","Invoices","Month end"], src:"Received is already owed", cites:[5],
     situation:"At 30 September three deliveries have signed receipts but no invoice yet: $2,100 of chairs, $860 of desks, $540 of shelving. AP sees nothing to pay. The accountant sees $3,500 the business owes.",
-    facts:["A liability is a present obligation to transfer an economic resource as a result of past events — a duty the entity has no practical ability to avoid "+C(5)+". The goods have arrived; the obligation exists; the invoice is paperwork."],
+    facts:["A liability is a present obligation to transfer an economic resource as a result of past events, a duty the entity has no practical ability to avoid "+C(5)+". The goods have arrived; the obligation exists; the invoice is paperwork."],
     visual:{type:"table",
       head:["Receipt","Date","Value","Invoice?","Exception"],
       rows:[["GRN-2207 · chairs","18 Sep","$2,100.00","none","7 · information to AP"],["GRN-2211 · desks","24 Sep","$860.00","none","7 · information to AP"],["GRN-2215 · shelving","29 Sep","$540.00","none","7 · information to AP"]],
       total:["Received not invoiced","","$3,500.00","",["accrue at 30 Sep","bad"]]},
     rule:{q:"From an accounting standpoint it is a liability. Goods received and not yet invoiced is goods received not invoiced (GRNI) — the business owes for them, and the obligation must be accrued at period end whether or not the invoice has arrived.", w:"SKILL.md · Step 4, one correction to exception 7's severity"},
     math:[["GRN-2207","$2,100.00"],["GRN-2211","$860.00"],["GRN-2215","$540.00"],["Total received, not invoiced","$3,500.00",1],["Proposed accrual at 30 Sep: DR inventory/expense, CR accrued liabilities","$3,500.00",1]],
-    verdict:["note","Exception 7 is information to AP and a close item to the accountant, and the skill flags it as both. Only a population run can total it — a document-by-document match never sees the receipts that have no invoice to match."] },
+    verdict:["note","Exception 7 is information to AP and a close item to the accountant, and the skill flags it as both. Only a population run can total it, because a document-by-document match never sees the receipts that have no invoice to match."] },
 
-  { n:7, title:"Three legs, two systems — and what that does to the fifteen tests",
+  { n:7, title:"Three legs, two systems, and what that does to the fifteen tests",
     chips:["QuickBooks","Warehouse sheet","Upload"], src:"Count the legs", cites:[2,6],
     situation:"Northbrook's invoices and purchase orders are in QuickBooks Online Plus. Deliveries are signed for in a warehouse spreadsheet. First run: the spreadsheet is not uploaded. Second run: it is.",
-    facts:["QuickBooks Online holds purchase orders on the Plus and Advanced plans, and its PO workflow does not record goods received "+C(2)+" — the receipt leg has to come from somewhere else.","A side finding the population read gives for free: an invoice with no tax charged may mean the buyer owes use tax itself "+C(6)+"."],
+    facts:["QuickBooks Online holds purchase orders on the Plus and Advanced plans, and its PO workflow does not record goods received "+C(2)+". The receipt leg has to come from somewhere else.","A side finding the population read gives for free: an invoice with no tax charged may mean the buyer owes use tax itself "+C(6)+"."],
     visual:{type:"table",
       head:["Exception tests","Needs","First run · no receipts","Second run · receipts uploaded"],
-      rows:[["1, 2 price; 5, 6 PO lines; 9 duplicate; 10 currency; 13 vendor; 14 tax","PO + invoice","run","run"],["3, 4 quantity; 7 received not billed; 8 billed not received","receipt leg",["did not run","bad"],"run"],["15 damaged goods billed in full","receipt with condition",["did not run","bad"],"run — condition column present"],["11, 12 approval","approval data","run — status field exposed","run"]],
+      rows:[["1, 2 price; 5, 6 PO lines; 9 duplicate; 10 currency; 13 vendor; 14 tax","PO + invoice","run","run"],["3, 4 quantity; 7 received not billed; 8 billed not received","receipt leg",["did not run","bad"],"run"],["15 damaged goods billed in full","receipt with condition",["did not run","bad"],"run, condition column present"],["11, 12 approval","approval data","run, status field exposed","run"]],
       total:["Match performed","",["two-way, by omission","bad"],"three-way"]},
     rule:{q:"If it holds invoices and POs but no receipts, it is a two-way match.", w:"SKILL.md · Everything depends on which legs the system actually holds"},
     rule2:{q:"Presenting a two-leg exercise as a three-way match misrepresents the control that was operated", w:"SKILL.md · Everything depends on which legs the system actually holds"},
-    math:[["Tests in total","15"],["First run — could not run: 3, 4, 7, 8, 15","5 tests"],["First run — exceptions found","0 of the 5 that didn't run"],["Second run — exceptions 3, 4, 15 on PO-1041 (Level 3)","3 exceptions"],["Second run — exception 7 total (Level 6)","$3,500.00",1]],
+    math:[["Tests in total","15"],["First run, could not run: 3, 4, 7, 8, 15","5 tests"],["First run, exceptions found","0 of the 5 that didn't run"],["Second run, exceptions 3, 4, 15 on PO-1041 (Level 3)","3 exceptions"],["Second run, exception 7 total (Level 6)","$3,500.00",1]],
     verdict:["flag","The first run's report says 'two-way match by omission' in bold and lists the five tests that did not run, so their absence reads as absence, not as a pass. The second run finds $318 on one invoice and $3,500 to accrue. Same invoices; the difference is the leg."] },
 ];
 
@@ -568,14 +568,14 @@ function run(){
   const pv = invp-pop, pvp = pv/pop*100;
   let h="";
   if(Math.abs(pv)<0.005) h+=res("ok","Price", fmt(invp), "Billed at the agreed price.");
-  else if(Math.abs(pvp)<=tp) h+=res("note","Price", (pv>0?"+":"−")+fmt(Math.abs(pv))+" / unit", `${Math.abs(pvp).toFixed(2)}% ${pv>0?"over":"under"} — inside your ${tp}% tolerance. Passes; the skill still counts it toward the month's pattern.`);
-  else h+=res(pv>0?"flag":"note","Price", (pv>0?"+":"−")+fmt(Math.abs(pv))+" / unit", `${Math.abs(pvp).toFixed(2)}% ${pv>0?"over":"under"} the order${tp?` — outside your ${tp}% tolerance`:" — no tolerance given, so exact match"}. Exception ${pv>0?"1, price overbilling (High)":"2, price underbilling (Low)"}.`);
+  else if(Math.abs(pvp)<=tp) h+=res("note","Price", (pv>0?"+":"−")+fmt(Math.abs(pv))+" / unit", `${Math.abs(pvp).toFixed(2)}% ${pv>0?"over":"under"}, inside your ${tp}% tolerance. Passes; the skill still counts it toward the month's pattern.`);
+  else h+=res(pv>0?"flag":"note","Price", (pv>0?"+":"−")+fmt(Math.abs(pv))+" / unit", `${Math.abs(pvp).toFixed(2)}% ${pv>0?"over":"under"} the order${tp?`, outside your ${tp}% tolerance`:", no tolerance given, so exact match"}. Exception ${pv>0?"1, price overbilling (High)":"2, price underbilling (Low)"}.`);
   const basis = hasGR ? grq : poq, basisName = hasGR ? "received" : "ordered";
   const qv = invq-basis, qvp = basis? qv/basis*100 : 0;
   if(!hasGR) h+=res("note","Quantity", `${invq} billed vs ${poq} ordered`, "No receipt entered: this is a two-way match. Exceptions 3, 4, 7, 8 and 15 cannot run and must be listed as not run.");
   else if(qv===0) h+=res("ok","Quantity", `${invq} billed = ${grq} received`, "Billed what arrived.");
-  else if(Math.abs(qvp)<=tq) h+=res("note","Quantity", `${invq} billed vs ${grq} received`, `${Math.abs(qvp).toFixed(2)}% ${qv>0?"over":"under"} — inside your ${tq}% quantity tolerance.`);
-  else h+=res(qv>0?"flag":"note","Quantity", `${invq} billed vs ${grq} received`, qv>0 ? `${qv} more billed than received${tq?` — outside your ${tq}% tolerance`:""}. Exception 3, quantity overbilling (High).` : `${-qv} fewer billed than received. Exception 7 — received not billed: information to AP, a liability to accrue for the accountant.`);
+  else if(Math.abs(qvp)<=tq) h+=res("note","Quantity", `${invq} billed vs ${grq} received`, `${Math.abs(qvp).toFixed(2)}% ${qv>0?"over":"under"}, inside your ${tq}% quantity tolerance.`);
+  else h+=res(qv>0?"flag":"note","Quantity", `${invq} billed vs ${grq} received`, qv>0 ? `${qv} more billed than received${tq?`, outside your ${tq}% tolerance`:""}. Exception 3, quantity overbilling (High).` : `${-qv} fewer billed than received. Exception 7, received not billed: information to AP, a liability to accrue for the accountant.`);
   const matchedQty = Math.min(invq, basis), matched = matchedQty*pop, invoice = invq*invp, disputed = Math.round((invoice-matched)*100)/100;
   h+=res("", "Invoice total", fmt(invoice), `${invq} × ${fmt(invp)}`);
   h+=res(disputed>0.005?"flag":"ok", "Step 5 · pay / dispute", disputed>0.005 ? `pay ${fmt(matched)}` : `pay ${fmt(matched)}`, disputed>0.005 ? `Matched portion ${matchedQty} × ${fmt(pop)} = ${fmt(matched)}; dispute ${fmt(disputed)}. Recommendation: Hold the remainder.` : "Everything matches. Recommendation: Pay.");
