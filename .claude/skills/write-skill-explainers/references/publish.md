@@ -42,6 +42,10 @@ The check fails on: a kind marked published/internal with no file; a file with t
 saying todo; a page without `<title>`; a public page without `id="sources"` and outside
 links; a stray file under `site/skills/`; an untracked skill folder; an unknown kind.
 
+Titles, descriptions and the sitemap are part of the check (see `page-contract.md`, "Search"). The
+sitemap's `lastmod` is the row's `verified` date, so reopen and re-date sources whenever a page's facts
+change — it is the honest "last reviewed" date, not a file timestamp.
+
 **Prove the check still bites.** Before committing, break one thing on purpose — rename
 `id="sources"`, or delete the title — run `--check`, see it fail, restore. A check that was
 never seen failing is not known to work.
@@ -65,7 +69,9 @@ gh run watch <id> -R MosoFin/mosofin-skill-explainers --exit-status
 ```
 
 - Then confirm the live URL serves the new content (`curl -s <url> | grep -c 'id="src'`),
-  and that an internal page returns 404. Pages can take a minute after the deploy job ends.
+  and that an internal page returns 404, and that `/sitemap.xml` lists the new URLs. Crawlers only read
+`robots.txt` at a domain's root, which a GitHub Pages project site cannot serve, so the sitemap is
+submitted in Google Search Console and Bing Webmaster Tools instead of being declared there. Pages can take a minute after the deploy job ends.
 
 Live site: https://mosofin.github.io/mosofin-skill-explainers/
 

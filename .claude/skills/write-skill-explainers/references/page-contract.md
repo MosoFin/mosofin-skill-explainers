@@ -14,8 +14,13 @@ Every explainer is a self-contained HTML file. The generated `index.html` pages 
 <title>Does Stripe Match Your Books?</title>
 ```
 
-- `<title>` is a name of two to five words. `build.py` reads it for the card on the skill
-  page and fails a page without one.
+- `<title>` is the search title, 25–65 characters, in the form `<Topic> <format> | MosoFin` — for
+  example "Bank Reconciliation Explained in Plain English | MosoFin". Lead with the words a person
+  would type. It differs from the `<h1>`, which stays in the human voice ("Does your bank match your
+  books?"); the skill page's cards use the `<h1>`.
+- Directly under it, `<meta name="description" content="…">`: 70–160 characters, unique on the site,
+  says what the page shows, and claims nothing the page doesn't. `build.py --check` fails a published
+  page without one.
 - Fonts only from Google Fonts (Archivo for text, IBM Plex Mono for labels and numbers).
   No other external stylesheets; scripts inline. The pages must work from a file:// open.
 
@@ -44,6 +49,21 @@ the reference page. Emerald is the only loud brand hue; red marks the mistake; a
   `.canvas` that scrolls on its own.
 - Tabular numerals on money (`font-variant-numeric: tabular-nums`).
 - Under 16 MB including any data URIs; in practice these pages are under 100 KB.
+
+## Search
+
+Everything else search engines read is **generated** by `build.py` between `<!-- seo:start -->` and
+`<!-- seo:end -->`: canonical URL, robots, Open Graph, Twitter card, favicon, theme colour and JSON-LD
+(an `Article` and a `BreadcrumbList`, `dateModified` taken from the tracker's `verified` date). Never
+edit that block by hand; change the title, description or tracker row and run `python3 build.py`.
+
+`--check` also fails a published page that has more than one `<h1>`, a heading that skips a level
+(h2 straight to h4), a title or description shared with another page, a canonical that is not the
+page's own URL, or JSON-LD that does not parse. `site/sitemap.xml` is generated from the tracker and
+lists published pages only, so internal pages never appear.
+
+Limits to know: pages have no social image (cards show text only), and the learn pages build their
+levels and source lists in JavaScript, which Google renders but simpler crawlers do not.
 
 ## Check before registering
 

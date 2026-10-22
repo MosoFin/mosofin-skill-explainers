@@ -96,7 +96,7 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Three-way match</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">three-way-match · shipped on main · audited 21 Oct 2026 · findings open</div>
+  <div class="eyebrow">three-way-match · shipped on main · audited 21 Oct 2026 · 1 of 3 findings fixed</div>
   <h1>How the three-way match is built, and what it does</h1>
   <p class="lede">One 729-line file in the standard (non-card) format. Its distinctive move is that it names no evidence tools at all: Gate 2 asks three capability questions of the live catalogue — are purchase orders exposed, are item receipts, is approval status — and the answers decide which of fifteen exception tests can run. This page shows where the weight sits, the run step by step, what the audit found, and how those three questions come out against a real workspace.</p>
 </header>
@@ -106,7 +106,7 @@
     <div class="stat"><span class="k">File</span><span class="v">729</span><span class="s">lines in SKILL.md, no references/</span></div>
     <div class="stat"><span class="k">Verdicts</span><span class="v">58 · 3 · 24</span><span class="s">[auto] · [gated] · [manual] tasks</span></div>
     <div class="stat"><span class="k">Exception tests</span><span class="v">15</span><span class="s">5 need the receipt leg, 2 need approval data</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">0/3</span><span class="s">fixed — all three are open recommendations</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">1/3</span><span class="s">fixed on main (4d5637c); two open</span></div>
   </div>
 </section>
 
@@ -229,7 +229,7 @@
 
 <section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Three open findings, none blocking, with the published guidance behind each</p>
+  <p class="sec-title">Three findings, none blocking: one fixed, two open</p>
   <div class="findings">
     <div class="f med"><span class="sev">Medium · open</span><div class="body">
       <h3>Nine of fourteen cross-references point at skills that are not in the repository</h3>
@@ -243,10 +243,10 @@
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md</span>
     </div></div>
-    <div class="f low"><span class="sev">Low · open</span><div class="body">
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>A sandbox-only path for the spreadsheet helper</h3>
-      <p>Step 6 says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. The bank-reconciliation fix — use the host's spreadsheet skill where one exists, name that path as an example, fall back to CSV — applies here word for word.</p>
-      <span class="where">SKILL.md · Step 6</span>
+      <p>Step 6 says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. It is now an ask-first sentence: the user is asked whether they want an Excel file, it is created only on a yes using the file name from the skill (<code>3WayMatch_…</code> or <code>Match_Population_…</code>), and the fallback is tables in the chat. The same fix went into all 31 skills.</p>
+      <span class="where">SKILL.md · Step 6 · main 4d5637c</span>
     </div></div>
   </div>
 </section>
@@ -267,6 +267,6 @@
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with real purchase orders and bills. Whether <code>search_purchase_orders</code> returns line detail — Gate 2's "with line detail, or header only?" — was not exercised; only the tool's existence was confirmed.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; the three findings above are open. Still to do: a live run with real purchase orders.</footer>
+<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; one finding fixed in 4d5637c, two open. Still to do: a live run with real purchase orders.</footer>
 
 </div>

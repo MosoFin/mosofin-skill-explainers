@@ -77,7 +77,8 @@ what is untested. It names commits and line counts, so it is `internal` by defau
 ### 6. Apply the page contract, then register and publish
 
 Every page follows `references/page-contract.md` (doctype, title, theme tokens, breadcrumb,
-fonts, phone width, `id="sources"`). Then follow `references/publish.md`: tracker row, build,
+fonts, phone width, `id="sources"`). Write the page's `<title>` and meta description as `page-contract.md` says; `build.py` generates the rest
+of the search markup and the sitemap. Then follow `references/publish.md`: tracker row, build,
 check, a negative test of the check, commit, push with the account that has access, watch
 both workflows, confirm the live URL, switch the account back.
 
@@ -96,5 +97,6 @@ A page that says "in review" about a shipped skill is wrong, not merely stale.
 - Describing a step the skill does not have, or softening a Required input.
 - Explainer HTML inside the skill's own folder, or in the skills repository at all.
 - Editing `site/index.html` or a skill's `index.html` by hand — `build.py` generates them.
+- Editing the generated `seo` block, or a page's title past 65 characters or description past 160.
 - Marking a page `published` to make a gap disappear. `todo` is honest; `internal` hides it.
 - Three pages written at once from memory. Write them in order; each one checks the last.

@@ -45,6 +45,16 @@ Python; no build step beyond that.
 2. Set that kind to `published` (or `internal`) in `tracker.tsv`, and fill in `sources` and `verified`.
 3. Run `python3 build.py`, then commit both.
 
+## Search
+
+Each page's `<title>` and meta description are written by hand (25–65 and 70–160 characters, unique).
+`build.py` generates the rest between `<!-- seo:start -->` markers — canonical URL, Open Graph, Twitter
+card, JSON-LD (`Article`, `BreadcrumbList`, `CollectionPage`), favicon, theme colour — and writes
+`site/sitemap.xml` from the tracker, published pages only. `--check` fails on drift, a bad title or
+description length, a second `<h1>`, a skipped heading level, a duplicate title or description, or JSON-LD
+that does not parse. Submit `https://mosofin.github.io/mosofin-skill-explainers/sitemap.xml` in Google
+Search Console and Bing Webmaster Tools; a project site cannot serve a root `robots.txt`.
+
 ## Writing a new explainer with Claude
 
 The workflow — read the skill, collect and verify sources, write the three pages in order,
