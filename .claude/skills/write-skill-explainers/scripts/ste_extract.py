@@ -76,7 +76,7 @@ def extract(path):
         if k=='w' and re.match(r'^(references|SKILL)',m.group(2)): continue
         try: v=json.loads('"'+m.group(2)+'"')
         except Exception: continue
-        v=re.sub(r'<[^>]+>','',v)
+        v=re.sub(r'<[^>]+>','',re.sub(r'\{\d+(?:,\d+)*\}','',v))   # drop inline cite tokens such as {3}
         if len(v.split())>3: blocks.append(re.sub(r'\s+',' ',v).strip())
     # de-duplicate keeping order
     seen=set(); res=[]
