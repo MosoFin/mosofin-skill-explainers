@@ -223,14 +223,14 @@
   <p class="lede">This skill checks that what your <b>payment app</b> (Stripe, Square or PayPal) says you were paid matches what your <b>books</b> say. It also catches the most common bookkeeping mistake with online sales.</p>
   <div class="short">
     <span class="label">The 20-second version</span>
-    <p>You give it a month. It compares your payment app with your books, line by line, and tells you whether they agree. If they don't, it shows you where and why, and suggests the fix for your bookkeeper. It never changes anything itself.</p>
+    <p>You give it a month. It compares your payment app with your books, line by line. It tells you whether they agree. If they don't, it shows you where and why. It also suggests the fix for your bookkeeper. It never changes anything itself.</p>
   </div>
 </header>
 
 <section>
   <span class="label">Where the money goes</span>
   <h2>A $100 sale never reaches your bank as $100</h2>
-  <p>A customer pays you $100. The payment app keeps its fee<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>, holds the rest for a few days<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup><sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>, then sends it to your bank, usually bundled with other sales. Your books have to show all three pieces, even though they happen on different days.</p>
+  <p>A customer pays you $100. The payment app keeps its fee<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. It holds the rest for a few days<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup><sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Then it sends the rest to your bank, usually together with other sales. Your books have to show all three pieces, even though the pieces happen on different days.</p>
   <figure>
     <div class="canvas">
       <svg viewBox="0 0 880 250" role="img" aria-label="A customer pays 100 dollars. The payment app keeps a 3 dollar 20 fee. The remaining 96 dollars 80 waits in the payment app for a few days, then arrives in the bank as a payout of 96 dollars 80.">
@@ -272,15 +272,15 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures: $3.20 is Stripe's published US card rate, 2.9% + 30¢, on a $100 sale<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Square and PayPal publish different rates<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>, and your contract may differ. Stripe pays out to US banks about two business days later<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>; Square can deposit the next business day<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Accountants call the waiting room a "clearing account": money the payment app owes you but hasn't sent yet. Stripe's payout reconciliation report tracks the same balance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</figcaption>
+    <figcaption>Example figures: $3.20 is Stripe's published US card rate, 2.9% + 30¢, on a $100 sale<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Square and PayPal publish different rates<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. Your contract may differ. Stripe sends the payout to US banks about two business days later<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Square can deposit the next business day<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Accountants call the waiting room a "clearing account": money the payment app owes you but hasn't sent yet. Stripe's payout reconciliation report tracks the same balance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</figcaption>
   </figure>
 </section>
 
 <section>
   <span class="label">The mistake it catches</span>
   <h2>Your profit looks right. Your sales are wrong.</h2>
-  <p>Your bank only ever sees the $96.80 payout, so that's often what gets recorded as the sale. The fee is never recorded at all. Profit comes out the same, which is why nobody notices.</p>
-  <p>The payment app itself keeps the sale, the fee and the amount left over as three separate figures<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. In the US, the Form 1099-K it sends the IRS reports the full $100, before fees and refunds<sup class="c"><a href="#src8" aria-label="source 8">8</a></sup>. The IRS treats fees and refunds as amounts you subtract on your return, not as smaller sales<sup class="c"><a href="#src9" aria-label="source 9">9</a></sup>. Record only the payout, and your sales won't line up with that form.</p>
+  <p>Your bank only ever sees the $96.80 payout, so the books often record that amount as the sale. The books never record the fee at all. Profit comes out the same, which is why nobody notices.</p>
+  <p>The payment app itself keeps the sale, the fee and the amount left over as three separate figures<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. In the US, the Form 1099-K it sends the IRS reports the full $100, before fees and refunds<sup class="c"><a href="#src8" aria-label="source 8">8</a></sup>. The IRS treats fees and refunds as amounts you subtract on your return, not as smaller sales<sup class="c"><a href="#src9" aria-label="source 9">9</a></sup>. If you record only the payout, your sales won't match that form.</p>
   <div class="compare">
     <div class="book">
       <h3>Recorded correctly</h3>
@@ -302,7 +302,7 @@
         <div class="row same"><span>Profit from this sale</span><span class="v">$96.80</span></div>
         <div class="row same"><span>Cash in the bank</span><span class="v">$96.80</span></div>
       </div>
-      <div class="verdict">Sales are too low and fees are invisible, and the profit line hides both.</div>
+      <div class="verdict">Sales are too low and fees are invisible. The profit line hides both.</div>
     </div>
   </div>
   <div class="scale">
@@ -310,20 +310,20 @@
     <div class="stat"><span class="label">Over a year</span><span class="v wrong num">$38,400</span><span class="s">of sales a lender, buyer or investor never sees</span></div>
     <div class="stat"><span class="label">Fees you can see</span><span class="v num">$0</span><span class="s">so you can't check what you paid against the published rates<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup><sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup> or your contract</span></div>
   </div>
-  <p class="muted" style="font-size:15px">Same example figures as above, scaled up: 1,000 × $3.20 = $3,200 a month, × 12 = $38,400 a year. Confirm how your accountant wants fees presented.</p>
+  <p class="muted" style="font-size:15px">These are the same example figures as above, scaled up: 1,000 × $3.20 = $3,200 a month, × 12 = $38,400 a year. Ask your accountant how they want to present fees.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
   <h2>It asks five questions before it looks at anything</h2>
   <ol class="qs">
-    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files and the checks are the same. No subscription needed.</div></li>
+    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files. The checks are the same. You need no subscription.</div></li>
     <li><div class="q">Which payment app: Stripe, Square or PayPal?</div><div class="why">Each one sends its money differently.</div></li>
     <li><div class="q">Which month?</div><div class="why">It never assumes a period.</div></li>
-    <li><div class="q">Does your bookkeeper record each sale, or one entry per payout?</div><div class="why">Not sure? It will show you what's in your books, and you decide.</div></li>
-    <li><div class="q">Does your payment app ever hold money back?</div><div class="why">Held money is still yours, so it's shown separately.</div></li>
+    <li><div class="q">Does your bookkeeper record each sale, or one entry per payout?</div><div class="why">Not sure? It will show you what is in your books. Then you decide.</div></li>
+    <li><div class="q">Does your payment app ever withhold money?</div><div class="why">Held money is still yours, so the skill shows it separately.</div></li>
   </ol>
-  <p>Then it reads your answers back: <i>"Checking Stripe against your books for September. Go ahead?"</i> It waits for your yes.</p>
+  <p>Then it repeats your answers to you: <i>"Checking Stripe against your books for September. Go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
@@ -334,9 +334,9 @@
       <span class="tag">Connected with MosoFin</span>
       <h3>Just say yes</h3>
       <ul>
-        <li>It reads your books directly, with no exporting</li>
-        <li>If Stripe is connected too, it reads both sides</li>
-        <li>You'll still be asked for the bank statement, the one thing it can't see</li>
+        <li>It reads your books directly. You do not export anything.</li>
+        <li>If you connect Stripe too, it reads both sides</li>
+        <li>It will still ask you for the bank statement, the one thing it can't see</li>
       </ul>
     </div>
     <div class="card">
@@ -355,10 +355,10 @@
   <span class="label">What you get back</span>
   <h2>A straight answer, and the fix for your bookkeeper</h2>
   <div class="gets">
-    <div class="get"><b>Do they match?</b><span>Yes or no for the month, with the difference in dollars.</span></div>
-    <div class="get"><b>What's off, and why</b><span>Each gap explained in plain words: a fee not recorded, a refund in the wrong month, a payout that didn't arrive.</span></div>
-    <div class="get"><b>Suggested corrections</b><span>The entries your bookkeeper would post. Suggestions only. You decide.</span></div>
-    <div class="get"><b>Where every number came from</b><span>Your books, the payment app, or a file you uploaded, so nothing is a guess.</span></div>
+    <div class="get"><b>Do they match?</b><span>It answers yes or no for the month. It also gives the difference in dollars.</span></div>
+    <div class="get"><b>What's off, and why</b><span>It explains each gap in plain words: a fee the books do not record, a refund in the wrong month, a payout that didn't arrive.</span></div>
+    <div class="get"><b>Suggested corrections</b><span>It suggests the entries your bookkeeper would post. These are suggestions only. You decide.</span></div>
+    <div class="get"><b>Where every number came from</b><span>The skill names the source of each number: your books, the payment app, or a file you uploaded. Nothing is a guess.</span></div>
   </div>
 </section>
 
@@ -366,10 +366,10 @@
   <div class="never">
     <span class="label">What it never does</span>
     <ul>
-      <li><b>Never changes your books.</b> It reads and suggests. A person makes every change.</li>
-      <li><b>Never moves money,</b> issues refunds or touches your payment app.</li>
-      <li><b>Never guesses a number.</b> If something's missing, it tells you what's missing.</li>
-      <li><b>Never reads anything before you say yes.</b></li>
+      <li><b>It never changes your books.</b> It reads and suggests. A person makes every change.</li>
+      <li><b>It never moves money,</b> issues refunds or touches your payment app.</li>
+      <li><b>It never guesses a number.</b> If something is missing, it tells you what is missing.</li>
+      <li><b>It never reads anything before you say yes.</b></li>
     </ul>
   </div>
 </section>
@@ -378,29 +378,29 @@
   <span class="label">Words you'll hear</span>
   <h2>Five terms, in plain English</h2>
   <dl>
-    <dt>Payout</dt><dd>The lump sum your payment app sends to your bank, usually covering many sales at once<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
-    <dt>Processing fee</dt><dd>What the payment app keeps for handling a card payment<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup><sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. A real business cost.</dd>
+    <dt>Payout</dt><dd>The lump sum your payment app sends to your bank. It usually covers many sales at once<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Processing fee</dt><dd>What the payment app keeps when it handles a card payment<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup><sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. It is a real business cost.</dd>
     <dt>Chargeback</dt><dd>A customer disputes a charge with their card issuer. The payment is reversed, and the amount plus a dispute fee is taken from your balance<sup class="c"><a href="#src10" aria-label="source 10">10</a></sup>.</dd>
-    <dt>Waiting room</dt><dd>Money the payment app owes you but hasn't sent yet. Accountants call it a clearing account<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. It should empty out every few days; if it keeps growing, something's wrong. That last rule is bookkeeping practice, not a published standard.</dd>
-    <dt>Reserve</dt><dd>Money the payment app holds back for a set time to cover possible refunds and disputes. It's paid out when the term ends, minus anything it had to cover<sup class="c"><a href="#src11" aria-label="source 11">11</a></sup>.</dd>
+    <dt>Waiting room</dt><dd>Money the payment app owes you but hasn't sent yet. Accountants call it a clearing account<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. It should empty every few days. If it keeps growing, something is wrong. That last rule is bookkeeping practice, not a published standard.</dd>
+    <dt>Reserve</dt><dd>Money the payment app withholds for a set time to cover possible refunds and disputes. The payment app pays it to you when the term ends, minus anything it had to cover<sup class="c"><a href="#src11" aria-label="source 11">11</a></sup>.</dd>
   </dl>
 </section>
 
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where the facts on this page come from</h2>
-  <p class="muted">The payment apps' own documentation and the IRS, as published when checked on 20 October 2026. Rates and timings change, so follow the link for today's figure. What the skill does comes from the skill's own files.</p>
+  <p class="muted">The sources are the payment apps' own documentation and the IRS, as they published it when MosoFin checked on 20 October 2026. Rates and timings change, so follow the link for today's figure. What the skill does comes from the skill's own files.</p>
   <ol class="srcs">
     <li id="src1"><a href="https://stripe.com/pricing" rel="noopener">Stripe: Pricing</a><span class="what">Standard US online card rate, 2.9% + 30¢ per successful charge.</span></li>
-    <li id="src2"><a href="https://docs.stripe.com/payouts" rel="noopener">Stripe: Payouts</a><span class="what">How Stripe sends your balance to your bank; US accounts are paid on a 2-business-day schedule.</span></li>
+    <li id="src2"><a href="https://docs.stripe.com/payouts" rel="noopener">Stripe: Payouts</a><span class="what">How Stripe sends your balance to your bank. Stripe pays US accounts on a 2-business-day schedule.</span></li>
     <li id="src3"><a href="https://squareup.com/help/us/en/article/3807-deposit-options-with-square" rel="noopener">Square: Transfer options</a><span class="what">Standard transfers arrive the next business day for payments taken before the cutoff.</span></li>
     <li id="src4"><a href="https://squareup.com/us/en/payments/our-fees" rel="noopener">Square: Our fees</a><span class="what">Square's published rates for in-person and online payments.</span></li>
     <li id="src5"><a href="https://www.paypal.com/us/business/paypal-business-fees" rel="noopener">PayPal: Business fees</a><span class="what">PayPal's published rates, including PayPal Checkout.</span></li>
-    <li id="src6"><a href="https://docs.stripe.com/reports/payout-reconciliation" rel="noopener">Stripe: Payout reconciliation report</a><span class="what">Matches each payout to the charges, refunds and fees in it, and shows the balance not yet paid out.</span></li>
+    <li id="src6"><a href="https://docs.stripe.com/reports/payout-reconciliation" rel="noopener">Stripe: Payout reconciliation report</a><span class="what">The report matches each payout to the charges, refunds and fees in it. It also shows the balance that Stripe has not sent yet.</span></li>
     <li id="src7"><a href="https://docs.stripe.com/api/balance_transactions/object" rel="noopener">Stripe API: Balance transaction</a><span class="what">Each transaction carries the gross amount, the fee and the net amount separately.</span></li>
     <li id="src8"><a href="https://www.irs.gov/instructions/i1099k" rel="noopener">IRS: Instructions for Form 1099-K</a><span class="what">The form reports the gross amount of payments, without subtracting fees or refunds.</span></li>
-    <li id="src9"><a href="https://www.irs.gov/businesses/what-to-do-with-form-1099-k" rel="noopener">IRS: What to do with Form 1099-K</a><span class="what">Fees, refunds and similar amounts are accounted for on your return rather than reducing the reported gross.</span></li>
-    <li id="src10"><a href="https://docs.stripe.com/disputes" rel="noopener">Stripe: Disputes</a><span class="what">A dispute (chargeback) reverses the payment; Stripe debits your balance for the amount and the dispute fee.</span></li>
+    <li id="src9"><a href="https://www.irs.gov/businesses/what-to-do-with-form-1099-k" rel="noopener">IRS: What to do with Form 1099-K</a><span class="what">You account for fees, refunds and similar amounts on your return. They do not reduce the reported gross.</span></li>
+    <li id="src10"><a href="https://docs.stripe.com/disputes" rel="noopener">Stripe: Disputes</a><span class="what">A dispute (chargeback) reverses the payment. Stripe debits your balance for the amount and the dispute fee.</span></li>
     <li id="src11"><a href="https://support.stripe.com/questions/reserves-faq" rel="noopener">Stripe Support: Reserves FAQ</a><span class="what">A reserve holds part of your funds for a set term to cover refunds and disputes, then pays it out.</span></li>
   </ol>
 </section>
@@ -408,12 +408,12 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. It describes the current version, which asks five questions first and accepts uploads. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. It describes the current version, which asks five questions first and accepts uploads. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Do you want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
 <footer>
-  <span>All dollar figures on this page are illustrative examples, not your data. The IRS sources cover US tax reporting; confirm with your accountant how fees should be presented in your financial statements.</span>
+  <span>All dollar figures on this page are illustrative examples, not your data. The IRS sources cover US tax reporting. Ask your accountant how you should present fees in your financial statements.</span>
 </footer>
 
 </div>
