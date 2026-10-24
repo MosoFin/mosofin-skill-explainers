@@ -220,17 +220,17 @@
 <header>
   <span class="label">MosoFin · credit card reconciliation, in plain words</span>
   <h1>Is every charge on the company card accounted for?</h1>
-  <p class="lede">A company card gets used dozens of times a month by people who aren't the bookkeeper. This skill checks that every charge on the <b>card statement</b> is in your <b>books</b>, coded to the right account, backed by a receipt, and for the business.</p>
+  <p class="lede">People who are not the bookkeeper use a company card dozens of times a month. This skill checks every charge on the <b>card statement</b>. It checks that the charge is in your <b>books</b>, sits under the right account, has a receipt, and is for the business.</p>
   <div class="short">
     <span class="label">The 20-second version</span>
-    <p>You give it the statement and the receipts. It pulls every card charge from your books, ties the statement balance to the card account, matches receipts to charges, and lists what's missing, duplicated, personal, or coded to the wrong place. Then it drafts the entries your bookkeeper would post. It never posts them, and it never pays the card.</p>
+    <p>You give it the statement and the receipts. It reads every card charge from your books and ties the statement balance to the card account. It matches receipts to charges and lists what is missing, duplicated, personal, or coded to the wrong place. Then it drafts the entries your bookkeeper would post. It never posts them. It never pays the card.</p>
   </div>
 </header>
 
 <section>
   <span class="label">Where the numbers come from</span>
   <h2>The statement and the books should land on the same figure</h2>
-  <p>Your books carry a card liability: what the company owes the issuer. The statement says the same thing from the issuer's side. They differ at month end for ordinary reasons (a charge posted on the 30th that the issuer records on the 1st, a payment still on its way) and for one bad reason: a charge nobody entered. The skill walks the two figures towards each other and names every step.</p>
+  <p>Your books carry a card liability: what the company owes the issuer. The statement says the same thing from the issuer's side. They differ at month end for ordinary reasons. Two examples are a charge posted on the 30th that the issuer records on the 1st, and a payment still on its way. They also differ for one bad reason: a charge nobody entered. The skill walks the two figures towards each other and names every step.</p>
   <figure>
     <div class="canvas">
       <svg viewBox="0 0 880 300" role="img" aria-label="Two columns. Left: the card liability in the books, 8,240 dollars 60, plus a 340 dollar charge posted on 30 September that is not on the statement yet, minus a 148 dollar 50 charge on the statement that was never entered in the books, equals 8,432 dollars 10. Right: the statement closing balance, 8,432 dollars 10. They meet.">
@@ -256,14 +256,14 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures. In QuickBooks Online a credit card account is reconciled the same way as a bank account: enter the statement's closing balance, tick what appears on it, finish at a difference of zero<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The skill builds that bridge and then keeps going, because a balance that ties can still hide a personal charge and a laptop in the wrong account.</figcaption>
+    <figcaption>Example figures. In QuickBooks Online, you reconcile a credit card account the same way as a bank account. You enter the statement's closing balance. You tick what appears on it. You finish at a difference of zero<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The skill goes further than that bridge, because a balance that ties can still hide a personal charge and a laptop in the wrong account.</figcaption>
   </figure>
 </section>
 
 <section>
   <span class="label">The mistake it catches</span>
   <h2>"The total was paid, so it's done"</h2>
-  <p>The quick way to handle a card is to post the statement total, pay it, and move on. The balance ties. Nothing looks wrong. The skill reads every charge instead, and three things usually turn up on a card that has only ever been checked in total.</p>
+  <p>The quick way to handle a card is to post the statement total, pay it, and continue to the next task. The balance ties. Nothing looks wrong. The skill reads every charge instead. It usually finds three things on a card that people only ever checked in total.</p>
   <div class="compare">
     <div class="book">
       <h3>What the skill does</h3>
@@ -274,7 +274,7 @@
         <div class="row off"><span>Laptop coded to office supplies, over the $2,500 line</span><span class="v">$2,900.00</span></div>
         <div class="row same"><span>Receipts missing above your $75 policy</span><span class="v">1 of 42</span></div>
       </div>
-      <div class="verdict">Four exceptions, each with a severity, a next step and a name. Proposed entries to move the laptop to fixed assets and to record the missing charge.</div>
+      <div class="verdict">The skill finds four exceptions, each with a severity, a next step and a name. It proposes entries to move the laptop to fixed assets and to record the missing charge.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -285,34 +285,34 @@
         <div class="row off"><span>Unused software still renewing</span><span class="v">$99 / mo</span></div>
         <div class="row off"><span>$2,900 asset expensed in one month</span><span class="v">hidden</span></div>
       </div>
-      <div class="verdict">The balance ties, the expenses are overstated, and the subscription renews again next month.</div>
+      <div class="verdict">The balance ties, but the expenses are too high. The subscription renews again next month.</div>
     </div>
   </div>
   <div class="scale">
-    <div class="stat"><span class="label">Receipts</span><span class="v num">$75</span><span class="s">the IRS generally doesn't require a receipt below this for travel and business expenses, except lodging; above it, one is needed<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
-    <div class="stat"><span class="label">Assets, not expenses</span><span class="v num">$2,500</span><span class="s">the IRS de minimis safe harbor per item for a business without audited statements; $5,000 with them<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup></span></div>
-    <div class="stat"><span class="label">Disputes</span><span class="v num">60 days</span><span class="s">from the statement to dispute a charge in writing; the issuer has 30 days to acknowledge<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
+    <div class="stat"><span class="label">Receipts</span><span class="v num">$75</span><span class="s">The IRS generally does not require a receipt below this amount for travel and business expenses, except lodging. Above it, you need a receipt<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Assets, not expenses</span><span class="v num">$2,500</span><span class="s">This is the IRS de minimis safe harbor per item for a business without audited statements. The limit is $5,000 for a business with audited statements<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup></span></div>
+    <div class="stat"><span class="label">Disputes</span><span class="v num">60 days</span><span class="s">This is how long you have, from the statement, to dispute a charge in writing. The issuer has 30 days to acknowledge the dispute<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
   </div>
-  <p class="muted" style="font-size:15px">Your own policy thresholds are what the skill applies. The figures above are the published rules it compares them against; the skill never fills in a threshold for you.</p>
+  <p class="muted" style="font-size:15px">The skill applies your own policy thresholds. The figures above are the published rules it compares them against. The skill never chooses a threshold for you.</p>
 </section>
 
 <section>
   <span class="label">One honest limit</span>
   <h2>It can read your books. It cannot read the card issuer, or a receipt</h2>
-  <p>With MosoFin connected, the skill reads every card charge posted in your books, the card liability and its movement, the payments made to the card, and whether a file is attached to each charge. No accounting connection shows it the statement or the receipts, so it always asks you for both. And a file being attached is not the same as a receipt being matched: the skill reports those as two separate facts.</p>
-  <p>Without the statement it still does useful work. It reviews every posted charge, runs the three monthly tests (duplicates, recurring subscriptions with their annual cost, purchases over your capitalisation threshold), and lists what sits in suspense or uncategorised accounts. It calls that a <b>posted-charge review</b>, not a reconciliation, because the books cannot test themselves.</p>
+  <p>With MosoFin connected, the skill reads every card charge posted in your books. It also reads the card liability and its movement, the payments made to the card, and whether each charge has a file attached. No accounting connection shows it the statement or the receipts, so it always asks you for both. An attached file is not the same as a matched receipt. The skill reports these as two separate facts.</p>
+  <p>Without the statement it still does useful work. It reviews every posted charge and runs the three monthly tests. The three tests cover duplicates, recurring subscriptions with their annual cost, and purchases over your capitalisation threshold. It also lists what sits in suspense or uncategorised accounts. It calls that a <b>posted-charge review</b>, not a reconciliation, because the books cannot test themselves.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
   <h2>It asks six questions before it looks at anything</h2>
   <ol class="qs">
-    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files and the checks are the same. No subscription needed.</div></li>
-    <li><div class="q">Which card, and whose?</div><div class="why">One reconciliation per card. A programme with several cards is reconciled per cardholder, then summed to the statement.</div></li>
+    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files. The checks are the same. You need no subscription.</div></li>
+    <li><div class="q">Which card, and whose?</div><div class="why">The skill does one reconciliation per card. For a programme with several cards, it reconciles each cardholder, then sums the results to the statement.</div></li>
     <li><div class="q">Which statement period, and does it match your accounting month?</div><div class="why">A 16th-to-15th statement against calendar-month books is the most common reason a card won't tie. It's structural, not an error, and the skill cuts by your dates.</div></li>
-    <li><div class="q">The statement.</div><div class="why">The one thing no accounting connection holds. It asks early so you know whether the result will be a reconciliation or a review.</div></li>
-    <li><div class="q">The receipts.</div><div class="why">Or an export from your receipt tool. A file attached to a charge in your books is not counted as a matched receipt.</div></li>
-    <li><div class="q">Your policies: below what amount is no receipt needed, above what amount is a purchase an asset, and can you reclaim tax?</div><div class="why">Your policy decides which missing receipt is acceptable and which laptop belongs in fixed assets. It never defaults the thresholds. If you can reclaim tax, a card slip is not enough evidence; the receipt has to show the tax.</div></li>
+    <li><div class="q">The statement.</div><div class="why">The statement is the one thing no accounting connection holds. The skill asks early so you know whether the result will be a reconciliation or a review.</div></li>
+    <li><div class="q">The receipts.</div><div class="why">You give the receipts, or an export from your receipt tool. The skill does not count a file attached to a charge in your books as a matched receipt.</div></li>
+    <li><div class="q">Your policies: below what amount is no receipt needed, above what amount is a purchase an asset, and can you reclaim tax?</div><div class="why">Your policy decides which missing receipt is acceptable and which laptop belongs in fixed assets. The skill never sets a default value for the thresholds. If you can reclaim tax, a card slip is not enough evidence. The receipt has to show the tax.</div></li>
   </ol>
   <p>Then it reads your answers back: <i>"Reconciling Dana Reyes's card for the September statement against the statement and receipts you uploaded, $75 receipt policy, $2,500 capitalisation line. Go ahead?"</i> It waits for your yes.</p>
 </section>
@@ -327,8 +327,8 @@
       <ul>
         <li>It reads every posted card charge with its merchant, amount, date and account</li>
         <li>It reads the card liability, its movement, and the payments made to the card</li>
-        <li>It can see whether a file is attached to a charge, and which tax code was used</li>
-        <li>You still supply the <b>statement</b> and the <b>receipts</b>, every time</li>
+        <li>It can see whether a charge has a file attached, and which tax code the charge uses</li>
+        <li>You still give it the <b>statement</b> and the <b>receipts</b>, every time</li>
       </ul>
     </div>
     <div class="card">
@@ -336,9 +336,9 @@
       <h3>Bring the statement, the receipts and an export</h3>
       <ul>
         <li><b>Card statement</b> for the period (PDF, CSV or spreadsheet)</li>
-        <li><b>Receipts</b>, or an export from your receipt app</li>
+        <li><b>Receipts</b>, or an export from your receipt tool</li>
         <li><b>Your books' card activity</b>: the card account's transactions and its closing balance</li>
-        <li>Typed in: cardholder, receipt threshold, capitalisation threshold, tax rules</li>
+        <li>You type the cardholder, the receipt threshold, the capitalisation threshold and the tax rules</li>
       </ul>
     </div>
   </div>
@@ -348,10 +348,10 @@
   <span class="label">What you get back</span>
   <h2>A balance that ties, every charge with its status, and the entries to post</h2>
   <div class="gets">
-    <div class="get"><b>The tie-out</b><span>Books to statement, with each reconciling item named. If no statement was supplied, it says the tie-out was not performed.</span></div>
-    <div class="get"><b>Every charge, with a receipt status</b><span>Matched, below threshold, missing, disputed or refunded, and whether a business purpose was captured. "File attached" and "receipt matched" are separate columns.</span></div>
-    <div class="get"><b>Exceptions, by severity</b><span>Missing receipts, possible personal charges, duplicates, subscriptions with their annual cost, purchases over the capital line, charges sitting in suspense, tax reclaimed with no invoice.</span></div>
-    <div class="get"><b>Proposed entries</b><span>In your real account names, marked as proposals. It also says which way you already post card activity, charge by charge or by statement total.</span></div>
+    <div class="get"><b>The tie-out</b><span>It ties the books to the statement and names each reconciling item. If you did not give a statement, it says it did not do the tie-out.</span></div>
+    <div class="get"><b>Every charge, with a receipt status</b><span>Each charge shows a status of matched, below threshold, missing, disputed or refunded. The skill also shows whether the charge has a business purpose recorded. "File attached" and "receipt matched" are separate columns.</span></div>
+    <div class="get"><b>Exceptions, by severity</b><span>The exceptions are missing receipts, possible personal charges, duplicates, and subscriptions with their annual cost. Others are purchases over the capital line, charges sitting in suspense, and tax reclaimed with no invoice.</span></div>
+    <div class="get"><b>Proposed entries</b><span>The skill drafts the entries in your real account names and marks them as proposals. It also says which way you already post card activity, charge by charge or by statement total.</span></div>
   </div>
 </section>
 
@@ -359,7 +359,7 @@
   <div class="never">
     <span class="label">What it never does</span>
     <ul>
-      <li><b>Never posts an entry or pays the card.</b> It drafts; a person posts.</li>
+      <li><b>Never posts an entry or pays the card.</b> It drafts. A person posts.</li>
       <li><b>Never calls a review a reconciliation.</b> Without the statement, the output says so.</li>
       <li><b>Never treats an attached file as a matched receipt.</b></li>
       <li><b>Never names an employee on test data,</b> and never stores card numbers or individual spending.</li>
@@ -372,27 +372,27 @@
   <span class="label">Words you'll hear</span>
   <h2>Six terms, in plain English</h2>
   <dl>
-    <dt>Statement period</dt><dd>The issuer's billing cycle. It often runs mid-month to mid-month, which is why it rarely lines up with your accounting month.</dd>
+    <dt>Statement period</dt><dd>The issuer's billing cycle. It often runs mid-month to mid-month, which is why it rarely matches your accounting month.</dd>
     <dt>Reconciling item</dt><dd>A named, legitimate reason the books and the statement differ at month end, usually timing. Anything without a name is an exception.</dd>
     <dt>Receipt threshold</dt><dd>The amount below which your policy doesn't require a receipt. The IRS's own line for most business expenses is $75, with lodging always needing one<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
     <dt>Capitalisation threshold</dt><dd>The amount above which a purchase is an asset to depreciate, not an expense. The IRS safe harbor is $2,500 per item for most small businesses<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
     <dt>Dispute</dt><dd>Telling the issuer a charge is wrong. In the US you have 60 days from the statement to do it in writing<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill tracks the amount and doesn't book the credit until the issuer decides.</dd>
-    <dt>Tax invoice</dt><dd>The document a tax authority requires before you reclaim tax on a purchase. Under UK VAT rules the amount you reclaim is the VAT shown on the supplier's VAT invoice; a card slip proves you paid, not what tax was charged<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+    <dt>Tax invoice</dt><dd>The document a tax authority requires before you reclaim tax on a purchase. Under UK VAT rules, the amount you reclaim is the VAT shown on the supplier's VAT invoice. A card slip proves you paid, not what tax the supplier charged<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
   </dl>
 </section>
 
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where the facts on this page come from</h2>
-  <p class="muted">Tax authorities, the US consumer-finance regulator and the accounting software's own documentation, as published when checked on 22 October 2026. Thresholds and deadlines change, so follow the link for today's wording. What the skill does comes from the skill's own file.</p>
+  <p class="muted">The sources are tax authorities, the US consumer-finance regulator and the accounting software's own documentation. This page uses them as published when checked on 22 October 2026. Thresholds and deadlines change, so follow the link for today's wording. What the skill does comes from the skill's own file.</p>
   <ol class="srcs">
-    <li id="src1"><a href="https://www.irs.gov/publications/p463" rel="noopener">IRS: Publication 463, Travel, Gift, and Car Expenses</a><span class="what">Documentary evidence is adequate if it shows the amount, date, place and essential character of the expense; it is generally not needed for an expense under $75 other than lodging.</span></li>
+    <li id="src1"><a href="https://www.irs.gov/publications/p463" rel="noopener">IRS: Publication 463, Travel, Gift, and Car Expenses</a><span class="what">Documentary evidence is adequate if it shows the amount, date, place and essential character of the expense. Documentary evidence is generally not needed for an expense under $75 other than lodging.</span></li>
     <li id="src2"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/tangible-property-final-regulations" rel="noopener">IRS: Tangible property final regulations</a><span class="what">The de minimis safe harbor lets a business deduct items up to $2,500 per invoice or item, or $5,000 with an applicable financial statement.</span></li>
-    <li id="src3"><a href="https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-charge-on-my-credit-card-bill-en-61/" rel="noopener">CFPB: How do I dispute a charge on my credit card bill?</a><span class="what">Send a written billing-error notice within 60 days of the statement; the issuer must acknowledge within 30 days and, if it agrees, remove the charge.</span></li>
-    <li id="src4"><a href="https://www.gov.uk/guidance/vat-guide-notice-700" rel="noopener">HMRC: VAT guide (VAT Notice 700)</a><span class="what">Input tax is reclaimed as the VAT shown on the supplier's VAT invoice; a less detailed invoice is allowed for £250 or less if it carries the supplier's VAT number and the rate.</span></li>
-    <li id="src5"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US" rel="noopener">Intuit: Reconcile an account in QuickBooks Online</a><span class="what">The same reconcile screen covers bank and credit card accounts: enter the statement's ending balance and date, tick matching items, finish at a difference of $0.00.</span></li>
+    <li id="src3"><a href="https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-charge-on-my-credit-card-bill-en-61/" rel="noopener">CFPB: How do I dispute a charge on my credit card bill?</a><span class="what">Send a written billing-error notice within 60 days of the statement. The issuer must acknowledge the notice within 30 days and, if the issuer agrees, remove the charge.</span></li>
+    <li id="src4"><a href="https://www.gov.uk/guidance/vat-guide-notice-700" rel="noopener">HMRC: VAT guide (VAT Notice 700)</a><span class="what">You reclaim input tax as the VAT shown on the supplier's VAT invoice. HMRC allows a less detailed invoice for £250 or less if the invoice carries the supplier's VAT number and the rate.</span></li>
+    <li id="src5"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US" rel="noopener">Intuit: Reconcile an account in QuickBooks Online</a><span class="what">The same reconcile screen covers bank and credit card accounts. You enter the statement's ending balance and date. You tick matching items. You finish at a difference of $0.00.</span></li>
   </ol>
-  <p class="muted" style="font-size:14.5px">Not backed by an outside authority: the receipt-status categories, the three monthly tests and the "review, not reconciliation" labelling are the skill's own rules. Sound corporate-card practice, not a published standard.</p>
+  <p class="muted" style="font-size:14.5px">No outside authority backs these items: the receipt-status categories, the three monthly tests and the "review, not reconciliation" labelling. They are the skill's own rules. They are sound corporate-card practice, not a published standard.</p>
 </section>
 
 <section>
@@ -403,7 +403,7 @@
 </section>
 
 <footer>
-  <span>All dollar figures on this page are illustrative examples, not your data. The receipt, capitalisation and dispute rules cited are US ones and the tax-invoice rule is a UK one; confirm with your accountant what applies to you.</span>
+  <span>All dollar figures on this page are illustrative examples, not your data. The receipt, capitalisation and dispute rules that this page cites are US rules. The tax-invoice rule is a UK rule. Ask your accountant what applies to you.</span>
 </footer>
 
 </div>
