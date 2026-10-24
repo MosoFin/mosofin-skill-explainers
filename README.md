@@ -71,6 +71,12 @@ description length, a second `<h1>`, a skipped heading level, a duplicate title 
 that does not parse. Submit `https://mosofin.github.io/mosofin-skill-explainers/sitemap.xml` in Google
 Search Console and Bing Webmaster Tools; a project site cannot serve a root `robots.txt`.
 
+## Processing a finance skill end to end
+
+The `process-finance-skill` skill in `.claude/skills/` takes one finance skill through all twelve steps:
+audit, fixes, the card-format split with a proof that no line was lost, sources, the three pages, citations,
+the STE pass, checks and publishing. Its two scripts audit a skill and prove a split.
+
 ## Writing a new explainer with Claude
 
 The workflow — read the skill, collect and verify sources, write the three pages in order,

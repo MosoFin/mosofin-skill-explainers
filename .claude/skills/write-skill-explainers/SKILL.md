@@ -19,6 +19,9 @@ so nothing on this site is installed with a skill. Never put an explainer inside
 Reference implementation, read it before writing a page of the same kind:
 `site/skills/merchant-and-payment-processor-rec/{plain,learn,anatomy}.html`.
 
+To take a skill through the whole process, from audit and card-format split to published pages, use the
+`process-finance-skill` skill. This skill is its page-writing part.
+
 ## Why the pages are built this way
 
 A business owner will only trust a skill they can check for themselves. So every page goes from
