@@ -220,17 +220,17 @@
 <header>
   <span class="label">MosoFin · bank reconciliation, in plain words</span>
   <h1>Does your bank match your books?</h1>
-  <p class="lede">Your <b>books</b> say you have one amount of cash. The <b>bank</b> says another. This skill proves the two differ only for reasons you can name. Whatever is left over is an error worth finding.</p>
+  <p class="lede">Your <b>books</b> say you have one amount of cash. The <b>bank</b> says another. This skill proves the two differ only for reasons you can name. Any amount that remains is an error worth finding.</p>
   <div class="short">
     <span class="label">The 20-second version</span>
-    <p>You give it a month and the bank statement. It pulls every cash movement from your books, lines them up against the statement, explains each difference (a cheque not yet cashed, a deposit not yet landed, a fee you didn't know about), and tells you whether the two sides meet to the cent. If they don't, it shows what's unexplained. It never changes anything itself.</p>
+    <p>You give the skill a month and the bank statement. The skill reads every cash movement from your books and matches each one against the statement. It explains each difference (a cheque not yet cashed, a deposit not yet landed, a fee you didn't know about). It tells you whether the two sides meet to the cent. If they don't, it shows what's unexplained. It never changes anything itself.</p>
   </div>
 </header>
 
 <section>
   <span class="label">Why the two numbers differ</span>
   <h2>Both can be right, and still disagree</h2>
-  <p>Money moves on different days in the bank than in your books. You write a cheque today; the bank sees it when it's cashed. You bank the till on Friday; the bank credits it Monday<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The bank charges a fee and pays interest without telling your books. Reconciling means walking both numbers towards each other until they meet.</p>
+  <p>Money moves on different days in the bank than in your books. You write a cheque today, and the bank sees it when someone cashes it. You bank the till on Friday, and the bank credits it on Monday<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The bank charges a fee and pays interest without telling your books. Reconciling means walking both numbers towards each other until they meet.</p>
   <figure>
     <div class="canvas">
       <svg viewBox="0 0 880 300" role="img" aria-label="Two ladders. Left: the bank's ending balance of 12,480 dollars, plus a 1,250 dollar deposit still in transit, minus 1,860 dollars of cheques not yet cashed, equals 11,870 dollars. Right: the books' balance of 11,880 dollars 50, minus a 15 dollar bank fee not yet recorded, plus 4 dollars 50 of interest not yet recorded, equals 11,870 dollars. The two ladders meet in the middle.">
@@ -256,29 +256,29 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures. Accountants call the two ladders a <b>bridge</b>. Each step on it is a named reason, and the skill will not accept a bridge that "nearly" balances. More on that below.</figcaption>
+    <figcaption>Example figures. Accountants call the two ladders a <b>bridge</b>. Each step on it is a named reason. The skill will not accept a bridge that "nearly" balances. More on that below.</figcaption>
   </figure>
 </section>
 
 <section>
   <span class="label">The mistake it catches</span>
   <h2>"Close enough" is where errors hide</h2>
-  <p>Suppose the ladders end $25.00 apart. The tempting move is to post a $25 "miscellaneous" entry so the month closes. QuickBooks itself warns against forcing an adjustment like that and says it is usually better to resolve the difference<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill's rule is stricter: the bridge ties to the cent, and a leftover amount is an unidentified item, not rounding.</p>
+  <p>Suppose the ladders end $25.00 apart. The tempting move is to post a $25 "miscellaneous" entry so the month closes. QuickBooks itself warns against forcing an adjustment like that and says it is usually better to resolve the difference<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill's rule is stricter: the bridge ties to the cent. A leftover amount is an unidentified item, not rounding.</p>
   <div class="compare">
     <div class="book">
       <h3>What the skill does</h3>
-      <span class="who">Finds the $25 before anyone writes it off</span>
+      <span class="who">Finds the $25 before anyone dismisses it</span>
       <div class="rows num">
         <div class="row"><span>Adjusted bank balance</span><span class="v">$11,870.00</span></div>
         <div class="row"><span>Adjusted book balance</span><span class="v">$11,895.00</span></div>
         <div class="row off"><span>Unexplained</span><span class="v">$25.00</span></div>
         <div class="row same"><span>Found: the same $25 supplier payment recorded twice</span><span class="v">fix it</span></div>
       </div>
-      <div class="verdict">It checks the books against themselves for duplicates (same amount, same payee, same date) before the statement is even needed.</div>
+      <div class="verdict">It checks the books against themselves for duplicates (same amount, same payee, same date). It does this before it needs the statement.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
-      <span class="who">Post $25 to "miscellaneous" and move on</span>
+      <span class="who">Post $25 to "miscellaneous" and continue</span>
       <div class="rows num">
         <div class="row"><span>Adjusted bank balance</span><span class="v">$11,870.00</span></div>
         <div class="row"><span>Adjusted book balance</span><span class="v">$11,895.00</span></div>
@@ -289,32 +289,32 @@
     </div>
   </div>
   <div class="scale">
-    <div class="stat"><span class="label">Cheques you deposit</span><span class="v num">2 days</span><span class="s">most become available by the second business day after deposit, under US funds-availability rules<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>, so a deposit still missing after weeks is not timing</span></div>
-    <div class="stat"><span class="label">Cheques you write</span><span class="v num">90 days</span><span class="s">uncashed for a quarter, the skill escalates it: it may be lost, or about to be paid twice. That age is the skill's rule, not a published standard</span></div>
-    <div class="stat"><span class="label">Then, by law</span><span class="v num wrong">the state's</span><span class="s">money nobody claims for a set period, often a year or more, becomes unclaimed property you must hand over<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
+    <div class="stat"><span class="label">Cheques you deposit</span><span class="v num">2 days</span><span class="s">Most cheques become available by the second business day after deposit, under US funds-availability rules<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Because of this, a deposit still missing after weeks is not timing.</span></div>
+    <div class="stat"><span class="label">Cheques you write</span><span class="v num">90 days</span><span class="s">If a cheque stays uncashed for a quarter, the skill escalates it. It may be that the cheque is lost or that you are about to pay twice. That age is the skill's rule, not a published standard.</span></div>
+    <div class="stat"><span class="label">Then, by law</span><span class="v num wrong">the state's</span><span class="s">Money that nobody claims for a set period, often a year or more, becomes unclaimed property. You must give that property to the state<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</span></div>
   </div>
-  <p class="muted" style="font-size:15px">The IRS expects a business to reconcile its bank account every month and to keep the deposit slips, cancelled cheques and statements that support its return<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. This skill produces that reconciliation; it does not replace the records.</p>
+  <p class="muted" style="font-size:15px">The IRS expects a business to reconcile its bank account every month. It also expects the business to keep the deposit slips, cancelled cheques and statements that support its return<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. This skill produces that reconciliation. It does not replace the records.</p>
 </section>
 
 <section>
   <span class="label">One honest limit</span>
   <h2>It can read your books. It cannot read your bank.</h2>
-  <p>With MosoFin connected, the skill reads one side of the bridge directly: the cash balance, every payment, deposit and transfer in your books. No accounting connection shows it the bank statement. So it always asks you for the statement, and it says exactly what it did and did not conclude. Comparing the books to the books is not a reconciliation, and the skill will not call it one.</p>
-  <p>Without the statement it still does useful work: it builds the whole book side, lists the cheques and deposits that are <i>probably</i> still outstanding, finds duplicates and wrong-date entries, and hands you a template where the only remaining job is matching against the statement when it arrives.</p>
+  <p>With MosoFin connected, the skill reads one side of the bridge directly: the cash balance, every payment, deposit and transfer in your books. No accounting connection shows it the bank statement. So it always asks you for the statement. It says exactly what it did and did not conclude. Comparing the books to the books is not a reconciliation, and the skill will not call it one.</p>
+  <p>Without the statement, the skill still does useful work. It builds the whole book side, and it lists the cheques and deposits that are <i>probably</i> still outstanding. It finds duplicates and wrong-date entries. It gives you a template. The only remaining job is to match the template against the statement when the statement arrives.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
   <h2>It asks six questions before it looks at anything</h2>
   <ol class="qs">
-    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files and the checks are the same. No subscription needed.</div></li>
+    <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files. The checks are the same. You need no subscription.</div></li>
     <li><div class="q">Which bank account, or accounts?</div><div class="why">It lists the cash accounts from your books by name. It never shows or stores a full account number.</div></li>
     <li><div class="q">Which period?</div><div class="why">It never assumes a month.</div></li>
-    <li><div class="q">The bank statement, as a PDF or CSV, or at least the ending balance and the lines.</div><div class="why">The one thing it cannot see. It asks early so you know what the result will and won't be.</div></li>
-    <li><div class="q">When was this account last reconciled?</div><div class="why">Without it, an item that looks new may be months old. It will tell you the bridge starts blind.</div></li>
+    <li><div class="q">Can you give the bank statement as a PDF or CSV, or at least the ending balance and the lines?</div><div class="why">The statement is the one thing the skill cannot see. The skill asks early so you know what the result will and won't be.</div></li>
+    <li><div class="q">When did you last reconcile this account?</div><div class="why">Without that date, an item that looks new may be months old. It will tell you the bridge starts blind.</div></li>
     <li><div class="q">How small a difference is worth chasing?</div><div class="why">Your threshold decides which items get an owner and a date. The bridge still has to tie exactly.</div></li>
   </ol>
-  <p>Then it reads your answers back: <i>"Reconciling the Operating account (…4471) for September against the statement you uploaded. Go ahead?"</i> It waits for your yes.</p>
+  <p>Then it repeats your answers: <i>"Reconciling the Operating account (…4471) for September against the statement you uploaded. Go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
@@ -325,9 +325,9 @@
       <span class="tag">Connected with MosoFin</span>
       <h3>Say yes, then add the statement</h3>
       <ul>
-        <li>It reads the cash balance, payments, deposits, transfers and manual entries from your books, with no exporting</li>
+        <li>It reads the cash balance, payments, deposits, transfers and manual entries from your books. You do not export anything.</li>
         <li>It finds your bank accounts by name from your chart of accounts</li>
-        <li>You still supply the <b>bank statement</b>, every time</li>
+        <li>You still give the <b>bank statement</b>, every time</li>
         <li>Helpful but optional: last month's reconciliation report</li>
       </ul>
     </div>
@@ -337,7 +337,7 @@
       <ul>
         <li><b>Bank statement</b> for the period (PDF or CSV)</li>
         <li><b>Your books' cash activity</b> for the same account and period: a general ledger export, plus the ending balance (a trial balance works)</li>
-        <li><b>Last reconciliation</b> if you have one: the report, or just the date it was last done</li>
+        <li><b>Last reconciliation</b> if you have one: the report, or just the date you last reconciled the account</li>
       </ul>
     </div>
   </div>
@@ -347,10 +347,10 @@
   <span class="label">What you get back</span>
   <h2>A bridge that balances, or the exact reason it doesn't</h2>
   <div class="gets">
-    <div class="get"><b>The two ladders</b><span>Bank side and book side, meeting to the cent, or not, with the unexplained amount stated plainly. It says whether a statement was supplied.</span></div>
-    <div class="get"><b>Every match, and how it was made</b><span>Same amount and date; same amount and similar wording; a cheque number or reference; or one bank line covering several entries. The weaker the method, the more you should look.</span></div>
-    <div class="get"><b>What's unmatched, sorted</b><span>Fees, interest, a bounced payment, a card dispute, a loan debit, or "unknown" with an owner and a date to find out.</span></div>
-    <div class="get"><b>Suggested entries, and a sign-off line</b><span>The fee and interest entries your bookkeeper would post, each tied to the statement line that proves it. Then two named people to prepare and review, and they can't be the same person.</span></div>
+    <div class="get"><b>The two ladders</b><span>It shows the bank side and the book side. They meet to the cent, or they do not. It states the unexplained amount plainly and says whether you gave a statement.</span></div>
+    <div class="get"><b>Every match, and how the skill made it</b><span>Each match uses one method. The methods are: same amount and date, same amount and similar wording, a cheque number or reference, or one bank line that covers several entries. The weaker the method, the more you should look.</span></div>
+    <div class="get"><b>What's unmatched, sorted</b><span>The skill sorts each unmatched item into fees, interest, a bounced payment, a card dispute, a loan debit, or "unknown". An "unknown" item gets an owner and a date to learn what it is.</span></div>
+    <div class="get"><b>Suggested entries, and a sign-off line</b><span>The skill suggests the fee and interest entries your bookkeeper would post. It ties each entry to the statement line that proves it. Then it gives you a sign-off line for two named people to prepare and review. They can't be the same person.</span></div>
   </div>
 </section>
 
@@ -358,10 +358,10 @@
   <div class="never">
     <span class="label">What it never does</span>
     <ul>
-      <li><b>Never changes your books.</b> It reads and suggests. It cannot mark an item cleared or sign a reconciliation off.</li>
-      <li><b>Never calls it reconciled without the statement.</b> A book-side total is labelled a preparation, not a reconciliation.</li>
-      <li><b>Never guesses a number.</b> A missing item is reported as missing, with the tool or file that would have covered it.</li>
-      <li><b>Never shows a full bank account number.</b> It's masked, always.</li>
+      <li><b>Never changes your books.</b> It reads and suggests. It cannot mark an item cleared or sign a reconciliation.</li>
+      <li><b>Never calls it reconciled without the statement.</b> The skill labels a book-side total a preparation, not a reconciliation.</li>
+      <li><b>Never guesses a number.</b> It reports a missing item as missing and names the tool or file that would have covered it.</li>
+      <li><b>Never shows a full bank account number.</b> It always masks the number.</li>
       <li><b>Never reads anything before you say yes.</b></li>
     </ul>
   </div>
@@ -371,29 +371,29 @@
   <span class="label">Words you'll hear</span>
   <h2>Six terms, in plain English</h2>
   <dl>
-    <dt>Deposit in transit</dt><dd>Money you banked that the bank hasn't credited yet. Cash and some cheques land the next business day; most other cheques by the second<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
-    <dt>Outstanding cheque</dt><dd>A payment you wrote that nobody has cashed. Your books show it gone; the bank doesn't yet.</dd>
-    <dt>Bridge</dt><dd>The two ladders of named adjustments that bring the bank balance and the book balance to the same figure. If they don't meet, something is unexplained.</dd>
-    <dt>Returned item / NSF</dt><dd>A payment that bounced. A cheque you deposited is sent back because the writer's account couldn't cover it<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>; "NSF" means non-sufficient funds.</dd>
-    <dt>Chargeback</dt><dd>A customer disputes a card payment with their card issuer; the payment is reversed and the amount, plus a dispute fee, comes out of your balance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</dd>
-    <dt>Preparer and reviewer</dt><dd>Two different people: one does the reconciliation, another checks it. Separating who authorises, who handles the money and who records it is a basic control against fraud and error<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. The skill fills in neither name.</dd>
+    <dt>Deposit in transit</dt><dd>Money you banked that the bank hasn't credited yet. Cash and some cheques land the next business day. Most other cheques land by the second business day<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Outstanding cheque</dt><dd>A payment you wrote that is still uncashed. Your books show it gone. The bank doesn't show it gone yet.</dd>
+    <dt>Bridge</dt><dd>The two ladders of named adjustments that bring the bank balance and the book balance to the same figure. If they don't meet, something remains unexplained.</dd>
+    <dt>Returned item / NSF</dt><dd>A payment that bounced. The bank returns a cheque you deposited because the writer's account couldn't cover it<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. "NSF" means non-sufficient funds.</dd>
+    <dt>Chargeback</dt><dd>A customer disputes a card payment with their card issuer. The dispute reverses the payment, and your balance loses the amount, plus a dispute fee<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</dd>
+    <dt>Preparer and reviewer</dt><dd>Two different people: one does the reconciliation, another checks it. Separating who authorises, who handles the money and who records it is a basic control against fraud and error<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. The skill writes neither name.</dd>
   </dl>
 </section>
 
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where the facts on this page come from</h2>
-  <p class="muted">Regulators, the US standard for internal control, and the software's own documentation, as published when checked on 21 October 2026. Rules and timings change, so follow the link for today's wording. What the skill does comes from the skill's own file.</p>
+  <p class="muted">The sources are regulators, the US standard for internal control, and the software's own documentation. Each one is as published when MosoFin checked it on 21 October 2026. Rules and timings change, so follow the link for today's wording. What the skill does comes from the skill's own file.</p>
   <ol class="srcs">
-    <li id="src1"><a href="https://www.fdic.gov/consumer-compliance-examination-manual/vi-1-expedited-funds-availability-act" rel="noopener">FDIC: Expedited Funds Availability Act (Regulation CC)</a><span class="what">Cash, electronic payments and certain cheques available next business day; other cheques generally by the second business day after deposit.</span></li>
-    <li id="src2"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US" rel="noopener">Intuit: Reconcile an account in QuickBooks Online</a><span class="what">Enter the statement's ending balance and date, tick matching items, finish at a difference of $0.00; talk to your accountant before forcing an adjustment.</span></li>
-    <li id="src3"><a href="https://unclaimed.org/what-is-unclaimed-property/" rel="noopener">NAUPA: What is unclaimed property?</a><span class="what">Uncashed cheques count; after a dormancy period with no owner contact, the holder must turn the property over to the state.</span></li>
-    <li id="src4"><a href="https://www.irs.gov/publications/p583" rel="noopener">IRS: Publication 583, Starting a Business and Keeping Records</a><span class="what">Reconcile the business bank account monthly; keep deposit slips, cancelled cheques and bank statements as supporting records.</span></li>
-    <li id="src5"><a href="https://www.consumerfinance.gov/compliance/supervisory-guidance/cfpb-bulletin-2022-06-unfair-returned-deposited-item-fee-assessment-practices/" rel="noopener">CFPB: Bulletin 2022-06, Returned Deposited Item fees</a><span class="what">A returned deposited item is a deposited cheque sent back because it could not be processed against the writer's account.</span></li>
-    <li id="src6"><a href="https://docs.stripe.com/disputes" rel="noopener">Stripe: Disputes</a><span class="what">A dispute (chargeback) reverses the payment; the amount and a dispute fee are debited from your balance.</span></li>
-    <li id="src7"><a href="https://www.gao.gov/greenbook" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23</a><span class="what">Segregate authority, custody and accounting; where that is not practical, design alternative controls.</span></li>
+    <li id="src1"><a href="https://www.fdic.gov/consumer-compliance-examination-manual/vi-1-expedited-funds-availability-act" rel="noopener">FDIC: Expedited Funds Availability Act (Regulation CC)</a><span class="what">Cash, electronic payments and certain cheques are available the next business day. Other cheques are generally available by the second business day after deposit.</span></li>
+    <li id="src2"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US" rel="noopener">Intuit: Reconcile an account in QuickBooks Online</a><span class="what">Enter the statement's ending balance and date. Tick matching items. Finish at a difference of $0.00. Talk to your accountant before you force an adjustment.</span></li>
+    <li id="src3"><a href="https://unclaimed.org/what-is-unclaimed-property/" rel="noopener">NAUPA: What is unclaimed property?</a><span class="what">Uncashed cheques count. After a dormancy period with no owner contact, the holder must give the property to the state.</span></li>
+    <li id="src4"><a href="https://www.irs.gov/publications/p583" rel="noopener">IRS: Publication 583, Starting a Business and Keeping Records</a><span class="what">Reconcile the business bank account monthly. Keep deposit slips, cancelled cheques and bank statements as supporting records.</span></li>
+    <li id="src5"><a href="https://www.consumerfinance.gov/compliance/supervisory-guidance/cfpb-bulletin-2022-06-unfair-returned-deposited-item-fee-assessment-practices/" rel="noopener">CFPB: Bulletin 2022-06, Returned Deposited Item fees</a><span class="what">A returned deposited item is a deposited cheque that a bank returns because the bank could not process it against the writer's account.</span></li>
+    <li id="src6"><a href="https://docs.stripe.com/disputes" rel="noopener">Stripe: Disputes</a><span class="what">A dispute (chargeback) reverses the payment. Stripe debits the amount and a dispute fee from your balance.</span></li>
+    <li id="src7"><a href="https://www.gao.gov/greenbook" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23</a><span class="what">Segregate authority, custody and accounting. Where that is not practical, design alternative controls.</span></li>
   </ol>
-  <p class="muted" style="font-size:14.5px">Not backed by an outside authority: the <b>90-day</b> and <b>10-business-day</b> escalation ages, and <b>tying to the cent</b> rather than to a materiality threshold, are the skill's own quality rules. They are common bookkeeping practice, not a published standard.</p>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the <b>90-day</b> and <b>10-business-day</b> escalation ages, or <b>tying to the cent</b> rather than to a materiality threshold. They are the skill's own quality rules. They are common bookkeeping practice, not a published standard.</p>
 </section>
 
 <section>
@@ -404,7 +404,7 @@
 </section>
 
 <footer>
-  <span>All dollar figures on this page are illustrative examples, not your data. The funds-availability and unclaimed-property sources are US rules and vary by state; confirm with your accountant what applies to you.</span>
+  <span>All dollar figures on this page are illustrative examples, not your data. The funds-availability and unclaimed-property sources are US rules and vary by state. Ask your accountant what applies to you.</span>
 </footer>
 
 </div>

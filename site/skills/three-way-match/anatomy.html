@@ -97,8 +97,8 @@
 
 <header>
   <div class="eyebrow">three-way-match · shipped on main · audited 21 Oct 2026 · all 3 findings fixed · card format</div>
-  <h1>How the three-way match is built, and what it does</h1>
-  <p class="lede">Was one 729-line file; now a 137-line card and six reference files, every line of the original kept. Its distinctive move is that it names no evidence tools at all: Gate 2 asks three capability questions of the live catalogue — are purchase orders exposed, are item receipts, is approval status — and the answers decide which of fifteen exception tests can run. This page shows where the weight sits, the run step by step, what the audit found, and how those three questions come out against a real workspace.</p>
+  <h1>The structure of the three-way match, and what it does</h1>
+  <p class="lede">The skill was one 729-line file and is now a 137-line card and six reference files, which keep every line of the original. Its distinctive move is that it names no evidence tools at all. Gate 2 asks three capability questions of the live catalogue: are purchase orders exposed, are item receipts exposed, is approval status exposed. The answers decide which of fifteen exception tests can run. This page shows where the weight sits, the run step by step, and what the audit found. It also shows the answers to those three questions against a real workspace.</p>
 </header>
 
 <section>
@@ -151,7 +151,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the fifteen tests, the six sheets and what to persist; <b>overview.md</b> holds the which-legs rule and the three near-substitutes, and the card restates the which-legs rule at the top so it is never skipped. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the fifteen tests, the six sheets and what to persist. <b>overview.md</b> holds the which-legs rule and the three near-substitutes. The card restates the which-legs rule at the top, so a model never skips it. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
   </figure>
 </section>
 
@@ -241,7 +241,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: it names which match was actually performed, in the summary and the file name, and lists the tests that could not run so their absence is not read as a pass. The receipt leg decides five of the fifteen tests; approval data decides two more.</figcaption>
+    <figcaption>Both paths converge on the read-back, and the skill reads nothing before it. The skill's design centres on the clause in the highlighted box. The clause names which match the skill actually performed, in the summary and the file name. The clause also lists the tests that could not run, so no one reads their absence as a pass. The receipt leg decides five of the fifteen tests. Approval data decides two more.</figcaption>
   </figure>
 </section>
 
@@ -251,19 +251,19 @@
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Nine of fourteen cross-references pointed at skills that are not in the repository</h3>
-      <p>The text and the Related skills table send the reader to <code>sox-controls-design-and-testing</code>, <code>fraud-detection-and-forensics</code>, <code>petty-cash-management</code>, <code>multicurrency-fx-revaluation</code>, <code>sales-tax-us-multistate</code>, <code>vat-gst-international</code>, <code>vendor-onboarding-and-w9-tin</code>, <code>standard-costing-and-variance-analysis</code> and <code>accruals-and-prepayments</code>. All but the last are queued and not yet shipped; the last is not in the queue at all — the repository's skill is <code>accruals-and-deferrals</code>. A user installing this skill alone follows nine names to nothing. Each sentence now stands without the name, the wrong name is corrected to <code>accruals-and-deferrals</code>, and the Related skills table lists only the five that exist, with a note that the others will be linked when they ship.</p>
+      <p>The text and the Related skills table send the reader to <code>sox-controls-design-and-testing</code>, <code>fraud-detection-and-forensics</code>, <code>petty-cash-management</code>, <code>multicurrency-fx-revaluation</code>, <code>sales-tax-us-multistate</code>, <code>vat-gst-international</code>, <code>vendor-onboarding-and-w9-tin</code>, <code>standard-costing-and-variance-analysis</code> and <code>accruals-and-prepayments</code>. All but the last are in the queue and not yet shipped. The last is not in the queue at all: the repository's skill is <code>accruals-and-deferrals</code>. A user installing this skill alone follows nine names to nothing. Each sentence now stands without the name, and the fix replaces the wrong name with <code>accruals-and-deferrals</code>. The Related skills table now lists only the five that exist, with a note that the others will be linked when they ship.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">overview.md · method.md Steps 3–4 · edge-cases.md · main 9882a07</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>729 lines in one file, against a 500-line guide</h3>
-      <p>Done the same way as the two skills before it: a 137-line card with the six intake questions, the three capability questions and the which-legs rule, and the original text moved unchanged into <code>references/</code>, 495 of 495 content lines accounted for by script. The validator and shared-block sync pass on the new layout.</p>
+      <p>The fix works the same way as it did for the two skills before it. The skill now has a 137-line card with the six intake questions, the three capability questions and the which-legs rule. The fix moved the original text unchanged into <code>references/</code>. A script accounted for 495 of 495 content lines. The validator and shared-block sync pass on the new layout.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md + references/ · main 526d8bf</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>A sandbox-only path for the spreadsheet helper</h3>
-      <p>Step 6 says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. It is now an ask-first sentence: the user is asked whether they want an Excel file, it is created only on a yes using the file name from the skill (<code>3WayMatch_…</code> or <code>Match_Population_…</code>), and the fallback is tables in the chat. The same fix went into all 31 skills.</p>
+      <p>Step 6 says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. It is now an ask-first sentence: the skill asks the user whether they want an Excel file. The skill creates the file only on a yes, using the file name from the skill (<code>3WayMatch_…</code> or <code>Match_Population_…</code>). The fallback is tables in the chat. All 31 skills received the same fix.</p>
       <span class="where">SKILL.md · Step 6 · main 4d5637c</span>
     </div></div>
   </div>
@@ -273,19 +273,19 @@
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>Gate 2's three capability questions, answered against a live catalogue on 21 Oct 2026 (workspace Online Shop, QuickBooks company file Northwood, 73 read tools): purchase orders <b>yes</b> (<code>search_purchase_orders</code>, <code>get_purchase_order</code>); item receipts <b>no tool</b>; approval status <b>not exposed</b>. The skill would run a two-way match by omission there, say so, and list tests 3, 4, 7, 8, 11, 12 and 15 as not run — which is the designed behaviour.</span></li>
-    <li><span class="ok">PASS</span><span>No evidence tool is hard-coded; names are read off <code>get_datasource_tools</code> each run. In that workspace <code>search_vendors</code> is <code>permission</code>-gated and <code>search_vendor_credits</code> is <code>disabled</code>, so the vendor-master read goes [gated] and vendor-credit history goes [manual] — the verdict table handles both.</span></li>
-    <li><span class="ok">PASS</span><span>No tool in the catalogue pays a bill or releases a payment; the skill's scope note that such a tool is out of scope regardless of policy has nothing to exclude.</span></li>
-    <li><span class="ok">PASS</span><span>The exact-match default is preserved from the source, and no tolerance is ever invented.</span></li>
-    <li><span class="ok">PASS</span><span>The output names which match was performed and which tests did not run, in the summary header, the coverage sheet and the file name.</span></li>
-    <li><span class="ok">PASS</span><span>Exception 7 is flagged both as AP information and as a period-end accrual, with the population total.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures); the shared blocks are in sync.</span></li>
-    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page — 11 — matches the skill text word for word, checked by script, after the split too.</span></li>
-    <li><span class="ok">PASS</span><span>No broken links anywhere in the bundle; each stage on the card points at a file and step that exists. The one-line install pulls all 7 files.</span></li>
+    <li><span class="ok">PASS</span><span>The audit answered Gate 2's three capability questions against a live catalogue on 21 Oct 2026. The workspace was Online Shop, the QuickBooks company file was Northwood, and the catalogue had 73 read tools. The catalogue answered <b>yes</b> for purchase orders (<code>search_purchase_orders</code>, <code>get_purchase_order</code>), <b>no tool</b> for item receipts, and <b>not exposed</b> for approval status. The skill would run a two-way match by omission there, and it would say so. It would also list tests 3, 4, 7, 8, 11, 12 and 15 as not run. That is the designed behaviour.</span></li>
+    <li><span class="ok">PASS</span><span>The skill hard-codes no evidence tool. It reads the names from <code>get_datasource_tools</code> each run. In that workspace <code>search_vendors</code> is <code>permission</code>-gated and <code>search_vendor_credits</code> is <code>disabled</code>. So the vendor-master read goes [gated], and vendor-credit history goes [manual]. The verdict table handles both.</span></li>
+    <li><span class="ok">PASS</span><span>No tool in the catalogue pays a bill or releases a payment. The skill's scope note says that such a tool is out of scope regardless of policy. That note has nothing to exclude.</span></li>
+    <li><span class="ok">PASS</span><span>The skill preserves the exact-match default from the source, and it never invents a tolerance.</span></li>
+    <li><span class="ok">PASS</span><span>The output names which match the skill performed and which tests did not run, in the summary header, the coverage sheet and the file name.</span></li>
+    <li><span class="ok">PASS</span><span>The output flags exception 7 both as AP information and as a period-end accrual, with the population total.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures). The shared blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>The learn page quotes 11 rules, and every one matches the skill text word for word. A script checked this after the split too.</span></li>
+    <li><span class="ok">PASS</span><span>The bundle has no broken links anywhere. Each stage on the card points at a file and step that exists. The one-line install pulls all 7 files.</span></li>
   </ul>
-  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with real purchase orders and bills. Whether <code>search_purchase_orders</code> returns line detail — Gate 2's "with line detail, or header only?" — was not exercised; only the tool's existence was confirmed.</p>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with real purchase orders and bills. The audit did not test whether <code>search_purchase_orders</code> returns line detail. Gate 2 asks this as "with line detail, or header only?" The audit checked only that the tool exists.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; findings fixed in 4d5637c, 9882a07 and 526d8bf. Still to do: a live run with real purchase orders.</footer>
+<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a>. The approved=true limit is d86fa27. The audit ran on 21 Oct 2026. The fixes for the findings are in 4d5637c, 9882a07 and 526d8bf. Still to do: a live run with real purchase orders.</footer>
 
 </div>
