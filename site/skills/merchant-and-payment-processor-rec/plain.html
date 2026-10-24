@@ -272,7 +272,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures: $3.20 is Stripe's published US card rate, 2.9% + 30¢, on a $100 sale<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Square and PayPal publish different rates<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. Your contract may differ. Stripe sends the payout to US banks about two business days later<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Square can deposit the next business day<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Accountants call the waiting room a "clearing account": money the payment app owes you but hasn't sent yet. Stripe's payout reconciliation report tracks the same balance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</figcaption>
+    <figcaption>Example figures: $3.20 is Stripe's published US card rate, 2.9% + 30¢, on a $100 sale<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Square and PayPal publish different rates<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. Your contract may differ. Stripe makes US card funds available to pay out about two business days later<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Square can deposit the next business day<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Accountants call the waiting room a "clearing account": money the payment app owes you but hasn't sent yet. Stripe's payout reconciliation report tracks the same balance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</figcaption>
   </figure>
 </section>
 
@@ -392,16 +392,16 @@
   <p class="muted">The sources are the payment apps' own documentation and the IRS, as they published it when MosoFin checked on 20 October 2026. Rates and timings change, so follow the link for today's figure. What the skill does comes from the skill's own files.</p>
   <ol class="srcs">
     <li id="src1"><a href="https://stripe.com/pricing" rel="noopener">Stripe: Pricing</a><span class="what">Standard US online card rate, 2.9% + 30¢ per successful charge.</span></li>
-    <li id="src2"><a href="https://docs.stripe.com/payouts" rel="noopener">Stripe: Payouts</a><span class="what">How Stripe sends your balance to your bank. Stripe pays US accounts on a 2-business-day schedule.</span></li>
+    <li id="src2" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://docs.stripe.com/payments/balances" rel="noopener">Stripe: Balances and settlement time</a><span class="what">A US card payment made on Monday is available in your Stripe balance on Wednesday, 2 business days later. Your payout schedule decides only when Stripe sends available funds to your bank.</span></li>
     <li id="src3"><a href="https://squareup.com/help/us/en/article/3807-deposit-options-with-square" rel="noopener">Square: Transfer options</a><span class="what">Standard transfers arrive the next business day for payments taken before the cutoff.</span></li>
     <li id="src4"><a href="https://squareup.com/us/en/payments/our-fees" rel="noopener">Square: Our fees</a><span class="what">Square's published rates for in-person and online payments.</span></li>
     <li id="src5"><a href="https://www.paypal.com/us/business/paypal-business-fees" rel="noopener">PayPal: Business fees</a><span class="what">PayPal's published rates, including PayPal Checkout.</span></li>
-    <li id="src6"><a href="https://docs.stripe.com/reports/payout-reconciliation" rel="noopener">Stripe: Payout reconciliation report</a><span class="what">The report matches each payout to the charges, refunds and fees in it. It also shows the balance that Stripe has not sent yet.</span></li>
-    <li id="src7"><a href="https://docs.stripe.com/api/balance_transactions/object" rel="noopener">Stripe API: Balance transaction</a><span class="what">Each transaction carries the gross amount, the fee and the net amount separately.</span></li>
-    <li id="src8"><a href="https://www.irs.gov/instructions/i1099k" rel="noopener">IRS: Instructions for Form 1099-K</a><span class="what">The form reports the gross amount of payments, without subtracting fees or refunds.</span></li>
-    <li id="src9"><a href="https://www.irs.gov/businesses/what-to-do-with-form-1099-k" rel="noopener">IRS: What to do with Form 1099-K</a><span class="what">You account for fees, refunds and similar amounts on your return. They do not reduce the reported gross.</span></li>
+    <li id="src6" data-at="Payout reconciliation section"><a href="https://docs.stripe.com/reports/payout-reconciliation" rel="noopener">Stripe: Payout reconciliation report</a><span class="what">The report matches each payout to the charges, refunds and fees in it. It also shows the balance that Stripe has not sent yet.</span></li>
+    <li id="src7" data-at="Attributes: amount, fee, net"><a href="https://docs.stripe.com/api/balance_transactions/object" rel="noopener">Stripe API: Balance transaction</a><span class="what">Each transaction carries the gross amount, the fee and the net amount separately.</span></li>
+    <li id="src8" data-at="Box 1a"><a href="https://www.irs.gov/instructions/i1099k" rel="noopener">IRS: Instructions for Form 1099-K</a><span class="what">The form reports the gross amount of payments, without subtracting fees or refunds.</span></li>
+    <li id="src9" data-at="Check your records"><a href="https://www.irs.gov/businesses/what-to-do-with-form-1099-k" rel="noopener">IRS: What to do with Form 1099-K</a><span class="what">You account for fees, refunds and similar amounts on your return. They do not reduce the reported gross.</span></li>
     <li id="src10"><a href="https://docs.stripe.com/disputes" rel="noopener">Stripe: Disputes</a><span class="what">A dispute (chargeback) reverses the payment. Stripe debits your balance for the amount and the dispute fee.</span></li>
-    <li id="src11"><a href="https://support.stripe.com/questions/reserves-faq" rel="noopener">Stripe Support: Reserves FAQ</a><span class="what">A reserve holds part of your funds for a set term to cover refunds and disputes, then pays it out.</span></li>
+    <li id="src11" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://support.stripe.com/questions/reserves-frequently-asked-questions" rel="noopener">Stripe Support: Reserves, frequently asked questions</a><span class="what">A reserve holds part of your funds for a set term to cover refunds and disputes, then pays it out.</span></li>
   </ol>
 </section>
 
@@ -417,5 +417,66 @@
 </footer>
 
 </div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-20", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
 </body>
 </html>

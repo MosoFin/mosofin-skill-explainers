@@ -358,15 +358,17 @@
 
 <script>
 const SOURCES = [
-  {t:"IRS: Publication 463, Travel, Gift, and Car Expenses", u:"https://www.irs.gov/publications/p463", w:"Documentary evidence (receipts, cancelled cheques, bills) is adequate if it shows the amount, date, place and essential character of the expense. It is generally not needed for an expense under $75, other than lodging. A record should also show the business purpose."},
-  {t:"Intuit: Reconcile an account in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US", w:"The reconcile screen covers bank and credit card accounts alike. Enter the statement's ending balance and date. Tick each transaction that appears on the statement. Finish when the difference is $0.00. Talk to your accountant before you force an adjustment."},
+  {t:"IRS: Publication 463, Travel, Gift, and Car Expenses", u:"https://www.irs.gov/publications/p463", at:"Chapter 5, Recordkeeping", w:"Documentary evidence (receipts, cancelled cheques, bills) is adequate if it shows the amount, date, place and essential character of the expense. It is generally not needed for an expense under $75, other than lodging. A record should also show the business purpose."},
+  {t:"Intuit: Reconcile an account in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/statement-reconciliation/reconcile-account-quickbooks-online/L3XzsllsK_US_en_US", at:"Reconcile an account", w:"The reconcile screen covers bank and credit card accounts alike. Enter the statement's ending balance and date. Tick each transaction that appears on the statement. Finish when the difference is $0.00. Talk to your accountant before you force an adjustment."},
   {t:"IRS: Tangible property final regulations", u:"https://www.irs.gov/businesses/small-businesses-self-employed/tangible-property-final-regulations", w:"Under the de minimis safe harbor election, a business may deduct amounts paid for tangible property. The limit is $2,500 per invoice or item. The limit is $5,000 per invoice or item if the business has an applicable financial statement."},
-  {t:"HMRC: VAT guide (VAT Notice 700)", u:"https://www.gov.uk/guidance/vat-guide-notice-700", w:"The amount of input tax you reclaim is the VAT shown on the supplier's VAT invoice. You may use a less detailed VAT invoice for supplies of £250 or less. That invoice must still carry the supplier's name, address and VAT registration number and the rate. A customer without a valid VAT invoice cannot reclaim."},
-  {t:"CFPB: How do I dispute a charge on my credit card bill?", u:"https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-charge-on-my-credit-card-bill-en-61/", w:"Send a written billing-error notice within 60 calendar days after the charge appears on the statement. The issuer has 30 days to acknowledge it. If the issuer agrees, it removes the charge from the bill. If the issuer disagrees, it must say why in writing."},
-  {t:"ACFE: Occupational Fraud 2024, A Report to the Nations, key findings", u:"https://www.acfe.com/-/media/files/ACFE/PDFs/RTTN/2024/Infographics/Key-Findings.pdf", w:"Asset misappropriation appears in 89% of occupational fraud cases, with a median loss of $120,000. In 32% of frauds, internal controls were lacking. In 19% of frauds, someone overrode existing controls."},
+  {t:"HMRC: VAT guide (VAT Notice 700)", u:"https://www.gov.uk/guidance/vat-guide-notice-700", at:"¶10.4.2 and ¶16.6.1", w:"The amount of input tax you reclaim is the VAT shown on the supplier's VAT invoice. You may use a less detailed VAT invoice for supplies of £250 or less. That invoice must still carry the supplier's name, address and VAT registration number and the rate. A customer without a valid VAT invoice cannot reclaim."},
+  {t:"CFPB: How do I dispute a charge on my credit card bill?", u:"https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-charge-on-my-credit-card-bill-en-61/", at:"whole page", w:"Send a written billing-error notice within 60 calendar days after the charge appears on the statement. The issuer has 30 days to acknowledge it. If the issuer agrees, it removes the charge from the bill. If the issuer disagrees, it must say why in writing."},
+  {t:"ACFE: Occupational Fraud 2024, A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", checked:"2026-10-24", via:"from search results, page not opened", w:"Asset misappropriation appears in 89% of occupational fraud cases, with a median loss of $120,000. In 32% of frauds, internal controls were lacking. In 19% of frauds, someone overrode existing controls."},
   {t:"IFRS Foundation: IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/", w:"Consolidated statements present a parent and its subsidiaries as a single economic entity. For this reason, a balance between two group companies disappears in the group total. The balance must still appear in each company's own books."},
 ];
 const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
 const RULES = [
   { id:"1", kind:"", title:"Tie the statement to the card liability",
@@ -388,12 +390,12 @@ const RULES = [
     formula:"same merchant, same amount, same day → duplicate\nsame merchant, same amount, every month → subscription, × 12\nexpense-coded charge > capitalisation line → asset",
     plain:"Each needs only the posted charges. Each finds something on a card that people only ever check in total.",
     where:"references/method.md · Step 6", cites:[3,6],
-    backed:"The IRS safe harbor draws the asset line at $2,500 per item for most small businesses. Asset misappropriation is the most common occupational fraud, found in 89% of cases." },
+    backed:"The IRS safe harbor draws the asset line at $2,500 per item for most small businesses.{3} Asset misappropriation is the most common occupational fraud, found in 89% of cases.{6}" },
   { id:"S", kind:"s", title:"Tax needs an invoice, and another company's cost is not your expense",
     formula:"recoverable tax code + no receipt → exposure\ncard of company A pays for company B → intercompany, not expense",
     plain:"A card slip proves that you paid. It does not prove what tax the seller charged. You book a charge where the cost belongs, not where the card lives.",
     where:"references/method.md · Step 5 · Both entity scenarios", cites:[4,7],
-    backed:"HMRC reclaims input tax as the VAT shown on a VAT invoice. IFRS 10 treats the group as one entity. Each company must still record the group's internal balances." },
+    backed:"Under HMRC's rules, you reclaim input tax as the VAT shown on a VAT invoice.{4} IFRS 10 treats the group as one entity, but each company must still record the group's internal balances.{7}" },
 ];
 
 const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -434,7 +436,7 @@ const LEVELS = [
   { n:4, title:"The laptop in office supplies",
     chips:["Books","$2,500 line"], src:"Three tests", cites:[3],
     situation:"Northbrook coded a $2,900 charge from an electronics retailer to Office Supplies. Northbrook's capitalisation threshold is $2,500.",
-    facts:["The IRS de minimis safe harbor lets a business without audited statements deduct items up to $2,500 each. Above that, the business capitalises and depreciates the item "+C(3)+". Northbrook's threshold is its own policy. The test is the same."],
+    facts:["The IRS de minimis safe harbor lets a business without audited statements deduct items up to $2,500 each "+C(3)+". Above that, the business capitalises and depreciates the item "+C(3)+". Northbrook's threshold is its own policy. The test is the same."],
     visual:{type:"table",
       head:["Charge","Coded to","Amount","Threshold","Test"],
       rows:[["Electronics retailer, 9 Sep","Office Supplies",["$2,900.00","bad"],"$2,500.00",["over the line: asset","bad"]],["Office chair, 14 Sep","Office Supplies","$640.00","$2,500.00","expense"],["Monitor, 22 Sep","Office Supplies","$389.00","$2,500.00","expense"]]},
@@ -459,7 +461,7 @@ const LEVELS = [
   { n:6, title:"Tax reclaimed on a card slip",
     chips:["Tax codes","Receipts"], src:"Tax needs an invoice", cites:[4],
     situation:"Northbrook's UK subsidiary reclaims VAT. Three September charges carry a recoverable tax code in the books. They total £1,440, with £240 of VAT. None has a receipt attached, only the card transaction.",
-    facts:["Under UK rules, the amount of input tax you reclaim is the VAT shown on the supplier's VAT invoice. HMRC accepts a less detailed invoice for £250 or less only if it carries the supplier's VAT number and the rate. A buyer without a valid VAT invoice cannot reclaim "+C(4)+"."],
+    facts:["Under UK rules, the amount of input tax you reclaim is the VAT shown on the supplier's VAT invoice. HMRC accepts a less detailed invoice for £250 or less only if it carries the supplier's VAT number and the rate "+C(4)+". A buyer without a valid VAT invoice cannot reclaim "+C(4)+"."],
     visual:{type:"table",
       head:["Charge","Gross","VAT coded","Receipt","Status"],
       rows:[["Stationery, 3 Sep","£180.00","£30.00",["none","bad"],["reclaim with no evidence","bad"]],["Software, 11 Sep","£600.00","£100.00",["none","bad"],["reclaim with no evidence","bad"]],["Travel agent, 19 Sep","£660.00","£110.00",["none","bad"],["reclaim with no evidence","bad"]]],
@@ -493,7 +495,7 @@ function renderRules(){
        <div class="formula">${esc(r.formula)}</div>
        <p class="plain">${esc(r.plain)}</p>
        <span class="where">Rule from the skill: ${esc(r.where)}</span>
-       <p class="backed"><b>Backed by</b> ${esc(r.backed)} ${C(...r.cites)}</p>`));
+       <p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`));
   });
 }
 function renderSources(){
@@ -582,5 +584,66 @@ document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("clic
 
 renderSources(); renderRules(); renderLevels(); load("clean");
 </script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-22", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
 </body>
 </html>

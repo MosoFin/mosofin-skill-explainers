@@ -60,6 +60,7 @@ def js_prose(code):
         else: i+=1
     out=[]
     for f in found:
+        f=re.sub(r'\{\d+(?:,\d+)*\}','',f)   # inline cite tokens such as {3}
         f=re.sub(r'<[^>]+>','',f.replace('\\n',' ')); f=re.sub(r'\s+',' ',f).strip()
         if len(f.split())>=4 and re.search(r'[A-Za-z]{3}',f) and not re.search(r'[{};=]|=>|\.querySelector',f): out.append(f)
     return out

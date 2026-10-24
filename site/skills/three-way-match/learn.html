@@ -357,14 +357,16 @@
 
 <script>
 const SOURCES = [
-  {t:"Federal Acquisition Regulation 32.905: Payment documentation and process", u:"https://www.acquisition.gov/far/32.905", w:"A receiving report or other authorisation must support invoice payments. It must show the quantities received and accepted and the date. A proper invoice carries the order number, description, quantity, unit price and extended price. Interim payments on cost-reimbursement service contracts are the exception."},
-  {t:"Intuit: Create and send purchase orders in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/purchase-orders/create-send-purchase-orders-quickbooks-online/L2mVpjOoq_US_en_US", w:"Purchase orders are available on the Plus and Advanced plans only. A new PO is Open. The PO closes when you add it to a bill or expense. The article does not cover recording goods received or partial receipts."},
-  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations, key findings", u:"https://www.acfe.com/-/media/files/ACFE/PDFs/RTTN/2024/Infographics/Key-Findings.pdf", w:"The report covers 1,921 cases in 138 countries, with a median loss of $145,000. Asset misappropriation occurred in 89% of cases, with a median loss of $120,000. Billing schemes were the most common type of asset misappropriation, in 22% of cases with a $100,000 median loss. 32% of frauds occurred where internal controls were lacking. 19% of frauds occurred where existing controls were overridden."},
-  {t:"GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23", u:"https://www.gao.gov/greenbook", w:"Segregate duties so that authority, custody and accounting are not in one pair of hands. Where that is not practical, design alternative controls to mitigate the risk."},
-  {t:"IFRS Foundation: Conceptual Framework for Financial Reporting, project summary (2018)", u:"https://www.ifrs.org/content/dam/ifrs/project/conceptual-framework/fact-sheet-project-summary-and-feedback-statement/conceptual-framework-project-summary.pdf", w:"A liability is a present obligation of the entity to transfer an economic resource as a result of past events. An obligation is a duty or responsibility that the entity has no practical ability to avoid."},
-  {t:"New York State Department of Taxation and Finance: Use Tax for Businesses", u:"https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/use_tax_for_businesses.htm", w:"A business that buys taxable goods or services without paying New York sales tax and then uses them in New York owes use tax itself. The business reports it on its sales tax return or a purchaser's report."},
+  {t:"Federal Acquisition Regulation 32.905: Payment documentation and process", u:"https://www.acquisition.gov/far/32.905", at:"§32.905(b)(1) and §32.905(c)", w:"A receiving report or other authorisation must support invoice payments. It must show the quantities received and accepted and the date. A proper invoice carries the order number, description, quantity, unit price and extended price. Interim payments on cost-reimbursement service contracts are the exception."},
+  {t:"Intuit: Create and send purchase orders in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/purchase-orders/create-send-purchase-orders-quickbooks-online/L2mVpjOoq_US_en_US", w:"Purchase orders are available on the Plus and Advanced plans only. A new PO is Open. The article does not cover recording goods received or partial receipts."},
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", checked:"2026-10-24", via:"from search results, page not opened", w:"The report covers 1,921 cases in 138 countries, with a median loss of $145,000. Asset misappropriation occurred in 89% of cases, with a median loss of $120,000. Billing schemes were the most common type of asset misappropriation, in 22% of cases with a $100,000 median loss. 32% of frauds occurred where internal controls were lacking. 19% of frauds occurred where existing controls were overridden."},
+  {t:"GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721, ¶10.21–10.23", u:"https://www.gao.gov/greenbook", at:"Principle 10, Segregation of Duties, ¶10.21–10.23", w:"Segregate duties so that authority, custody and accounting are not in one pair of hands. Where that is not practical, design alternative controls to mitigate the risk."},
+  {t:"IFRS Foundation: Conceptual Framework for Financial Reporting, project summary (2018)", u:"https://www.ifrs.org/content/dam/ifrs/project/conceptual-framework/fact-sheet-project-summary-and-feedback-statement/conceptual-framework-project-summary.pdf", at:"Table: definition of a liability", w:"A liability is a present obligation of the entity to transfer an economic resource as a result of past events. An obligation is a duty or responsibility that the entity has no practical ability to avoid."},
+  {t:"New York State Department of Taxation and Finance: Use Tax for Businesses", u:"https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/use_tax_for_businesses.htm", at:"How to report and pay use tax", w:"A business that buys taxable goods or services without paying New York sales tax and then uses them in New York owes use tax itself. The business reports it on its sales tax return or a purchaser's report."},
 ];
 const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
 const RULES = [
   { id:"1", kind:"", title:"Count the legs, and say which match you ran",
@@ -381,7 +383,7 @@ const RULES = [
     formula:"|billed − ordered| ≤ tolerance → match\notherwise → exception, resolve before pay",
     plain:"How much overbilling is acceptable is a business decision. The skill never picks a number for you. If you give no number, the skill flags every difference.",
     where:"references/method.md · Step 3", cites:[3],
-    backed:"Billing schemes are the most common way to steal assets. They occur in 22% of occupational fraud cases. Small tolerated differences are exactly how these schemes survive." },
+    backed:"Billing schemes are the most common way to steal assets. They occur in 22% of occupational fraud cases.{3} Small tolerated differences are exactly how these schemes survive." },
   { id:"W", kind:"w", title:"Watch the month, not just the invoice",
     formula:"always 1.8% over, against 2% → a pattern\nreceipts posted in bulk on one date → a signature\nsame name orders, receives, approves → a finding",
     plain:"Each instance passes. Only the population shows the shape. The skill reports patterns with counts and totals, never as an accusation.",
@@ -495,7 +497,7 @@ function renderRules(){
        <div class="formula">${esc(r.formula)}</div>
        <p class="plain">${esc(r.plain)}</p>
        <span class="where">Rule from the skill: ${esc(r.where)}</span>
-       <p class="backed"><b>Backed by</b> ${esc(r.backed)} ${C(...r.cites)}</p>`));
+       <p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`));
   });
 }
 function renderSources(){
@@ -586,5 +588,66 @@ document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("clic
 
 renderSources(); renderRules(); renderLevels(); load("clean");
 </script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-21", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
 </body>
 </html>

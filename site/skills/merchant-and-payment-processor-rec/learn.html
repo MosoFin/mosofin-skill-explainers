@@ -365,17 +365,19 @@
 <script>
 const SOURCES = [
   {t:"Stripe: Pricing", u:"https://stripe.com/pricing", w:"The standard US card price is 2.9% + 30¢ per successful charge. International cards and currency conversion cost extra."},
-  {t:"Stripe: The Balance Transaction object", u:"https://docs.stripe.com/api/balance_transactions/object", w:"Each transaction has a gross amount, a fee and a net amount. The net is the amount minus the fee. Funds are either pending or available."},
-  {t:"Stripe: Payout reconciliation report", u:"https://docs.stripe.com/reports/payout-reconciliation", w:"The report matches each bank payout to the transactions that the payout settles. It groups them into charges, refunds and fees. Its balance summary takes the starting balance, adds the period's activity and subtracts payouts to give the ending balance. A separate section lists transactions not yet settled at the end date."},
-  {t:"Stripe: Payouts", u:"https://docs.stripe.com/payouts", w:"US settlement timing is 2 business days. The payout schedule controls when Stripe sends funds. It does not control how long pending funds take to become available."},
+  {t:"Stripe: The Balance Transaction object", u:"https://docs.stripe.com/api/balance_transactions/object", at:"Attributes: amount, fee, net", w:"Each transaction has a gross amount, a fee and a net amount. The net is the amount minus the fee. Funds are either pending or available."},
+  {t:"Stripe: Payout reconciliation report", u:"https://docs.stripe.com/reports/payout-reconciliation", at:"Payout reconciliation section", w:"The report matches each bank payout to the transactions that the payout settles. It groups them into charges, refunds and fees. Its balance summary takes the starting balance, adds the period's activity and subtracts payouts to give the ending balance. A separate section lists transactions not yet settled at the end date."},
+  {t:"Stripe: Balances and settlement time", u:"https://docs.stripe.com/payments/balances", checked:"2026-10-24", via:"from search results, page not opened", w:"A US card payment made on Monday is available in your Stripe balance on Wednesday, 2 business days later. The payout schedule controls when Stripe sends funds. It does not change how long pending funds take to become available."},
   {t:"Square: Our fees", u:"https://squareup.com/us/en/payments/our-fees", w:"US card rates depend on the plan. In person, they are 2.4%–2.6% + 15¢. Online, they are 2.9%–3.3% + 30¢."},
   {t:"Square Help: Set up and edit transfer options", u:"https://squareup.com/help/us/en/article/3807-deposit-options-with-square", w:"For standard transfers, payments taken before 5 PM PT reach the bank the next business day. Friday payments typically arrive Monday."},
   {t:"PayPal: Business fees", u:"https://www.paypal.com/us/business/paypal-business-fees", w:"The US commercial rate for PayPal Checkout is 3.49% plus a fixed fee of $0.49 per transaction."},
-  {t:"IRS: Instructions for Form 1099-K", u:"https://www.irs.gov/instructions/i1099k", w:"The gross amount payment processors report is the total of payments before any adjustment for fees, refunds, credits or discounts."},
-  {t:"IRS: What to do with Form 1099-K", u:"https://www.irs.gov/businesses/what-to-do-with-form-1099-k", w:"Report all gross receipts from your books. Fees and refunds are not taxable income. Subtract them from the gross amount. Do not omit them from it."},
+  {t:"IRS: Instructions for Form 1099-K", u:"https://www.irs.gov/instructions/i1099k", at:"Box 1a", w:"The gross amount payment processors report is the total of payments before any adjustment for fees, refunds, credits or discounts."},
+  {t:"IRS: What to do with Form 1099-K", u:"https://www.irs.gov/businesses/what-to-do-with-form-1099-k", at:"Check your records", w:"Report all gross receipts from your books. Fees and refunds are not taxable income. Subtract them from the gross amount. Do not omit them from it."},
   {t:"IFRS Foundation: IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/issued-standards/list-of-standards/ifrs-10-consolidated-financial-statements/", w:"Consolidated statements present a parent and its subsidiaries as a single economic entity."},
 ];
 const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
 const RULES = [
   { id:"1", kind:"", title:"Break every payout into its parts",
@@ -402,7 +404,7 @@ const RULES = [
     formula:"Stripe  → its own clearing account\nSquare  → its own clearing account\nCompany → its own, too",
     plain:"When you combine the accounts, errors in opposite directions cancel each other and disappear. When you check the accounts separately, the errors cannot hide.",
     where:"gates.md · Gate 1 · edge-cases.md", cites:[3,10], practice:true,
-    backed:"Each app reports its own payouts against its own transactions. IFRS 10 treats a group, not each company, as the single economic entity. One account per app is bookkeeping practice rather than a standard." },
+    backed:"Each app reports its own payouts against its own transactions.{3} IFRS 10 treats a group, not each company, as the single economic entity.{10} One account per app is bookkeeping practice rather than a standard." },
 ];
 
 const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -430,7 +432,7 @@ const LEVELS = [
   { n:3, title:"Month-end timing",
     chips:["Stripe","2 months"], src:"Rule 2", cites:[3,4],
     situation:"The month is the same August. Stripe paid $2,100 of late-July sales in August. The $2,580 of sales from 30–31 August will not arrive until September. Stripe paid $44,598 in August.",
-    facts:["Stripe's US settlement timing is 2 business days "+C(4)+". So Stripe pays sales from the last two days of a month in the next month.","Stripe's report has its own section for transactions not yet settled at the end date "+C(3)+". This is the same money that the skill finds in the waiting room."],
+    facts:["A US card payment becomes available in your Stripe balance 2 business days later "+C(4)+". So Stripe pays sales from the last two days of a month in the next month.","Stripe's report has its own section for transactions not yet settled at the end date "+C(3)+". This is the same money that the skill finds in the waiting room."],
     visual:{type:"wf", start:["Opening balance (1 Aug)",2100], steps:[["Gross charges",48000],["Refunds",-1200],["Chargebacks",-300],["Fees",-1422],["Payouts to bank",-44598]], end:["Closing balance (31 Aug)",2580], dec:0, warn:true},
     rule:{q:"Should match the processor's reported \"Available Balance\" at period end — plus any \"Pending\" / \"In Transit\" amounts depending on definition.", w:"method.md · Step 4"},
     math:[["Opening balance","$2,100.00"],["+ gross charges","$48,000.00"],["− refunds, chargebacks, fees","$2,922.00"],["− payouts to bank","$44,598.00"],["= closing balance","$2,580.00",1],["Stripe says it still holds","$2,580.00"],["Difference","$0.00",1],["Why payouts ($44,598) ≠ net ($45,078)","$480 more stayed in the waiting room"]],
@@ -450,7 +452,7 @@ const LEVELS = [
   { n:5, title:"Early warnings: fee rate and payout delay",
     chips:["Stripe","3 months"], src:"Watch the trends", cites:[1,4],
     situation:"These are three months on Stripe under the same contract. June and July cost exactly the published price. In August, Stripe charged $1,632. Payouts also started taking 5 business days instead of 2.",
-    facts:["The published price, 2.9% + 30¢ "+C(1)+", sets the expected fee for any month: 2.9% of gross plus 30¢ per charge.","Stripe's US settlement timing is 2 business days "+C(4)+", so 5 is well outside the norm."],
+    facts:["The published price, 2.9% + 30¢ "+C(1)+", sets the expected fee for any month: 2.9% of gross plus 30¢ per charge.","US card funds usually become available 2 business days after the payment "+C(4)+", so 5 is well outside the norm."],
     visual:{type:"table",
       head:["Month","Gross","Charges","Expected fee","Charged","Payout delay"],
       rows:[["June","$44,000","92","$1,303.60","$1,303.60","2 days"],["July","$46,000","96","$1,362.80","$1,362.80","2 days"],["August","$48,000","100","$1,422.00",["$1,632.00","bad"],["5 days","bad"]]]},
@@ -498,7 +500,7 @@ function renderRules(){
        <div class="formula">${esc(r.formula)}</div>
        <p class="plain">${esc(r.plain)}</p>
        <span class="where">Rule from the skill: ${esc(r.where)}</span>
-       <p class="backed"><b>Backed by</b> ${esc(r.backed)} ${C(...r.cites)}</p>`));
+       <p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`));
   });
 }
 function renderSources(){
@@ -591,5 +593,66 @@ document.querySelector('[data-k2="plan"]').addEventListener("change",run);
 
 renderSources(); renderRules(); renderLevels(); load("clean");
 </script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-20", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
 </body>
 </html>
