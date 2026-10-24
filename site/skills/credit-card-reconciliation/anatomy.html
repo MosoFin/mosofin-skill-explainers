@@ -105,16 +105,16 @@
 
 <header>
   <div class="eyebrow">credit-card-reconciliation · shipped on main as one file · card-format rewrite prepared, not yet on main · audited 23 Oct 2026</div>
-  <h1>How the credit card reconciliation is built, and what it does</h1>
-  <p class="lede">On main it is one 973-line file, the largest of the reconciliation skills. The rewrite described here is a 143-line card and seven reference files, with the original text kept. What sets this skill apart is a richer book side: card charges are posted one by one, so duplicates, recurring subscriptions and capital purchases can be tested every month from the books alone, statement or not. This page shows how the files connect, the run step by step, the source behind each step, what the audit found, and what it corrected on the earlier version of this page.</p>
+  <h1>The structure of the credit card reconciliation, and what it does</h1>
+  <p class="lede">On main the skill is one 973-line file, the largest of the reconciliation skills. The rewrite described here is a 143-line card and seven reference files, with the original text kept. What sets this skill apart is a richer book side: the books hold one posting for each card charge. So the skill can test duplicates, recurring subscriptions and capital purchases every month from the books alone, statement or not. This page shows how the files connect, the run step by step, and the source behind each step. It also shows what the audit found and what this page fixed on the earlier version.</p>
 </header>
 
 <section>
   <div class="stats">
     <div class="stat"><span class="k">Card</span><span class="v">143</span><span class="s">lines in SKILL.md, down from 973</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">731/733</span><span class="s">original lines byte for byte; the other 2 are the description and one link depth</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">731/733</span><span class="s">original lines byte for byte. The other 2 are the description and one link depth</span></div>
     <div class="stat"><span class="k">Verdicts</span><span class="v">42 · 11 · 33</span><span class="s">[auto] · [gated] · [manual], unchanged by the split</span></div>
-    <div class="stat"><span class="k">Tool names</span><span class="v">22</span><span class="s">QuickBooks tools named; 21 recorded against the live catalogue, 1 to re-check</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">22</span><span class="s">QuickBooks tools named, with 21 recorded against the live catalogue and 1 to re-check</span></div>
     <div class="stat"><span class="k">Findings</span><span class="v">2/2</span><span class="s">fixed in the rewrite, plus 1 library-wide finding open</span></div>
   </div>
 </section>
@@ -166,7 +166,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card is what loads every time. Each stage points to one file, so the method is read only once it is being done. <b>method.md</b> carries the accounting, Steps 0 to 9 and both entity scenarios; <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The structural limit, that the books can be read and the card issuer and the receipts never, now sits at the top of the card as well as in overview.md. Line counts are the files' own, counted the same way for every bar.</figcaption>
+    <figcaption>The card loads every time, and each stage points to one file, so the skill reads the method only when it does that stage. <b>method.md</b> carries the accounting, Steps 0 to 9 and both entity scenarios. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The structural limit is that the skill can read the books and can never read the card issuer or the receipts. This limit now sits at the top of the card as well as in overview.md. Line counts are the files' own, counted the same way for every bar.</figcaption>
   </figure>
 </section>
 
@@ -256,33 +256,33 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: without a statement balance, Step 2 does not build the bridge and the output is labelled a posted-charge review. Steps 3 to 6 run either way, so this skill is useful even in an accounting-only workspace.</figcaption>
+    <figcaption>Both paths converge on the read-back. The skill reads nothing before it. The skill rests on the clause in the highlighted box. Without a statement balance, Step 2 does not build the bridge. The skill labels the output a posted-charge review. Steps 3 to 6 run either way, so this skill is useful even in an accounting-only workspace.</figcaption>
   </figure>
 </section>
 
 <section>
   <h2>Source backing</h2>
   <p class="sec-title">Every step, what it touches, and what stands behind it</p>
-  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>: [1] IRS Publication 463, [2] Intuit QuickBooks Online reconcile, [3] IRS tangible property regulations, [4] HMRC VAT Notice 700, [5] CFPB card disputes, [6] ACFE Report to the Nations 2024, [7] IFRS 10. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority exists, and the pages say so.</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The first three are [1] IRS Publication 463, [2] Intuit QuickBooks Online reconcile, [3] IRS tangible property regulations. The last four are [4] HMRC VAT Notice 700, [5] CFPB card disputes, [6] ACFE Report to the Nations 2024, [7] IFRS 10. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority exists, and the pages say so.</p>
   <div class="tbl"><table>
     <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>Stage 1 · Gates 0–3</td><td>Asks, confirms workspace, company file, tools and profile; reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy and checked in CI; tool names and policies read from the live catalogue every run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks the user. Checks the workspace, company file, tools and profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy and checked in CI. The skill reads tool names and policies from the live catalogue every run</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 0</td><td>Fetches the book side in one batch</td><td><code>search_purchases</code> <code>get_general_ledger</code> <code>get_trial_balance</code> <code>search_bill_payments</code> <code>search_transfers</code> <code>search_attachables</code> <code>search_tax_codes</code> <code>search_employees</code></td><td>Live QuickBooks catalogue read on 21 Oct 2026: tools present, none write-capable. One of the 22 names is not individually recorded (see the corrections below)</td><td><span class="kind auth">Checked live</span></td></tr>
-      <tr><td>Step 1</td><td>Parses the statement and its six totals</td><td>None; the statement is supplied</td><td>[2] A reconciliation starts from the statement's ending balance and date</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 1</td><td>Parses the statement and its six totals</td><td>None. The user supplies the statement</td><td>[2] A reconciliation starts from the statement's ending balance and date</td><td><span class="kind auth">Authority</span></td></tr>
       <tr><td>Step 2</td><td>Ties the statement to the card liability, or builds no bridge without a statement</td><td><code>get_balance_sheet</code> <code>get_trial_balance</code></td><td>[2] The same reconcile screen covers credit card accounts and finishes at a $0.00 difference</td><td><span class="kind auth">Authority</span></td></tr>
       <tr><td>Step 3</td><td>Matches receipts to charges, with a status for each</td><td><code>search_attachables</code></td><td>[1] What adequate evidence shows, and the $75 line. The five status labels are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 4</td><td>Codes each charge to the user's chart of accounts</td><td><code>search_accounts</code> <code>search_vendors</code></td><td>No outside authority; the user's chart drives it</td><td><span class="kind prac">Practice</span></td></tr>
-      <tr><td>Step 5</td><td>Checks tax recovery against the receipt, not the card slip; flags it for the user when the policy is unclear</td><td><code>search_tax_codes</code> <code>get_purchase</code></td><td>[4] Input tax is reclaimed on a valid VAT invoice. No US authority is cited, so the jurisdiction is always asked</td><td><span class="kind auth">Authority (UK)</span></td></tr>
-      <tr><td>Step 6</td><td>Flags exceptions; runs the duplicate, subscription and capitalisation tests</td><td><code>search_purchases</code> over several months</td><td>[3] The IRS safe harbor for the capitalisation line, [6] why card controls matter. The tests themselves are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 7</td><td>Proposes the posting entry, Option A or B</td><td><code>search_accounts</code></td><td>No outside authority for preferring Option A; the skill says "recommend" and never posts</td><td><span class="kind prac">Practice</span></td></tr>
+      <tr><td>Step 4</td><td>Codes each charge to the user's chart of accounts</td><td><code>search_accounts</code> <code>search_vendors</code></td><td>No outside authority. The user's chart drives it</td><td><span class="kind prac">Practice</span></td></tr>
+      <tr><td>Step 5</td><td>Checks tax recovery against the receipt, not the card slip. Flags it for the user when the policy is unclear</td><td><code>search_tax_codes</code> <code>get_purchase</code></td><td>[4] Input tax is reclaimed on a valid VAT invoice. No US authority is cited, so the skill always asks for the jurisdiction</td><td><span class="kind auth">Authority (UK)</span></td></tr>
+      <tr><td>Step 6</td><td>Flags exceptions. Runs the duplicate, subscription and capitalisation tests</td><td><code>search_purchases</code> over several months</td><td>[3] The IRS safe harbor for the capitalisation line, [6] why card controls matter. The tests themselves are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Proposes the posting entry, Option A or B</td><td><code>search_accounts</code></td><td>No outside authority for preferring Option A. The skill says "recommend" and never posts</td><td><span class="kind prac">Practice</span></td></tr>
       <tr><td>Step 8</td><td>Delivers six sheets and a coverage sheet</td><td>None</td><td>The skill's own output standard and file-name rule</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 9</td><td>Offers to save policies, never card numbers or spending</td><td><code>create_skill</code></td><td>The skill's own rule, stated with its privacy reason</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Both entity scenarios</td><td>One run per entity; cross-entity card use is an intercompany balance</td><td>One <code>data_source_id</code> per call</td><td>[7] Group balances are eliminated on consolidation but stay in each company's own books</td><td><span class="kind auth">Authority</span></td></tr>
-      <tr><td>Edge case: disputes</td><td>Tracks the disputed amount until the issuer resolves it</td><td>None</td><td>[5] Written notice within 60 days; the issuer acknowledges within 30</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Both entity scenarios</td><td>One run per entity. Cross-entity card use is an intercompany balance</td><td>One <code>data_source_id</code> per call</td><td>[7] Consolidation eliminates group balances, but they stay in each company's own books</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Edge case: disputes</td><td>Tracks the disputed amount until the issuer resolves it</td><td>None</td><td>[5] Written notice within 60 days. The issuer acknowledges within 30</td><td><span class="kind auth">Authority</span></td></tr>
     </tbody>
   </table></div>
-  <p style="color:var(--muted);font-size:14.5px">Re-read on 23 Oct 2026 through search results, not by opening the pages, because this environment cannot reach those hosts. Wording matched for [2], [3], [5], [6] and [7], and for [1] except its sentence that a record should show the business purpose, which the results did not show. For [4] the £250 simplified-invoice rule matched; the claim that a customer without a valid VAT invoice cannot reclaim is stated more directly in HMRC's input tax manual (VIT31000) than on Notice 700 itself, so that page is the better citation. [7] states the single-economic-entity idea on the IFRS page and the elimination of group balances in the standard's own text. Opening every page again is still to do.</p>
+  <p style="color:var(--muted);font-size:14.5px">The audit re-read the sources on 23 Oct 2026 through search results, not by opening the pages, because this environment cannot reach those hosts. The wording matched for [2], [3], [5], [6] and [7], and the £250 simplified-invoice rule matched for [4]. It also matched for [1], except its sentence that a record should show the business purpose, which the results did not show. HMRC's input tax manual (VIT31000) states the claim that a customer without a valid VAT invoice cannot reclaim more directly than Notice 700 itself. So that page is the better citation. [7] states the single-economic-entity idea on the IFRS page and the elimination of group balances in the standard's own text. Opening every page again is still to do.</p>
 </section>
 
 <section>
@@ -291,19 +291,19 @@
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>973 lines in one file, against a 500-line guide</h3>
-      <p>Split the way bank-reconciliation and three-way-match were: a 143-line card with the six intake questions, the upload checklist and the rules that never bend, and the original text moved unchanged into <code>references/</code>. 731 of the 733 content lines are present byte for byte; the other two are the description, rewritten for the card, and the onboarding link, which gains one <code>../</code> for the new depth.</p>
+      <p>The fix follows the split used for bank-reconciliation and three-way-match. The result is a 143-line card with the six intake questions, the upload checklist and the rules that never bend. The fix moved the original text unchanged into <code>references/</code>. 731 of the 733 content lines are present byte for byte. The other two are the description, rewritten for the card, and the onboarding link. The link gains one <code>../</code> for the new depth.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md + references/ · commit c7a48d8, not yet on main</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>Two cross-references pointed at skills that are not in the repository</h3>
-      <p>Step 6 sent sanctions screening to <code>aml-kyc-procedures</code> and the multi-entity section sent cross-company charges to <code>intercompany-reconciliation</code>. Both sentences now stand on their own: screening is a compliance check for a person to run, and cross-entity charges go to whoever reconciles balances between the entities. The four references that remain all name skills in the library.</p>
+      <p>Step 6 sent sanctions screening to <code>aml-kyc-procedures</code>. The multi-entity section sent cross-company charges to <code>intercompany-reconciliation</code>. Both sentences now stand on their own. The first says screening is a compliance check for a person to run. The second says cross-entity charges go to whoever reconciles balances between the entities. The four references that remain all name skills in the library.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">Step 6 · Both entity scenarios · commit 5b10dc0, not yet on main</span>
     </div></div>
     <div class="f low"><span class="sev">Low · open</span><div class="body">
       <h3>Fifteen other skills have a description over 1,024 characters</h3>
-      <p>Found while checking this card, whose first draft was 1,311 characters and is now 1,010. The platform guidance gives 1,024 characters as the maximum for a description. The longest in the library are journal-entry-builder (1,172), payroll-reconciliation (1,157), expense-report-processor (1,142), bank-reconciliation (1,133) and three-way-match (1,039). The repository's validator does not check the length. Not changed here; it is the owners' call, and it touches skills this audit does not cover.</p>
+      <p>The audit found this while checking this card, whose first draft was 1,311 characters and is now 1,010. The platform guidance gives 1,024 characters as the maximum for a description. The longest in the library are journal-entry-builder (1,172), payroll-reconciliation (1,157), expense-report-processor (1,142), bank-reconciliation (1,133) and three-way-match (1,039). The repository's validator does not check the length. This audit does not change the descriptions. The change is the owners' call, and it touches skills this audit does not cover.</p>
       <blockquote>“description: Maximum 1024 characters.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Anthropic · Agent Skills overview</a></cite></blockquote>
       <span class="where">library-wide · frontmatter of 15 skills · .github/validate-skill.sh has no length check</span>
     </div></div>
@@ -316,17 +316,17 @@
   <div class="findings">
     <div class="f add"><span class="sev">Corrected</span><div class="body">
       <h3>Edge cases: twenty, nine Mosofin-specific, should be 22 and 10</h3>
-      <p>Counted again from the file: twelve from the original skill and ten marked Mosofin-specific. One run of text that starts with a bold line is the continuation of the owner-paid-card case, not a separate case.</p>
+      <p>The audit counted again from the file. It found twelve from the original skill and ten marked Mosofin-specific. One run of text that starts with a bold line is the continuation of the owner-paid-card case, not a separate case.</p>
       <span class="where">references/edge-cases.md</span>
     </div></div>
     <div class="f add"><span class="sev">Corrected</span><div class="body">
-      <h3>Tool names: 21 should be 22, and one is unconfirmed</h3>
-      <p>The skill names 22 QuickBooks tools, plus four Mosofin workflow tools. The 21 Oct catalogue read recorded 21 as present. Which one was not recorded is not known, and the connector could not be reached to find out, so the count stays open until the catalogue is read again.</p>
+      <h3>Tool names: 21 should be 22, and one stays unconfirmed</h3>
+      <p>The skill names 22 QuickBooks tools, plus four Mosofin workflow tools. The 21 Oct catalogue read recorded 21 as present. The read did not record one name. The audit does not know which one. The audit could not reach the connector to check which one. So the count stays open until someone reads the catalogue again.</p>
       <span class="where">references/tools-and-glossary.md · references/method.md Step 0</span>
     </div></div>
     <div class="f add"><span class="sev">Corrected</span><div class="body">
       <h3>Part sizes were one to three lines high</h3>
-      <p>The old bar chart ran one to three lines above the file's own counts (intro 44 against 42, Part A 110 against 108, edge cases 83 against 80, output standards 40 against 39), most likely from trailing blank lines. The new chart uses each file's own line count for every bar.</p>
+      <p>The old bar chart ran one to three lines above the file's own counts. The differences were intro 44 against 42, Part A 110 against 108, edge cases 83 against 80, output standards 40 against 39. The extra lines most likely came from trailing blank lines. The new chart uses each file's own line count for every bar.</p>
       <span class="where">Construction</span>
     </div></div>
   </div>
@@ -336,21 +336,21 @@
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>All 733 content lines of the 973-line file are accounted for in the card and references, 731 byte for byte and two as expected rewrites. Each moved block was compared with its original line range.</span></li>
-    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page, 11, matches the skill text word for word and sits in the file and section the learn page names, checked by script after the split.</span></li>
+    <li><span class="ok">PASS</span><span>All 733 content lines of the 973-line file are in the card and references, 731 byte for byte and two as expected rewrites. The audit compared each moved block with its original line range.</span></li>
+    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page, 11, matches the skill text word for word. Each rule sits in the file and section that the learn page names. A script checked this after the split.</span></li>
     <li><span class="ok">PASS</span><span>Every tool name used in a step, gate or edge case appears in the tool reference table (20 names checked by script).</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes with the rewrite (31 skills, 0 failures) and the shared blocks are in sync. The description is 1,010 characters.</span></li>
-    <li><span class="ok">PASS</span><span>Every statement on the card was checked against the reference line it summarises. Six statements said more than the skill does, such as never <i>displaying</i> a card number where the skill says never <i>persist</i> one, and were corrected before commit.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes with the rewrite (31 skills, 0 failures). The shared blocks are in sync. The description is 1,010 characters.</span></li>
+    <li><span class="ok">PASS</span><span>The audit checked every statement on the card against the reference line it summarises. Six statements said more than the skill does, such as never <i>displaying</i> a card number where the skill says never <i>persist</i> one. The audit fixed them before the commit.</span></li>
     <li><span class="ok">PASS</span><span>No broken links in the bundle. Every reference over 100 lines opens with a contents list. The only link between two references points at the protocol file, which the card also links directly.</span></li>
-    <li><span class="ok">PASS</span><span>The statement and the receipts are Required and [manual]; Step 2 builds no bridge without a statement; the output names which of the two it produced.</span></li>
+    <li><span class="ok">PASS</span><span>The statement and the receipts are Required and [manual]. Step 2 builds no bridge without a statement. The output names which of the two it produced.</span></li>
     <li><span class="ok">PASS</span><span>"A file is attached" and "a receipt was matched" are separate columns in Sheet 2 and separate facts in the output standards.</span></li>
-    <li><span class="ok">PASS</span><span>The three monthly tests (duplicates, recurring subscriptions with annualised cost, capitalisation breaches) run with or without a statement, and the thresholds are never defaulted.</span></li>
-    <li><span class="ok">PASS</span><span>No card numbers, cardholder spending, receipt images or transaction detail are persisted; no exception is raised against a named employee on fixture data.</span></li>
+    <li><span class="ok">PASS</span><span>The three monthly tests (duplicates, recurring subscriptions with annualised cost, capitalisation breaches) run with or without a statement. The skill never defaults the thresholds.</span></li>
+    <li><span class="ok">PASS</span><span>The skill persists no card numbers, cardholder spending, receipt images or transaction detail. It raises no exception against a named employee on fixture data.</span></li>
     <li><span class="ok">PASS</span><span>The spreadsheet instruction is the ask-first sentence applied across all 31 skills in 4d5637c, with the file name <code>CC_Recon_[Cardholder]_[YYYY-MM].xlsx</code>.</span></li>
   </ul>
-  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real card statement and receipts, and a fresh read of the QuickBooks catalogue, because the Mosofin connector could not be reached on 23 Oct. Whether <code>search_attachables</code> returns per-transaction links in practice, which the receipt-file check depends on, was not exercised; only the tool's existence and policy were confirmed on 21 Oct. The seven outside sources were re-read through search results, not opened.</p>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real card statement and receipts, and a fresh read of the QuickBooks catalogue. This is because the audit could not reach the Mosofin connector on 23 Oct. The audit did not test whether <code>search_attachables</code> returns per-transaction links in practice. The receipt-file check depends on the answer. The audit checked only the tool's existence and policy on 21 Oct. The audit re-read the seven outside sources through search results and did not open them.</p>
 </section>
 
-<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-card-reconciliation">MosoFin/mosofin-finance-skills</a> as the 973-line file; the approved=true limit is d86fa27, the spreadsheet fix 4d5637c. The card-format rewrite is two commits on the branch <code>claude/credit-card-card-format</code>, 5b10dc0 and c7a48d8, and is not on <code>main</code>: replace those with the merged hashes and rebuild when it ships. Audited 23 Oct 2026. Still to do: a live run with a real statement.</footer>
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-card-reconciliation">MosoFin/mosofin-finance-skills</a> as the 973-line file. The approved=true limit is d86fa27, and the spreadsheet fix is 4d5637c. The card-format rewrite is two commits on the branch <code>claude/credit-card-card-format</code>, 5b10dc0 and c7a48d8, and it is not on <code>main</code>. When it ships, replace those hashes with the merged hashes. Then rebuild. A live run with a real statement is still to do after the audit on 23 Oct 2026.</footer>
 
 </div>
