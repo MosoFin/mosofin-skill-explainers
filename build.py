@@ -470,6 +470,11 @@ def outputs(rows):
         for k in published_kinds(r):
             p = os.path.join(SITE, "skills", r["skill"], f"{k}.html")
             out[p] = seo_page(r, k, open(p).read())
+        for k in CITED:   # internal plain/learn pages get the citation block too, so they read the same before they go public
+            p = os.path.join(SITE, "skills", r["skill"], f"{k}.html")
+            if r[k] == "internal" and os.path.exists(p):
+                t = re.sub(re.escape(CITE_START) + r".*?" + re.escape(CITE_END) + r"\n?", "", open(p).read(), flags=re.S)
+                out[p] = t.replace("</body>", cite_block(r["verified"]) + "</body>", 1)
     out[os.path.join(SITE, "sitemap.xml")] = sitemap(rows)
     return out
 
