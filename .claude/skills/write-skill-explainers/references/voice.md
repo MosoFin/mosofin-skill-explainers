@@ -61,8 +61,11 @@ python3 -I .claude/skills/write-skill-explainers/scripts/ste_verify.py site/skil
 `ste_extract.py` pulls the visible prose, and leaves out every quoted skill rule, the diagrams and the code.
 `ste_verify.py` compares the page with the last commit and fails if anything but wording changed: the HTML
 structure, links, source titles, formulas, quoted rules, cite numbers, and every number, date and amount
-must be identical. It reports any change in the count of hedge words (may, usually, often, about) so you can
-restore one that a rewrite removed.
+must be identical. Script code must be identical too: only quoted strings and the prose between tags and
+`${...}` in calculator templates may change. A cite marker `C(n)` may be added to a sentence you split, never
+removed. It reports any change in the count of hedge words (may, usually, often, about) so you can restore one
+that a rewrite removed. The extractor also pulls the prose that lives inside the learn page's script
+(situations, facts, verdicts, calculator text), so the linter sees everything a reader sees.
 
 **What the pass must never do.** Turn "may" into a fact. Drop a condition or a scope qualifier to fit the
 word limit. Add a cause, a frequency or an example the page did not state. Touch a quoted rule, a source

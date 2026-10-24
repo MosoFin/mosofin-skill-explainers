@@ -20,10 +20,55 @@ class P(HTMLParser):
         x=re.sub(r'\s+',' ',''.join(s.cur)).strip()
         if x: s.out.append(x)
         s.cur=[]
+
+PROTECTED=('q','t','u','formula','where','src','kind','id','type','cites','chips')
+def js_prose(code):
+    """Prose a reader sees that lives in script code: quoted strings and the text of template literals (${...} becomes N)."""
+    found=[]; n=len(code)
+    def string(i,q):
+        j=i+1
+        while j<n and code[j]!=q: j+=2 if code[j]=='\\' else 1
+        return j+1
+    def template(i):
+        j=i+1; buf=[]
+        while j<n and code[j]!='`':
+            c=code[j]
+            if c=='\\': buf.append(code[j+1:j+2]); j+=2
+            elif c=='$' and code[j+1:j+2]=='{':
+                d=1; k=j+2
+                while d and k<n:
+                    if code[k] in '"\'': k=string(k,code[k]); continue
+                    if code[k]=='`': k,_=template(k); continue
+                    d+=(code[k]=='{')-(code[k]=='}'); k+=1
+                buf.append('N'); j=k
+            elif c=='<':
+                k=code.find('>',j); k=n if k<0 else k+1; buf.append(' '); j=k
+            else: buf.append(c); j+=1
+        return j+1,''.join(buf)
+    i=0
+    while i<n:
+        c=code[i]
+        if c=='/' and code[i+1:i+2]=='/': k=code.find('\n',i); i=n if k<0 else k
+        elif c=='/' and code[i+1:i+2]=='*': k=code.find('*/',i); i=n if k<0 else k+2
+        elif c in '"\'':
+            j=string(i,c); text=code[i+1:j-1]
+            key=re.search(r'(\w+)\s*:\s*$',code[max(0,i-30):i])
+            if not (key and key.group(1) in PROTECTED): found.append(text)
+            i=j
+        elif c=='`':
+            i,text=template(i); found.append(text)
+        else: i+=1
+    out=[]
+    for f in found:
+        f=re.sub(r'<[^>]+>','',f.replace('\\n',' ')); f=re.sub(r'\s+',' ',f).strip()
+        if len(f.split())>=4 and re.search(r'[A-Za-z]{3}',f) and not re.search(r'[{};=]|=>|\.querySelector',f): out.append(f)
+    return out
 def extract(path):
     t=open(path).read()
     p=P(); p.feed(t); p.flush()
     blocks=p.out
+    for m in re.finditer(r'<script>(.*?)</script>',t,re.S): blocks+=js_prose(m.group(1))
+    # (older field-name pass kept below; duplicates are removed)
     # JS string fields that are visible prose (learn page)
     for m in re.finditer(r'\b(plain|backed|where_plain|note|desc|w|what|why|result|intro|lede)\s*:\s*"((?:[^"\\]|\\.)*)"',t):
         k=m.group(1)
