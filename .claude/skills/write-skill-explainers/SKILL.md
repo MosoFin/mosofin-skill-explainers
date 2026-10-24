@@ -64,7 +64,8 @@ never do.
 Read `references/voice.md` before writing prose for either public page; it is short, and `--check` fails the
 build on em dashes and filler words. When a page is written, run its Simplified Technical English pass
 (same file, section "The Simplified Technical English pass") on all three pages, and prove with
-`scripts/ste_verify.py` that only the wording changed.
+`scripts/ste_verify.py` that only the wording changed. The project-wide rule for all technical
+writing, pages or not, is the `technical-writing-ste` skill.
 
 ### 4. Write the learn page
 

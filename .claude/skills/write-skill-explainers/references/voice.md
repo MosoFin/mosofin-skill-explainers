@@ -34,6 +34,9 @@ Quoted rules, source titles and the sources' own wording stay exactly as they ar
 
 ## The Simplified Technical English pass (every page, every kind)
 
+This section is the page-specific part of the project rule in `.claude/skills/technical-writing-ste/`,
+which covers all technical writing: skill files, docs, commit messages and pull request descriptions too.
+
 Owners, bookkeepers and AI agents all read these pages, and some of them read English as a second
 language or through a translator. Simplified Technical English (ASD-STE100) removes the two things that
 cause misreading: words with more than one meaning, and sentences with more than one possible shape.

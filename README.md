@@ -57,6 +57,10 @@ action, no semicolons, no hedge removed. `scripts/ste_extract.py` and `scripts/s
 skill pull the prose for the linter and prove that only the wording changed. The pages follow the structural
 rules. They do not check the approved-word dictionary, so none calls itself STE-compliant.
 
+The same rule covers all technical writing in this project, not only the pages: skill files, docs, commit
+messages and pull request descriptions. The `technical-writing-ste` skill in `.claude/skills/` says where
+each mode applies, what must never change, and how to check a text with the linter.
+
 ## Search
 
 Each page's `<title>` and meta description are written by hand (25–65 and 70–160 characters, unique).
