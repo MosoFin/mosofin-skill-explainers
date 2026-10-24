@@ -411,7 +411,7 @@ def index(rows):
     ways = [WAYS[k] for k, *_ in kinds]
     ways = ways[0] if len(ways) == 1 else ", ".join(ways[:-1]) + " and " + ways[-1]
     count = {1: "one way", 2: "two ways", 3: "three ways"}.get(len(kinds), f"{len(kinds)} ways")
-    with_any = [r for r in rows if any(r[k] != "todo" for k, *_ in KINDS)]
+    with_any = [r for r in rows if published_kinds(r)]   # a skill whose pages are all internal gets no public page or link
     pages = sum(1 for r in rows for k, *_ in KINDS if r[k] == "published")
     trs = []
     for r in rows:
@@ -465,7 +465,7 @@ def sitemap(rows):
 def outputs(rows):
     out = {os.path.join(SITE, "index.html"): index(rows)}
     for r in rows:
-        if any(r[k] != "todo" for k, *_ in KINDS):
+        if published_kinds(r):
             out[os.path.join(SITE, "skills", r["skill"], "index.html")] = landing(r)
         for k in published_kinds(r):
             p = os.path.join(SITE, "skills", r["skill"], f"{k}.html")
@@ -514,6 +514,7 @@ def seo_problems(outs):
         levels = [int(x) for x in re.findall(r"<h([1-6])[\s>]", h)]
         for a, b in zip(levels, levels[1:]):
             if b > a + 1: bad.append(f"{rel}: heading jumps from h{a} to h{b}"); break
+        if SEO_START not in h: continue   # an internal plain/learn page: title, description and headings are checked, the SEO block comes when it is published
         cano = re.search(r'<link rel="canonical" href="(.*?)"', h)
         want = SITE_URL + rel.replace("index.html", "")
         if not cano or html.unescape(cano.group(1)) != want: bad.append(f"{rel}: canonical should be {want}")

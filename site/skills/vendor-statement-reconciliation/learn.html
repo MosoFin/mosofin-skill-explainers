@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor Statement Reconciliation Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked supplier-statement examples, from one invoice number spelled two ways to a payment sent elsewhere, with a calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule .badge.w{background:var(--hold-soft);color:var(--hold)}
+  .rule .badge.s{background:var(--blue-soft);color:var(--blue)}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .tag-x{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--hold-soft);color:var(--hold);margin-left:6px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Vendor statement reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · vendor-statement-reconciliation · learning guide</span>
+  <h1>From one invoice number to a payment that went somewhere else</h1>
+  <p class="lede">This page shows how the skill checks a supplier's statement against your books, <b>one level at a time</b>. It starts with one invoice number written two ways. It ends with a payment that never reached the supplier. The page quotes every rule from the skill itself. It also works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are US audit standards, an international accounting standard, a UK tax guide, QuickBooks help, a fraud study and the FBI. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter your own statement. The page builds the same bridge.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Thirteen rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one company, Northbrook Trading, and one supplier, Harbor Office Supply, account NB-2210. Harbor dated its statement 25 September, and it lists every open item. Your books are at 30 September.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in your own statement</h2>
+  <p class="muted">Enter the totals for one supplier and one statement, or load an example. The page builds the bridge from your books to the statement, line by line. It shows any credit notes as money owed to you, on their own. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="harbor">Harbor, September</button>
+      <button type="button" data-p="timing">Level 2 · timing only</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>From the supplier's statement</legend>
+        <label class="field"><span>Statement balance (S)</span><input data-k="S" inputmode="decimal"></label>
+        <label class="field"><span>Invoices on the statement, not in your books (M)</span><input data-k="M" inputmode="decimal"></label>
+        <label class="field"><span>Credit notes on the statement, not in your books (C)</span><input data-k="C" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>From your books</legend>
+        <label class="field"><span>Your ledger balance for this supplier (B)</span><input data-k="B" inputmode="decimal"></label>
+        <label class="field"><span>Invoices in your books dated after the statement date (L)</span><input data-k="L" inputmode="decimal"></label>
+        <label class="field"><span>Your payments the supplier has not received (T)</span><input data-k="T" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="math num" id="bridge" aria-live="polite"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="results" id="owed" aria-live="polite"></div>
+    <p class="fine">The page uses expected statement = B − L + T + M − C, and unexplained = S − expected. The page calls it a tie when the unexplained amount is under half a cent. The skill itself matches item by item, in its four tiers. This bridge only adds up the totals of what that matching finds. The "Harbor, September" preset puts Levels 2, 3 and 4 on one statement: $18,640.00 + $2,480.00 − $410.00 = $20,710.00.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Do you want to use MosoFin, or upload the data yourself? Which supplier, or which suppliers? The skill asks for the statement, as a PDF or CSV. It asks which company the statement is for, and the account reference. It asks for your period end, the statement's date and what the statement covers. It also asks about a dispute log and who owns the exceptions.</div>
+    <div><b>Needs</b>The skill needs the supplier's statement, which only you can supply. It needs your AP ageing or vendor ledger for that supplier, connected or exported. It needs your cutoff date. A payment register and a dispute log make the result better.</div>
+    <div><b>Gives back</b>The skill gives back six sheets. They are a summary, the matched items with their tier, the exceptions with owner and age, and the proposed entries. The last two are the vendor ranking and a coverage sheet. Every entry carries the label PROPOSED &mdash; NOT POSTED. The skill asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never posts an entry and never contacts a supplier. It never books a liability from a statement line. It never forces an uncertain match. It reads nothing before you answer its questions and say yes.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from seven outside sources. They include a US audit standard-setter, an international accounting standard-setter and the UK tax authority. The others are QuickBooks help, a fraud examiners' association and the FBI. MosoFin checked each one on 24 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The four match tiers, the six difference types and the Step 0 ranking signals are the skill's own rules. So are the "three near-substitutes" and the six output sheets. The page marks them as the skill's where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 6 and 7 are US sources. Source 4 is a UK rule. Source 3 is an international standard. Source 5 is QuickBooks Online help. Check with your accountant which rules apply to you. This page explains <code>vendor-statement-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"PCAOB: AS 1105, Audit Evidence", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS1105", at:"¶.08", checked:"2026-10-24", via:"from search results, page not opened", w:"Evidence from a knowledgeable source outside the company is generally more reliable than evidence from the company's own records. This is a general rule. Reliability still depends on the source and the circumstances."},
+  {t:"PCAOB: AS 2315, Audit Sampling", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315", checked:"2026-10-24", via:"from search results, page not opened", w:"You cannot find an account understated by omitted items by sampling the items that the books recorded. An auditor can test later cash payments for payables left out of the books, because the omitted purchases show up there."},
+  {t:"IFRS Foundation: IAS 37 Provisions, Contingent Liabilities and Contingent Assets", u:"https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2022/issued/ias37.html", at:"¶11", checked:"2026-10-24", via:"from search results, page not opened", w:"Accruals are liabilities to pay for goods or services received or supplied but not yet paid, invoiced or formally agreed with the supplier. Trade payables are the ones invoiced or formally agreed. Companies often report accruals as part of trade and other payables."},
+  {t:"HMRC: VAT guide (VAT Notice 700)", u:"https://www.gov.uk/guidance/vat-guide-notice-700", at:"¶10.4.2", checked:"2026-10-24", via:"from search results, page not opened", w:"Under UK rules, the input tax you reclaim is the VAT shown on the supplier's VAT invoice."},
+  {t:"Intuit: Enter vendor credits and refunds in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/vendor-credits/enter-refund-vendor/L2y1KARni_US_en_US", checked:"2026-10-24", via:"from search results, page not opened", w:"You record a supplier's credit as a vendor credit and apply it when you pay bills. A credit applies only to an open bill. With no open bill it stays unapplied until one arrives. You record a cash refund separately."},
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", checked:"2026-10-24", via:"from search results, page not opened", w:"Billing schemes, which are invoices for fictitious or inflated goods or services, appeared in 22% of the 1,921 cases studied. Their median loss was $100,000. Asset misappropriation appeared in 89% of cases."},
+  {t:"FBI IC3: 2024 Internet Crime Report", u:"https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", at:"loss table, Business Email Compromise", checked:"2026-10-24", via:"from search results, page not opened", w:"Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints. The FBI advises checking any request to change account information through a second channel."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The thirteen quotes, word for word from the skill's files. Section names are written as the files write them. */
+const Q = {
+  q1:{q:"A vendor statement is independent evidence, prepared by a third party from their own records.", w:"references/overview.md · This is a genuine external reconciliation"},
+  q2:{q:"Anything on their list and not on yours is a candidate unrecorded liability", w:"references/overview.md · Which makes it the primary control over completeness of AP"},
+  q3:{q:"You cannot book a liability from a statement line alone", w:"references/overview.md · Three near-substitutes"},
+  q4:{q:"if the supplier exists twice in one vendor master, half the invoices are under the other record", w:"references/gates.md · Gate 1 \u2014 Establish the datasource and entity scenario"},
+  q5:{q:"a supplier account in credit means the business has paid more than it owes", w:"references/method.md · Step 0 \u2014 Decide which vendors to reconcile *(Mosofin addition)*"},
+  q6:{q:"INV-0042, 42 and 0042 are one document", w:"references/method.md · Step 1 \u2014 Normalise both datasets"},
+  q7:{q:"The supplier's statement cutoff is very often not your period end.", w:"references/method.md · Step 1 \u2014 Normalise both datasets"},
+  q8:{q:"An unmatched item is a question; a wrongly matched item is two wrong answers", w:"references/method.md · Step 2 \u2014 Match statement items to the AP ledger"},
+  q9:{q:"with a recurring supplier billing the same amount monthly, amount plus date proximity can match the wrong month.", w:"references/method.md · Step 2 \u2014 Match statement items to the AP ledger"},
+  q10:{q:"A credit note on the statement and not in your ledger is a reduction in what you owe that has not been taken", w:"references/method.md · Step 3 \u2014 Explain differences"},
+  q11:{q:"Where the liability is confirmed and the document has not yet arrived, the answer is an accrual, not an invoice posting.", w:"references/method.md · Step 5 \u2014 Accounting actions"},
+  q12:{q:"The statement is for a different entity in the group. Every invoice presents as missing.", w:"references/edge-cases.md · Edge Cases"},
+  q13:{q:"Payments made to an old bank account. A payment you made and they did not receive.", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"The statement comes from outside your books", r:Q.q1, cites:[1],
+    plain:"Harbor wrote the statement from its own records. Nobody at Northbrook could change it. So it can show what your own books cannot.",
+    backed:"Audit standards treat evidence from a knowledgeable source outside the company as generally more reliable than the company's own records. This is a general rule, and reliability still depends on the source." },
+  { id:"2", title:"Their list finds what your books never saw", r:Q.q2, cites:[2],
+    plain:"A check of what you recorded can never find what you did not record. The supplier's list can.",
+    backed:"Auditors cannot find omitted items by sampling the items the books recorded. They test later cash payments instead, because the omitted purchases show up there." },
+  { id:"3", title:"A statement line is not an invoice", r:Q.q3, cites:[4],
+    plain:"The statement says an invoice may exist. The skill asks for the invoice before anyone books it. The invoice gives the amount, the coding and the tax.",
+    backed:"Under UK rules, the input tax you reclaim is the VAT shown on the supplier's VAT invoice.{4} A statement line is not that invoice." },
+  { id:"4", title:"Look for a second vendor record first", r:Q.q4, cites:[],
+    plain:"Before the skill calls an invoice missing, it checks the vendor master for a second record of the same supplier." },
+  { id:"5", title:"A supplier account in credit is money", r:Q.q5, cites:[],
+    plain:"The skill ranks suppliers before it reconciles one. An account in credit ranks high, because the causes are all money you can get back." },
+  { id:"6", title:"Document numbers are text", r:Q.q6, cites:[],
+    plain:"The skill strips prefixes and leading zeros on both sides the same way. Then it compares the numbers as text, and it records what it did." },
+  { id:"7", title:"Two dates, one known window", r:Q.q7, cites:[],
+    plain:"The skill reads both dates. It treats activity between them as a known window, not as a list of exceptions." },
+  { id:"8", title:"Leave a doubtful match open", r:Q.q8, cites:[],
+    plain:"A wrong match marks one item as resolved when it is not. It also leaves a second item looking wrong when it is fine. So the skill leaves doubtful items for a person." },
+  { id:"9", title:"Same amount, wrong month", r:Q.q9, cites:[],
+    plain:"Tier 2 of the matching order uses amount and date. When two candidates tie, the skill reports the tie and does not pick one." },
+  { id:"10", title:"A credit note nobody took", r:Q.q10, cites:[5],
+    plain:"Nobody chases a supplier for money the supplier owes them. So the skill reports missing credit notes on their own, apart from the problems.",
+    backed:"In QuickBooks Online you record a supplier's credit as a vendor credit. It applies only to an open bill." },
+  { id:"11", title:"Until the invoice arrives, accrue", r:Q.q11, cites:[3],
+    plain:"An accrual reverses when the invoice arrives, and the invoice takes its place. A posted invoice with no document leaves a payable nobody can support.",
+    backed:"IAS 37 describes accruals as amounts owed for goods or services received but not yet paid, invoiced or formally agreed with the supplier." },
+  { id:"12", title:"Check who the statement is for", r:Q.q12, cites:[],
+    plain:"The skill reads the addressee and the account reference off the statement. It checks them against your company file before it matches anything." },
+  { id:"13", title:"A payment they never received is serious", r:Q.q13, cites:[7],
+    plain:"If someone changed the supplier's bank details by fraud, the supplier's statement is where it shows. The skill flags it for a person to follow up.",
+    backed:"The FBI counts $2,770,151,146 of reported business email compromise losses in 2024, from 21,442 complaints.{7} It advises checking account changes through a second channel.{7}" },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"Clean matching · Northbrook Trading and Harbor Office Supply, statement dated 25 September" },
+  { n:1, title:"One invoice, two spellings",
+    chips:["Statement","Ledger"], src:"Rule 6", cites:[],
+    situation:"Harbor's statement lists INV-0042, dated 3 Sep, for $1,250.00. Your ledger holds document 42, dated 3 Sep, for $1,250.00. A match on the raw text finds nothing.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Side","As printed","Strip the prefix","Strip leading zeros","Compared as"],
+      rows:[["Statement","INV-0042","0042","42","42"],["Ledger","42","42","42","42"]]},
+    rules:[Q.q6],
+    math:[["Statement number","INV-0042"],["Strip the prefix INV-","0042"],["Strip the leading zeros","42"],["Ledger number","42"],["Same text?","yes",1],["Amount: $1,250.00 − $1,250.00","$0.00"],["Match tier","1, document number",1]],
+    verdict:["ok","The two lines match at tier 1, the most certain tier. The skill records the tier and the normalisation it applied. A reviewer can then repeat the match.","MATCH"] },
+
+  { n:2, title:"Two dates, five days apart",
+    chips:["Statement at 25 Sep","Ledger at 30 Sep"], src:"Rule 7", cites:[1],
+    situation:"Harbor's statement shows $18,640.00 owed at 25 Sep. Your ledger shows $21,115.00 at 30 Sep. The gap is $2,475.00, and none of it is an error.",
+    facts:["Evidence from a knowledgeable source outside the company is generally more reliable than the company's own records "+C(1)+". That makes the statement worth comparing, once both dates are clear."],
+    visual:{type:"wf", start:["Your ledger at 30 Sep",21115], steps:[["Invoice 0057, 27 Sep, not yet on the statement",-3100],["Payment of 29 Sep, not yet received by Harbor",625]], end:["Expected statement at 25 Sep",18640], dec:2},
+    rules:[Q.q7],
+    math:[["Your ledger at 30 Sep","$21,115.00"],["− invoice 0057, dated 27 Sep","$3,100.00"],["+ payment of 29 Sep","$625.00"],["= expected statement balance","$18,640.00",1],["Harbor's statement at 25 Sep","$18,640.00"],["Unexplained","$0.00",1],["Gap explained: $3,100.00 − $625.00","$2,475.00"]],
+    verdict:["ok","The statement ties. Both items fall in the known window between 25 and 30 Sep. The skill lists them as timing items with their dates.","TIES"] },
+
+  { tier:"What only the statement can show" },
+  { n:3, title:"An invoice your books never saw",
+    chips:["Statement","Ledger","Vendor master"], src:"Rules 2, 4, 11 and 3", cites:[1,2,3],
+    situation:"Harbor's statement lists INV-0049, dated 18 Sep, for $2,480.00. Your ledger has no item that matches it at any of the four tiers.",
+    facts:["You cannot find a payable left out of the books by sampling the items the books recorded. Auditors test later cash payments instead, because the omitted purchases show up there "+C(2)+".",
+           "Evidence from a knowledgeable source outside the company is generally more reliable than the company's own records "+C(1)+". Harbor's statement is that kind of evidence.",
+           "An accrual is a liability for goods or services received but not yet paid, invoiced or formally agreed with the supplier. Companies often report accruals as part of trade and other payables "+C(3)+"."],
+    visual:{type:"table",
+      head:["Check before calling it missing","Result"],
+      rows:[["A match at any of the four tiers","none"],["A second Harbor record in the vendor master","none"],["Posted to a sibling company","no"],["What remains",["candidate unrecorded liability","bad"]]]},
+    rules:[Q.q2, Q.q4, Q.q11, Q.q3],
+    math:[["INV-0049 on the statement","$2,480.00"],["Matching item in your ledger","none"],["Proposed accrual at 30 Sep","$2,480.00",1],["Label on the entry","PROPOSED \u2014 NOT POSTED"],["Next action","ask Harbor for the invoice copy"]],
+    verdict:["flag","The skill proposes an accrual of $2,480.00 at 30 Sep and asks for the invoice copy. It does not post an invoice from the statement line. When the invoice arrives, it takes the accrual's place.","FLAG"] },
+
+  { n:4, title:"A credit note nobody claimed",
+    chips:["Statement","Ledger","Payments"], src:"Rules 10 and 5", cites:[5],
+    situation:"Harbor's statement lists credit note CN-0011, dated 12 Sep, for −$410.00, for returned chairs. Your books do not have it. Northbrook paid the invoice it relates to, INV-0031 for $410.00, in full on 5 Sep.",
+    facts:["In QuickBooks Online you record a supplier's credit as a vendor credit and apply it when you pay bills. A credit applies only to an open bill. With no open bill, it stays unapplied until one arrives. You record a cash refund separately "+C(5)+"."],
+    visual:{type:"table",
+      head:["Document","Amount","In your books"],
+      rows:[["INV-0031","$410.00","yes"],["Payment, 5 Sep","−$410.00","yes"],["CN-0011, 12 Sep",["−$410.00","good"],["no","bad"]]]},
+    pair:[["ok","Money owed to you","$410.00","CN-0011. The skill reports it on its own, apart from the problems."]],
+    rules:[Q.q10, Q.q5],
+    math:[["INV-0031","$410.00"],["− paid on 5 Sep","$410.00"],["= still owed on INV-0031","$0.00",1],["CN-0011, not taken","$410.00"],["= cash Harbor owes you","$410.00",1]],
+    verdict:["ok","The $410.00 is cash owed to Northbrook. Northbrook has no open Harbor bill, so the credit cannot apply to one. Ask Harbor for a refund, or offset it against the next bill.","OWED TO YOU"] },
+
+  { tier:"Harder cases · when amounts and payments mislead" },
+  { n:5, title:"Same amount, wrong month",
+    chips:["Statement","Ledger"], src:"Rules 9 and 8", cites:[],
+    situation:"Harbor's cleaning contract bills $950.00 every month. The statement shows two open items of $950.00: INV-0577 dated 2 Aug and INV-0612 dated 1 Sep. Your ledger has one open $950.00 item dated 17 Aug, with no document number.",
+    facts:[], nofact:"This level needs no outside fact. The four match tiers are the skill's own rules.",
+    visual:{type:"table",
+      head:["Statement item","Date","Amount","Days from 17 Aug"],
+      rows:[["INV-0577","2 Aug","$950.00","15 before"],["INV-0612","1 Sep","$950.00","15 after"]]},
+    rules:[Q.q9, Q.q8],
+    math:[["17 Aug − 2 Aug","15 days"],["1 Sep − 17 Aug: 14 days to 31 Aug, + 1","15 days"],["A tie at tier 2?","yes",1],["Open on the statement: $950.00 + $950.00","$1,900.00"],["Open in your ledger","$950.00"],["Missing invoice, whichever month it is","$950.00",1]],
+    verdict:["note","The skill does not pick one. It reports the tie and asks for the document number of the ledger item. Whichever month that is, the other $950.00 is a missing invoice.","TIE"] },
+
+  { n:6, title:"The payment that went somewhere else",
+    chips:["Ledger","Bank","Statement","Vendor master"], src:"Rule 13", cites:[6,7],
+    situation:"Your books show a $5,600.00 payment to Harbor on 12 Sep, and it cleared your bank. Harbor's statement still shows INV-0044 for $5,600.00 open, and no payment received. Harbor's bank details in your vendor master changed on 2 Sep, after an email.",
+    facts:["Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints "+C(7)+". The FBI advises checking any request to change account information through a second channel "+C(7)+".",
+           "Billing schemes, which are invoices for fictitious or inflated goods or services, appeared in 22% of the 1,921 fraud cases studied "+C(6)+". Their median loss was $100,000 "+C(6)+"."],
+    visual:{type:"table",
+      head:["Date","What happened","Amount"],
+      rows:[["2 Sep","Harbor's bank details change in your vendor master, after an email",""],["12 Sep","Your payment to Harbor clears your bank","$5,600.00"],["25 Sep","Harbor's statement: INV-0044 open, no payment received",["$5,600.00","bad"]]]},
+    rules:[Q.q13],
+    math:[["Paid by you on 12 Sep","$5,600.00"],["Received by Harbor, per its statement","$0.00"],["Difference","$5,600.00",1],["Days from the bank change to the payment: 12 − 2","10 days"],["Verdict","serious, [manual]",1]],
+    verdict:["flag","This is the pattern that business email compromise produces. The skill flags it as serious and [manual]. A person calls Harbor on a phone number already on file. Billing schemes are a separate risk that is also common.","SERIOUS"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function wf(v){
+  const pts=[v.start[1]]; let run=v.start[1];
+  v.steps.forEach(s=>{run+=s[1]; pts.push(run);});
+  const max=Math.max(...pts, v.start[1]);
+  const pct=x=>(x/max*100).toFixed(2)+"%";
+  let h=`<div class="wf">`;
+  h+=row(v.start[0], 0, v.start[1], "start", fmt(v.start[1], v.dec));
+  run=v.start[1];
+  v.steps.forEach(s=>{ const a=run, b=run+s[1]; h+=row(s[0], Math.min(a,b), Math.abs(s[1]), s[1]<0?"minus":"plus", (s[1]<0?"− ":"+ ")+fmt(Math.abs(s[1]), v.dec)); run=b; });
+  h+=row(v.end[0], 0, v.end[1], "end"+(v.warn?" warn":""), fmt(v.end[1], v.dec), true);
+  return h+"</div>";
+  function row(lbl, left, width, cls, amt, total){
+    return `<div class="wf-row${total?" total":""}"><span>${esc(lbl)}</span><div class="wf-track"><div class="wf-bar ${cls}" style="left:${pct(left)};width:${pct(Math.max(width,max*0.004))}"></div></div><span class="amt">${amt}</span></div>`;
+  }
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = L.visual.type==="wf" ? wf(L.visual) : table(L.visual);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: the bridge from your books to the supplier's statement --- */
+const PRESETS = {
+  harbor: {S:20710, B:21115, L:3100, T:625, M:2480, C:410},
+  timing: {S:18640, B:21115, L:3100, T:625, M:0,    C:0},
+  blank:  {S:"",    B:"",    L:"",   T:"",  M:"",   C:""},
+};
+const inputs=[...document.querySelectorAll("[data-k]")];
+const num = k => { const v=parseFloat(String(document.querySelector(`[data-k="${k}"]`).value).replace(/[$£€,\s]/g,"")); return isFinite(v)?v:0; };
+function load(p){ inputs.forEach(i=>i.value=PRESETS[p][i.dataset.k]); document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p)); run(); }
+function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const S=num("S"), B=num("B"), L=num("L"), T=num("T"), M=num("M"), Cr=num("C");
+  const bridge=document.getElementById("bridge"), box=document.getElementById("results"), owed=document.getElementById("owed");
+  owed.innerHTML = Cr>0 ? res("ok","Money owed to you, shown on its own", fmt(Cr), "These credit notes reduce what you owe. If the invoice a credit relates to is already paid, the credit is cash the supplier owes you.") : "";
+  if(!S && !B){ bridge.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter the statement balance and your ledger balance to start."); return; }
+  const expected = Math.round((B - L + T + M - Cr)*100)/100, diff = Math.round((S-expected)*100)/100;
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  bridge.innerHTML = line("Your ledger balance (B)", fmt(B))
+    + line("− invoices in your books after the statement date (L)", fmt(L))
+    + line("+ your payments the supplier has not received (T)", fmt(T))
+    + line("+ invoices on the statement, not in your books (M)", fmt(M))
+    + line("− credit notes on the statement, not in your books (C)", fmt(Cr))
+    + line("= expected statement balance", fmt(expected), 1)
+    + line("Statement balance (S)", fmt(S))
+    + line("Unexplained: S − expected", fmt(diff), 1);
+  let h = res("", "Expected statement", fmt(expected), `${fmt(B)} − ${fmt(L)} + ${fmt(T)} + ${fmt(M)} − ${fmt(Cr)}`);
+  h += Math.abs(diff)<0.005
+    ? res("ok","Unexplained", "$0.00", "It ties. Every difference has a name.")
+    : res("flag","Unexplained", fmt(diff), `The statement is ${fmt(Math.abs(diff))} ${diff>0?"above":"below"} what your named items explain. Look for items on one side only, then check the dates.`);
+  if(M>0) h += res("flag","Invoices to ask for", fmt(M), "These are candidate unrecorded liabilities. Ask the supplier for each invoice copy. At a period end, accrue them. Do not post an invoice from a statement line.");
+  box.innerHTML = h;
+}
+inputs.forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("harbor");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-24", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

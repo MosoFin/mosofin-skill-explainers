@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor Statement Reconciliation in Plain English | MosoFin</title>
+<meta name="description" content="What a vendor statement reconciliation checks: a supplier's statement against your accounts payable, to find missing invoices and unclaimed credits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Vendor statement reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · vendor statement reconciliation, in plain words</span>
+  <h1>Does your supplier agree with your books?</h1>
+  <p class="lede">Each month a supplier can send you a <b>statement</b>: their list of what you owe them. This skill compares that list with your <b>accounts payable (AP)</b>, which is what your books say you owe suppliers. It checks one item at a time.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it the supplier's statement. It reads the same supplier's invoices, credits and payments from your books. It matches the two lists item by item and explains every difference. It finds invoices your books never saw and credit notes nobody claimed. It proposes a fix for each. It never posts anything and never contacts the supplier.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Where the numbers come from</span>
+  <h2>Two lists of the same debt, kept by two different people</h2>
+  <p>Your books show what you recorded. The supplier's statement shows what the supplier recorded, from their own system. Auditors treat evidence from an independent outside source as generally more reliable than a company's own records<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. So the statement can show a gap your own books cannot show.</p>
+  <p>The two figures rarely agree on the first look. Some differences are timing. Others are real mistakes. The skill names each line that takes one figure to the other.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 340" role="img" aria-label="Two columns. Left: Northbrook Trading's books show 21,115 dollars owed to Harbor Office Supply at 30 September. Minus a 3,100 dollar invoice dated 27 September, after the statement date. Plus a 625 dollar payment of 29 September that Harbor has not received. Plus a 2,480 dollar invoice on Harbor's statement that the books never recorded. Minus a 410 dollar credit note that nobody claimed. The result is 20,710 dollars. Right: Harbor's statement at 25 September shows a closing balance of 20,710 dollars. They meet.">
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <rect x="16" y="20" width="540" height="304" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="36" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">YOUR BOOKS · NORTHBROOK TRADING</text>
+          <text x="36" y="80" fill="var(--ink)">Owed to Harbor at 30 September</text><text x="536" y="80" text-anchor="end" font-weight="700" fill="var(--ink)">$21,115.00</text>
+          <text x="36" y="112" fill="var(--hold)">− Invoice 0057, 27 Sep, after the statement date</text><text x="536" y="112" text-anchor="end" fill="var(--hold)">− 3,100.00</text>
+          <text x="36" y="144" fill="var(--hold)">+ Payment of 29 Sep, Harbor has not received it</text><text x="536" y="144" text-anchor="end" fill="var(--hold)">+ 625.00</text>
+          <text x="36" y="176" fill="var(--wrong)">+ INV-0049 on the statement, never in your books</text><text x="536" y="176" text-anchor="end" fill="var(--wrong)">+ 2,480.00</text>
+          <text x="36" y="208" fill="var(--green)">− Credit note CN-0011, nobody claimed it</text><text x="536" y="208" text-anchor="end" fill="var(--green)">− 410.00</text>
+          <line x1="36" y1="228" x2="536" y2="228" stroke="var(--rule-strong)"/>
+          <text x="36" y="258" font-weight="700" fill="var(--ink)">Your books, adjusted</text><text x="536" y="258" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">$20,710.00</text>
+          <text x="36" y="290" font-size="13" fill="var(--muted)">Amber lines are timing. The red line is a bill your books lack.</text>
+          <text x="36" y="308" font-size="13" fill="var(--muted)">The green line is money that Harbor owes back to you.</text>
+
+          <rect x="584" y="20" width="280" height="304" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="604" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">HARBOR'S STATEMENT</text>
+          <text x="604" y="80" fill="var(--ink)">Closing balance, 25 September</text>
+          <text x="604" y="122" font-weight="800" font-size="26" fill="var(--ink)">$20,710.00</text>
+          <text x="604" y="162" font-size="13" fill="var(--muted)">Harbor Office Supply</text>
+          <text x="604" y="182" font-size="13" fill="var(--muted)">Account NB-2210</text>
+          <text x="604" y="202" font-size="13" fill="var(--muted)">Every open item</text>
+          <rect x="604" y="238" width="240" height="40" rx="20" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="724" y="263" text-anchor="middle" font-weight="700" fill="var(--green)">They meet, to the cent</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company and supplier. Harbor dated the statement 25 September, and your books close on 30 September. The skill treats the five days between those dates as a known window, so the two amber lines are timing. The arithmetic: 21,115.00 − 3,100.00 + 625.00 + 2,480.00 − 410.00 = 20,710.00.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="label">The mistakes it catches</span>
+  <h2>"We pay the bills we have, so the balance is right"</h2>
+  <p>The quick way to handle a supplier is to pay the invoices in your books and file the statement unread. Nothing looks wrong. The skill reads every line of the statement instead. In this example it finds two things the shortcut misses.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">Every statement line, against every item in your books</span>
+      <div class="rows num">
+        <div class="row off"><span>INV-0049, 18 Sep, on the statement and not in your books</span><span class="v">$2,480.00</span></div>
+        <div class="row off"><span>CN-0011, 12 Sep, a credit for returned chairs, never recorded</span><span class="v">$410.00</span></div>
+        <div class="row same"><span>Timing lines in the five-day window</span><span class="v">2</span></div>
+      </div>
+      <div class="verdict">The skill reports the credit note on its own, apart from the problems. It asks for a copy of the missing invoice and proposes an accrual for it.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Pay what your books show, file the statement</span>
+      <div class="rows num">
+        <div class="row"><span>Your books say you owe Harbor</span><span class="v">$21,115.00</span></div>
+        <div class="row"><span>Bills paid when due</span><span class="v">✓</span></div>
+        <div class="row off"><span>INV-0049 stays out of your books</span><span class="v">hidden</span></div>
+        <div class="row off"><span>The $410.00 credit stays with Harbor</span><span class="v">unclaimed</span></div>
+      </div>
+      <div class="verdict">Your books leave out a possible $2,480.00 bill. They also miss $410.00 that Harbor owes back to you.</div>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <span class="tag up">An invoice your books never saw</span>
+      <h3>INV-0049, $2,480.00</h3>
+      <p>Accountants call this an <b>unrecorded liability</b>: a bill you owe that your books do not show. A check of only the items you recorded cannot find an item that nobody recorded<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The supplier's list can find it.</p>
+      <p>First, the skill checks two simpler causes. Harbor can have a second supplier record in your books. The invoice can also sit in another of your companies. Here neither is true. So the skill asks for a copy of the invoice. At 30 September it proposes an <b>accrual</b> of $2,480.00, which records a bill for goods you received before the invoice arrives<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+    </div>
+    <div class="card">
+      <span class="tag">A credit note nobody claimed</span>
+      <h3>CN-0011, $410.00</h3>
+      <p>Harbor credited you for returned chairs. Your books never recorded the credit. The invoice it relates to, INV-0031 for $410.00, was paid in full on 5 September. So the $410.00 is cash that Harbor owes you.</p>
+      <p>In QuickBooks you record a supplier's credit as a vendor credit and use it against a bill you have not paid yet. With no open Harbor bill, the credit stays unused until a bill arrives. A cash refund is a separate entry<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">The serious one</span>
+  <h2>A payment that went somewhere else</h2>
+  <p>Take a different case with the same supplier. On 12 September you paid Harbor $5,600.00, and the money left your bank. Harbor's statement still shows INV-0044 for $5,600.00 as open, with no payment received. On 2 September someone changed Harbor's bank details in your books, after an email.</p>
+  <p>This is the pattern that business email compromise (BEC), a fraud by email, produces. The skill marks a payment the supplier never received as serious. It contacts nobody. A person at your company checks the details with Harbor. The FBI advises that you check any request to change account details through a second channel, such as a phone number you already had<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Email fraud, 2024</span><span class="v num wrong">$2.77 billion</span><span class="s">Reported losses to business email compromise in 2024, from 21,442 complaints to the FBI<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup></span></div>
+    <div class="stat"><span class="label">Billing schemes</span><span class="v num">22%</span><span class="s">Share of 1,921 fraud cases that used invoices for fake or inflated goods or services<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup></span></div>
+    <div class="stat"><span class="label">Median loss</span><span class="v num">$100,000</span><span class="s">The median loss in a billing scheme, in the same study<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup></span></div>
+  </div>
+  <p class="muted" style="font-size:15px">Billing schemes are a different risk from email fraud. The figures show how often each one occurs. They do not say how often a statement check finds one.</p>
+</section>
+
+<section>
+  <span class="label">One honest limit</span>
+  <h2>It can read your books. It cannot read the supplier's statement</h2>
+  <p>With MosoFin connected, the skill reads your side in full: every invoice, credit and payment, the payment list and your supplier records. No accounting system holds the supplier's statement, because the supplier sends it to you. So the skill always asks you for it.</p>
+  <p>Without a statement it can still help. It can rank your suppliers to show which ones to check first, from your books alone. The ranking puts large balances and large spending first. It also lists suppliers with old unpaid items, and suppliers whose regular invoices stopped. A supplier account in credit means you paid more than you owe. That money is usually yours to recover. The skill learns which suppliers were never checked from its saved history, or it asks you on a first run.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>It asks six questions before it looks at anything</h2>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your side from there. Without it, you upload the files and the checks stay the same. The skill asks only if your account has a MosoFin connection.</div></li>
+    <li><div class="q">Which supplier, or which suppliers?</div><div class="why">A check of every supplier is not possible and not necessary. On the MosoFin path the skill offers its ranking. You choose.</div></li>
+    <li><div class="q">The supplier's statement, as a PDF or CSV.</div><div class="why">The statement is the one side your books never hold. Without it there is nothing to compare. The skill says so and offers the ranking, which needs only your books.</div></li>
+    <li><div class="q">Which of your companies is the statement for, and under which account number?</div><div class="why">A statement for another company or another account makes every invoice look missing. The skill reads both from the statement and checks them with you.</div></li>
+    <li><div class="q">Your period end, the statement's date, and what the statement lists?</div><div class="why">The two dates often differ. A statement can list every open item, only overdue items, or a running balance. An overdue-only statement makes every current invoice look unmatched. The skill never assumes the two dates are the same.</div></li>
+    <li><div class="q">Do you keep a record of disputes, and who handles the exceptions?</div><div class="why">Disputes live in emails and notes, not in your books. Every exception needs a person and a target date, and you set both.</div></li>
+  </ol>
+  <p>Then it reads your answers back and waits for your yes:</p>
+  <blockquote><i>"Reconciling Harbor Office Supply's statement dated 25 September, addressed to Northbrook Trading (account NB-2210), against your AP ledger at 30 September read from your Mosofin connection. The statement lists every open item. The five days between the two dates are a known window. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload two files and a date</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then add the statement</h3>
+      <ul>
+        <li>It reads every invoice, credit and payment for the supplier</li>
+        <li>It reads your payment list and your supplier records</li>
+        <li>It checks that the company it reads is the company on the statement</li>
+        <li>You still give it the <b>supplier's statement</b>, every time</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the statement and an export</h3>
+      <ul>
+        <li><b>Supplier's statement</b> (PDF or CSV), required</li>
+        <li><b>What you owe that supplier</b>, as an AP ageing or supplier ledger export, required</li>
+        <li><b>Your period end date</b>, typed in the chat, required</li>
+        <li>Your payment list with bank details, recommended</li>
+        <li>Your notes on disputed invoices, recommended</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Six sheets: the balance, the matches, and what to do next</h2>
+  <div class="gets">
+    <div class="get"><b>The summary</b><span>The two balances, the difference, how much it explains and how much it does not. It shows both dates.</span></div>
+    <div class="get"><b>Every match, with its strength</b><span>Each matched item shows which of four tests matched it. A match on the document number is the strongest. A loose match on the description is the weakest.</span></div>
+    <div class="get"><b>Exceptions, with a person and a date</b><span>Each one has a cause, a person, a next step, a target date and an age. For a recurring check, open exceptions carry forward to the next month.</span></div>
+    <div class="get"><b>Proposed entries</b><span>It drafts corrections for a person to post. It keeps accruals apart from invoice entries.</span></div>
+    <div class="get"><b>Which suppliers to check</b><span>The ranking: large balances, suppliers never checked, accounts in credit, and broken invoice patterns.</span></div>
+    <div class="get"><b>Where every number came from</b><span>Which side it read and which side you supplied, and what it did not do, such as contact the supplier.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat.</p>
+</section>
+
+<section>
+  <div class="never">
+    <span class="label">What it never does</span>
+    <ul>
+      <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
+      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never posts an entry or changes your data.</b> Every entry is a proposal for a person to post.</li>
+      <li><b>Never contacts a supplier.</b> It sends nothing to anyone.</li>
+      <li><b>Never books a bill from a statement line.</b> Until the invoice arrives, it proposes an accrual.</li>
+      <li><b>Never forces a doubtful match.</b> When two items fit equally well, it reports the tie and lets a person decide.</li>
+      <li><b>Never calls an invoice missing too early.</b> It first checks for a second supplier record and a statement for another company.</li>
+    </ul>
+    <p class="muted" style="font-size:15px">Each proposed entry carries this label from the skill:</p>
+    <blockquote><code>PROPOSED — NOT POSTED</code></blockquote>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Accounts payable (AP)</dt><dd>What you owe your suppliers, as your books record it. The skill compares it with what the supplier records.</dd>
+    <dt>Supplier statement</dt><dd>The supplier's list of what you owe them, made from their own records. Accountants also call it a vendor statement.</dd>
+    <dt>Unrecorded liability</dt><dd>A bill you owe that is not in your books. An invoice on the statement and not in your books is a possible one.</dd>
+    <dt>Accrual</dt><dd>An entry for goods or services you received but the supplier has not yet invoiced. It often appears with trade payables<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Credit note</dt><dd>A document from the supplier that reduces what you owe, for example after a return. QuickBooks calls it a vendor credit<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+    <dt>Cutoff date</dt><dd>The date a list stops. The supplier's cutoff and yours often differ. The skill treats the days between them as a known window, not as errors.</dd>
+    <dt>Match tier</dt><dd>The skill's four match tests, from strongest to weakest: document number, amount and date, order number and amount, then a loose match on the description.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are US audit standards, an international accounting standard, the accounting software's own help, a fraud study and an FBI report. We checked each one on 24 October 2026 from search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-24" data-via="from search results, page not opened" data-at="¶.08"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS1105" rel="noopener">PCAOB: AS 1105, Audit Evidence</a><span class="what">As a general rule, evidence from an informed source outside the company is more reliable than evidence from the company's own records. Reliability still depends on the source and the circumstances.</span></li>
+    <li id="src2" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315" rel="noopener">PCAOB: AS 2315, Audit Sampling</a><span class="what">A sample of the recorded items cannot show that an account is too low because items are missing. An auditor can test later cash payments instead, because the missing purchases appear there.</span></li>
+    <li id="src3" data-checked="2026-10-24" data-via="from search results, page not opened" data-at="¶11"><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2022/issued/ias37.html" rel="noopener">IFRS Foundation: IAS 37 Provisions, Contingent Liabilities and Contingent Assets</a><span class="what">Accruals are amounts owed for goods or services received but not yet paid, invoiced or formally agreed with the supplier. Trade payables are the invoiced or agreed ones. Accruals often appear within trade and other payables.</span></li>
+    <li id="src4" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/vendor-credits/enter-refund-vendor/L2y1KARni_US_en_US" rel="noopener">Intuit: Enter vendor credits and refunds in QuickBooks Online</a><span class="what">You enter a supplier's credit as a vendor credit and apply it when you pay bills. It applies only to an open bill, so without one it waits unapplied. A cash refund has its own entry.</span></li>
+    <li id="src5" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf" rel="noopener">ACFE: Occupational Fraud 2024: A Report to the Nations</a><span class="what">Of the 1,921 cases in the study, 22% involved billing schemes, with a median loss of $100,000. Theft of company assets occurred in 89% of cases.</span></li>
+    <li id="src6" data-checked="2026-10-24" data-via="from search results, page not opened" data-at="loss table, Business Email Compromise"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" rel="noopener">FBI IC3: 2024 Internet Crime Report</a><span class="what">Victims reported $2,770,151,146 lost to business email compromise in 2024, across 21,442 complaints. The FBI tells businesses to check any change to payment details through a second channel.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the four match tests, the six types of difference, or the signals that rank which suppliers to check first. The same is true of the three near-substitutes in the skill's background file and the six output sheets. They are the skill's own rules.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>vendor-statement-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, Harbor Office Supply and every figure in their examples. They are not your data. The audit standards, the fraud study and the FBI report are US sources. IAS 37 is an international standard. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-24", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
