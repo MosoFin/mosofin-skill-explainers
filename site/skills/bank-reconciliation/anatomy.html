@@ -97,8 +97,8 @@
 
 <header>
   <div class="eyebrow">bank-reconciliation · shipped on main · audited 21 Oct 2026 · all 4 findings fixed · card format</div>
-  <h1>How the bank reconciliation is built, and what it does</h1>
-  <p class="lede">Was one 865-line file; now a 132-line card and seven reference files, with every line of the original kept. This page shows how they connect, the run step by step, what the audit found and how each finding was fixed, and what checked out against the live QuickBooks catalogue.</p>
+  <h1>How the parts of the bank reconciliation connect, and what it does</h1>
+  <p class="lede">The skill was one 865-line file. It is now a 132-line card and seven reference files. The split kept every line of the original. This page shows how the parts connect and shows the run step by step. It also shows what the audit found, the fix for each finding, and what passed the check against the live QuickBooks catalogue.</p>
 </header>
 
 <section>
@@ -106,7 +106,7 @@
     <div class="stat"><span class="k">Card</span><span class="v">132</span><span class="s">lines in SKILL.md, down from 865</span></div>
     <div class="stat"><span class="k">Content kept</span><span class="v">665/665</span><span class="s">original lines, moved into 7 reference files</span></div>
     <div class="stat"><span class="k">Tool names</span><span class="v">21/21</span><span class="s">QuickBooks tools exist in the live catalogue</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">4/4</span><span class="s">fixed on main — 79f7a93 and 2197ec8</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">4/4</span><span class="s">fixed on main in 79f7a93 and 2197ec8</span></div>
   </div>
 </section>
 
@@ -151,7 +151,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the accounting — Steps 0–7, the quality checks and both entity scenarios; <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The defining limitation — the books can be read, the bank never — now sits at the top of the card as well as in overview.md.</figcaption>
+    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the accounting: Steps 0–7, the quality checks and both entity scenarios. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. Its text stays in sync with the repository's single copy. The defining limitation is that the skill can read the books but never the bank. This limitation now sits at the top of the card as well as in overview.md.</figcaption>
   </figure>
 </section>
 
@@ -241,7 +241,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: without a statement balance, Step 1 stops and the output is labelled a book-side preparation. The duplicate check in Step 3 is the one part of matching that runs without the statement at all.</figcaption>
+    <figcaption>Both paths converge on the read-back, and the skill reads nothing before it. The highlighted box is the clause at the core of the skill's design. Without a statement balance, Step 1 stops, and the skill labels the output a book-side preparation. The duplicate check in Step 3 is the one part of matching that runs without the statement at all.</figcaption>
   </figure>
 </section>
 
@@ -251,24 +251,24 @@
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Two cross-references pointed at skills that are not in the repository</h3>
-      <p>Step 2 sends the reader to <code>bank-fee-and-interest-analysis</code> and the FX edge case to <code>multicurrency-fx-revaluation</code>. Both are in <code>deploy-queue.tsv</code> but not yet under <code>skills/</code>, so a user installing this skill alone follows a name to nothing. Both sentences now stand on their own without naming a skill; the links can return when those skills ship.</p>
+      <p>Step 2 sends the reader to <code>bank-fee-and-interest-analysis</code> and the FX edge case to <code>multicurrency-fx-revaluation</code>. Both are in <code>deploy-queue.tsv</code> but not yet under <code>skills/</code>, so a user installing this skill alone follows a name to nothing. Both sentences now stand on their own without naming a skill. The links can return when those skills ship.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md · Step 2 · Edge Cases · main 79f7a93</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>865 lines in one file, against a 500-line guide</h3>
-      <p>The processor-rec skill was split into a 121-line card plus references for exactly this reason. Done the same way: a 132-line card with the six intake questions, the upload checklist and the rules that never bend, and the original text moved unchanged into <code>references/</code> — 665 of 665 content lines accounted for by script. The validator and shared-block sync pass on the new layout.</p>
+      <p>The processor-rec skill became a 121-line card plus references for exactly this reason. This skill now follows the same pattern. It has a 132-line card with the six intake questions, the upload checklist and the rules that never bend. The split moved the original text unchanged into <code>references/</code>. A script accounted for 665 of 665 content lines. The validator and shared-block sync pass on the new layout.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md + references/ · main 2197ec8</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>A sandbox-only path for the spreadsheet helper</h3>
-      <p>Outputs says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else; on a laptop or another client it is a dead instruction. It now asks the user whether they want an Excel file, creates it only on a yes using the file name the skill defines, and falls back to tables in the chat. No path is named. The same sentence went into all 31 skills.</p>
+      <p>Outputs says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. On a laptop or another client it is a dead instruction. The skill now asks the user whether they want an Excel file. It creates the file only on a yes, with the file name that the skill defines. Otherwise, it uses tables in the chat. The skill names no path. All 31 skills received the same sentence.</p>
       <span class="where">references/output.md · main 79f7a93 and 4d5637c</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
-      <h3>The escalation ages were stated as rules without saying they are practice</h3>
-      <p>"Deposits in transit older than 10 business days" and "outstanding cheques older than 90 days" are sound bookkeeping convention, but the skill presents them beside funds-availability and unclaimed-property rules that <i>are</i> published. One clause — "these ages are practice; adjust to the entity's bank and state" — now follows the two bullets, and asks for the chosen ages to be saved as a preference in Step 7. The quoted bullets themselves are unchanged.</p>
+      <h3>The skill stated the escalation ages as rules without saying that they are practice</h3>
+      <p>"Deposits in transit older than 10 business days" and "outstanding cheques older than 90 days" are sound bookkeeping convention. However, the skill presents them beside funds-availability and unclaimed-property rules that <i>are</i> published. One clause now follows the two bullets: "these ages are practice; adjust to the entity's bank and state". The clause also says to save the chosen ages as a preference in Step 7. The quoted bullets themselves did not change.</p>
       <span class="where">SKILL.md · Quality checks · main 79f7a93</span>
     </div></div>
   </div>
@@ -278,19 +278,19 @@
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>Every QuickBooks tool named — 21 — exists in the live catalogue read on 21 Oct 2026 (workspace Online Shop, company file Northwood). 73 tools listed, none write-capable.</span></li>
-    <li><span class="ok">PASS</span><span>Policies are read per run, as the skill says: in that workspace <code>get_account</code> is <code>permission</code>-gated, not the "usually [auto]" the text suggests — Gate 2 resolves it correctly.</span></li>
-    <li><span class="ok">PASS</span><span>The bank statement is Required and [manual] in Gate 3, and Step 1 stops without it. No path produces a "reconciled" label from the books alone.</span></li>
-    <li><span class="ok">PASS</span><span>Every proposed entry must name the statement line that evidences it, and uses the real account names from the chart of accounts.</span></li>
-    <li><span class="ok">PASS</span><span>Full bank account numbers are never displayed or persisted; Step 7 persists policy and names, never balances or item lists.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures); the shared onboarding, scope and write-guardrail blocks are in sync.</span></li>
-    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page — 11 — matches the skill text word for word, checked by script, after the split too.</span></li>
-    <li><span class="ok">PASS</span><span>No broken links anywhere in the bundle; each stage on the card points at a file and step that exists.</span></li>
-    <li><span class="ok">PASS</span><span>The one-line install pulls all 8 files, references included.</span></li>
+    <li><span class="ok">PASS</span><span>The audit read the live catalogue on 21 Oct 2026 (workspace Online Shop, company file Northwood). All 21 QuickBooks tools that the skill names exist in it. The catalogue lists 73 tools, and none is write-capable.</span></li>
+    <li><span class="ok">PASS</span><span>The skill reads policies per run, as its own text says. In that workspace, <code>get_account</code> is <code>permission</code>-gated, not the "usually [auto]" that the text suggests. Gate 2 resolves it correctly.</span></li>
+    <li><span class="ok">PASS</span><span>In Gate 3, the skill lists the bank statement as Required and [manual]. Step 1 stops without it. No path produces a "reconciled" label from the books alone.</span></li>
+    <li><span class="ok">PASS</span><span>Every proposed entry must name the statement line that evidences it. Every proposed entry also uses the real account names from the chart of accounts.</span></li>
+    <li><span class="ok">PASS</span><span>The skill never shows or saves full bank account numbers. Step 7 saves policy and names. It never saves balances or item lists.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures). The shared onboarding, scope and write-guardrail blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every rule that the learn page quotes (11 in all) matches the skill text word for word. A script checked this, including after the split.</span></li>
+    <li><span class="ok">PASS</span><span>No link anywhere in the bundle is broken. Each stage on the card points at a file and step that exists.</span></li>
+    <li><span class="ok">PASS</span><span>The one-line install pulls all 8 files, including the references.</span></li>
   </ul>
-  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real statement. The intercompany and shared-account scenarios are described in the skill and worked on the learn page, but not exercised against data.</p>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real statement. The skill describes the intercompany and shared-account scenarios, and the learn page contains worked examples of them. The audit did not exercise them against data.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27. Audited 21 Oct 2026; three findings fixed in 79f7a93 and the card-format split in 2197ec8. Still to do: a live run with a bank statement.</footer>
+<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/bank-reconciliation">MosoFin/mosofin-finance-skills</a>. The approved=true limit is d86fa27. The audit ran on 21 Oct 2026. Commit 79f7a93 fixed three findings, and commit 2197ec8 made the card-format split. A live run with a bank statement is still to do.</footer>
 
 </div>
