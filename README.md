@@ -51,6 +51,12 @@ Public pages are written for people. `build.py --check` fails a plain or learn p
 prose (quoted skill rules and empty table cells are exempt) or a filler word such as "leverage" or "robust".
 The rest of the style rules are in `.claude/skills/write-skill-explainers/references/voice.md`.
 
+Every page also goes through a Simplified Technical English pass (ASD-STE100, structural rules only) with the
+[asd-ste100 skill](https://github.com/danyuchn/asd-ste100-skill): short active sentences, one word for one
+action, no semicolons, no hedge removed. `scripts/ste_extract.py` and `scripts/ste_verify.py` in the workflow
+skill pull the prose for the linter and prove that only the wording changed. The pages follow the structural
+rules. They do not check the approved-word dictionary, so none calls itself STE-compliant.
+
 ## Search
 
 Each page's `<title>` and meta description are written by hand (25–65 and 70–160 characters, unique).
