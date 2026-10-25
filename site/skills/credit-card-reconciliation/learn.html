@@ -351,7 +351,7 @@
 </section>
 
 <footer>
-  <span>Rules are quoted from the skill's own file, <code>SKILL.md</code>: the opening section on what a connected workspace gives you, Steps 2 to 6, Both entity scenarios and the Edge Cases. Facts are cited to the sources above. All dollar figures are worked examples, not your data. The receipt, capitalisation and dispute rules cited are US ones and the tax-invoice rule is a UK one; confirm with your accountant what applies to you. This page explains <code>credit-card-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-card-reconciliation">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>Rules are quoted from the skill's own reference files: <code>references/overview.md</code> on what a connected workspace gives you, <code>references/method.md</code> Steps 2 to 6 and Both entity scenarios, and <code>references/edge-cases.md</code>. Facts are cited to the sources above. All dollar figures are worked examples, not your data. The receipt, capitalisation and dispute rules cited are US ones and the tax-invoice rule is a UK one; confirm with your accountant what applies to you. This page explains <code>credit-card-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-card-reconciliation">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -372,27 +372,27 @@ const RULES = [
   { id:"1", kind:"", title:"Tie the statement to the card liability",
     formula:"Card liability in the books\n+ charges in books, not yet on statement\n− charges on statement, not yet in books\n+ payments in transit ± FX timing\n= statement closing balance",
     plain:"Every step on that ladder has a name. A difference left over is a charge or a payment nobody has explained, never rounding.",
-    where:"SKILL.md · Step 2", cites:[2],
+    where:"references/method.md · Step 2", cites:[2],
     backed:"QuickBooks' own reconcile screen does the same for a credit card account, and finishes only at a difference of $0.00." },
   { id:"2", kind:"", title:"A file is not a receipt",
     formula:"matched: receipt confirms date, amount, merchant\nbelow threshold: no receipt required by policy\nmissing: above threshold, no receipt → exception",
     plain:"An attachment proves a file exists. A match proves it is the right receipt for the right amount. The skill reports those as two separate facts.",
-    where:"SKILL.md · Step 3", cites:[1],
+    where:"references/method.md · Step 3", cites:[1],
     backed:"The IRS calls evidence adequate when it shows the amount, date, place and essential character of the expense, and generally does not need it under $75 except for lodging." },
   { id:"3", kind:"", title:"Say which you did: reconciliation, or review",
     formula:"statement supplied → tie-out + review\nno statement → posted-charge review only",
     plain:"The books cannot test themselves. Without the statement the skill still runs every test it can, and labels the result a review.",
-    where:"SKILL.md · What a connected workspace gives you here", cites:[2],
+    where:"references/overview.md · What a connected workspace gives you here", cites:[2],
     backed:"A reconciliation in the accounting software starts from the statement's closing balance; with nothing to enter there, there is no reconciliation to finish." },
   { id:"W", kind:"w", title:"Three tests every month, statement or not",
     formula:"same merchant, same amount, same day → duplicate\nsame merchant, same amount, every month → subscription, × 12\nexpense-coded charge > capitalisation line → asset",
     plain:"Each needs only the posted charges. Each finds something on a card that has only ever been checked in total.",
-    where:"SKILL.md · Step 6", cites:[3,6],
+    where:"references/method.md · Step 6", cites:[3,6],
     backed:"The IRS safe harbor draws the asset line at $2,500 per item for most small businesses, and asset misappropriation is the most common occupational fraud, found in 89% of cases." },
   { id:"S", kind:"s", title:"Tax needs an invoice, and another company's cost is not your expense",
     formula:"recoverable tax code + no receipt → exposure\ncard of company A pays for company B → intercompany, not expense",
     plain:"A card slip proves you paid, not what tax was charged. And a charge is booked where the cost belongs, not where the card lives.",
-    where:"SKILL.md · Step 5 · Both entity scenarios", cites:[4,7],
+    where:"references/method.md · Step 5 · Both entity scenarios", cites:[4,7],
     backed:"HMRC reclaims input tax as the VAT shown on a VAT invoice, and IFRS 10 treats the group as one entity whose internal balances must still be recorded by each company." },
 ];
 
@@ -405,7 +405,7 @@ const LEVELS = [
     situation:"The September statement closes at $8,432.10 with 42 charges and one payment. The card liability in Northbrook's books is $8,092.10. One $340 charge was posted in the books on 30 September; the issuer recorded it on 1 October.",
     facts:["In QuickBooks Online a credit card account is reconciled like a bank account: enter the statement's closing balance and date, tick what appears, finish at a difference of $0.00 "+C(2)+".","If a charge on the statement is wrong, the cardholder has 60 days from the statement to dispute it in writing, and the issuer 30 days to acknowledge "+C(5)+". The skill tracks a disputed amount and does not book the credit until the issuer decides."],
     visual:{type:"wf", start:["Card liability in the books",8092.10], steps:[["Charge posted 30 Sep, on October's statement",340]], end:["Adjusted books",8432.10], dec:2},
-    rule:{q:"The credit card liability on the GL should reconcile to the statement closing balance", w:"SKILL.md · Step 2"},
+    rule:{q:"The credit card liability on the GL should reconcile to the statement closing balance", w:"references/method.md · Step 2"},
     math:[["Card liability in the books","$8,092.10"],["+ charge in books, not yet on statement","$340.00"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
     verdict:["ok","Ties. The $340 is timing, nothing else. The skill records it as a reconciling item with its posting date, so next month's run expects it on October's statement."] },
 
@@ -416,8 +416,8 @@ const LEVELS = [
     visual:{type:"table",
       head:["Status","Charges","What the skill saw","Exception?"],
       rows:[["Matched","31","receipt confirms date, amount and merchant","no"],["Below threshold","6","under $75, no receipt required by policy","no"],["File attached, not a match",["4","bad"],"a file exists; amount or merchant differs",["yes, 4"]],["Missing, above threshold",["1","bad"],"$412 hotel, nothing attached",["yes, high"]]]},
-    rule:{q:"it is not a match: a file being present says nothing about whether it is the right receipt for the right amount.", w:"SKILL.md · Step 3"},
-    rule2:{q:"Missing receipt above threshold — exception, needs follow-up", w:"SKILL.md · Step 3"},
+    rule:{q:"it is not a match: a file being present says nothing about whether it is the right receipt for the right amount.", w:"references/method.md · Step 3"},
+    rule2:{q:"Missing receipt above threshold — exception, needs follow-up", w:"references/method.md · Step 3"},
     math:[["Charges on the statement","42"],["Matched","31"],["Below $75, no receipt needed","6"],["Attached but not matched","4"],["Missing above threshold","1"],["Exceptions: 4 + 1","5",1]],
     verdict:["flag","Five exceptions, not one. The four attached-but-unmatched files would read as fine in a system that only checks whether something is attached. The hotel charge is the one the IRS would ask about first."] },
 
@@ -426,8 +426,8 @@ const LEVELS = [
     situation:"Same statement, but the books show $8,240.60, and the bridge is $148.50 short. The missing charge is a Saturday grocery-store purchase that was never submitted, with no receipt and no business purpose.",
     facts:["Asset misappropriation is the most common occupational fraud, in 89% of cases, with a median loss of $120,000; a third of frauds happen where controls are lacking "+C(6)+". Most unsubmitted charges are forgetfulness, which is exactly why the skill reports the facts and lets a person decide."],
     visual:{type:"wf", start:["Card liability in the books",8240.60], steps:[["Charge posted 30 Sep, on October's statement",340],["Charge on statement, never entered",-148.50]], end:["Adjusted books",8432.10], dec:2, warn:true},
-    rule:{q:"Charges on the statement but not yet posted to GL → reconciling item (timing)", w:"SKILL.md · Step 2"},
-    rule2:{q:"Possible personal-use charges (groceries, personal services, weekend non-business locations)", w:"SKILL.md · Step 6"},
+    rule:{q:"Charges on the statement but not yet posted to GL → reconciling item (timing)", w:"references/method.md · Step 2"},
+    rule2:{q:"Possible personal-use charges (groceries, personal services, weekend non-business locations)", w:"references/method.md · Step 6"},
     math:[["Card liability in the books","$8,240.60"],["+ timing item","$340.00"],["− charge on statement not in books","$148.50"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
     verdict:["flag","The bridge ties once the $148.50 is named, but naming it is the finding: a weekend grocery charge with no receipt and no purpose. The skill lists it as a possible personal charge with the cardholder as owner. It never calls it anything more than that."] },
 
@@ -438,8 +438,8 @@ const LEVELS = [
     visual:{type:"table",
       head:["Charge","Coded to","Amount","Threshold","Test"],
       rows:[["Electronics retailer, 9 Sep","Office Supplies",["$2,900.00","bad"],"$2,500.00",["over the line: asset","bad"]],["Office chair, 14 Sep","Office Supplies","$640.00","$2,500.00","expense"],["Monitor, 22 Sep","Office Supplies","$389.00","$2,500.00","expense"]]},
-    rule:{q:"Capitalization-threshold breaches — charges above the entity's capitalisation limit coded to an expense account", w:"SKILL.md · Step 6"},
-    rule2:{q:"Card used for capital purchases (equipment over the entity's capitalisation threshold): flag for Fixed Asset coding, not expense.", w:"SKILL.md · Edge Cases"},
+    rule:{q:"Capitalization-threshold breaches — charges above the entity's capitalisation limit coded to an expense account", w:"references/method.md · Step 6"},
+    rule2:{q:"Card used for capital purchases (equipment over the entity's capitalisation threshold): flag for Fixed Asset coding, not expense.", w:"references/edge-cases.md · Edge Cases"},
     math:[["Charge","$2,900.00"],["Capitalisation threshold","$2,500.00"],["Over by","$400.00",1],["Proposed entry: DR Computer Equipment, CR Office Supplies","$2,900.00",1]],
     verdict:["flag","One line, one proposed entry. September's expenses were $2,900 too high and the asset register was missing a laptop. The skill only runs this test once the threshold is given; it never assumes one."] },
 
@@ -451,7 +451,7 @@ const LEVELS = [
       head:["Merchant","Monthly","Months seen","Annualised","Note"],
       rows:[["Cloud hosting","$240.00","3","$2,880.00","in use"],["Accounting software","$85.00","3","$1,020.00","in use"],["Design tool",["$99.00","bad"],"3",["$1,188.00","bad"],["last login March","bad"]],["Four others","$380.00","3","$4,560.00","in use"]],
       total:["7 subscriptions","$804.00","","$9,648.00",""]},
-    rule:{q:"Recurring subscriptions — same merchant, same amount, repeating monthly across several periods. Present the list with the annualised cost; this reliably surfaces software nobody uses", w:"SKILL.md · Step 6"},
+    rule:{q:"Recurring subscriptions — same merchant, same amount, repeating monthly across several periods. Present the list with the annualised cost; this reliably surfaces software nobody uses", w:"references/method.md · Step 6"},
     math:[["Design tool: $99 × 12","$1,188.00",1],["All seven: $804 × 12","$9,648.00"],["Share that is the unused tool: 1,188 ÷ 9,648","12.3%"]],
     verdict:["flag","$1,188 a year for a tool nobody opens, listed with the six that are in use so the owner can decide. The skill presents the list and the annual cost; whether a subscription is unused is a question for the team."] },
 
@@ -464,8 +464,8 @@ const LEVELS = [
       head:["Charge","Gross","VAT coded","Receipt","Status"],
       rows:[["Stationery, 3 Sep","£180.00","£30.00",["none","bad"],["reclaim with no evidence","bad"]],["Software, 11 Sep","£600.00","£100.00",["none","bad"],["reclaim with no evidence","bad"]],["Travel agent, 19 Sep","£660.00","£110.00",["none","bad"],["reclaim with no evidence","bad"]]],
       total:["Exposure","£1,440.00","£240.00","",""]},
-    rule:{q:"Tax must be visible on the receipt — some jurisdictions require a valid tax invoice, not just a credit-card slip. This is the point most often missed: the card slip proves payment, not tax", w:"SKILL.md · Step 5"},
-    rule2:{q:"A recoverable tax code with no receipt — Mosofin-specific and directly detectable. A tax recovery claim with no supporting invoice is an exposure; list them.", w:"SKILL.md · Edge Cases"},
+    rule:{q:"Tax must be visible on the receipt — some jurisdictions require a valid tax invoice, not just a credit-card slip. This is the point most often missed: the card slip proves payment, not tax", w:"references/method.md · Step 5"},
+    rule2:{q:"A recoverable tax code with no receipt — Mosofin-specific and directly detectable. A tax recovery claim with no supporting invoice is an exposure; list them.", w:"references/edge-cases.md · Edge Cases"},
     math:[["Charges with a recoverable tax code and no receipt","3"],["VAT claimed on them: 30 + 100 + 110","£240.00",1],["Evidence held","card transactions only"],["Action","obtain VAT invoices or reverse the claim"]],
     verdict:["flag","£240 of VAT reclaimed with nothing behind it. The skill can see the tax code and the absence of a file from the books alone, which is why this test runs even on the upload path once the receipts are known."] },
 
@@ -477,7 +477,7 @@ const LEVELS = [
       head:["Charge","Paid by","Belongs to","Booked as","Should be"],
       rows:[["Venue deposit, 6 Sep · $900","Northbrook card","Southbrook",["Marketing (Northbrook)","bad"],"Due from Southbrook"],["Printing, 20 Sep · $340","Northbrook card","Southbrook",["Marketing (Northbrook)","bad"],"Due from Southbrook"]],
       total:["Intercompany","","","","$1,240.00 owed by Southbrook"]},
-    rule:{q:"A card issued to one entity but used for another's expenses is the common cross-entity case. Those charges are not that entity's expense — they create an intercompany balance: entity A paid for entity B's cost.", w:"SKILL.md · Both entity scenarios"},
+    rule:{q:"A card issued to one entity but used for another's expenses is the common cross-entity case. Those charges are not that entity's expense — they create an intercompany balance: entity A paid for entity B's cost.", w:"references/method.md · Both entity scenarios"},
     math:[["Southbrook costs on the Northbrook card: 900 + 340","$1,240.00",1],["Northbrook marketing expense, overstated by","$1,240.00"],["Proposed: DR Due from Southbrook, CR Marketing (Northbrook)","$1,240.00"],["Proposed: DR Marketing (Southbrook), CR Due to Northbrook","$1,240.00",1]],
     verdict:["note","Not an error to delete and not Northbrook's expense: an intercompany balance, with one proposed entry in each company. Northbrook's September marketing drops by $1,240 and Southbrook's rises by the same, and the two cancel only in the group accounts."] },
 ];
