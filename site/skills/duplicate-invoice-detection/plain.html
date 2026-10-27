@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicate Invoice Detection in Plain English | MosoFin</title>
+<meta name="description" content="What a duplicate invoice scan checks: your bills and payments for the same bill entered or paid twice, a supplier under two records, and unused credits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .limit{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--wrong);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+
+  .tbl{background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow-x:auto;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:600px;font-size:15.5px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tr:last-child td{border-bottom:none}
+  td.r{white-space:nowrap;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14px}
+  td .conf{display:inline-block;padding:2px 8px;border-radius:5px;font-size:13.5px;font-weight:600;background:var(--green-soft);color:var(--green);white-space:nowrap}
+  td .conf.mid{background:var(--hold-soft);color:var(--hold)}
+  td .conf.low{background:var(--ground);color:var(--muted)}
+  tr.notrun td{background:var(--wrong-soft)}
+  tr.notrun td .conf{background:var(--wrong);color:#fff}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Duplicate invoice detection</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · duplicate invoice detection, in plain words</span>
+  <h1>Did I pay the same bill twice?</h1>
+  <p class="lede">A supplier chases a bill you already paid. Someone enters it again, and the money goes out a second time. This skill reads your <b>bills</b>, your <b>payments</b>, your <b>supplier records</b> and your <b>open credits</b>. It finds the bill that went out twice, before or after the money left.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a period. It reads every bill and every payment in a wider window, and runs ten tests on them. Each match gets a confidence level and a reason. It lists the unpaid duplicates first, because you can void those at no cost. One test, the bank-account test, cannot run here. The skill says so on every result. It never voids a bill, never merges a supplier and never asks a supplier for money.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a scan finds</span>
+  <h2>One scan of Northbrook Trading: four months of bills</h2>
+  <p>Northbrook reviews September. The skill scans 1 July to 31 October, a wider window, because a duplicate often sits on each side of a month end. It reads 1,284 bills from 212 suppliers, including 9 inactive supplier records, 1,197 payments and 14 open credits. It finds six groups of records that look like the same bill. The skill calls each group a <b>cluster</b>.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 400" role="img" aria-label="Two panels. Left: six clusters found in Northbrook Trading's scan. A: Harbor Office Supply INV-0442 entered twice, 1,250 dollars, both paid, very high confidence. B: Crestline Logistics INV-7731, 4,860 dollars, paid by cheque and again by ACH, high confidence. C: Pinnacle Design under two supplier records, INV-2210, 3,200 dollars, one paid and one open, high confidence. D: Acme Corp and Acme Corporation, 980 dollars, two days apart, medium confidence. E: Summit Cleaning, 950 dollars, five days apart, medium confidence. F: Harbor credit note CN-0011, 410 dollars, never used, low confidence. Right: totals under Standard sensitivity. Flagged: 9,310 dollars. Already paid out: 6,110 dollars. Caught before payment: 3,200 dollars. Credit owed to Northbrook: 410 dollars. Rule 7 not run.">
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <rect x="16" y="20" width="540" height="364" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="36" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">SIX CLUSTERS · NORTHBROOK TRADING · 1 JUL TO 31 OCT</text>
+          <text x="36" y="82" fill="var(--wrong)">A · Harbor Office Supply · INV-0442 entered twice, both paid</text><text x="536" y="82" text-anchor="end" font-weight="700" fill="var(--wrong)">$1,250.00</text>
+          <text x="36" y="114" fill="var(--wrong)">B · Crestline Logistics · INV-7731 paid by cheque, then by ACH</text><text x="536" y="114" text-anchor="end" font-weight="700" fill="var(--wrong)">$4,860.00</text>
+          <text x="36" y="146" fill="var(--hold)">C · Pinnacle Design, two supplier records · INV-2210, one still open</text><text x="536" y="146" text-anchor="end" font-weight="700" fill="var(--hold)">$3,200.00</text>
+          <text x="36" y="178" fill="var(--muted)">D · Acme Corp and Acme Corporation · $980 two days apart</text><text x="536" y="178" text-anchor="end" fill="var(--muted)">$980.00</text>
+          <text x="36" y="210" fill="var(--muted)">E · Summit Cleaning · $950 twice, five days apart</text><text x="536" y="210" text-anchor="end" fill="var(--muted)">$950.00</text>
+          <text x="36" y="242" fill="var(--green)">F · Harbor credit note CN-0011 · open since 12 Sep, never used</text><text x="536" y="242" text-anchor="end" fill="var(--green)">$410.00</text>
+          <line x1="36" y1="262" x2="536" y2="262" stroke="var(--rule-strong)"/>
+          <text x="36" y="292" font-weight="700" fill="var(--ink)">Flagged under Standard: A, B and C</text><text x="536" y="292" text-anchor="end" font-weight="800" font-size="20" fill="var(--wrong)">$9,310.00</text>
+          <text x="36" y="322" font-size="13" fill="var(--muted)">Red lines are money that left twice. The amber line is a duplicate still unpaid.</text>
+          <text x="36" y="342" font-size="13" fill="var(--muted)">Grey lines are medium confidence, flagged only under Strict.</text>
+          <text x="36" y="362" font-size="13" fill="var(--muted)">The green line is money that Harbor owes back to Northbrook.</text>
+
+          <rect x="584" y="20" width="280" height="364" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="604" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">SENSITIVITY: STANDARD</text>
+          <text x="604" y="82" fill="var(--muted)">Already paid out, A and B</text>
+          <text x="604" y="110" font-weight="800" font-size="24" fill="var(--wrong)">$6,110.00</text>
+          <text x="604" y="150" fill="var(--muted)">Caught before payment, C</text>
+          <text x="604" y="178" font-weight="800" font-size="24" fill="var(--hold)">$3,200.00</text>
+          <text x="604" y="218" fill="var(--muted)">Credit owed to Northbrook, F</text>
+          <text x="604" y="246" font-weight="800" font-size="24" fill="var(--green)">$410.00</text>
+          <rect x="604" y="296" width="240" height="64" rx="12" fill="var(--wrong-soft)" stroke="var(--wrong)"/>
+          <text x="624" y="322" font-weight="700" fill="var(--wrong)">Rule 7: not run here</text>
+          <text x="624" y="344" font-size="13" fill="var(--wrong)">Owner: the bank's payments team</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company. Under Standard sensitivity the skill flags clusters A, B and C: 1,250.00 + 4,860.00 + 3,200.00 = 9,310.00. Clusters A and B were paid twice: 1,250.00 + 4,860.00 = 6,110.00. Under Strict sensitivity it also flags D and E: 980.00 + 950.00 = 1,930.00 more, 11,240.00 in total. The $410.00 credit is not a duplicate. The skill reports it on its own, as money that Harbor owes Northbrook.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="label">The mistakes it catches</span>
+  <h2>"We check each bill when it arrives, so nothing goes out twice"</h2>
+  <p>The usual control is a person who looks at each bill as it comes in. That person sees one bill at a time. A duplicate looks like any other bill, because it is a copy of a real one. The skill compares every bill with every other bill in the window. In this example it finds three things the one-at-a-time check missed.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">Every bill against every other bill, and every payment against every bill</span>
+      <div class="rows num">
+        <div class="row off"><span>Harbor INV-0442, entered on 3 Sep and again on 19 Sep</span><span class="v">$1,250.00</span></div>
+        <div class="row off"><span>Crestline INV-7731, paid by cheque on 22 Aug and by ACH on 4 Sep</span><span class="v">$4,860.00</span></div>
+        <div class="row off"><span>Pinnacle INV-2210, under two supplier records, one open</span><span class="v">$3,200.00</span></div>
+        <div class="row same"><span>Credit note CN-0011, never used</span><span class="v">$410.00</span></div>
+      </div>
+      <div class="verdict">The skill lists the open Pinnacle bill first. A person voids it before payment, and the $3,200.00 never leaves. For Harbor and Crestline it proposes a recovery: a credit on the next invoice, or a refund.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Pay each bill as it comes in</span>
+      <div class="rows num">
+        <div class="row"><span>Harbor's second copy of INV-0442 looks like a new bill</span><span class="v">paid</span></div>
+        <div class="row"><span>Crestline's reminder gets a second payment by ACH</span><span class="v">paid</span></div>
+        <div class="row off"><span>Pinnacle's open bill waits for its turn</span><span class="v">due</span></div>
+        <div class="row off"><span>The $410.00 credit stays with Harbor</span><span class="v">unused</span></div>
+      </div>
+      <div class="verdict">$6,110.00 left twice. $3,200.00 more is about to. Harbor still holds $410.00 of your money.</div>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <span class="tag bad">The same number, twice</span>
+      <h3>Harbor INV-0442, $1,250.00</h3>
+      <p>The same supplier and the same invoice number is the strongest signal the skill has. It flags this match at Very High confidence, even when the dates or the amounts differ a little. Both copies were paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice as the first option, and a refund as the second.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">Two channels, one bill</span>
+      <h3>Crestline INV-7731, $4,860.00</h3>
+      <p>The bill list shows INV-7731 once. The payment list shows it paid twice: a cheque on 22 August and an ACH transfer on 4 September. A search of the bills alone cannot find this. The skill reads the payments as well, with the method of each one. The paper trail, the cancelled cheque and the ACH record, shows both payments. The IRS tells a business to keep such documents in an orderly way, by year and by type<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">One supplier, two records</span>
+      <h3>Pinnacle INV-2210, $3,200.00</h3>
+      <p>Pinnacle Design exists twice in your <b>vendor master</b>, your list of supplier records. INV-2210 sits under each record. One copy was paid and one is still open. The skill reports two findings from one match: a supplier record to merge and a duplicate bill. A person voids the open copy, and the $3,200.00 never leaves. The skill proposes the merge and never does it. In QuickBooks a merge moves the duplicate's history to the record you keep and makes the duplicate inactive. To bring a merged supplier back, you must create its profile again by hand<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+    </div>
+    <div class="card">
+      <span class="tag">A credit nobody used</span>
+      <h3>Harbor CN-0011, $410.00</h3>
+      <p>Harbor gave Northbrook a credit note on 12 September. Since then Northbrook paid three later Harbor invoices in full. Nobody used the credit. This is not a duplicate. It is $410.00 that Harbor owes Northbrook. The skill reports it on its own, at the top, so it does not hide among the duplicates.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Why the scan runs every month</span>
+  <h2>A false bill can run for a year and a half before anyone sees it</h2>
+  <p>Most duplicates are honest errors. Some are not. A fraud study of 1,921 cases found a billing scheme, false or inflated invoices, in 424 of them, which is 22%<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The skill does not know which kind it found. It reports the cluster, the rule and the confidence, and a person decides.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Median loss</span><span class="v num wrong">$100,000</span><span class="s">The median loss in a billing scheme, in the same study<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Time to detection</span><span class="v num">18 months</span><span class="s">How long a billing scheme typically ran before detection, against 12 months for all frauds<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Caught early</span><span class="v num good">$30,000</span><span class="s">Median loss when a fraud was caught within six months. Frauds that ran two to three years had a median loss of $250,000<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The study counts frauds of every kind. It does not say how often a duplicate scan finds one. The skill's own files say to save each cleared cluster between runs. Without that list, the same false alarms return every month and nobody reads the report.</p>
+</section>
+
+<section>
+  <span class="label">The ten tests</span>
+  <h2>Ten rules, from the surest to the weakest</h2>
+  <p>The skill runs each rule in this order. The confidence level says how strong the evidence for a match is. Your <b>sensitivity</b> setting decides which levels count as flagged: Standard flags High and Very High, Strict adds Medium, and Permissive flags Very High only. The skill prints the setting on every result, because a clean result under Permissive means something very different from one under Strict.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Rule</th><th>What it looks for</th><th>Confidence</th><th>Runs here?</th></tr></thead>
+      <tbody>
+        <tr><td class="r">1</td><td>Same supplier, same invoice number</td><td><span class="conf">Very High</span></td><td>Yes</td></tr>
+        <tr><td class="r">2</td><td>Same supplier, same amount, same date, different invoice numbers</td><td><span class="conf">High</span></td><td>Yes</td></tr>
+        <tr><td class="r">3</td><td>Same supplier, same amount, dates within 7 days (you can change the window)</td><td><span class="conf mid">Medium</span></td><td>Yes</td></tr>
+        <tr><td class="r">4</td><td>Same amount, supplier names that look alike, such as "Acme Corp" and "Acme Corporation"</td><td><span class="conf mid">Medium</span></td><td>Yes</td></tr>
+        <tr><td class="r">5</td><td>An invoice number out of sequence, such as one lower than numbers already paid</td><td><span class="conf mid">Medium-Low</span></td><td>Yes</td></tr>
+        <tr><td class="r">6</td><td>Same invoice number under two supplier records</td><td><span class="conf">High</span></td><td>Yes</td></tr>
+        <tr class="notrun"><td class="r">7</td><td><b>Two supplier records that share one bank account.</b> The fraud test.</td><td><span class="conf">High</span></td><td><b>No. Reported as not run, with an owner.</b></td></tr>
+        <tr><td class="r">8</td><td>Round amounts that repeat in a short window</td><td><span class="conf low">Low</span></td><td>Yes</td></tr>
+        <tr><td class="r">9</td><td>One bill paid through two channels, such as a cheque and a wire</td><td><span class="conf">High</span></td><td>Yes, when the payment list has the method</td></tr>
+        <tr><td class="r">10</td><td>A credit note never used while later bills were paid in full</td><td><span class="conf low">Low</span></td><td>Yes. Reported as money owed to you</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted" style="font-size:15px">Rule 4 scores how alike two names are, from 0 to 1. The score gives extra weight to names that start the same way<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill flags a pair at 0.85 or above and shows the score, so a person can judge it. Acme Corp and Acme Corporation scored 0.91. Rule 3 found Summit Cleaning's $950.00 on 1 September and 6 September, five days apart. It did not flag the 1 October invoice: a bill 30 days later is a monthly pattern, not a duplicate.</p>
+</section>
+
+<section>
+  <div class="limit">
+    <span class="label">One honest limit</span>
+    <h2>A clean scan never means the fraud test passed</h2>
+    <p>Rule 7 looks for two supplier records that pay into one bank account. That is either one supplier entered twice or a fraud set up on purpose. It is the one rule aimed at fraud, and it is the one rule this skill cannot run. MosoFin does not expose supplier bank details, on purpose, because bank details are the main target in payment fraud. So the skill reports Rule 7 as not run. It names the person or team who runs the test in your banking or payables system. Northbrook's result says: Rule 7 not run, owner the bank's payments team. The rules-run sheet shows 9 rules ran and 1 did not.</p>
+    <p>Two outside facts show why the skill will not stay quiet about it. In 2024 businesses reported $2,770,151,146 lost to business email compromise, a fraud by email, in 21,442 complaints. A supplier's compromised email account is one way the fraud worked<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The standard control is to keep approving, paying and recording with different people, which helps prevent fraud, waste and abuse<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. The skill does not replace either. It tells you, every time, that the bank-account test is still yours to run.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>It asks six questions before it reads anything</h2>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your bills and payments from there. Without it, you upload the files and the ten rules stay the same. The skill asks only if your account has a MosoFin connection.</div></li>
+    <li><div class="q">Which period should the scan cover?</div><div class="why">The skill never picks a period for you. It proposes a window wider than the month you review, and says that it proposed it. A duplicate often sits on each side of a month end, and a pair across a year end is a known fraud pattern.</div></li>
+    <li><div class="q">Which suppliers bill the same amount on purpose every month: rent, subscriptions, retainers?</div><div class="why">Those are the main source of false alarms. Without your list the skill runs Rule 8 anyway, and says that it may flag bills that are fine.</div></li>
+    <li><div class="q">Strict, Standard or Permissive? And a window for Rule 3, if not 7 days?</div><div class="why">The setting decides which confidence levels count as flagged. Without an answer the skill uses Standard and 7 days, and prints both on the result.</div></li>
+    <li><div class="q">Who runs the bank-account test, Rule 7, in your payables or banking system, and how often?</div><div class="why">The one rule aimed at fraud, and the one this skill cannot run. Without a name the skill leaves the owner column open, and says so before it reports anything.</div></li>
+    <li><div class="q">Do you have results from an earlier scan: clusters you already reviewed and cleared?</div><div class="why">Without them the same false alarms come back every month. The skill scans without them and offers to save the cleared clusters at the end.</div></li>
+  </ol>
+  <p>Then it reads your answers back and waits for your yes:</p>
+  <blockquote><i>"Scanning Northbrook Trading's bills and payments from 1 July to 31 October. That is a wider window than September, the month under review. I read them from your Mosofin connection, with inactive vendor records included. Sensitivity Standard, Rule 3 window 7 days. The landlord, the insurer and three software suppliers are on the recurring list. Rule 7 is not run here. Your bank runs it. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload two files and two lists</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes to the read-back</h3>
+      <ul>
+        <li>It reads every bill in the window, page by page to the end, and states the count</li>
+        <li>It reads every payment with its method, for Rule 9</li>
+        <li>It reads your supplier records, inactive ones included</li>
+        <li>It reads your open credit notes, for Rule 10</li>
+        <li>If you run several companies, it asks whether to scan across them. One bill paid by two companies is invisible to each company's own scan</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the bills and the payments</h3>
+      <ul>
+        <li><b>Bill list</b> (CSV or XLSX): every bill in the window, with supplier, invoice number, date, amount, order reference and status. Required</li>
+        <li><b>Payment list</b> (CSV or XLSX): what was paid, when, and how. Required for Rule 9 and for paid status</li>
+        <li><b>Supplier records</b>, inactive ones included, with payment addresses. Recommended, the look-alike rules need it</li>
+        <li><b>Open credit notes</b>. Recommended, Rule 10 needs it</li>
+        <li>Your recurring-supplier list, sensitivity, Rule 3 window and cleared clusters, typed in the chat</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Seven sheets: the clusters, the money, and what ran</h2>
+  <div class="gets">
+    <div class="get"><b>The summary</b><span>The period, and how many records it scanned against how many exist. The total flagged and the exposure by confidence, paid against open, and the sensitivity used.</span></div>
+    <div class="get"><b>Every cluster, side by side</b><span>Each group of records with its rule, its confidence, the amount per record, the cluster total and the paid status. The records sit next to each other, so a person can agree or dismiss in seconds.</span></div>
+    <div class="get"><b>The detail</b><span>Every field the skill used to match: the raw and cleaned supplier name and invoice number, the date, the amount, the payment method and date.</span></div>
+    <div class="get"><b>Suppliers to merge</b><span>Each pair of supplier records that look like one supplier, with the record to keep and the reason. Proposals only.</span></div>
+    <div class="get"><b>The recovery plan</b><span>Per cluster, the action and the contact. Unpaid duplicates first, because voiding one costs nothing.</span></div>
+    <div class="get"><b>Rules run</b><span>Which of the ten rules ran, over how many records, and what each found. Rule 7 appears as not run, with its owner. This sheet is what makes "no duplicates found" a statement you can defend.</span></div>
+    <div class="get"><b>Coverage</b><span>For each task, which tool read the data, how many records it read, and any gap.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat.</p>
+</section>
+
+<section>
+  <div class="never">
+    <span class="label">What it never does</span>
+    <ul>
+      <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
+      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never voids a record, merges a supplier, or asks a supplier for money.</b> Every action is a proposal for a person.</li>
+      <li><b>Never picks the period or the company for you.</b> The scan window is wider than the month you review, and the result says how many records it scanned against how many exist.</li>
+      <li><b>Never reports a rule that did not run as finding nothing.</b> Rule 7 appears in every result as not run, with its owner. The sensitivity setting is on every result.</li>
+      <li><b>Never saves bank details, bill-level data, or a suspicion attached to a named person.</b> A duplicate is usually an error. It saves cleared clusters and supplier settings, and only when you say yes.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Eight terms, in plain English</h2>
+  <dl>
+    <dt>AP register</dt><dd>The list of supplier bills and what you paid against them. AP is short for accounts payable, what you owe suppliers.</dd>
+    <dt>Vendor master</dt><dd>Your list of supplier records. A <b>vendor alias</b> is one supplier that exists under more than one record.</dd>
+    <dt>Duplicate payment</dt><dd>The same bill paid twice. The copies can carry the same invoice number, or a changed one, or sit under two supplier records.</dd>
+    <dt>Cluster</dt><dd>A group of records that the skill suspects are the same bill. Each cluster carries one rule and one confidence level.</dd>
+    <dt>Confidence level</dt><dd>How strong the evidence for a match is, from Very High to Low. Each of the ten rules has a fixed level.</dd>
+    <dt>Sensitivity</dt><dd>How eagerly the scan flags. Strict flags more, Permissive flags less, and Standard sits between. The result always says which one ran.</dd>
+    <dt>Similarity score</dt><dd>A number from 0 to 1 that says how alike two names are, with extra weight when the first characters agree. The US Census Bureau developed it to match names and addresses between records<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill's threshold is 0.85.</dd>
+    <dt>Credit note</dt><dd>A document from a supplier that reduces what you owe. One left unused while you pay later bills in full is money the supplier owes you.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a fraud study, the accounting software's own help and a US statistical method paper. The others are an IRS publication, an FBI report and a US control standard. We checked each one on 27 October 2026 from search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf" rel="noopener">ACFE: Occupational Fraud 2024: A Report to the Nations</a><span class="what">Billing schemes, invoices for false or inflated goods or services, appeared in 424 of the 1,921 cases, 22%. The median loss was $100,000. A billing scheme typically ran 18 months before detection, against 12 months for all frauds. Frauds caught within six months had a median loss of $30,000. Those that ran two to three years had a median loss of $250,000.</span></li>
+    <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/chart-accounts/merge-duplicate-vendors/L0NPj861i_US_en_US" rel="noopener">Intuit: Merge duplicate vendors in QuickBooks Online</a><span class="what">A merge moves the duplicate's past transactions to the vendor you keep and makes the duplicate inactive. To bring a merged vendor back you must create the profile again by hand. Vendors merge in pairs.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.census.gov/content/dam/Census/library/working-papers/2006/adrm/rrs2006-02.pdf" rel="noopener">US Census Bureau: Overview of Record Linkage and Current Research Directions (Winkler, 2006)</a><span class="what">The Jaro-Winkler comparator scores how alike two strings are, from 0 to 1, with extra weight when the first characters agree. The Census Bureau developed it to match names and addresses between records.</span></li>
+    <li id="src4" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Supporting documents"><a href="https://www.irs.gov/publications/p583" rel="noopener">IRS: Publication 583, Starting a Business and Keeping Records</a><span class="what">Purchases and other transactions create supporting documents such as paid bills, invoices, receipts and cancelled cheques. Keep them in an orderly way, by year and by type. Keep a record that supports an item on a return until the period of limitations for that return ends.</span></li>
+    <li id="src5" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="loss table, Business Email Compromise"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" rel="noopener">FBI IC3: 2024 Internet Crime Report</a><span class="what">Victims reported $2,770,151,146 lost to business email compromise in 2024, across 21,442 complaints. A compromised vendor email account is one of the ways the scheme worked.</span></li>
+    <li id="src6" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Principle 10, Segregation of Duties, ¶10.21–10.23"><a href="https://www.gao.gov/assets/gao-25-107721.pdf" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721</a><span class="what">When different people hold the authority to approve, the custody of the asset and the accounting, the split helps prevent fraud, waste and abuse.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the ten rules, their order or their confidence levels. The same is true of the 0.85 threshold, the 7-day window, the three sensitivity settings and the seven sheets. They are the skill's own rules.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>duplicate-invoice-detection</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its suppliers and every figure in their examples. They are not your data. The fraud study, the software help, the IRS publication, the FBI report and the control standard are US sources. The method paper is from a US statistical agency. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
