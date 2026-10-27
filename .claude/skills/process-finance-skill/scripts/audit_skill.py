@@ -17,6 +17,7 @@ if ref:
 else:
     text = open(os.path.join(repo, path)).read()
 lines = text.split("\n")
+if lines and lines[-1] == "": lines.pop()   # a trailing newline is not a line
 library = set(os.listdir(os.path.join(repo, "skills"))) | set(os.listdir(os.path.join(repo, "dashboards")))
 card = os.path.isdir(os.path.join(repo, "skills", skill, "references"))
 
