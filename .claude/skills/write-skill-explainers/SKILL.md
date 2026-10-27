@@ -19,6 +19,9 @@ so nothing on this site is installed with a skill. Never put an explainer inside
 Reference implementation, read it before writing a page of the same kind:
 `site/skills/merchant-and-payment-processor-rec/{plain,learn,anatomy}.html`.
 
+To take a skill through the whole process, from audit and card-format split to published pages, use the
+`process-finance-skill` skill. This skill is its page-writing part.
+
 ## Why the pages are built this way
 
 A business owner will only trust a skill they can check for themselves. So every page goes from
@@ -62,7 +65,10 @@ say what the skill checks, what mistake it catches, what it will ask them, and w
 never do.
 
 Read `references/voice.md` before writing prose for either public page; it is short, and `--check` fails the
-build on em dashes and filler words.
+build on em dashes and filler words. When a page is written, run its Simplified Technical English pass
+(same file, section "The Simplified Technical English pass") on all three pages, and prove with
+`scripts/ste_verify.py` that only the wording changed. The project-wide rule for all technical
+writing, pages or not, is the `technical-writing-ste` skill.
 
 ### 4. Write the learn page
 
@@ -101,6 +107,9 @@ A page that says "in review" about a shipped skill is wrong, not merely stale.
 - Explainer HTML inside the skill's own folder, or in the skills repository at all.
 - Editing `site/index.html` or a skill's `index.html` by hand — `build.py` generates them.
 - Em dashes in prose, "not X, it's Y" lines, one-word verdicts, filler words (`references/voice.md`).
+- A page that never went through the STE pass, or a pass that dropped a hedge, a condition or a number, or
+  touched a quoted rule. `scripts/ste_verify.py` must print OK before the commit.
+- Calling a page "STE-compliant". The dictionary is not checked, so say only that the structural rules were applied.
 - Editing the generated `seo` block, or a page's title past 65 characters or description past 160.
 - Marking a page `published` to make a gap disappear. `todo` is honest; `internal` hides it.
 - Three pages written at once from memory. Write them in order; each one checks the last.

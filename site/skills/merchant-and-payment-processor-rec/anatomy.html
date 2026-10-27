@@ -97,15 +97,15 @@
 
 <header>
   <div class="eyebrow">merchant-and-payment-processor-rec · shipped on main · fixes applied</div>
-  <h1>How the processor reconciliation is built, and what it does</h1>
-  <p class="lede">The skill splits one 862-line file into a 121-line card and seven reference files. This page shows how they connect, the run stage by stage, and how each audit finding was fixed — with the published source behind each fix.</p>
+  <h1>The structure of the processor reconciliation, and what it does</h1>
+  <p class="lede">The skill splits one 862-line file into a 121-line card and seven reference files. This page shows how the files connect. It shows the run stage by stage. It also shows the fix for each audit finding, with the published source behind each fix.</p>
 </header>
 
 <section>
   <div class="stats">
     <div class="stat"><span class="k">Card</span><span class="v">121</span><span class="s">lines in SKILL.md, down from 862</span></div>
     <div class="stat"><span class="k">References</span><span class="v">7</span><span class="s">files, each loaded at one step</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">562/575</span><span class="s">original lines; the other 13 were the fixes</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">562/575</span><span class="s">original lines. The other 13 were the fixes</span></div>
     <div class="stat"><span class="k">Findings</span><span class="v">6/6</span><span class="s">fixed, plus 2 from Anthropic's guide</span></div>
   </div>
 </section>
@@ -173,7 +173,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries most of the weight because it is the accounting. The net-revenue test sits in <b>edge-cases.md</b>, and the card points Stage 3 straight at it.</figcaption>
+    <figcaption>The model loads the card every time. Each stage points to exactly one file, so a model reads the method only when it is doing the method. <b>method.md</b> carries most of the weight because it is the accounting. The net-revenue test sits in <b>edge-cases.md</b>, and the card points Stage 3 straight at it.</figcaption>
   </figure>
 </section>
 
@@ -270,7 +270,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and nothing is read before it. When the processor isn't connected, Stage 3's processor side comes from the uploaded CSVs — read using the column map in method.md; the QuickBooks side still reads live if Mosofin was chosen. The highlighted box is the check the skill exists for.</figcaption>
+    <figcaption>Both paths converge on the read-back. The skill reads nothing before the read-back. When the processor is not connected, Stage 3 takes the processor side from the uploaded CSVs. The skill reads the CSVs with the column map in method.md. The QuickBooks side still reads live if Mosofin is the chosen source. The highlighted box is the test the skill exists for.</figcaption>
   </figure>
 </section>
 
@@ -279,38 +279,38 @@
   <p class="sec-title">Each finding fixed, and the published source behind the fix</p>
   <div class="findings">
     <div class="f high done"><span class="sev">High · fixed</span><div class="body">
-      <h3>Every <code>approved=true</code> is limited to reads — on main, in all 30 skills</h3>
-      <p>The approval loop now says "reads only; if it would write, never re-invoke". The audit found 23 skills; widening the search found 56 lines across all 30. CI now checks every <code>approved=true</code>, not just the policy row, and fails both single-line and wrapped regressions.</p>
+      <h3>Every <code>approved=true</code> allows reads only, on main, in all 30 skills</h3>
+      <p>The approval loop now says "reads only; if it would write, never re-invoke". The audit found 23 skills. A wider search found 56 lines across all 30. CI now inspects every <code>approved=true</code>, not just the policy row. CI fails both single-line and wrapped regressions.</p>
       <blockquote>“Limit the permissions that LLM extensions are granted to other systems to the minimum necessary.”<cite><a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP Top 10 for LLM Applications 2025 · LLM06 Excessive Agency</a></cite></blockquote>
       <span class="where">main · commit d86fa27 · pushed</span>
     </div></div>
     <div class="f high done"><span class="sev">High · fixed</span><div class="body">
       <h3>Gate 3 confirms Stage 1 instead of asking again</h3>
-      <p>Six rows are marked "answered in Stage 1 — confirm, don't re-ask". Gate 3 now opens by confirming those answers in one line and asks only what Stage 1 did not cover.</p>
+      <p>The skill marks six rows "answered in Stage 1 — confirm, don't re-ask". Gate 3 now opens by confirming those answers in one line. It asks only what Stage 1 did not cover.</p>
       <blockquote>“Make sure to only ask for a piece of information once within a single journey.”<cite><a href="https://design-system.service.gov.uk/patterns/question-pages/">GOV.UK Design System · Question pages</a></cite></blockquote>
       <span class="where">references/gates.md</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Broken link in the protocol file</h3>
-      <p>The path now resolves from references/. A standalone install doesn't depend on it: the public docs URL sits beside it, and the card links every reference itself.</p>
+      <p>The path now resolves from references/. A standalone install does not depend on it: the public docs URL sits beside it, and the card links every reference itself.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">references/mosofin-protocol.md</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>"Stage" for the card, "Step" for the method</h3>
-      <p>The card's six are now Stages 1–6, with a one-line note that "Steps 0–10" always mean method.md. Reference headers follow the rename.</p>
+      <p>The card's six steps are now Stages 1–6, with a one-line note that "Steps 0–10" always mean method.md. Reference headers follow the rename.</p>
       <blockquote>“Choose one term and use it throughout the Skill … Consistency helps Claude parse and follow instructions.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md · references/*.md headers</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
-      <h3>No wording left that says Mosofin is required — and the description triggers on uploads</h3>
-      <p>The retired PART A heading and the overview sentence now treat Mosofin as one source of the numbers. The description is rewritten in third person, says what and when, and now names uploaded exports. 880 of 1,024 characters.</p>
+      <h3>No wording left that says Mosofin is required, and the description triggers on uploads</h3>
+      <p>The retired PART A heading and the overview sentence now treat Mosofin as one source of the numbers. The rewritten description is in third person. It says what the skill does and when to use it. It now names uploaded exports. It takes 880 of 1,024 characters.</p>
       <blockquote>“Always write in third person … Include both what the Skill does and specific triggers/contexts for when to use it.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md frontmatter · references/gates.md · references/overview.md</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>The upload path now says how to read the file</h3>
-      <p>method.md has a "Reading an upload" section: Stripe's documented columns and what each is used for, a confirm-the-mapping rule for other processors, and checks before trusting a file — gross − fee = net per payout, the period matches Stage 1, one currency per total.</p>
+      <p>method.md has a "Reading an upload" section. The section covers Stripe's documented columns and what the skill uses each column for. It covers a rule to confirm the mapping for other processors. It also covers tests to run before the skill trusts a file. The tests are: gross − fee = net per payout, the period matches Stage 1, and there is one currency per total.</p>
       <blockquote>“Fees paid for this transaction. Expressed in major units of the currency (e.g. dollars for USD, yen for JPY).”<cite><a href="https://docs.stripe.com/reports/report-types/payout-reconciliation">Stripe Docs · Payout reconciliation report</a></cite></blockquote>
       <span class="where">references/method.md · Step 0</span>
     </div></div>
@@ -322,7 +322,7 @@
     </div></div>
     <div class="f add done"><span class="sev">Added</span><div class="body">
       <h3>The card stays well under the published limit</h3>
-      <p>The card is 121 lines. The guide's limit is 500, so there is room to grow before anything else needs splitting out.</p>
+      <p>The card is 121 lines. The guide's limit is 500, so the card has room to grow before the skill must split anything else from it.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md</span>
     </div></div>
@@ -331,21 +331,21 @@
 
 <section>
   <h2>Passed</h2>
-  <p class="sec-title">What checked out</p>
+  <p class="sec-title">What passed</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>562 of 575 original lines are untouched; the other 13 are exactly the lines the fixes replaced.</span></li>
-    <li><span class="ok">PASS</span><span>No broken links anywhere in the bundle, and every method Step the card cites exists.</span></li>
-    <li><span class="ok">PASS</span><span>Every QuickBooks tool named — 15 — exists in the live catalogue read on 1 Sep.</span></li>
-    <li><span class="ok">PASS</span><span>No write-directing language outside the protocol file.</span></li>
+    <li><span class="ok">PASS</span><span>The fixes left 562 of 575 original lines untouched. The other 13 are exactly the lines the fixes replaced.</span></li>
+    <li><span class="ok">PASS</span><span>The bundle has no broken links anywhere. Every method Step the card cites exists.</span></li>
+    <li><span class="ok">PASS</span><span>Every QuickBooks tool named (15) exists in the live catalogue read on 1 Sep.</span></li>
+    <li><span class="ok">PASS</span><span>The skill has no write-directing language outside the protocol file.</span></li>
     <li><span class="ok">PASS</span><span>The intake covers all 7 inputs the original marked Required.</span></li>
-    <li><span class="ok">PASS</span><span>The mock flag is checked on both sides, so fixture processor data can't pass as real.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes — 31 skills, 0 failures. For a card-format skill it reads SKILL.md and every reference file together.</span></li>
-    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks sit in mosofin-protocol.md and stay in sync with the repository's single copy; an edited line is caught as drift.</span></li>
+    <li><span class="ok">PASS</span><span>The skill inspects the mock flag on both sides, so fixture processor data cannot pass as real.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures. For a card-format skill it reads SKILL.md and every reference file together.</span></li>
+    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks sit in mosofin-protocol.md and stay in sync with the repository's single copy. An edited line is caught as drift.</span></li>
     <li><span class="ok">PASS</span><span>gates.md carries the same ONBOARDING and PART A framing as the other 30 skills, word for word.</span></li>
   </ul>
-  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run, and the processor's own tool names — no Stripe or Square catalogue has been read. One claim is the skill's own and not independently sourced here: that revenue net of fees is an error. The search turned up practitioner guides, not the accounting standard, so it isn't cited.</p>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run, and the processor's own tool names. No Stripe or Square catalogue has been read. One claim is the skill's own and not independently sourced here: that revenue net of fees is an error. The search found practitioner guides, not the accounting standard, so the page does not cite the claim.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">MosoFin/mosofin-finance-skills</a> as e4a34f4, with the card (c2adc10) and the audit fixes (ef5b11a). The approved=true fix is d86fa27. Still to do: a live run against QuickBooks and Stripe.</footer>
+<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">MosoFin/mosofin-finance-skills</a> as e4a34f4, with the card (c2adc10) and the audit fixes (ef5b11a). The approved=true fix is d86fa27. Still to do: a live run against QuickBooks and Stripe.</footer>
 
 </div>

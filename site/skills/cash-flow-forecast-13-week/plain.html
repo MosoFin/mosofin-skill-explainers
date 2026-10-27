@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13-Week Cash Flow Forecast in Plain English | MosoFin</title>
+<meta name="description" content="What a 13-week cash flow forecast shows: cash in and out each week, the lowest point, the week that breaks your floor, and whether you make payroll.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:620px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← 13-week cash flow forecast</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · 13-week cash flow forecast, in plain words</span>
+  <h1>Will I make payroll in 6 weeks?</h1>
+  <p class="lede">Your profit report cannot answer that question. Only a week-by-week count of the <b>cash</b> in your bank can. This skill builds that count for the next 13 weeks: money in, money out, and the balance at the end of each week.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it your bank balances, your payroll dates, your loan and tax dates, and your cash floor. It reads your open invoices and bills. It measures how late each customer really pays. It then shows the balance for each of 13 weeks, the lowest point, and the week that breaks your floor. It proposes what you could move. It never moves anything itself.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">The answer, week by week</span>
+  <h2>13 weeks of Northbrook Trading's cash, one chain</h2>
+  <p>Northbrook Trading starts its forecast on Monday 6 October. Its bank has <b>$182,400</b> that it can spend: $151,900 in the operating account and $30,500 in savings. A tax reserve account holds $24,000 more. The skill leaves that account out, because the owner set that money aside and cannot spend it this week. Northbrook's lender requires a cash balance of at least <b>$150,000</b> at all times. That promise to a lender is a <b>covenant</b>. The $150,000 is the <b>floor</b>.</p>
+  <p>Each week has one piece of arithmetic. Week 1 opens at $182,400. Customers pay $46,200. Northbrook pays out $38,500. The week closes at 182,400 + 46,200 − 38,500 = <b>$190,100</b>. Week 2 opens at $190,100. The skill runs this chain across all 13 weeks. The <b>headroom</b> is the closing balance minus the floor: 190,100 − 150,000 = $40,100 in week 1.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's 13-week cash forecast">
+        <thead><tr><th scope="col">Week</th><th scope="col">Opens with</th><th scope="col">Cash in</th><th scope="col">Cash out</th><th scope="col">Closes with</th><th scope="col">Headroom</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Week 1</th><td>182,400</td><td>+ 46,200</td><td>− 38,500</td><td class="c">190,100</td><td class="h">40,100</td></tr>
+        <tr><th scope="row">Week 2</th><td>190,100</td><td>+ 31,800</td><td>− 61,300</td><td class="c">160,600</td><td class="h">10,600</td></tr>
+        <tr><th scope="row">Week 3</th><td>160,600</td><td>+ 52,900</td><td>− 33,200</td><td class="c">180,300</td><td class="h">30,300</td></tr>
+        <tr><th scope="row">Week 4</th><td>180,300</td><td>+ 38,400</td><td>− 28,900</td><td class="c">189,800</td><td class="h">39,800</td></tr>
+        <tr><th scope="row">Week 5</th><td>189,800</td><td>+ 47,100</td><td>− 61,300</td><td class="c">175,600</td><td class="h">25,600</td></tr>
+        <tr><th scope="row">Week 6</th><td>175,600</td><td>+ 44,800</td><td>− 33,200</td><td class="c">187,200</td><td class="h">37,200</td></tr>
+        <tr class="breach"><th scope="row">Week 7</th><td>187,200</td><td>+ 40,200</td><td>− 96,400</td><td class="c">131,000</td><td class="h">−19,000</td></tr>
+        <tr><th scope="row">Week 8</th><td>131,000</td><td>+ 71,500</td><td>− 28,900</td><td class="c">173,600</td><td class="h">23,600</td></tr>
+        <tr><th scope="row">Week 9</th><td>173,600</td><td>+ 39,600</td><td>− 61,300</td><td class="c">151,900</td><td class="h">1,900</td></tr>
+        <tr><th scope="row">Week 10</th><td>151,900</td><td>+ 52,300</td><td>− 33,200</td><td class="c">171,000</td><td class="h">21,000</td></tr>
+        <tr><th scope="row">Week 11</th><td>171,000</td><td>+ 41,900</td><td>− 28,900</td><td class="c">184,000</td><td class="h">34,000</td></tr>
+        <tr><th scope="row">Week 12</th><td>184,000</td><td>+ 38,700</td><td>− 61,300</td><td class="c">161,400</td><td class="h">11,400</td></tr>
+        <tr><th scope="row">Week 13</th><td>161,400</td><td>+ 49,800</td><td>− 33,200</td><td class="c">178,000</td><td class="h">28,000</td></tr>
+        <tr class="tot"><th scope="row">13 weeks</th><td>182,400</td><td>+ 595,200</td><td>− 599,600</td><td class="c">178,000</td><td class="h">28,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Each week opens with the previous week's closing balance. Headroom is the closing balance minus the $150,000 floor. Over 13 weeks, $595,200 comes in and $599,600 goes out, so the balance ends $4,400 lower than it started: 182,400 + 595,200 − 599,600 = 178,000.</figcaption>
+  </figure>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 276" role="img" aria-label="A bar for each of the 13 weeks shows the closing cash balance, with a dashed line at the 150,000 dollar floor. Twelve bars stand above the line, between 151,900 and 190,100 dollars. The week 7 bar is red and stops at 131,000 dollars, below the floor.">
+        <g font-family="Archivo,sans-serif">
+          <line x1="50" y1="80" x2="870" y2="80" stroke="var(--hold)" stroke-width="2" stroke-dasharray="6 5"/>
+          <text x="58" y="270" font-size="12.5" fill="var(--hold)" font-weight="600">Dashed line: the $150,000 floor (covenant)</text>
+          <line x1="50" y1="230" x2="870" y2="230" stroke="var(--rule-strong)"/>
+          <text x="12" y="234" font-size="11" fill="var(--faint)">$0</text>
+          <text x="12" y="34" font-size="11" fill="var(--faint)">$200k</text>
+          <line x1="50" y1="30" x2="870" y2="30" stroke="var(--rule)" stroke-dasharray="2 4"/>
+            <rect x="58" y="39.9" width="44" height="190.1" rx="4" fill="var(--green)"/>
+            <text x="80" y="33.9" text-anchor="middle" font-size="11.5" fill="var(--muted)">190k</text>
+            <text x="80" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W1</text>
+            <rect x="120" y="69.4" width="44" height="160.6" rx="4" fill="var(--green)"/>
+            <text x="142" y="63.4" text-anchor="middle" font-size="11.5" fill="var(--muted)">160k</text>
+            <text x="142" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W2</text>
+            <rect x="182" y="49.7" width="44" height="180.3" rx="4" fill="var(--green)"/>
+            <text x="204" y="43.7" text-anchor="middle" font-size="11.5" fill="var(--muted)">180k</text>
+            <text x="204" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W3</text>
+            <rect x="244" y="40.2" width="44" height="189.8" rx="4" fill="var(--green)"/>
+            <text x="266" y="34.2" text-anchor="middle" font-size="11.5" fill="var(--muted)">189k</text>
+            <text x="266" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W4</text>
+            <rect x="306" y="54.4" width="44" height="175.6" rx="4" fill="var(--green)"/>
+            <text x="328" y="48.4" text-anchor="middle" font-size="11.5" fill="var(--muted)">175k</text>
+            <text x="328" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W5</text>
+            <rect x="368" y="42.8" width="44" height="187.2" rx="4" fill="var(--green)"/>
+            <text x="390" y="36.8" text-anchor="middle" font-size="11.5" fill="var(--muted)">187k</text>
+            <text x="390" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W6</text>
+            <rect x="430" y="99.0" width="44" height="131.0" rx="4" fill="var(--wrong)"/>
+            <text x="452" y="93.0" text-anchor="middle" font-size="11.5" fill="var(--muted)">131k</text>
+            <text x="452" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W7</text>
+            <rect x="492" y="56.4" width="44" height="173.6" rx="4" fill="var(--green)"/>
+            <text x="514" y="50.4" text-anchor="middle" font-size="11.5" fill="var(--muted)">173k</text>
+            <text x="514" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W8</text>
+            <rect x="554" y="78.1" width="44" height="151.9" rx="4" fill="var(--green)"/>
+            <text x="576" y="72.1" text-anchor="middle" font-size="11.5" fill="var(--muted)">151k</text>
+            <text x="576" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W9</text>
+            <rect x="616" y="59.0" width="44" height="171.0" rx="4" fill="var(--green)"/>
+            <text x="638" y="53.0" text-anchor="middle" font-size="11.5" fill="var(--muted)">171k</text>
+            <text x="638" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W10</text>
+            <rect x="678" y="46.0" width="44" height="184.0" rx="4" fill="var(--green)"/>
+            <text x="700" y="40.0" text-anchor="middle" font-size="11.5" fill="var(--muted)">184k</text>
+            <text x="700" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W11</text>
+            <rect x="740" y="68.6" width="44" height="161.4" rx="4" fill="var(--green)"/>
+            <text x="762" y="62.6" text-anchor="middle" font-size="11.5" fill="var(--muted)">161k</text>
+            <text x="762" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W12</text>
+            <rect x="802" y="52.0" width="44" height="178.0" rx="4" fill="var(--green)"/>
+            <text x="824" y="46.0" text-anchor="middle" font-size="11.5" fill="var(--muted)">178k</text>
+            <text x="824" y="248" text-anchor="middle" font-size="12" fill="var(--faint)">W13</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The same 13 closing balances as bars. The red bar is week 7. It is the <b>lowest point</b> of the forecast, and the skill calls it the single most important number in the output.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="label">The week that breaks the floor</span>
+  <h2>Week 7: payroll, the tax deposit and the insurance land together</h2>
+  <p>Northbrook pays net wages of $28,900 on the 15th and on the last day of each month. The skill asks for those dates, because no accounting system holds a payroll calendar. On the Wednesday after each payday, Northbrook must send $9,300 of payroll taxes to the IRS. The skill lists that as a separate outflow in a later week, because it is easy to forget. One year ago, Northbrook paid $21,000 for its annual insurance. The skill scans last year's bank activity for large one-off payments and looks for an anniversary that falls inside the 13 weeks. This one does, in week 7.</p>
+  <div class="compare">
+    <div class="book bad">
+      <h3>Week 7 as forecast</h3>
+      <span class="who">Three large payments in one week, against normal receipts</span>
+      <div class="rows num">
+        <div class="row"><span>Opens with</span><span class="v">$187,200</span></div>
+        <div class="row"><span>Customers pay</span><span class="v">+ 40,200</span></div>
+        <div class="row"><span>Net payroll</span><span class="v">− 28,900</span></div>
+        <div class="row"><span>Payroll tax deposit</span><span class="v">− 9,300</span></div>
+        <div class="row"><span>Insurance renewal</span><span class="v">− 21,000</span></div>
+        <div class="row"><span>Other bills</span><span class="v">− 37,200</span></div>
+        <div class="row off"><span>Closes with</span><span class="v">$131,000</span></div>
+      </div>
+      <div class="verdict">Cash out is 28,900 + 9,300 + 21,000 + 37,200 = $96,400. The week closes at 187,200 + 40,200 − 96,400 = $131,000. That is $19,000 below the $150,000 floor. Payroll is paid in full, because $131,000 is well above zero. The covenant is broken.</div>
+    </div>
+    <div class="book">
+      <h3>The levers the skill proposes</h3>
+      <span class="who">Each one is a proposal for a person. The skill does none of them.</span>
+      <div class="rows num">
+        <div class="row"><span>Ask Meridian Foods to pay its $71,500 five days early</span><span class="v">$202,500</span></div>
+        <div class="row"><span>Draw $19,000 on the credit line for one week</span><span class="v">$150,000</span></div>
+        <div class="row off"><span>Defer the software renewal and the marketing spend</span><span class="v">$145,600</span></div>
+      </div>
+      <div class="verdict">Meridian's $71,500 is due in week 8. Five days earlier, it lands in week 7: 131,000 + 71,500 = $202,500. The deferral moves 6,400 + 8,200 = $14,600, so the week closes at $145,600, still $4,400 below the floor. That lever is not enough on its own.</div>
+    </div>
+  </div>
+  <p>Two payments never appear on the lever list. The skill does not propose a late payroll. State law sets how often you must pay wages, and many states require employers to name the paydays in advance<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill does not propose a late tax deposit either. The IRS sets the deposit date from your payday, and the deposit is due days after it, not weeks<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill's own rule says that payroll and tax remittances are not deferrable, so other payments are the flex.</p>
+  <p>A lender can treat a broken covenant as a default. So the skill always says whether the floor is a covenant or a target that you set for yourself. The consequences differ. The skill asks, and it never assumes a floor.</p>
+</section>
+
+<section>
+  <span class="label">What it catches</span>
+  <h2>Three things an owner misses without a weekly view</h2>
+  <div class="three">
+    <div class="card">
+      <span class="tag bad">The lumpy week</span>
+      <h3>A healthy quarter can still hold one bad week</h3>
+      <p>Across 13 weeks, Northbrook's cash falls by only $4,400. A monthly view shows a comfortable business. The weekly chain shows week 7 at $131,000. The skill flags every week below the floor, every week below zero, and the lowest point with its week number. In a survey of 7,653 small employer firms, 56% named paying operating expenses such as payroll and rent as a financial challenge<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">The customer who pays late</span>
+      <h3>Harbor Retail's $24,000 arrives in week 5, not week 2</h3>
+      <p>Harbor Retail owes $24,000, due on 17 October, which is week 2. Your ageing report only says that the invoice is not yet due<sup class="c"><a href="#src8" aria-label="source 8">8</a></sup>. The skill reads Harbor's last 9 invoices and the dates the payments arrived. Harbor paid them 16 days after the due date on average, with a spread of 4 days. So the skill places the $24,000 about 2 November, which lands in week 5. It shows the sample size of 9, because a pattern from two invoices is not a pattern. The skill never forecasts collection on the due date when it can read payment history.</p>
+      <p>Timing is about the bank, and the bank has its own delays. An ACH payment settles in at most two banking days, and most settle in one day or less<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. A local cheque must be available by the second business day after you deposit it<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The skill places each receipt in the week the money reaches the bank.</p>
+    </div>
+    <div class="card">
+      <span class="tag">The tax deposit after the payday</span>
+      <h3>One payday, two outflows, two weeks</h3>
+      <p>Northbrook pays wages on Friday 31 October, in week 4. The $9,300 of payroll taxes on that payday is due the following Wednesday, 5 November, in week 5. Northbrook is a semiweekly depositor. For that schedule, the IRS requires taxes from a Wednesday, Thursday or Friday payday by the next Wednesday<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill puts the two outflows in two different weeks. A forecast that forgets the second one overstates week 5 by $9,300.</p>
+    </div>
+  </div>
+  <div class="scale">
+    <div class="stat"><span class="label">Operating expenses</span><span class="v num">56%</span><span class="s">Share of 7,653 small employer firms that named paying operating expenses, such as payroll, rent and inventory, as a financial challenge<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Uneven cash flow</span><span class="v num wrong">51%</span><span class="s">Share that named uneven cash flow, which includes collecting receivables, as a financial challenge in the same survey<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Rising costs</span><span class="v num">75%</span><span class="s">The most common challenge in the survey. A forecast does not cure it, but it shows the week it bites<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+  </div>
+  <p class="muted" style="font-size:15px">Your accounting software may offer a cash planner. QuickBooks' planner projects 90 days from the history of your connected bank accounts, and it leaves out credit card transactions and transactions entered by hand<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. This skill works from a different base: your open invoices, your open bills, and the payroll and tax calendar that you give it.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>It asks six questions before it reads anything</h2>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your balances, invoices, bills and payment history from there. Without it, you upload the files and the method stays the same. The skill asks this only if your account has a MosoFin connection.</div></li>
+    <li><div class="q">Which bank accounts count as cash you can spend, and is any cash restricted?</div><div class="why">The opening balance starts the whole chain. A deposit you cannot reach this week is not cash you can spend. On the MosoFin path the skill lists your cash accounts by name and you say which ones count. It never assumes an opening balance.</div></li>
+    <li><div class="q">Your payroll calendar: pay dates, net pay, tax deposit dates, benefit dates.</div><div class="why">Required. Usually the most certain and the most critical outflow, and the one that must never slip. Your history shows the rhythm. Only you can give the amounts for the weeks ahead.</div></li>
+    <li><div class="q">Loan payments, tax due dates, and any other large one-off payment in the 13 weeks.</div><div class="why">Required. These are the lumpy items that break a floor in a single week. The skill also scans last year's cash for large payments whose anniversary falls inside the horizon.</div></li>
+    <li><div class="q">Your minimum cash floor: a covenant or your own preference, and how it defines cash?</div><div class="why">Headroom, red flags and runway are all measured against the floor. A covenant breach can make a loan repayable at once. Without a floor, the skill reports the lowest point and the weeks until cash reaches zero, and says that it tested no floor.</div></li>
+    <li><div class="q">Any credit line: its limit, borrowing base and clean-down rules. And the horizon, if not 13 weeks.</div><div class="why">An undrawn limit is not the same as money you can draw today. Without a credit line, the skill forecasts without one and says so. It proposes 13 weeks and says that it proposed it.</div></li>
+  </ol>
+  <p>Then it reads your answers back and waits for your yes:</p>
+  <blockquote><i>"Forecasting Northbrook Trading for 13 weeks from Monday 6 October. Opening cash comes from the Operating and Savings accounts, with the tax reserve account excluded, read from your Mosofin connection. The payroll calendar, loan schedule and floor are the ones you gave me. The floor is a covenant at $150,000, cash net of restricted. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload three exports and your calendar</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it the dates no ledger holds</h3>
+      <ul>
+        <li>It reads your opening cash by account</li>
+        <li>It reads your open invoices and open bills with their due dates</li>
+        <li>It reads the payment history and measures each customer's days-to-pay</li>
+        <li>It reads your recurring payments and last year's cash movement</li>
+        <li>You still give it the <b>payroll calendar</b>, the <b>loan and tax dates</b>, the <b>floor</b> and any <b>credit line</b>, every time</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the balances, the lists and the dates</h3>
+      <ul>
+        <li><b>Opening cash by account</b> at the start date, with restricted accounts marked, typed or CSV, required</li>
+        <li><b>Open invoices</b> with dates, due dates and amounts, plus <b>payment history</b> for the last several months, CSV or XLSX, required</li>
+        <li><b>Open bills</b> with due dates, plus bill payment history, CSV or XLSX, required</li>
+        <li><b>Payroll calendar, loan payments, tax dates</b>, the floor and the credit line, typed in the chat, required</li>
+        <li>Your <b>bank account activity</b> for the last twelve months, CSV or XLSX, recommended. It shows the recurring and annual payments</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Seven sheets: the forecast, the alerts, and what could move</h2>
+  <div class="gets">
+    <div class="get"><b>The 13-week forecast</b><span>Opening cash, receipts, payments, net flow, closing cash, the floor and the headroom, for each week and in total.</span></div>
+    <div class="get"><b>Collections, customer by customer</b><span>Each open invoice with its expected week, the customer's measured days-to-pay and the sample size behind it.</span></div>
+    <div class="get"><b>Payments, item by item</b><span>Each bill and each scheduled payment with its planned week and its priority.</span></div>
+    <div class="get"><b>Liquidity alerts</b><span>Weeks below the floor, the lowest point and its week, the runway, and the draw a credit line would need.</span></div>
+    <div class="get"><b>What if</b><span>What happens when collections slip by the observed spread, when the largest receipt fails, and when a payment moves.</span></div>
+    <div class="get"><b>Forecast against actual</b><span>Last week's forecast beside what really happened, so the forecast improves each week.</span></div>
+    <div class="get"><b>Where every number came from</b><span>Which lines it read, which lines you supplied, and which it could not evidence. Payroll, loan, tax and floor lines always show as supplied by you.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. Each week, it can compare last week's forecast with the actual cash, drop week 1 and add a new week 13.</p>
+</section>
+
+<section>
+  <div class="never">
+    <span class="label">What it never does</span>
+    <ul>
+      <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
+      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never draws on a credit line, schedules a payment or defers anything.</b> Every lever is a proposal for a person.</li>
+      <li><b>Never assumes the opening balance, the floor, the payroll amounts or the company.</b> It leaves restricted cash out of the opening balance, and you say which accounts count.</li>
+      <li><b>Never forecasts a payment on the due date when it can read payment history.</b> It measures days-to-pay per customer and shows the sample size.</li>
+      <li><b>Never puts payroll or a tax deposit on the lever list.</b> It also never lets a forecast built on test data drive a cash decision.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Direct method</dt><dd>A forecast of the actual money in and out, rather than one that starts from profit. The international cash flow standard encourages the direct method because it helps to estimate future cash flows<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</dd>
+    <dt>Runway</dt><dd>How many weeks the cash lasts at the current rate before it reaches zero or the floor.</dd>
+    <dt>Floor and covenant</dt><dd>The floor is the balance you must not go below. A covenant is a floor you promised to a lender. A breach can make the loan repayable at once.</dd>
+    <dt>Headroom</dt><dd>How far above the floor you are in a week. Week 1 closes at $190,100, so its headroom is $40,100.</dd>
+    <dt>Days-to-pay</dt><dd>How long a customer really takes to pay, measured from the due date over several invoices. Harbor Retail's is 16 days, from 9 invoices.</dd>
+    <dt>Restricted cash</dt><dd>Cash you cannot freely spend, such as a tax reserve. The skill leaves it out of the opening balance.</dd>
+    <dt>Revolver</dt><dd>A credit line you can draw on and repay repeatedly. Its limit is not always the amount you can draw today.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a Federal Reserve survey and two US government pages on payroll. They also include two pages on how payments reach a bank, an international accounting standard and two Intuit help pages. We found each one on 27 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Financial challenges"><a href="https://www.fedsmallbusiness.org/reports/survey/2025/2025-report-on-employer-firms" rel="noopener">Federal Reserve Banks: 2025 Report on Employer Firms, Small Business Credit Survey</a><span class="what">In the 2024 survey of 7,653 small employer firms, 56% named paying operating expenses such as payroll, rent and inventory as a financial challenge. 51% named uneven cash flow, which includes collecting receivables. Rising costs were the most common challenge, at 75%.</span></li>
+    <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Section 11, Depositing Taxes"><a href="https://www.irs.gov/publications/p15" rel="noopener">IRS: Publication 15 (Circular E), Employer's Tax Guide</a><span class="what">A monthly depositor sends employment taxes by the 15th of the next month. A semiweekly depositor sends taxes from a Wednesday, Thursday or Friday payday by the next Wednesday. Taxes from a Saturday to Tuesday payday are due by the next Friday. The schedule depends on the taxes reported in a lookback period: $50,000 or less means monthly, more means semiweekly. $100,000 or more accumulated on one day is due the next business day.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="whole page"><a href="https://www.dol.gov/agencies/whd/state/payday" rel="noopener">US Department of Labor: State Payday Requirements</a><span class="what">State law sets how often an employer must pay wages. California, for example, requires payment at least twice a calendar month on paydays designated in advance.</span></li>
+    <li id="src4" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.nacha.org/content/how-ach-payments-work" rel="noopener">Nacha: How ACH Payments Work</a><span class="what">The sender of an ACH credit chooses settlement the same day, the next banking day or in two banking days, and no later. Nacha estimates that 80% of ACH payments settle in one banking day or less.</span></li>
+    <li id="src5" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="§229.10"><a href="https://www.federalreserve.gov/frrs/regulations/section-22910-next-day-availability.htm" rel="noopener">Federal Reserve: Regulation CC, §229.10 Next-day availability</a><span class="what">Cash deposited in person and electronic payments must be available by the next business day. Local cheques must be available by the second business day after the deposit.</span></li>
+    <li id="src6" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="¶18–19"><a href="https://www.ifrs.org/issued-standards/list-of-standards/ias-7-statement-of-cash-flows/" rel="noopener">IFRS Foundation: IAS 7 Statement of Cash Flows</a><span class="what">The direct method reports the major classes of gross cash receipts and gross cash payments. The standard encourages it because it gives information that helps to estimate future cash flows, which the indirect method does not give.</span></li>
+    <li id="src7" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://quickbooks.intuit.com/learn-support/en-au/help-article/budget-forecast-reports/use-cash-flow-planner-quickbooks-online/L2l59mIqe_AU_en_AU" rel="noopener">Intuit: Use the cash flow planner in QuickBooks Online</a><span class="what">The planner forecasts money in and out for the next 90 days from the history of connected bank accounts. It leaves out credit card transactions, transactions entered by hand and multi-currency files. Events you add are hypothetical and do not change the books.</span></li>
+    <li id="src8" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/accounts-receivable-reports/run-accounts-receivable-aging-report/L4N7PC2hg_US_en_US" rel="noopener">Intuit: Run an accounts receivable aging report in QuickBooks Online</a><span class="what">The A/R ageing summary shows unpaid balances by how long they are past due, counted from the due date. The periods are such as 1 to 30, 31 to 60, 61 to 90 and over 90 days.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the 13-week horizon as a default or the days-to-pay method, measured per customer with its sample size. The same is true of the weekly chain, the lever list, the seven sheets and the rule that payroll is never deferred. They are the skill's own rules. Sources 1 to 5, 7 and 8 are US sources. Source 6 is an international standard.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>cash-flow-forecast-13-week</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/cash-flow-forecast-13-week">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and is not yet on the main branch. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, Harbor Retail, Meridian Foods and every figure in their examples. They are not your data. The survey, the payroll pages, the payment pages and the Intuit pages are US sources. IAS 7 is an international standard. Confirm with your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

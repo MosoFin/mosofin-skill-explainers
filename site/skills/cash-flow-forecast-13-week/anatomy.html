@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13-Week Cash Flow Forecast Anatomy | MosoFin</title>
+<meta name="description" content="How the 13-week cash flow forecast skill is built: the card, seven reference files, the run step by step, the source behind each step and two audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← 13-week cash flow forecast</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">cash-flow-forecast-13-week · on main as one file · card-format rewrite prepared, not yet on main · audited 27 Oct 2026</div>
+  <h1>The structure of the 13-week cash flow forecast, and what it does</h1>
+  <p class="lede">On main the skill is one 937-line file. The rewrite described here turns it into a 138-line card and seven reference files, and it keeps the original text. Two things set this skill apart. It times each receipt by the customer's measured days-to-pay, not by the due date. And the lines that breach a floor never come from the books, so the skill always asks for them. Those lines are payroll, debt service, tax dates, the floor and the facility. This page shows how the files connect, the run step by step, and the source behind each step. It also shows the two audit findings, one fixed in the rewrite and one open.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">138</span><span class="s">lines in SKILL.md, down from 937</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">708/710</span><span class="s">original lines byte for byte, and 30 of 30 sections in one piece</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">39 · 10 · 32</span><span class="s">[auto] · [gated] · [manual] on main, unchanged in the references</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">22</span><span class="s">evidence tools named, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">1 + 1</span><span class="s">one fixed in the rewrite, one open: a tool name to re-check</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 138 lines instead of 937</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 138-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 351 lines, then mosofin-protocol.md at 262, gates.md at 140, edge-cases.md at 73, tools-and-glossary.md at 64, output.md at 50 and overview.md at 49.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 138</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · what it cannot read</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, six questions</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read, then the grid</text>
+          <text x="48" y="272">Stage 4 · Cash in, cash out, chain</text>
+          <text x="48" y="312">Stage 5 · Flags, levers, 7 sheets</text>
+          <text x="48" y="352">Stage 6 · Reconcile, then save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="231" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="124" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">140</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">351</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="64" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">73</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="44" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">50</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="43" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">49</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="57" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">64</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–9</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 9 and both entity scenarios. <b>edge-cases.md</b> holds the 19 edge cases, 9 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3 and the 13 inputs of the Gate 3 table. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>tools-and-glossary.md</b> names the 7 workflow tools, the 22 evidence tools and the glossary. Each bar uses the file's own line count from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1130" role="img" aria-label="Stage 1 asks six questions: Mosofin or upload, which accounts count as cash and which are restricted, the payroll calendar, debt service and tax dates, the floor and whether it is a covenant, and the credit facility and the horizon. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, ask whether cash is pooled, read the tool catalogue and read the company profile. Otherwise the user uploads opening cash, open invoices with payment history, open bills, and types in the payroll, debt, tax, floor and facility. Both paths read back and wait for a yes. Stage 3: step 0 reads the evidence in one batch and checks the mock flag, step 1 sets up the 13-week grid with restricted cash excluded. Stage 4: step 2 times receipts by each customer's measured days-to-pay, step 3 places disbursements in the week they clear, step 4 runs the chain. Stage 5: step 5 flags weeks below the floor, the lowest point and the runway, step 6 tests levers that never include payroll, step 8 delivers seven sheets. Stage 6: step 7 reconciles last week to actuals and step 9 offers to save, on an explicit yes.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="690" x2="460" y2="720" marker-end="url(#a2)"/>
+          <line x1="460" y1="852" x2="460" y2="882" marker-end="url(#a2)"/>
+          <line x1="460" y1="1014" x2="460" y2="1044" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> Cash accounts, restricted cash?</text>
+            <text x="590" y="74"><tspan font-weight="600">C</tspan> Payroll calendar and tax dates</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> Debt service, taxes, one-offs</text>
+            <text x="330" y="100"><tspan font-weight="600">E</tspan> Floor: covenant or preference?</text>
+            <text x="590" y="100"><tspan font-weight="600">F</tspan> Facility, and the horizon</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · is cash pooled?</text>
+            <text x="98" y="364">G2  tool catalogue · writes out of scope</text>
+            <text x="98" y="388">G3  currency, time zone, then C to F</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Opening cash by account, required</text>
+            <text x="558" y="340">Invoices + payment history, required</text>
+            <text x="558" y="364">Bills + bill payment history, required</text>
+            <text x="558" y="388">Payroll, debt, tax, floor: typed in</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="180" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–1 · READ THE EVIDENCE, SET UP THE GRID</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="584">search_accounts · get_balance_sheet · get_trial_balance</text>
+            <text x="80" y="604">get_aged_receivables · get_aged_payables · search_invoices</text>
+            <text x="80" y="624">search_payments · search_bills · search_bill_payments</text>
+            <text x="80" y="644">get_vendor_expenses · get_general_ledger · get_cash_flow</text>
+          </g>
+          <text x="80" y="672" font-size="13" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan> · 13 week columns with dates · opening cash for Week 1 · restricted cash excluded</text>
+          <rect x="640" y="556" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">fixture data must never</text>
+          <text x="741" y="618" text-anchor="middle" font-size="12" fill="var(--ink)">drive a liquidity decision</text>
+
+          <rect x="60" y="722" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="748" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–4 · RECEIPTS, DISBURSEMENTS, THEN THE CHAIN · + EDGE-CASES.MD</text>
+          <text x="80" y="776" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 2</tspan>  receipts by each customer's measured days-to-pay, sample size shown · in the week they hit the bank</text>
+          <text x="80" y="804" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  payroll, then its taxes on remittance dates · bills · recurring · lumpy items · in the week they clear</text>
+          <text x="80" y="832" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 4</tspan>  opening + receipts − disbursements = closing = next week's opening · 13 times</text>
+
+          <rect x="60" y="884" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="910" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 5–8 · FLAGS, LEVERS, SEVEN SHEETS · + OUTPUT.MD</text>
+          <text x="80" y="938" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 5</tspan>  below the floor · below zero · lowest point and its week · runway · draw needed · covenant or preference?</text>
+          <text x="80" y="966" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  collections slip by the spread · one receipt fails · deferrals: never payroll, never a tax remittance</text>
+          <text x="80" y="994" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8</tspan>  forecast · AR detail · AP detail · alerts · sensitivities · tracker · coverage · ask before Excel</text>
+
+          <rect x="60" y="1046" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1072" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 7</tspan>: last week's forecast against actual cash · explain variances · drop Week 1, add a new week</text>
+          <text x="80" y="1096" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">then Step 9</tspan>: save the schedule, floor, facility, lever list, method · never balances or the forecast · explicit yes</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. On both paths the skill still asks C to F. No ledger holds the payroll calendar, the debt service, the tax dates, the floor or the facility. The highlighted box shows the mock rule from Step 0. Stage 4 also reads edge-cases.md, for example for a dominant customer, a seasonal cycle or payment float. Stage 6 runs on a rolling run. Step 9 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The sources are [1] Federal Reserve Banks, 2025 Report on Employer Firms. [2] IRS Publication 15. [3] US Department of Labor, State Payday Requirements. [4] Nacha, How ACH Payments Work. [5] Federal Reserve, Regulation CC §229.10. [6] IFRS Foundation, IAS 7. [7] Intuit, the cash flow planner in QuickBooks Online. [8] Intuit, the A/R aging report in QuickBooks Online. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks the six questions. Checks the workspace, the company file, the cash pooling, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · questions C and D</td><td>Asks for the payroll calendar, the tax remittance dates, debt service and tax due dates as required, [manual] inputs</td><td>None. The user supplies them</td><td>[3] State law fixes how often wages are paid. [2] The deposit schedule for employment taxes follows the payday and the lookback period</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the evidence in one batch and checks the <code>mock</code> flag</td><td><code>search_accounts</code> <code>get_balance_sheet</code> <code>get_trial_balance</code> <code>get_aged_receivables</code> <code>get_aged_payables</code> <code>search_invoices</code> <code>read_invoice</code> <code>search_payments</code> <code>search_bills</code> <code>search_bill_payments</code> <code>get_vendor_expenses</code> <code>get_general_ledger</code> <code>get_cash_flow</code> <code>search_customers</code> <code>search_vendors</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue (see F2). The mock rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Sets up 13 week columns with dates and the opening cash for Week 1. Excludes restricted cash</td><td>None beyond Step 0's reads</td><td>[6] The direct method reports the major classes of gross cash receipts and payments. The restricted-cash rule and the 13-week default are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Times each receipt by the customer's measured days-to-pay, with the sample size. Places it in the week it hits the bank</td><td><code>search_invoices</code> against <code>search_payments</code></td><td>[8] The aging report shows only how far past due an invoice is. [4] An ACH credit settles within two banking days. [5] Cash and electronic payments are available the next business day, local checks the second. The days-to-pay method and its sample-size rule are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Places payroll, its tax remittances, bills, recurring items and lumpy items in the week they clear. Scans last year's cash for anniversaries</td><td><code>get_general_ledger</code> <code>get_vendor_expenses</code> <code>search_bills</code></td><td>[2] An employer deposits payroll taxes by the 15th of the next month, or by the next Wednesday or Friday. So they are a separate, later outflow. [5] When a bank makes a deposited check available. The anniversary scan is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4</td><td>Runs the chain: one week's closing cash is the next week's opening, 13 times</td><td>None. Arithmetic</td><td>No outside authority. The weekly chain is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Flags weeks below the floor and below zero, the lowest point and its week, the runway and the draw a facility would need. States whether the floor is a covenant or a preference</td><td>None beyond the grid</td><td>[1] 56% of small employer firms named paying operating expenses as a challenge, and 51% named uneven cash flow. The flags and the covenant-or-preference rule are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Tests collections that slip by the observed spread, one receipt that fails, and which payments could move</td><td>None beyond the grid</td><td>No outside authority. Which payments are deferrable is the user's judgment. The rule that payroll and statutory remittances never appear on the lever list is the skill's own</td><td><span class="kind prac">Practice</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Compares last week's forecast to actual cash, explains the variances and rolls the grid forward one week</td><td><code>get_general_ledger</code> <code>search_payments</code> <code>search_bill_payments</code></td><td>The rolling discipline is the skill's own. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Delivers seven sheets, the last a coverage sheet. Asks before it makes an Excel file</td><td>None</td><td>[7] QuickBooks' planner projects 90 days from bank history and leaves out manual entries. That is the contrast with a forecast built from open invoices, bills and the payroll calendar. The seven sheets and the file-name rule are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 9</td><td>Offers to save the schedule, the payroll calendar, the floor and its definition, the facility terms, the lever list and the days-to-pay method. Never cash balances or the forecast</td><td><code>create_skill</code></td><td>The skill's own rule, stated with its reason: a cash position is sensitive and a stale one misleads</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Both entity scenarios</td><td>One run per entity. A group total only where the user says that the entities pool their cash, with every transfer modelled</td><td>One <code>data_source_id</code> per call</td><td>No outside authority. The pooling rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Edge case: payroll is sacrosanct</td><td>Treats payroll and statutory remittances as non-deferrable and models other payments as the flex</td><td>None</td><td>[3] State law fixes the paydays. [2] The IRS schedule fixes the deposit dates. The lever rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Edge case: payment float</td><td>Places the cash impact in the week a cheque or ACH clears, not the week it starts</td><td>None</td><td>[4] An ACH credit cannot settle more than two banking days out. [5] Local checks are available by the second business day after deposit</td><td><span class="kind auth">Authority</span></td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the eight sources on 27 Oct 2026 through search results. Nobody opened the pages. Sources [1] to [5], [7] and [8] are US, and [6] is international. Six items have no outside authority behind them. They are the 13-week default, the days-to-pay method with its sample size, the weekly chain, the lever list, the seven sheets and the payroll rule. The public pages present them as the skill's rules.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Two findings: one fixed in the rewrite, one open</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>937 lines in one file, against a 500-line guide</h3>
+      <p>The split follows the one used for credit-card-reconciliation and vendor-statement-reconciliation. The result is a 138-line card with the six rules that never bend, the six intake questions, the upload checklist and six stages. The original text moved unchanged into <code>references/</code>. 708 of the 710 content lines are present byte for byte, and all 30 sections stay in one piece. The other two lines are the description, rewritten for the card at 970 of 1,024 characters, and the onboarding link. The link gains one <code>../</code> for the new depth.</p>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md + references/ · commit 6a95376, not yet on main</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>The tool reference names <code>read_invoice</code>, the only tool name with that naming style</h3>
+      <p>Every other evidence tool name uses <code>search_</code> or <code>get_</code>. The audit did not change it. The moved text stays byte-identical, and only a live catalogue read shows the real name. The Gate 2 rule already says to read names from the catalogue, so the risk is low. The audit could not reach the connector on 27 Oct 2026.</p>
+      <span class="where">references/tools-and-glossary.md · references/method.md Step 0 · unchanged in 6a95376, not yet on main</span>
+    </div></div>
+  </div>
+  <p style="color:var(--muted);font-size:14.5px">The audit found no reference to a skill outside the library, no sandbox path, and a description within the limit.</p>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes with the rewrite (31 skills, 0 failures). The shared blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>708 of the 710 content lines are present byte for byte, and all 30 of 30 sections stay in one piece.</span></li>
+    <li><span class="ok">PASS</span><span>No broken links in the bundle.</span></li>
+    <li><span class="ok">PASS</span><span>The audit checked every statement on the card against the reference line it summarises. One statement said more than the skill does: "asks you about each anniversary". The skill scans last year's cash and checks each anniversary. It does not ask about each. The audit removed the over-claim before the commit.</span></li>
+    <li><span class="ok">PASS</span><span>The lever rule, no payroll and no statutory remittance, is in both the card and the references.</span></li>
+    <li><span class="ok">PASS</span><span>The mock rule, no liquidity decision on fixture data, is in both the card and the references.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with real invoices, bills and payment history. The audit did not read the tool catalogue, because it could not reach the Mosofin connector on 27 Oct 2026. So nothing here shows which of the 22 evidence tool names Gate 2 would find. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/cash-flow-forecast-13-week">MosoFin/mosofin-finance-skills</a> as the 937-line file. The card-format rewrite is two commits on the branch <code>claude/cash-flow-forecast-card-format</code>: 6a95376 (the split) and c2f1505 (the README line). These commits are not on <code>main</code>. When the rewrite ships, replace these hashes with the merged hashes. A live run and a catalogue read are still to do after the audit on 27 Oct 2026.</footer>
+
+</div>

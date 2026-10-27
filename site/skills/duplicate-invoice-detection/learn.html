@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicate Invoice Detection Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked duplicate-bill examples, from one invoice number entered twice to the fraud test the scan cannot run, with a calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .math div span:last-child{text-align:right}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 180px;gap:10px;align-items:center;font-size:15px}
+  .field input,.field select,.crow input,.crow select{font:inherit;font-size:14.5px;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%;min-width:0}
+  .field input,.crow input{font-variant-numeric:tabular-nums;text-align:right}
+  .field input:focus-visible,.field select:focus-visible,.crow input:focus-visible,.crow select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .chead,.crow{display:grid;grid-template-columns:76px 1.6fr 1fr .8fr 1.2fr;gap:8px;align-items:center;font-size:14.5px}
+  .chead{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .crow .cname{font-weight:600}
+  .crow label{display:contents}
+  @media (max-width:680px){
+    .chead{display:none}
+    .crow{grid-template-columns:1fr 1fr;padding:10px 0;border-bottom:1px dashed var(--rule)}
+    .crow .cname{grid-column:1/-1}
+    .crow label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+    .crow label:nth-of-type(1){grid-column:1/-1}
+  }
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Duplicate invoice detection</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · duplicate-invoice-detection · learning guide</span>
+  <h1>From one invoice number entered twice to the test the scan cannot run</h1>
+  <p class="lede">This page shows how the skill finds a bill your business entered or paid twice, <b>one level at a time</b>. It starts with one invoice number that appears twice. It ends with the one rule the scan cannot run here. The page quotes every rule from the skill itself. It also works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are a fraud study, QuickBooks help, a US Census Bureau paper, the IRS, the FBI and the GAO. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter the clusters from your own scan. The page totals the exposure the same way.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Fourteen rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one company, Northbrook Trading. The scan covers 1 July to 31 October, and September is the month under review. It reads 1,284 bills from 212 vendors, 1,197 bill payments and 14 open vendor credits. The sensitivity is Standard, and the Rule 3 window is 7 days.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in your own scan</h2>
+  <p class="muted">Enter up to six clusters from your own scan, or load an example. For each cluster, pick the rule that matched, the amount per record, the record count and the paid status. Then pick the sensitivity. The page shows which clusters that setting flags and totals the exposure. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="northbrook">Northbrook, July to October</button>
+      <button type="button" data-p="level1">Level 1 only</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <fieldset><legend>Sensitivity</legend>
+      <label class="field"><span>Which confidence levels the scan flags</span><select data-k="sens" id="sens">
+        <option value="strict">Strict: Medium and above</option>
+        <option value="standard" selected>Standard: High and above</option>
+        <option value="permissive">Permissive: Very High only</option>
+      </select></label>
+    </fieldset>
+    <fieldset><legend>Clusters</legend>
+      <div class="chead" aria-hidden="true"><span>Cluster</span><span>Rule matched</span><span>Amount per record</span><span>Records</span><span>Paid status</span></div>
+      <div id="clusters" style="display:flex;flex-direction:column;gap:8px"></div>
+    </fieldset>
+    <div class="math num" id="bridge" aria-live="polite"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <p class="fine">The page counts one record in each cluster as the real bill. So the exposure of a cluster is the amount per record × (records − 1). Standard flags High and Very High. Strict adds Medium. Permissive flags Very High only. A credit cluster is never exposure. The page shows it as money owed to you, whatever the sensitivity. Rule 7 never runs here, so a Rule 7 cluster adds nothing. The "Northbrook, July to October" preset holds the six clusters from the levels. Under Standard: $1,250.00 + $4,860.00 + $3,200.00 = $9,310.00 flagged. Under Strict: $9,310.00 + $980.00 + $950.00 = $11,240.00.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Do you want to use MosoFin, or upload the data yourself? Which period should the scan cover? Which suppliers bill the same amount every month on purpose? Strict, Standard or Permissive, and what window for Rule 3? Who runs the bank-account test, Rule 7, and how often? Do you have results from an earlier scan, with clusters already cleared?</div>
+    <div><b>Needs</b>The skill needs the AP register for the whole window, with vendor, invoice number, date, amount and status. It needs the payment register, with the date and the method of each payment. The vendor master with inactive records and the open vendor credits make the result better.</div>
+    <div><b>Gives back</b>The skill gives back seven sheets. They are a summary, the flagged clusters, the record detail, the vendor aliases to merge and the recovery plan. The last two are the rules-run sheet and a coverage sheet. Unpaid duplicates come first. The skill asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never voids a record, never merges a vendor and never asks a supplier for money. It never defaults the period or the entity. It never reports Rule 7 as finding nothing. It never saves bank details or a suspicion attached to a named person.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are a fraud examiners' association, QuickBooks Online help, a US Census Bureau research paper, the IRS, the FBI and the US Government Accountability Office. MosoFin checked each one on 27 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The ten rules, their order and their confidence levels are the skill's own. So are the 0.85 name-score threshold, the 7-day window, the three sensitivity settings and the seven output sheets. The page marks them as the skill's where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code>, <code>references/edge-cases.md</code> and <code>references/output.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 4, 5 and 6 are US sources. Source 3 is a US statistical method paper. Check with your accountant which rules apply to you. This page explains <code>duplicate-invoice-detection</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", checked:"2026-10-27", via:"from search results, page not opened", w:"Billing schemes, which are invoices for fictitious or inflated goods or services, appeared in 424 of the 1,921 cases studied, or 22%. Their median loss was $100,000. A billing scheme typically ran 18 months before detection, against 12 months for all frauds. Frauds caught within six months had a median loss of $30,000. Those lasting two to three years had a median loss of $250,000."},
+  {t:"Intuit: Merge duplicate vendors in QuickBooks Online", u:"https://quickbooks.intuit.com/learn-support/en-us/help-article/chart-accounts/merge-duplicate-vendors/L0NPj861i_US_en_US", checked:"2026-10-27", via:"from search results, page not opened", w:"A merge moves the duplicate's past transactions to the vendor you keep and marks the duplicate inactive. To restore a merged vendor you must recreate the profile by hand. Vendors merge in pairs."},
+  {t:"US Census Bureau: Overview of Record Linkage and Current Research Directions (Winkler, 2006)", u:"https://www.census.gov/content/dam/Census/library/working-papers/2006/adrm/rrs2006-02.pdf", checked:"2026-10-27", via:"from search results, page not opened", w:"The Jaro-Winkler comparator scores how alike two strings are, from 0 to 1, with extra weight when the first characters agree. The Census Bureau developed it for matching names and addresses between records. This page cites it only for what the score is."},
+  {t:"IRS: Publication 583, Starting a Business and Keeping Records", u:"https://www.irs.gov/publications/p583", at:"Supporting documents", checked:"2026-10-27", via:"from search results, page not opened", w:"Purchases and other transactions generate supporting documents such as paid bills, invoices, receipts and cancelled checks. Keep them in an orderly way, by year and type. Keep records that support an item on a return until the period of limitations for that return runs out."},
+  {t:"FBI IC3: 2024 Internet Crime Report", u:"https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", at:"loss table, Business Email Compromise", checked:"2026-10-27", via:"from search results, page not opened", w:"Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints. Compromised vendor emails are one way the scheme worked."},
+  {t:"GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721", u:"https://www.gao.gov/assets/gao-25-107721.pdf", at:"Principle 10, Segregation of Duties, ¶10.21–10.23", checked:"2026-10-27", via:"from search results, page not opened", w:"Segregating authority, custody and accounting among different people helps prevent fraud, waste and abuse."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The fourteen quotes, word for word from the skill's files. Section names are written as the files write them. */
+const Q = {
+  q1:{q:"businesses pay the same bill twice more often than they realise", w:"references/overview.md · Duplicate Invoice Detection (Mosofin)"},
+  q2:{q:"the detection rules are not a procedure to be performed; they are queries", w:"references/overview.md · This is the best-fitting skill in the pack"},
+  q3:{q:"do not let a clean result imply the fraud test passed", w:"references/overview.md · This is the best-fitting skill in the pack"},
+  q4:{q:"Scan wider than the current period — duplicates frequently straddle a boundary.", w:"references/gates.md · Gate 3 — Profile the entity, then interview the user"},
+  q5:{q:"Same vendor + identical invoice number = almost certainly a duplicate entry.", w:"references/method.md · Step 2 — Apply duplicate-detection rules"},
+  q6:{q:"Paid through two channels = classic duplicate-payment pattern.", w:"references/method.md · Step 2 — Apply duplicate-detection rules"},
+  q7:{q:"Report it as not run, with a named owner, rather than omitting it.", w:"references/method.md · Step 2 — Apply duplicate-detection rules"},
+  q8:{q:"it is money the entity is owed and has not taken.", w:"references/method.md · Step 2 — Apply duplicate-detection rules"},
+  q9:{q:"a \"clean\" result under Permissive means something very different from a clean result under Strict", w:"references/method.md · Step 3 — Sensitivity tuning"},
+  q10:{q:"a duplicate caught before payment costs nothing to fix.", w:"references/method.md · Step 5 — Recoverability assessment"},
+  q11:{q:"if they're 30-ish days apart, that's a pattern, not a duplicate.", w:"references/edge-cases.md · Edge Cases"},
+  q12:{q:"a partial population produces false negatives that look exactly like a clean result.", w:"references/edge-cases.md · Edge Cases"},
+  q13:{q:"flag — fiscal-year-boundary fraud is a known pattern.", w:"references/edge-cases.md · Edge Cases"},
+  q14:{q:"No silent suppression of legitimate same-amount recurring patterns", w:"references/output.md · Output Quality Standards"},
+};
+
+const RULES = [
+  { id:"1", title:"Paying twice is common", r:Q.q1, cites:[1],
+    plain:"A supplier chases an invoice that someone already paid. Someone enters it again, and the money goes out a second time. The skill finds the honest mistake and the deliberate one.",
+    backed:"Billing schemes, which are invoices for fictitious or inflated goods or services, appeared in 424 of the 1,921 fraud cases studied, or 22%. Their median loss was $100,000.{1}" },
+  { id:"2", title:"The rules are queries", r:Q.q2, cites:[3],
+    plain:"The workspace holds the bill register and the vendor master in full. So nine of the ten rules run as searches over that data, each with a confidence level.",
+    backed:"One of those searches compares vendor names with the Jaro-Winkler score. The score runs from 0 to 1, with extra weight when the first characters agree.{3}" },
+  { id:"3", title:"A clean scan is not a fraud test passed", r:Q.q3, cites:[6],
+    plain:"Rule 7, two vendor records that share one bank account, is the fraud test. Mosofin does not expose bank details, so the scan reports that rule as not run.",
+    backed:"The GAO Green Book says that separating authority, custody and accounting among different people helps prevent fraud, waste and abuse.{6}" },
+  { id:"4", title:"Scan wider than the month", r:Q.q4, cites:[],
+    plain:"The skill never defaults the period. It proposes a window wider than the month under review, and it says that it proposed it." },
+  { id:"5", title:"Same number, same vendor", r:Q.q5, cites:[],
+    plain:"An identical invoice number under one vendor is the strongest signal the skill has. It flags the pair at Very High, even when the dates or the amounts differ a little." },
+  { id:"6", title:"Two channels, one bill", r:Q.q6, cites:[4],
+    plain:"The skill reads the payment register as well as the bill register. A bill paid once by cheque and once by bank transfer shows only there.",
+    backed:"The IRS says that purchases generate supporting documents such as paid bills, invoices, receipts and cancelled checks. It says to keep them in an orderly way.{4}" },
+  { id:"7", title:"Not run is not nothing found", r:Q.q7, cites:[],
+    plain:"Every output lists Rule 7 as not run. It names the person or the team that runs the bank-account test elsewhere." },
+  { id:"8", title:"An unused credit is your money", r:Q.q8, cites:[],
+    plain:"A credit note stays open while later invoices are paid in full. That credit is money the supplier owes you. The skill reports it on its own, and prominently." },
+  { id:"9", title:"Say the sensitivity", r:Q.q9, cites:[],
+    plain:"Standard flags High and above. Strict adds Medium. Permissive flags Very High only. The output states which setting it used." },
+  { id:"10", title:"Unpaid first", r:Q.q10, cites:[],
+    plain:"A person can void an open duplicate before payment. A paid one needs a credit, a refund or a set-off. So the output lists open duplicates first." },
+  { id:"11", title:"Thirty days apart is a pattern", r:Q.q11, cites:[],
+    plain:"Rent, subscriptions and retainers repeat at one amount every month. The skill checks the gap between the dates before it calls two equal amounts a duplicate." },
+  { id:"12", title:"A partial scan looks clean", r:Q.q12, cites:[],
+    plain:"Duplicate detection compares every record with every other record. So the skill reads the whole population and states the count scanned against the count available." },
+  { id:"13", title:"The year end is a known pattern", r:Q.q13, cites:[1],
+    plain:"One invoice paid in December and the same number paid in January is a flag. That is why the scan window extends past the period under review.",
+    backed:"A billing scheme typically ran 18 months before detection, against 12 months for all frauds.{1} A scheme of that length crosses at least one year end." },
+  { id:"14", title:"No silent filtering", r:Q.q14, cites:[],
+    plain:"When the skill sets a recurring supplier aside, it says so. A reader sees what the skill filtered and why." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"One vendor, one register · Northbrook Trading, 1 July to 31 October" },
+  { n:1, title:"The same number, twice",
+    chips:["Bill register","Payment register"], src:"Rules 5 and 1", cites:[1],
+    situation:"Harbor Office Supply's invoice INV-0442 appears twice in Northbrook's bill register, on 3 Sep and 19 Sep, for $1,250.00 each. Northbrook paid both.",
+    facts:["Billing schemes appeared in 424 of the 1,921 fraud cases studied, or 22%, with a median loss of $100,000 "+C(1)+". Most duplicates are honest errors. The skill finds both kinds."],
+    visual:{type:"table",
+      head:["Record","Vendor","Invoice number","Date","Amount","Paid"],
+      rows:[["Bill 1","Harbor Office Supply","INV-0442","3 Sep","$1,250.00","yes"],["Bill 2","Harbor Office Supply",["INV-0442","bad"],"19 Sep",["$1,250.00","bad"],"yes"]]},
+    rules:[Q.q5, Q.q1],
+    math:[["Vendor on both bills","Harbor Office Supply"],["Invoice number on both bills","INV-0442"],["Same vendor and same number?","yes",1],["Confidence, Rule 1","Very High"],["Paid: $1,250.00 + $1,250.00","$2,500.00"],["Owed for one invoice","$1,250.00"],["Paid twice: $2,500.00 − $1,250.00","$1,250.00",1]],
+    verdict:["flag","Cluster A. Rule 1 matches at Very High, so every sensitivity setting flags it. Both bills are paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice.","FLAGGED"] },
+
+  { n:2, title:"Two channels, one bill",
+    chips:["Bill register","Payment register"], src:"Rule 6", cites:[4],
+    situation:"Crestline Logistics' invoice INV-7731, $4,860.00, appears once in the bill register. The payment register shows it paid twice: by cheque on 22 Aug and by ACH on 4 Sep.",
+    facts:["Purchases generate supporting documents such as paid bills, invoices, receipts and cancelled checks. The IRS says to keep them in an orderly way, by year and type "+C(4)+". The cancelled cheque and the ACH record show both payments."],
+    visual:{type:"table",
+      head:["Register","Document","Date paid","Method","Amount"],
+      rows:[["Bills","INV-7731","","","$4,860.00"],["Payments","Payment of INV-7731","22 Aug","Cheque","$4,860.00"],["Payments","Payment of INV-7731","4 Sep",["ACH","bad"],["$4,860.00","bad"]]]},
+    rules:[Q.q6],
+    math:[["Bills for INV-7731","1"],["Payments against INV-7731","2"],["Paid: $4,860.00 + $4,860.00","$9,720.00"],["Owed for the bill","$4,860.00"],["Paid twice: $9,720.00 − $4,860.00","$4,860.00",1],["Confidence, Rule 9","High"],["Flagged under Standard?","yes",1]],
+    verdict:["flag","Cluster B. A search of bills alone finds one bill and nothing wrong. The payment search finds the second payment. The $4,860.00 is paid out, so the skill proposes a credit, a refund or a set-off.","FLAGGED"] },
+
+  { tier:"Two registers and two vendor records" },
+  { n:3, title:"One supplier, two records",
+    chips:["Bill register","Vendor master"], src:"Rules 2 and 10", cites:[2,3],
+    situation:"Pinnacle Design exists under two vendor records, \"Pinnacle Design\" and \"Pinnacle Design LLC\". Invoice INV-2210, $3,200.00, sits under each. One is paid, and one is still open. Elsewhere, \"Acme Corp\" and \"Acme Corporation\" both billed $980.00, two days apart.",
+    facts:["The Jaro-Winkler score says how alike two strings are, from 0 to 1, with extra weight when the first characters agree. The US Census Bureau developed it to match names and addresses between records "+C(3)+".",
+           "In QuickBooks Online, a merge moves the duplicate's past transactions to the vendor you keep and marks the duplicate inactive. To restore a merged vendor, you must recreate the profile by hand. Vendors merge in pairs "+C(2)+"."],
+    visual:{type:"table",
+      head:["Cluster","Vendor records","Invoices","Amount","Name score","Rule","Confidence"],
+      rows:[["C","Pinnacle Design · Pinnacle Design LLC","INV-2210 under each","$3,200.00","","6","High"],["D","Acme Corp · Acme Corporation","12 Sep and 14 Sep","$980.00","0.91","4","Medium"]]},
+    pair:[["ok","Caught before payment","$3,200.00","The open INV-2210. A person voids it, and nothing is lost."]],
+    rules:[Q.q2, Q.q10],
+    math:[["INV-2210 under Pinnacle Design","$3,200.00, paid"],["INV-2210 under Pinnacle Design LLC","$3,200.00, open"],["Rule 6: same number, two vendor records","High",1],["Findings from one match","2: vendor-master duplicate, duplicate bill"],["Void the open bill before payment: cost","$0.00",1],["Acme name score","0.91"],["Threshold","0.85"],["0.91 ≥ 0.85?","yes, Rule 4 at Medium",1],["Flagged under Standard?","C yes, D no"]],
+    verdict:["flag","Clusters C and D. The skill proposes a merge for each pair of vendor records, and says that a merge is not reversible. Under Standard, the skill flags cluster C and lists cluster D at Medium only. A person voids the open Pinnacle bill before payment, and that saves $3,200.00 at no cost.","FLAGGED"] },
+
+  { n:4, title:"Same amount, five days apart, or thirty",
+    chips:["Bill register","Recurring list"], src:"Rules 11, 4 and 13", cites:[],
+    situation:"Summit Cleaning bills $950.00 on the 1st of each month. The bill register shows $950.00 on 1 Sep, 6 Sep and 1 Oct. The recurring list names the landlord, the insurer and three software suppliers, not Summit.",
+    facts:[], nofact:"This level needs no outside fact. The 7-day window and the 30-day pattern test are the skill's own rules.",
+    visual:{type:"table",
+      head:["Pair","Days apart","Inside 7 days?","Result"],
+      rows:[["1 Sep and 6 Sep","5","yes",["Rule 3, Medium","bad"]],["1 Sep and 1 Oct","30","no","a pattern, not a duplicate"],["6 Sep and 1 Oct","25","no","a pattern, not a duplicate"]]},
+    rules:[Q.q11, Q.q4, Q.q13],
+    math:[["6 Sep − 1 Sep","5 days"],["5 ≤ 7?","yes, Rule 3 matches",1],["1 Oct − 1 Sep","30 days"],["30 ≤ 7?","no, a monthly pattern",1],["The suspect","the 6 Sep invoice, $950.00"],["Confidence, Rule 3","Medium"],["Flagged under Standard?","no"],["Flagged under Strict?","yes, $950.00",1],["Same number on both sides of 30 Sep?","none found"]],
+    verdict:["note","Cluster E. The 6 Sep invoice is the suspect, at Medium. Standard does not flag it, and Strict does. Because the scan window runs from July, the skill also saw that no September bill straddled the quarter end with the same number.","MEDIUM"] },
+
+  { tier:"What the scan can and cannot say" },
+  { n:5, title:"The credit nobody used",
+    chips:["Vendor credits","Payment register"], src:"Rule 8", cites:[],
+    situation:"Harbor Office Supply issued credit note CN-0011, $410.00, on 12 Sep, and it is still open. Since then, Northbrook paid three later Harbor invoices in full.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Document","Date","Amount","Status"],
+      rows:[["CN-0011","12 Sep",["−$410.00","good"],["open","bad"]],["Three later Harbor invoices","after 12 Sep","","paid in full"]]},
+    pair:[["ok","Money owed to Northbrook","$410.00","CN-0011. Reported on its own, at the top of the output."]],
+    rules:[Q.q8],
+    math:[["Credit open","$410.00"],["Applied against later invoices","$0.00"],["Later invoices paid in full","3"],["Credit not taken: $410.00 − $0.00","$410.00",1],["Confidence, Rule 10","Low, for AP hygiene"],["Is it a duplicate?","no"]],
+    verdict:["ok","Cluster F. It is not a duplicate. Harbor owes Northbrook that $410.00. The skill reports it separately, apart from the exposure, and proposes a refund or a set-off.","OWED TO YOU"] },
+
+  { n:6, title:"What the scan cannot say",
+    chips:["Rules-run sheet","Coverage sheet"], src:"Rules 3, 7, 9 and 12", cites:[1,5,6],
+    situation:"The scan ran nine of the ten rules over all 1,284 bills under Standard. Rule 7, two vendor records that share one bank account, did not run. Mosofin does not expose bank details.",
+    facts:["A billing scheme typically ran 18 months before detection, against 12 months for all frauds. Frauds caught within six months had a median loss of $30,000. Those lasting two to three years had a median loss of $250,000 "+C(1)+".",
+           "Separating authority, custody and accounting among different people helps prevent fraud, waste and abuse "+C(6)+".",
+           "Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints. Compromised vendor emails are one way the scheme worked "+C(5)+"."],
+    visual:{type:"table",
+      head:["Sheet line","Value"],
+      rows:[["Rules run","9 of 10"],["Rule 7",["not run · owner: the bank's payments team","bad"]],["Sensitivity","Standard"],["Population scanned","1,284 of 1,284 bills"],["Flagged exposure, High and above","$9,310.00"],["Paid out, recoverable","$6,110.00"],["Caught before payment","$3,200.00"],["Credits owed","$410.00"]]},
+    rules:[Q.q3, Q.q7, Q.q9, Q.q12],
+    math:[["Cluster A, Rule 1, Very High","$1,250.00"],["Cluster B, Rule 9, High","$4,860.00"],["Cluster C, Rule 6, High","$3,200.00"],["Flagged under Standard: 1,250 + 4,860 + 3,200","$9,310.00",1],["Cluster D, Rule 4, Medium","$980.00"],["Cluster E, Rule 3, Medium","$950.00"],["Flagged under Strict: 9,310 + 980 + 950","$11,240.00",1],["Paid out: A + B","$6,110.00",1],["Caught before payment: C","$3,200.00",1],["Credits owed: F","$410.00"],["Rules run: 10 − 1","9"]],
+    verdict:["note","The output states the sensitivity, the population and Rule 7 as not run with its owner. A clean scan here means no duplicate error found. It does not mean a fraud test passed. The bank's payments team runs that test.","NOT RUN"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: which clusters the chosen sensitivity flags, and what they add up to --- */
+const CONF = {1:"Very High",2:"High",3:"Medium",4:"Medium",5:"Medium-Low",6:"High",7:"High",8:"Low",9:"High",10:"Low"};   // the skill's own confidence per rule
+const RANK = {"Very High":4,"High":3,"Medium":2,"Medium-Low":1,"Low":0};
+const FLOOR = {strict:2, standard:3, permissive:4};
+const RULE_NAMES = {
+  1:"1 · exact invoice number, same vendor",
+  2:"2 · same amount, vendor and invoice date",
+  3:"3 · same amount, vendor, dates within N days",
+  4:"4 · same amount, similar vendor name",
+  5:"5 · invoice number out of sequence",
+  6:"6 · same invoice number, two vendor records",
+  7:"7 · same bank account, two vendors (not run here)",
+  8:"8 · round-number amounts in a short window",
+  9:"9 · paid through two channels",
+  10:"10 · credit memo never applied",
+};
+const STATUS = {paid:"both paid", open:"one still open", credit:"a credit note"};
+const NAMES = ["A","B","C","D","E","F"];
+const PRESETS = {
+  northbrook: [[1,1250,2,"paid"],[9,4860,2,"paid"],[6,3200,2,"open"],[4,980,2,"paid"],[3,950,2,"paid"],[10,410,1,"credit"]],
+  level1:     [[1,1250,2,"paid"]],
+  blank:      [],
+};
+function buildRows(){
+  const box=document.getElementById("clusters");
+  NAMES.forEach((nm,i)=>{
+    const ruleOpts = `<option value="">none</option>` + Object.keys(RULE_NAMES).map(k=>`<option value="${k}">${esc(RULE_NAMES[k])}</option>`).join("");
+    const stOpts = Object.keys(STATUS).map(k=>`<option value="${k}">${esc(STATUS[k])}</option>`).join("");
+    box.appendChild(el("div",{class:"crow","data-i":i},
+      `<span class="cname">Cluster ${nm}</span>
+       <label><span>Rule matched</span><select data-f="rule" aria-label="Cluster ${nm}: rule matched">${ruleOpts}</select></label>
+       <label><span>Amount per record</span><input data-f="amt" inputmode="decimal" aria-label="Cluster ${nm}: amount per record"></label>
+       <label><span>Records</span><input data-f="cnt" inputmode="numeric" aria-label="Cluster ${nm}: records in the cluster"></label>
+       <label><span>Paid status</span><select data-f="st" aria-label="Cluster ${nm}: paid status">${stOpts}</select></label>`));
+  });
+}
+const numv = v => { const x=parseFloat(String(v).replace(/[$£€,\s]/g,"")); return isFinite(x)?x:0; };
+function readRows(){
+  return [...document.querySelectorAll(".crow")].map((row,i)=>({
+    name:NAMES[i],
+    rule:+row.querySelector('[data-f="rule"]').value||0,
+    amt:numv(row.querySelector('[data-f="amt"]').value),
+    cnt:Math.max(0,Math.floor(numv(row.querySelector('[data-f="cnt"]').value))),
+    st:row.querySelector('[data-f="st"]').value,
+  }));
+}
+function load(p){
+  document.querySelectorAll(".crow").forEach((row,i)=>{
+    const d=PRESETS[p][i]||["", "", "", "paid"];
+    row.querySelector('[data-f="rule"]').value=d[0];
+    row.querySelector('[data-f="amt"]').value=d[1];
+    row.querySelector('[data-f="cnt"]').value=d[2];
+    row.querySelector('[data-f="st"]').value=d[3];
+  });
+  document.getElementById("sens").value="standard";
+  document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const sens=document.getElementById("sens").value, floor=FLOOR[sens];
+  const rows=readRows().filter(r=>r.rule && r.amt>0 && r.cnt>0);
+  const bridge=document.getElementById("bridge"), box=document.getElementById("results");
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  if(!rows.length){ bridge.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter at least one cluster with a rule, an amount and a record count."); return; }
+  let flagged=0, paid=0, open=0, credits=0, nFlag=0, h="";
+  rows.forEach(r=>{
+    const conf=CONF[r.rule];
+    if(r.st==="credit"){ const c=Math.round(r.amt*r.cnt*100)/100; credits+=c; h+=line(`Cluster ${r.name}: rule ${r.rule}, ${conf}, credit ${fmt(r.amt)} × ${r.cnt}`, `owed ${fmt(c)}`); return; }
+    if(r.rule===7){ h+=line(`Cluster ${r.name}: rule 7, not run here`, "no exposure"); return; }
+    const exp=Math.round(r.amt*(r.cnt-1)*100)/100;
+    const isFlag=RANK[conf]>=floor;
+    if(isFlag){ flagged+=exp; nFlag++; if(r.st==="open") open+=exp; else paid+=exp; }
+    h+=line(`Cluster ${r.name}: rule ${r.rule}, ${conf}, ${fmt(r.amt)} × (${r.cnt} − 1)`, (isFlag?"flagged ":"listed, not flagged ")+fmt(exp));
+  });
+  const label={strict:"Strict",standard:"Standard",permissive:"Permissive"}[sens];
+  h+=line(`= flagged exposure under ${label}`, fmt(flagged), 1);
+  h+=line("Rule 7: not run", "owner to be named", 1);
+  bridge.innerHTML=h;
+  let out = res("flag", `Flagged exposure, ${label}`, fmt(flagged), `${nFlag} of ${rows.length} clusters flagged. ${sens==="strict"?"Medium and above.":sens==="standard"?"High and above.":"Very High only."}`);
+  out += res("flag", "Already paid out", fmt(paid), "Money that went out twice. Ask for a credit, a refund or a set-off.");
+  out += res("ok", "Caught before payment", fmt(open), "Open duplicates. A person voids them, at no cost. They come first in the output.");
+  out += res("ok", "Credits owed to you", fmt(credits), "Open credit notes, shown on their own. Not part of the exposure.");
+  out += res("note", "Rule 7: not run", "—", "The bank-account test does not run here. Name who runs it in your AP or banking system.");
+  box.innerHTML=out;
+}
+buildRows();
+document.querySelectorAll(".crow input, .crow select, #sens").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("northbrook");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
