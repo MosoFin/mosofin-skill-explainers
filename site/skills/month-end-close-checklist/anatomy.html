@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Month-End Close Checklist Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the month-end close checklist skill is built: a 158-line card, seven reference files, the close run, and the ten audit findings fixed on 27 Oct 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+
+  .f .basis{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);max-width:66ch}
+  .f .basis b{color:var(--ink);font-weight:500}
+  .f ul.lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f ul.lows b{color:var(--ink);font-weight:600}
+  .f ul.lows .basis{display:block;margin-top:2px}
+  .gap{color:var(--muted);font-size:14.5px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Month-end close checklist</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">month-end-close-checklist · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the month-end close checklist is built, and what it does</h1>
+  <p class="lede">A 158-line card with seven reference files behind it, split on 25 Oct 2026 from a 984-line file. It builds and runs the monthly close — every task with an owner, a due date, its dependencies and a status — and ends in a tie-out that shows the books are reportable. Its point is a status board that reports what the books show, not what people claim. The audit on 27 Oct found that its headline check, inter-period continuity, compared the ledger with itself and could never fail; all ten findings are fixed on the branch.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">158</span><span class="s">lines in SKILL.md, down from 984</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">563/563</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·7·2</span><span class="s">High · Medium · Low, 10 in all</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">10/10</span><span class="s">0 partly fixed, 0 rejected, in 937f77b</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 434" role="img" aria-label="SKILL.md is a 158-line card with the rules and six stages. The rules point to mosofin-protocol.md (262 lines), stage 2 to gates.md (144), stages 3 to 6 to method.md (431, the largest), stage 4 also to edge-cases.md (78), stage 5 also to output.md (51). overview.md (54) and tools-and-glossary.md (62) are read on demand.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="394" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 158</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, ten questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read, build, scope list</text>
+<text x="48" y="272">Stage 4 · Owners, materiality, items</text>
+<text x="48" y="312">Stage 5 · Tie out, review, output</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="188" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="104" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">144</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">431</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="56" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">78</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="37" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">51</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">54</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">62</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="126">before 1st call</text>
+<text x="318" y="206">Gates 0–3</text>
+<text x="458" y="300">Steps 0–9</text>
+<text x="318" y="422" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption><b>method.md</b>, at 431 lines, carries the full Pre-Close to Day 7 task list, the scoping rules, owners and dependencies, materiality, the tie-out and nine output sheets. After the audit it also states, for every [auto] task, the test that proves it (account, side, date window). <b>gates.md</b> has a second use here: the capability map says which tasks can be status-checked and which rest on the owner's word. The honesty clause — no bank statement, close software, tracker or calendar, and no lock or post — is on the card and in the rules.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1271" role="img" aria-label="Stage 1 asks ten questions: Mosofin or upload, the period, the close calendar, soft or hard close, the framework, owners, materiality, a template, entity facts on the upload path, and cash or accrual basis. On the Mosofin path gates 0 to 2 confirm the workspace, count company files and subledger platforms, and map which tasks can be status-checked; otherwise the user uploads trial balances at this and the prior period end and last month&#x27;s TB as reported. Both read back and wait for a yes. Steps 0 to 2 read the evidence, build and scope the task list. No bank statement, close software, tracker or calendar can be read, and nothing is locked or posted. Steps 3 to 5 assign owners, apply materiality and track open items. Steps 6 to 8 tie out, record lessons learned and output nine sheets. Step 9 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="170" x2="460" y2="200" marker-end="url(#a2)"/>
+<polyline points="330,252 230,252 230,316" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,252 690,252 690,316" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,488 230,532 398,532" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,488 690,532 522,532" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="556" x2="460" y2="586" marker-end="url(#a2)"/>
+<line x1="460" y1="740" x2="460" y2="770" marker-end="url(#a2)"/>
+<line x1="460" y1="882" x2="460" y2="912" marker-end="url(#a2)"/>
+<line x1="460" y1="1024" x2="460" y2="1054" marker-end="url(#a2)"/>
+<line x1="460" y1="1187" x2="460" y2="1217" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+<text x="340" y="74"><tspan font-weight="600">B</tspan> Which period</text>
+<text x="600" y="74"><tspan font-weight="600">C</tspan> Close calendar or target date</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Soft or hard close</text>
+<text x="340" y="100"><tspan font-weight="600">E</tspan> Reporting framework</text>
+<text x="600" y="100"><tspan font-weight="600">F</tspan> Who owns each task</text>
+<text x="80" y="126"><tspan font-weight="600">G</tspan> Materiality threshold</text>
+<text x="340" y="126"><tspan font-weight="600">H</tspan> Template, last month's close</text>
+<text x="600" y="126"><tspan font-weight="600">I</tspan> Industry, entities (upload)</text>
+<text x="80" y="152"><tspan font-weight="600">J</tspan> Cash or accrual basis</text>
+</g>
+<polygon points="460,202 590,252 460,302 330,252" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="248" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="60" y="318" width="370" height="170" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="368" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="392" xml:space="preserve">G1  count company files: one → no Day 6</text>
+<text x="78" y="416" xml:space="preserve">      · subledger platforms connected</text>
+<text x="78" y="440" xml:space="preserve">G2  which tasks can be status-checked,</text>
+<text x="78" y="464" xml:space="preserve">      which rest on the owner</text>
+</g>
+<rect x="490" y="318" width="370" height="170" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="508" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · REQUIRED</text>
+<g font-size="13" fill="var(--ink)">
+<text x="508" y="368" xml:space="preserve">Trial balance at the period end and</text>
+<text x="508" y="392" xml:space="preserve">      the prior period end</text>
+<text x="508" y="416" xml:space="preserve">Last month's TB as reported, for continuity</text>
+<text x="508" y="440" xml:space="preserve">Period, calendar, soft or hard close, framework,</text>
+<text x="508" y="464" xml:space="preserve">      typed in</text>
+</g>
+<text x="236" y="242" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="684" y="242" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="400" y="508" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="537" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="588" width="800" height="152" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="614" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–2 · READ THE EVIDENCE, BUILD THE LIST, SCOPE IT · MOCK FLAG CHECKED</text>
+<text x="80" y="638" font-size="13.5" fill="var(--ink)">Basis passed as accounting_method on every read · Pre-Close to Day 7, each task with its verdict</text>
+<text x="80" y="659" font-size="13.5" fill="var(--ink)">Scoped to the entity, every removal reported with its evidence · industry tasks added</text>
+<text x="80" y="680" font-size="13.5" fill="var(--ink)">Now listed too: clearing and suspense accounts at nil (Day 4) · prior-month accruals reversed (Day 3)</text>
+<text x="80" y="703" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · search_journal_entries · get_trial_balance · get_balance_sheet</text>
+<text x="80" y="723" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_profit_and_loss · get_general_ledger · search_classes · search_locations · get_company_info</text>
+<rect x="60" y="772" width="800" height="110" rx="10" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="80" y="798" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--high)">WHAT NO CONNECTION CAN SUPPLY</text>
+<text x="80" y="822" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">No bank statement, close software, task tracker or team calendar</tspan>, and it cannot lock the books,</text>
+<text x="80" y="843" font-size="13.5" fill="var(--ink)">post an entry or mark a task complete. Owners, the calendar and materiality come from the user;</text>
+<text x="80" y="864" font-size="13.5" fill="var(--ink)">a reconciliation is never reported as verified from the ledger.</text>
+<rect x="60" y="914" width="800" height="110" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="940" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–5 · OWNERS, MATERIALITY, OPEN ITEMS</text>
+<text x="80" y="964" font-size="13.5" fill="var(--ink)">Owner, due date, dependencies, status, critical path · reviewer and review date, [manual]</text>
+<text x="80" y="985" font-size="13.5" fill="var(--ink)">Evidence column: the stated test for each [auto] task beside what the owner claims</text>
+<text x="80" y="1006" font-size="13.5" fill="var(--ink)">Materiality split on listed accounts · risk areas · tasks waiting on outside information grouped</text>
+<rect x="60" y="1056" width="800" height="131" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1082" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–8 · TIE-OUT, LESSONS LEARNED, OUTPUT</text>
+<text x="80" y="1106" font-size="13.5" fill="var(--ink)">TB balanced, true by construction · reconciliation status from the owner's workpaper, agreed to ledger</text>
+<text x="80" y="1127" font-size="13.5" fill="var(--ink)">Continuity per account vs last month's TB as reported, else "not performed" · books locked [manual]</text>
+<text x="80" y="1148" font-size="13.5" fill="var(--ink)">Lessons learned timed from entry-created times, not transaction dates</text>
+<text x="80" y="1169" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">Nine sheets</tspan>: calendar, tasks, open items, variances, materiality, tie-out, lessons, scoping, coverage</text>
+<rect x="60" y="1219" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1245" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: task list, owners by role, calendar, threshold; never balances, statuses or close results</text>
+</g>
+</svg>
+    </div>
+    <figcaption>Both paths converge on the read-back. The red box is the clause the skill is built around: an entry posted is not a task complete, and a reconciliation compares the ledger with something outside it, so the board shows the owner's claim and the books' evidence side by side. After the audit the continuity check needs last month's TB as it was reported, and says "not performed" without it.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Ten findings, all fixed on 27 Oct, with the practice behind each</p>
+  <p class="gap">An independent senior-bookkeeper audit on 27 Oct 2026 gave the verdict "fit with fixes". The one thing that mattered most: the inter-period continuity check, billed as the most valuable tie-out item, compared two live reads of the same ledger. Each finding was checked against the skill before acting; all were fixed in 937f77b.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — The continuity check compared the ledger with itself, so it could never find a reopened period</h3>
+<p>The prior-period TB was pulled live (or exported today) and compared with this period's opening balances. A back-posting into July is already in both, so they always agree — yet the text said a break "means a prior period was reopened".</p>
+<p class="fix"><b>Fixed.</b> Continuity compares last month's TB as reported (user-supplied, [manual]) with a fresh read of the same date, per account. Without it the check is "not performed — no reported prior TB", never a pass; a P&amp;L and retained-earnings break in the first month of a fiscal year is noted as expected. Balances are still never persisted: the user supplies the reported TB each month.</p>
+<p class="basis"><b>Basis:</b> Agreeing opening balances to the signed-off prior-period figures, as in AU-C 510 and ISA 510.</p>
+<span class="where">references/method.md · Steps 0, 6 · SKILL.md upload checklist · references/gates.md · references/overview.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — [gated] meant two different things</h3>
+<p>Gate 2 defines [gated] as an approval-gated tool; method.md used it on whole task groups to mean "partly observable, partly manual", so the coverage sheet could not say which.</p>
+<p class="fix"><b>Fixed.</b> [gated] is kept for the Gate 2 meaning only; mixed groups are tagged "mixed — see each task" with per-part verdicts, and the coverage sheet has one row per part.</p>
+<p class="basis"><b>Basis:</b> The skill's own Gate 2 definition; a coverage record must be unambiguous.</p>
+<span class="where">references/method.md · Part B, Days 2/4/6/7, Steps 5, 7 · references/gates.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — How an entry proves a task was never defined on a first run</h3>
+<p>Only the saved Step 9 preference said which account or entry proves each [auto] task, so a first run would match by memo text or guess.</p>
+<p class="fix"><b>Fixed.</b> Step 3 states each [auto] task's test before reading — accounts, side, date window, compared with last month — and shows it in the Evidence column; with no account in the chart the task is [manual].</p>
+<p class="basis"><b>Basis:</b> Standard close-review practice: evidence is defined before it is gathered.</p>
+<span class="where">references/method.md · Step 3</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — Standard small-business close checks were missing</h3>
+<p>No task cleared Undeposited Funds, Uncategorized or Ask My Accountant, reviewed Opening Balance Equity, or checked that last month's accruals were reversed.</p>
+<p class="fix"><b>Fixed.</b> Day 3: prior-month accruals reversed, [auto]. Day 4: clearing and suspense accounts at nil or listed with an owner, [auto].</p>
+<p class="basis"><b>Basis:</b> Standard bookkeeping practice for QuickBooks and Xero files.</p>
+<span class="where">references/method.md · Day 3, Day 4</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M4 — The tie-out claimed to see whether a reconciliation was recorded</h3>
+<p>"Flag any [account] without a reconciliation recorded" — no listed tool reads reconciliation status.</p>
+<p class="fix"><b>Fixed.</b> Reconciliation status is [manual], from the owner or the workpaper, agreed to the ledger; Sheet 6 adds reconciled balance per workpaper, ledger balance and difference.</p>
+<p class="basis"><b>Basis:</b> Standard practice: a reconciliation is evidenced by its workpaper, not by the ledger.</p>
+<span class="where">references/method.md · Step 6, Sheet 6</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M5 — The accounting basis was never asked</h3>
+<p>"The accounting method on the reads" cannot reveal the basis, because the skill chooses it; yet basis decides whether a third of the tasks apply.</p>
+<p class="fix"><b>Fixed.</b> New intake J, cash or accrual, Required; passed as <code>accounting_method</code> on every read and stated in the Sheet 1 header; accrual balances only corroborate.</p>
+<p class="basis"><b>Basis:</b> Standard reporting practice.</p>
+<span class="where">SKILL.md intake J · references/method.md · Steps 0, 2 · references/gates.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M6 — "Measured" close timing used the transaction date</h3>
+<p>Close entries are dated the last day of the month whatever day they were entered, so the lessons-learned sheet would report a zero-slip close every month.</p>
+<p class="fix"><b>Fixed.</b> Step 7 uses the entry-created timestamp; if the read returns none, the measurement is [manual] and said so.</p>
+<p class="basis"><b>Basis:</b> Standard close-metrics practice.</p>
+<span class="where">references/method.md · Step 7 · SKILL.md Stage 5</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M7 — No review or approval evidence per task</h3>
+<p>Tasks had an owner and status but no reviewer or review date, and Sheet 6 had a single sign-off.</p>
+<p class="fix"><b>Fixed.</b> Reviewer (role) and Reviewed on columns, [manual]; Sheet 6 sign-off is Prepared by / date — Reviewed by / date.</p>
+<p class="basis"><b>Basis:</b> Preparer and reviewer evidence, standard in controller and external-accountant review.</p>
+<span class="where">references/method.md · Step 3, Sheets 1, 6</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · 2 fixed</span><div class="body">
+<h3>Two smaller corrections</h3>
+<ul class="lows">
+<li><b>L1 · Inventory cutoff marked [auto].</b> The ledger shows document dates, not when goods shipped or arrived. <i>Fixed:</i> [auto] to list receipts and sales around period end; [manual] to agree them to receiving and shipping records.<span class="basis">Basis: standard inventory cutoff practice.</span></li>
+<li><b>L2 · The variance tracker had no prior-month column.</b> Day 5 asks for balance-sheet variance to prior month; Sheet 4 held only budget, actual, variance. <i>Fixed:</i> Comparison basis and Prior period columns added.<span class="basis">Basis: standard bookkeeping practice.</span></li>
+</ul>
+<span class="where">references/method.md · Day 1, Sheet 4 · 937f77b</span>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <b>31 skills, 0 failures</b> (<code>.github/validate-skill.sh skills</code>, run 27 Oct 2026).</span></li>
+    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its 7 reference files resolves, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, Steps 0–9, exists as a heading in method.md, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>The description is <b>1000 characters</b>, under the 1,024 limit, third person, and names the upload path.</span></li>
+    <li><span class="ok">PASS</span><span>Content kept at the split: <b>563 of 563</b> original content lines present in references/, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, "What is right": "an entry posted is not a task complete", with claimed Status beside observed Evidence — a strong control.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: scoping removes tasks with evidence, so a wrong removal is visible; unconnected group members keep their tasks.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: external dependencies (vendor statements, bank statements, rates) are grouped as the real critical path.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: a balanced TB is "true by construction", and bank and card recs are [manual] because no statement is available.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: materiality is never assumed; statuses and close results are never persisted.</span></li>
+  </ul>
+  <p class="gap"><b>Not yet tested:</b> a live run against a connected company file through a real close. Tool names were not checked against a live catalogue in this pass; whether <code>search_journal_entries</code> returns an entry-created time (the M6 fix depends on it) was not confirmed. The split report's open notes — <code>management-reporting-pack</code> dropped as if unshipped, and the continuity comparison with financial-statement-builder slightly overstated — were not acted on.</p>
+</section>
+
+<footer>On branch claude/trusting-ramanujan-8k8te1 of MosoFin/mosofin-finance-skills, not yet merged to main. Cross-references to unshipped skills removed in 7e38716; card split in f5e9ba2 — 56f9f95 then briefly restored the long SKILL.md and 94abe0d re-applied the 157-line card; Gate 1 cross-entity pointer fixed in 14f616a; audit fixes in 937f77b (27 Oct 2026). Earlier: d86fa27, 4d5637c. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

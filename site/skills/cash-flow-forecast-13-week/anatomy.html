@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13-Week Cash Flow Forecast Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the 13-week cash flow forecast skill is built: a 160-line card, seven reference files, the weekly run, and the eight audit findings fixed on 27 Oct 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+
+  .f .basis{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);max-width:66ch}
+  .f .basis b{color:var(--ink);font-weight:500}
+  .f ul.lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f ul.lows b{color:var(--ink);font-weight:600}
+  .f ul.lows .basis{display:block;margin-top:2px}
+  .gap{color:var(--muted);font-size:14.5px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← 13-week cash flow forecast</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">cash-flow-forecast-13-week · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the 13-week cash flow forecast is built, and what it does</h1>
+  <p class="lede">A 160-line card with seven reference files behind it, split on 25 Oct 2026 from a 937-line file. It projects, week by week, how much money will actually be in the bank: opening cash, the receipts and payments expected to clear, and the closing balance that becomes next week's opening. It names the lowest cash point and its week, tests the floor and the runway, and times collections from each customer's measured payment behaviour rather than due dates. The audit on 27 Oct found that the two numbers that set the low point — opening cash and recurring spend — could both be wrong; all eight findings are fixed on the branch.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">160</span><span class="s">lines in SKILL.md, down from 937</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">523/523</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">2·3·3</span><span class="s">High · Medium · Low, 8 in all</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">8/8</span><span class="s">0 partly fixed, 0 rejected, in 4523888</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 434" role="img" aria-label="SKILL.md is a 160-line card with the rules and six stages. The rules point to mosofin-protocol.md (262 lines), stage 2 to gates.md (144), stages 3 to 6 to method.md (390, the largest), stages 3 to 5 also to edge-cases.md (75), stage 5 also to output.md (50). overview.md (49) and tools-and-glossary.md (68) are read on demand.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="394" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 160</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, ten questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read, set up the grid</text>
+<text x="48" y="272">Stage 4 · Receipts, payments, chain</text>
+<text x="48" y="312">Stage 5 · Risks, sensitivities, output</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="208" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="114" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">144</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">390</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="60" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">75</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="40" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">50</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">49</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">68</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 230 C 450 230, 450 202, 574 202" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 210, 574 210" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="126">before 1st call</text>
+<text x="318" y="206">Gates 0–3</text>
+<text x="458" y="300">Steps 0–9</text>
+<text x="318" y="422" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>A builder, not a reconciliation, so the stages follow the forecast: read and set up the grid (Steps 0–1), place receipts and payments and run the chain (Steps 2–4), then flag risks, test sensitivities, compare to actuals and output (Steps 5–8). <b>method.md</b> holds all of it and the seven-sheet workbook. <b>edge-cases.md</b> is read from Stage 3 on — distress, concentration, seasonality, multi-currency, revolver mechanics and clearing time all change the grid. The honesty clause — payroll, debt service, tax dates, the floor and the facility are never in the books — is at the top of the card and in the rules.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1336" role="img" aria-label="Stage 1 asks ten questions: Mosofin or upload, horizon, available and restricted cash, payroll, debt service and tax, which bills to pay, the floor, the facility, entities and pooling, and new sales and FX. On the Mosofin path gates 0 to 2 confirm the workspace and company file, ask whether cash is pooled, and check that agings carry due dates and payment history is readable; otherwise the user uploads bank balances, aging detail, schedules and card statements. Both read back and wait for a yes. Steps 0 and 1 read the books and open Week 1 at the bank balance. Payroll, debt service, tax dates, the floor, facility terms and FX can never be read and are always asked. Steps 2 to 4 place receipts and payments and run the chain. Steps 5 to 8 flag risks, test sensitivities, reconcile to actuals and output seven sheets. Step 9 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="170" x2="460" y2="200" marker-end="url(#a2)"/>
+<polyline points="330,252 230,252 230,316" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,252 690,252 690,316" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,512 230,556 398,556" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,512 690,556 522,556" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="580" x2="460" y2="610" marker-end="url(#a2)"/>
+<line x1="460" y1="784" x2="460" y2="814" marker-end="url(#a2)"/>
+<line x1="460" y1="926" x2="460" y2="956" marker-end="url(#a2)"/>
+<line x1="460" y1="1089" x2="460" y2="1119" marker-end="url(#a2)"/>
+<line x1="460" y1="1252" x2="460" y2="1282" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+<text x="340" y="74"><tspan font-weight="600">B</tspan> Horizon and start date</text>
+<text x="600" y="74"><tspan font-weight="600">C</tspan> Available vs restricted cash</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Payroll schedule</text>
+<text x="340" y="100"><tspan font-weight="600">E</tspan> Debt service, tax, lumpy items</text>
+<text x="600" y="100"><tspan font-weight="600">F</tspan> Which bills to pay, when</text>
+<text x="80" y="126"><tspan font-weight="600">G</tspan> The floor and its definition</text>
+<text x="340" y="126"><tspan font-weight="600">H</tspan> Credit facility terms</text>
+<text x="600" y="126"><tspan font-weight="600">I</tspan> Entities; is cash pooled?</text>
+<text x="80" y="152"><tspan font-weight="600">J</tspan> New sales timing; FX rates</text>
+</g>
+<polygon points="460,202 590,252 460,302 330,252" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="248" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="60" y="318" width="370" height="194" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="368" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="392" xml:space="preserve">G1  company file · excluded entity named</text>
+<text x="78" y="416" xml:space="preserve">      · several entities: is cash pooled?</text>
+<text x="78" y="440" xml:space="preserve">G2  agings carry due dates?</text>
+<text x="78" y="464" xml:space="preserve">      payment history readable?</text>
+</g>
+<rect x="490" y="318" width="370" height="194" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="508" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · REQUIRED</text>
+<g font-size="13" fill="var(--ink)">
+<text x="508" y="368" xml:space="preserve">Bank balances at the start date + latest bank rec</text>
+<text x="508" y="392" xml:space="preserve">A/R Aging Detail, one row per invoice, due date</text>
+<text x="508" y="416" xml:space="preserve">A/P Aging Detail, one row per bill, due date</text>
+<text x="508" y="440" xml:space="preserve">Payroll, debt service and tax schedules</text>
+<text x="508" y="464" xml:space="preserve">Card statements, when cards are used</text>
+<text x="508" y="488" xml:space="preserve">Entity, horizon, start date, the floor, typed in</text>
+</g>
+<text x="236" y="242" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="684" y="242" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="400" y="532" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="561" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="612" width="800" height="172" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="638" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · READ THE BOOKS, SET UP THE WEEKLY GRID · MOCK: TRUE → STOP</text>
+<text x="80" y="662" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">Week 1 opens at the bank balance</tspan> on the start date, agreed to the books through the latest bank rec;</text>
+<text x="80" y="683" font-size="13.5" fill="var(--ink)">deposits in transit and Undeposited Funds placed once · restricted cash excluded · otherwise labelled</text>
+<text x="80" y="704" font-size="13.5" fill="var(--ink)">"book balance, not agreed to bank"</text>
+<text x="80" y="727" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · get_balance_sheet · get_aged_receivables · get_aged_payables</text>
+<text x="80" y="747" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_invoices · search_payments · search_bills · search_bill_payments</text>
+<text x="80" y="767" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_general_ledger · get_cash_flow · get_vendor_expenses · get_company_info</text>
+<rect x="60" y="816" width="800" height="110" rx="10" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="80" y="842" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--high)">WHAT NO CONNECTION CAN SUPPLY</text>
+<text x="80" y="866" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">Payroll schedule</tspan> (unless payroll is connected), debt service, tax due dates, the floor or covenant,</text>
+<text x="80" y="887" font-size="13.5" fill="var(--ink)">facility terms, FX rates, and which payments could slip: always asked, and shown as [manual] lines</text>
+<text x="80" y="908" font-size="13.5" fill="var(--ink)">with named gaps — never dropped because no tool covers them.</text>
+<rect x="60" y="958" width="800" height="131" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="984" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–4 · RECEIPTS, DISBURSEMENTS, THE WEEKLY CHAIN</text>
+<text x="80" y="1008" font-size="13.5" fill="var(--ink)">Receipts at due date + measured days past due, amount-weighted, with sample size; overdue invoices</text>
+<text x="80" y="1029" font-size="13.5" fill="var(--ink)">to Week 1–2 at reduced confidence, or at-risk past the cutoff the user sets</text>
+<text x="80" y="1050" font-size="13.5" fill="var(--ink)">Payroll · AP plan · recurring from cash paid, de-duplicated · card payments · lumpy · last year's one-offs</text>
+<text x="80" y="1071" font-size="13.5" fill="var(--ink)">Closing cash = next week's opening</text>
+<rect x="60" y="1121" width="800" height="131" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1147" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 5–8 · RISKS, SENSITIVITIES, ACTUALS, OUTPUT</text>
+<text x="80" y="1171" font-size="13.5" fill="var(--ink)">Below the floor (red), below zero (critical) · lowest cash point and its week · runway · facility draw</text>
+<text x="80" y="1192" font-size="13.5" fill="var(--ink)">Collections slip by the observed spread · the receipt that matters most · levers, never payroll</text>
+<text x="80" y="1213" font-size="13.5" fill="var(--ink)">Rolling: re-anchor to the actual bank balance, own-account transfers excluded from actuals</text>
+<text x="80" y="1234" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">Seven sheets</tspan>, live formulas: forecast, AR detail, AP detail, alerts, sensitivities, vs actual, coverage</text>
+<rect x="60" y="1284" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1310" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: schedules, the floor, facility terms, the days-to-pay method; never balances or the forecast</text>
+</g>
+</svg>
+    </div>
+    <figcaption>Both paths converge on the read-back. The red box is the clause the skill is built around: the most certain outflows — payroll, debt service, tax — are the ones no ledger holds, so they are asked for and shown as named gaps rather than silently left out. After the audit, Week 1 starts from the bank, not the books, and each roll re-anchors to it.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings, all fixed on 27 Oct, with the practice behind each</p>
+  <p class="gap">An independent senior-bookkeeper audit on 27 Oct 2026 gave the verdict "fit with fixes": the structure is professional (direct method, weekly chain, measured days-to-pay, floor and covenant discipline), but starting cash came from the books with no agreement to the bank, and recurring spend was layered on top of open bills. Each finding was checked against the skill before acting; all were fixed in 4523888.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — Opening cash was the book balance, never agreed to the bank</h3>
+<p>Week 1 opening cash was read from the ledger ("[auto] for the opening balance"). Unreviewed bank-feed items, customer payments sitting in Undeposited Funds and uncleared cheques all make that figure wrong — and it carries through every week of the chain.</p>
+<p class="fix"><b>Fixed.</b> Opening cash is the bank balance on the start date ([manual] on both paths), agreed to the books through the latest bank reconciliation. Outstanding payments are placed once in their clearing weeks; deposits in transit and Undeposited Funds become Week 1 receipts; unreviewed feed items are listed. Without a bank balance it is labelled "book balance, not agreed to bank". Card and gates ask for bank balances.</p>
+<p class="basis"><b>Basis:</b> Standard treasury practice: a 13-week forecast starts from the bank balance, with outstanding items listed separately.</p>
+<span class="where">references/method.md · Step 1 · SKILL.md Mosofin path, upload checklist · references/gates.md Gate 3</span>
+</div></div>
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H2 — Recurring payments from history were counted on top of open bills</h3>
+<p>Disbursements came from open A/P, a recurring pattern from vendor-expense history, and last year's one-offs, with no rule to drop an item already in open A/P or a supplied schedule. <code>get_vendor_expenses</code> is also accrual expense, not cash paid.</p>
+<p class="fix"><b>Fixed.</b> Recurring amounts come from cash paid (ledger on the cash accounts, bill payments). Each recurring item and one-off is dropped where an open bill, a schedule line or a payroll, debt, tax or card line already covers it. Sheet 3 gains a Source column.</p>
+<p class="basis"><b>Basis:</b> Direct-method cash forecasting practice: each payment appears once, from cash actually paid.</p>
+<span class="where">references/method.md · Step 3, Sheet 3</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — Days-to-pay was measured from one date and applied from another</h3>
+<p>It was measured invoice date → payment date but applied as days late after the due date, adding the payment terms twice; invoices already past their expected date had no rule, and averages were unweighted.</p>
+<p class="fix"><b>Fixed.</b> Measured as days past due at payment (payment date − due date), amount-weighted, payments only; expected collection = due date + lag. Past-expected invoices go to Week 1–2 at reduced confidence unless beyond an at-risk cutoff the user is asked for (the auditor's 90 days was not hardcoded). The glossary defines it one way.</p>
+<p class="basis"><b>Basis:</b> Standard collections forecasting practice; one consistent measure of payment lag.</p>
+<span class="where">references/method.md · Step 2 · references/tools-and-glossary.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — Balance-sheet liabilities due in the window were not read; card payments were missing</h3>
+<p>Credit-card balances, sales tax payable, payroll liabilities and loan balances were never read, and the monthly card payment had no line at all — often the second-largest outflow after payroll.</p>
+<p class="fix"><b>Fixed.</b> Step 0's balance-sheet read now sizes credit cards, sales tax/VAT, payroll liabilities, current loans and accrued interest (amounts [auto], dates [manual]); Step 3 has its own card-payment line; card statements are Required on the upload path when cards are used.</p>
+<p class="basis"><b>Basis:</b> Standard small-business cash forecasting practice.</p>
+<span class="where">references/method.md · Steps 0, 3 · SKILL.md upload checklist</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — The roll did not re-anchor to actual cash, and actuals included own-account transfers</h3>
+<p>"Roll the forecast forward one week" did not open the new Week 1 at the actual bank balance, so errors compounded; ledger actuals counted a transfer between the entity's accounts as both a receipt and a payment.</p>
+<p class="fix"><b>Fixed.</b> Each roll opens at the actual bank balance with a variance line against last week's forecast closing; transfers between in-scope cash accounts (<code>search_transfers</code>) are excluded from actuals.</p>
+<p class="basis"><b>Basis:</b> Rolling 13-week forecast practice as used in lender reporting.</p>
+<span class="where">references/method.md · Step 7</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · 3 fixed</span><div class="body">
+<h3>Three label and checklist corrections</h3>
+<ul class="lows">
+<li><b>L1 · "Clean-down" defined two ways.</b> The glossary said yearly; an edge case said weekly. <i>Fixed:</i> Defined once: repay to zero (or below a set level) for a set period, at the frequency the facility agreement states.<span class="basis">Basis: credit facility terms as written in the agreement.</span></li>
+<li><b>L2 · The upload path accepted an aging summary.</b> A summary aging has no invoice rows or due dates, and the forecast is entirely about dates. <i>Fixed:</i> The checklist asks for A/R and A/P Aging Detail exports, one row per invoice or bill with its due date.<span class="basis">Basis: standard bookkeeping practice.</span></li>
+<li><b>L3 · [gated] used for "derived then confirmed".</b> Judgments in Steps 1–2 and Gate 3 were tagged [gated], which means an approval-gated read tool. <i>Fixed:</i> Relabelled "[auto] to derive, [manual] to confirm".<span class="basis">Basis: the skill's own Gate 2 definition of the verdicts.</span></li>
+</ul>
+<span class="where">references/tools-and-glossary.md · SKILL.md upload checklist · references/method.md · references/gates.md · 4523888</span>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <b>31 skills, 0 failures</b> (<code>.github/validate-skill.sh skills</code>, run 27 Oct 2026).</span></li>
+    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its 7 reference files resolves, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, Steps 0–9, exists as a heading in method.md, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>The description is <b>1020 characters</b>, under the 1,024 limit, third person, and names the upload path.</span></li>
+    <li><span class="ok">PASS</span><span>Content kept at the split: <b>523 of 523</b> original content lines present in references/, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Four internal contradictions found while splitting were fixed in 7975b74; for this skill, the tool reference no longer calls invoice and payment dates a "numerator and denominator".</span></li>
+    <li><span class="ok">PASS</span><span>Audit, "What is right": direct method throughout; receipts and payments are placed in the week they hit the bank.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: collections are timed from measured payment behaviour with a sample size, not the optimistic due-date assumption.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: the lowest cash point is the headline number; covenant floors are kept apart from management floors, with the covenant's own definition of cash.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: payroll and statutory remittances are never on the lever list; entities are forecast separately and consolidated only when cash is pooled.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: the anniversary scan of last year's cash catches annual one-offs, the most common omission in a real 13-week forecast.</span></li>
+  </ul>
+  <p class="gap"><b>Not yet tested:</b> a live run against a connected company file with real agings, payment history and bank balances. Tool names were not checked against a live catalogue in this pass. The split report's note that the customer-concentration edge case cites <code>get_customer_sales</code>, which is not in the tool table or the Step 0 batch, was not acted on; whether <code>search_transfers</code> (used by the M3 fix) is in the catalogue was not confirmed.</p>
+</section>
+
+<footer>On branch claude/trusting-ramanujan-8k8te1 of MosoFin/mosofin-finance-skills, not yet merged to main. Card split in fb7f999 (this skill's body named no unshipped skill, so no cross-reference commit; the old description's two names went with the rewrite); Gate 1 cross-entity pointer fixed in 14f616a; the days-to-pay labels in 7975b74; audit fixes in 4523888 (27 Oct 2026). Earlier: d86fa27, 4d5637c. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

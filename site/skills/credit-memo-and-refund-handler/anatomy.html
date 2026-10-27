@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit Memo and Refund Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the credit memo and refund skill is built: a 153-line card, seven reference files, the run step by step, and the ten audit findings fixed on 27 Oct 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+
+  .f .basis{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);max-width:66ch}
+  .f .basis b{color:var(--ink);font-weight:500}
+  .f ul.lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f ul.lows b{color:var(--ink);font-weight:600}
+  .f ul.lows .basis{display:block;margin-top:2px}
+  .gap{color:var(--muted);font-size:14.5px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Credit memos and refunds</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">credit-memo-and-refund-handler · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the credit memo and refund handler is built, and what it does</h1>
+  <p class="lede">A 153-line card with seven reference files behind it, split on 25 Oct 2026 from a 900-line file. It handles money going back the other way — customer credit memos and refunds, vendor credits and refunds, sales returns, chargebacks and goodwill credits: it names the type, validates each credit against the original invoice or bill, checks that the tax reversal mirrors the original, proposes the entry and lists unapplied credits in both directions. An independent bookkeeping audit on 27 Oct found ten problems, three of them entries or tests that gave wrong answers; all ten are fixed on the branch.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">153</span><span class="s">lines in SKILL.md, down from 900</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">495/495</span><span class="s">original content lines moved into 7 reference files at the split; 462 unchanged after the deliberate audit edits</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">3·5·2</span><span class="s">High · Medium · Low, 10 in all</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">10/10</span><span class="s">0 partly fixed, 0 rejected, in 900f739</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 434" role="img" aria-label="SKILL.md is a 153-line card with the rules and six stages. The rules point to mosofin-protocol.md (262 lines), stage 2 to gates.md (138), stages 3 to 6 to method.md (388, the largest), stages 4 and 5 also to edge-cases.md (76), stage 5 also to output.md (38). overview.md (48) and tools-and-glossary.md (61) are read on demand.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="394" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 153</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, eight questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read the books</text>
+<text x="48" y="272">Stage 4 · Type, validate, tax</text>
+<text x="48" y="312">Stage 5 · Entry, application, output</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="209" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="110" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">138</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">388</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="61" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">76</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="30" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">38</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">48</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">61</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 270 C 450 270, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 208, 574 208" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="126">before 1st call</text>
+<text x="318" y="206">Gates 0–3</text>
+<text x="458" y="300">Steps 0–7</text>
+<text x="318" y="422" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage points at the file it needs, as the card's Files table says. <b>method.md</b> carries the accounting: the seven-row type table, the four checks against the original, the tax reversal and one proposed entry per credit type — after the audit, nine entry forms, because a refund, a chargeback and a goodwill credit each split in two. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause — the reason for a credit is never in any system — sits at the top of the card and in the rules.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1223" role="img" aria-label="Stage 1 asks eight questions: Mosofin or upload, the type and chargeback status, the original invoice or bill, the credit amount, the reason, the tax jurisdiction, the period and who approves over-credits. On the Mosofin path gates 0 to 2 confirm the workspace, the company file and a payment processor, and the right search per document type; otherwise the user uploads the credit document, the original, the chart of accounts and types in the type, reason and amount. Both read back and wait for a yes. Step 0 reads the books. The reason for a credit can never be read and is always asked. Steps 1 to 3 identify the type, validate every credit against the original and compute the tax reversal. Steps 4 to 6 propose the entry by type, track application and output six sheets. Step 7 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+<polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,462 230,506 398,506" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,462 690,506 522,506" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="530" x2="460" y2="560" marker-end="url(#a2)"/>
+<line x1="460" y1="692" x2="460" y2="722" marker-end="url(#a2)"/>
+<line x1="460" y1="834" x2="460" y2="864" marker-end="url(#a2)"/>
+<line x1="460" y1="976" x2="460" y2="1006" marker-end="url(#a2)"/>
+<line x1="460" y1="1139" x2="460" y2="1169" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+<text x="340" y="74"><tspan font-weight="600">B</tspan> Type; chargeback status</text>
+<text x="600" y="74"><tspan font-weight="600">C</tspan> The original invoice or bill</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> The credit amount</text>
+<text x="340" y="100"><tspan font-weight="600">E</tspan> The reason, never inferred</text>
+<text x="600" y="100"><tspan font-weight="600">F</tspan> Tax jurisdiction</text>
+<text x="80" y="126"><tspan font-weight="600">G</tspan> Which period to review</text>
+<text x="340" y="126"><tspan font-weight="600">H</tspan> Who approves over-credits</text>
+</g>
+<polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="60" y="292" width="370" height="170" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="342" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="366" xml:space="preserve">G1  company file · payment processor connected?</text>
+<text x="78" y="390" xml:space="preserve">G2  one search per document type: credit memos,</text>
+<text x="78" y="414" xml:space="preserve">      refund receipts, vendor credits, invoices, bills</text>
+</g>
+<rect x="490" y="292" width="370" height="170" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="508" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · REQUIRED</text>
+<g font-size="13" fill="var(--ink)">
+<text x="508" y="342" xml:space="preserve">Credit memo, refund, vendor credit or chargeback</text>
+<text x="508" y="366" xml:space="preserve">Original invoice or bill, if applicable</text>
+<text x="508" y="390" xml:space="preserve">Type, reason and amount, typed in</text>
+<text x="508" y="414" xml:space="preserve">Chart of accounts, for GL posting</text>
+<text x="508" y="438" xml:space="preserve">Tax jurisdiction, if the original was taxed</text>
+</g>
+<text x="236" y="216" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="684" y="216" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="400" y="482" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="511" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="562" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="588" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 0 · READ THE BOOKS · ONE BATCH PER ENTITY, MOCK FLAG CHECKED</text>
+<text x="80" y="612" font-size="13.5" fill="var(--ink)">Credits, refunds and vendor credits already recorded, the originals, balances, accounts, tax codes</text>
+<text x="80" y="635" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_credit_memos · search_refund_receipts · search_vendor_credits</text>
+<text x="80" y="655" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_invoices · search_bills · get_aged_receivables · get_aged_payables</text>
+<text x="80" y="675" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · search_tax_codes · search_items · get_company_info</text>
+<rect x="60" y="724" width="800" height="110" rx="10" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="80" y="750" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--high)">WHAT NO CONNECTION CAN SUPPLY</text>
+<text x="80" y="774" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">The reason for a credit</tspan> (E) is always asked: return, pricing dispute, goodwill, damage or error.</text>
+<text x="80" y="795" font-size="13.5" fill="var(--ink)">Also never readable: whether returned goods came back saleable, the write-off tax rules,</text>
+<text x="80" y="816" font-size="13.5" fill="var(--ink)">the FX rate, and a chargeback's fee and reference unless a payment processor is connected.</text>
+<rect x="60" y="866" width="800" height="110" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="892" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–3 · TYPE, VALIDATE AGAINST THE ORIGINAL, TAX REVERSAL</text>
+<text x="80" y="916" font-size="13.5" fill="var(--ink)">Type: the document comes from the books, the reason from the user; neither is defaulted</text>
+<text x="80" y="937" font-size="13.5" fill="var(--ink)">Every credit in the period: exists · credits to date ≤ original amount · period · currency</text>
+<text x="80" y="958" font-size="13.5" fill="var(--ink)">Tax reversed at the rate of the line credited, as its own line; pro-rata only for whole-invoice cuts</text>
+<rect x="60" y="1008" width="800" height="131" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1034" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 4–6 · PROPOSED ENTRY, APPLICATION, OUTPUT</text>
+<text x="80" y="1058" font-size="13.5" fill="var(--ink)">Entry by type: credit memo · refund on account or direct · sales return · vendor credit · vendor refund</text>
+<text x="80" y="1079" font-size="13.5" fill="var(--ink)">Chargeback disputed, accepted or fraud loss · goodwill credit note · bad-debt write-off (tax relief manual)</text>
+<text x="80" y="1100" font-size="13.5" fill="var(--ink)">Applying a credit is a sub-ledger event, no second journal · unapplied register from aging detail</text>
+<text x="80" y="1121" font-size="13.5" fill="var(--ink)"><tspan font-weight="600" fill="var(--ink)">Six sheets</tspan>: register, posting inputs, application, unapplied credits, exceptions, coverage</text>
+<rect x="60" y="1171" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1197" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 7 · Offer to save</tspan>: account map, reason codes, thresholds; never counterparties, amounts or balances</text>
+</g>
+</svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The red box is the clause the skill is built around: three credit types can share an identical document and need three different entries, so the reason is asked every time and never inferred from the document type. Steps 1–3 run on every credit in the period, not only the one being processed.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Ten findings, all fixed on 27 Oct, with the standard behind each</p>
+  <p class="gap">An independent senior-bookkeeper audit on 27 Oct 2026 gave the verdict "fit with fixes": the type, tax-mirroring and no-second-journal discipline is good, but goodwill credits were booked as bad debt, refunds of an existing credit hit revenue twice, and the over-credit test ran against a balance the credit had already reduced. Each finding was checked against the skill before acting; all were fixed in 900f739.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — A goodwill credit was booked as bad debt, and the entry did not balance without tax</h3>
+<p>Goodwill credit notes and bad-debt write-offs shared one entry, <code>DR Bad Debt Expense (or Goodwill Allowance) $net / DR Tax Payable $tax (only if tax recoverable) / CR AR $gross</code>. Drop the tax line and the debits fall short of the credit; "Goodwill Allowance" is not an account.</p>
+<p class="fix"><b>Fixed.</b> Split into two. A goodwill credit note is <code>DR Sales Returns &amp; Allowances / DR Output Tax (mirrors the original) / CR AR</code>. A write-off is <code>DR Bad Debt Expense (or Allowance) gross / CR AR gross</code>, with the tax reclassified only under claimed bad-debt relief, [manual]. "Goodwill Allowance" removed; intake E and the gates reason row reworded.</p>
+<p class="basis"><b>Basis:</b> ASC 606 and IFRS 15 (a concession to a customer reduces the transaction price); ASC 326 for credit losses; VAT/GST credit-note and bad-debt relief rules.</p>
+<span class="where">references/method.md · Step 1, Step 4 · SKILL.md intake E · references/gates.md</span>
+</div></div>
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H2 — A refund of a credit already on account reversed revenue and tax a second time</h3>
+<p>The single refund template, <code>DR Sales Returns $net / DR Tax $tax / CR Cash $gross</code>, is right only for a direct refund. When a credit memo was issued first, the refund of that balance must clear A/R; following the template reverses revenue and tax twice and leaves A/R in credit.</p>
+<p class="fix"><b>Fixed.</b> Two forms: a refund of a credit or overpayment already on account is <code>DR AR / CR Cash</code>; the existing template stays for a direct refund with no prior credit memo. Before proposing a refund the skill checks for an existing credit memo or unapplied payment. The overpayment edge case now debits A/R (or Customer Deposits if reclassified).</p>
+<p class="basis"><b>Basis:</b> Double-entry practice: a refund settles the receivable the credit memo created; standard bookkeeping practice.</p>
+<span class="where">references/method.md · Step 4 · references/edge-cases.md</span>
+</div></div>
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H3 — The over-credit test read a balance the credit had already reduced</h3>
+<p>"Confirm the credit amount ≤ the invoice balance" compared a recorded credit with what was left after it, so it passed for the wrong reason, and a later price adjustment on a paid invoice showed as an unapproved over-credit.</p>
+<p class="fix"><b>Fixed.</b> The test is now credits to date (this one plus earlier ones) ≤ the original invoice amount. The balance before the credit decides whether it is applied or becomes a refund or credit on account; neither is an exception. Matching wording in edge-cases.md, Sheet 5, overview.md, gates.md and the card.</p>
+<p class="basis"><b>Basis:</b> Standard credit-control practice: total credits may not exceed the amount invoiced.</p>
+<span class="where">references/method.md · Step 2 · SKILL.md D, H, Stage 4</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — Pro-rata tax reversal was wrong on mixed-rate invoices</h3>
+<p>"For partial credits → reverse proportional tax" reclaims output tax that was never charged when the credited line was zero-rated or exempt.</p>
+<p class="fix"><b>Fixed.</b> Partial credits reverse tax at the rate of the line(s) credited; pro-rata only for a whole-invoice percentage reduction, and said so.</p>
+<p class="basis"><b>Basis:</b> VAT/GST credit-note rules: the adjustment follows the rate charged on the supply credited.</p>
+<span class="where">references/method.md · Step 3</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — The unapplied-credit register used date-bounded searches and missed old credits</h3>
+<p>A search limited to the review period finds only credits dated in it; old unapplied credits are the ones that matter, so the "vendor credits not taken" figure was understated and presented as complete.</p>
+<p class="fix"><b>Fixed.</b> The population is the A/R and A/P aging detail at period end, filtered to credit memos, vendor credits and unapplied payments; searches only enrich rows. Without aging detail the register is labelled "credits dated in [period] only".</p>
+<p class="basis"><b>Basis:</b> Standard A/R and A/P aging practice: open items are listed as at a date, whatever their age.</p>
+<span class="where">references/method.md · Step 5</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — Every chargeback was reversed to revenue at once</h3>
+<p>The template booked every chargeback as a revenue and tax reversal, whether still disputed (and possibly won back) or a fraud loss on a sale that did happen.</p>
+<p class="fix"><b>Fixed.</b> Intake B asks disputed, accepted or fraud loss. Disputed: a chargeback receivable, no revenue reversal. Accepted dispute: the existing template. Fraud loss: a loss entry with the tax treatment [manual], as for a write-off.</p>
+<p class="basis"><b>Basis:</b> Card-network chargeback and representment process; ASC 606 variable consideration; bad-debt relief rules for the fraud case.</p>
+<span class="where">SKILL.md intake B · references/method.md · Step 4</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M4 — Credits issued after period end for sales before it were not considered for accrual</h3>
+<p>The edge case said to "post to the credit's period unless materiality forces a prior-period adjustment" — mixing a cut-off accrual with error correction.</p>
+<p class="fix"><b>Fixed.</b> Post at the credit's own date; for an earlier period still open, propose a refund-liability accrual for the user to decide; restate a prior period only to correct an error.</p>
+<p class="basis"><b>Basis:</b> ASC 606 and IFRS 15 refund liability; ASC 855 subsequent events; ASC 250 and IAS 8 for prior-period errors.</p>
+<span class="where">references/edge-cases.md · references/method.md chargeback</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M5 — Unapplied vendor credits were called money owed without checking with the vendor</h3>
+<p>"These are money you are owed and have not taken" — many are duplicate entries, credits already refunded, or for vendors no longer used, which the books alone cannot show.</p>
+<p class="fix"><b>Fixed.</b> Reworded to credits recorded and not yet used, to be confirmed with the supplier's statement before claiming; "Confirm with vendor statement" is the first action on Sheet 4 for credits older than one billing cycle. overview.md qualified.</p>
+<p class="basis"><b>Basis:</b> Standard accounts-payable practice: agree vendor credits to the supplier statement before claiming them.</p>
+<span class="where">references/method.md · Step 5, Sheet 4 · references/overview.md</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · 2 fixed</span><div class="body">
+<h3>Two labelling and edge-case corrections</h3>
+<ul class="lows">
+<li><b>L1 · [gated] used to mean "partly manual".</b> The type row was "Required — [gated]", though [gated] means an approval-gated read tool. <i>Fixed:</i> "[auto] for the document type; [manual] for the reason", and the same misuse on item cost relabelled [auto].<span class="basis">Basis: the skill's own Gate 2 definition of the verdicts.</span></li>
+<li><b>L2 · A cross-currency credit the books do not allow.</b> The edge case described a credit in a different currency from its invoice, which cannot be applied. <i>Fixed:</i> Issue it in the invoice currency, apply at the original rate, realised FX gain or loss on application; a different-currency credit is flagged.<span class="basis">Basis: ASC 830 and IAS 21 on realised exchange differences; standard accounting-software behaviour.</span></li>
+</ul>
+<span class="where">references/method.md · references/gates.md · references/edge-cases.md · 900f739</span>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <b>31 skills, 0 failures</b> (<code>.github/validate-skill.sh skills</code>, run 27 Oct 2026).</span></li>
+    <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its 7 reference files resolves, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, Steps 0–7, exists as a heading in method.md, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>The description is <b>1019 characters</b>, under the 1,024 limit, third person, and names the upload path.</span></li>
+    <li><span class="ok">PASS</span><span>Content kept at the split: <b>495 of 495</b> original content lines present in references/, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, "What is right": the document is kept apart from the reason, and the reason is never inferred or defaulted.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: tax on a credit is its own line, checked against the original invoice's tax.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: applying a credit is a sub-ledger event with no second journal entry, stated plainly and correctly.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: vendor credits reverse the account the original bill was coded to; restocking fees are a separate line; damaged returns come back at net realisable value.</span></li>
+    <li><span class="ok">PASS</span><span>Audit: applying one entity's credit against another entity's invoice is treated as intercompany, not an application.</span></li>
+  </ul>
+  <p class="gap"><b>Not yet tested:</b> a live run against a connected company file with real credits, refunds and a payment processor. Tool names were not checked against a live catalogue in this pass. The M2 fix depends on an aging-detail read being listed at Gate 2, which was not confirmed; the split report's open notes (Gate 3 lists four credit types where Step 1 has seven rows; <code>get-bill</code> is hyphenated beside underscored siblings) were not acted on.</p>
+</section>
+
+<footer>On branch claude/trusting-ramanujan-8k8te1 of MosoFin/mosofin-finance-skills, not yet merged to main. Cross-references to unshipped skills removed in 0fc0da3; card split in 34adf3c; Gate 1 cross-entity pointer fixed in 14f616a; audit fixes in 900f739 (27 Oct 2026). Earlier: the approved=true read limit d86fa27, the spreadsheet ask-first sentence 4d5637c. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>
