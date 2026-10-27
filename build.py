@@ -490,6 +490,7 @@ def voice_problems(outs):
         if not re.match(r"skills/[^/]+/(plain|learn)\.html$", rel): continue
         t = re.sub(r'<script type="application/ld\+json">.*?</script>|<style>.*?</style>|<!-- seo:start.*?seo:end -->|<blockquote>.*?</blockquote>', "", h, flags=re.S)
         t = re.sub(r'\bq:"(?:[^"\\]|\\.)*"', 'q:""', t)
+        t = re.sub(r'\bw:"references/[^"]*"', 'w:""', t)   # a where label quotes a skill heading word for word, dashes included
         n = len(re.findall(r" — ", t))
         if n: bad.append(f"{rel}: {n} em dash(es) in prose. Use a comma, colon, brackets or a full stop; quoted skill rules are exempt")
         words = [w for w in BANNED if re.search(r"\b" + w + r"\w*", re.sub(r"<[^>]+>", " ", t), re.I)]
