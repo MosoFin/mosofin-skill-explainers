@@ -315,13 +315,14 @@
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks five questions before it looks at anything</h2>
+  <h2>It asks five questions before it looks at anything, and one optional sixth</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files and the checks are the same. No subscription needed.</div></li>
     <li><div class="q">Which payment app: Stripe, Square or PayPal?</div><div class="why">Each one sends its money differently.</div></li>
     <li><div class="q">Which month?</div><div class="why">It never assumes a period.</div></li>
     <li><div class="q">Does your bookkeeper record each sale, or one entry per payout?</div><div class="why">Not sure? It will show you what's in your books, and you decide.</div></li>
     <li><div class="q">Does your payment app ever hold money back?</div><div class="why">Held money is still yours, so it's shown separately.</div></li>
+    <li><div class="q">Optional: what fee rate does your contract set?</div><div class="why">With it, the skill checks the fees against your contract. Without it, it still watches the fee rate month to month and says it skipped the contract check.</div></li>
   </ol>
   <p>Then it reads your answers back: <i>"Checking Stripe against your books for September. Go ahead?"</i> It waits for your yes.</p>
 </section>
@@ -336,7 +337,7 @@
       <ul>
         <li>It reads your books directly, with no exporting</li>
         <li>If Stripe is connected too, it reads both sides</li>
-        <li>You'll still be asked for the bank statement, the one thing it can't see</li>
+        <li>You'll still be asked for the bank statement, the one thing it can't see. Without it, payouts are matched only to the deposits in your books, and the result says so</li>
       </ul>
     </div>
     <div class="card">
@@ -345,7 +346,7 @@
       <ul>
         <li><b>Payout report</b> from your payment app's dashboard (CSV)</li>
         <li><b>Your books</b> for sales, fees and the waiting-room account, as an export or trial balance</li>
-        <li><b>Bank statement</b> for the month (PDF or CSV)</li>
+        <li><b>Bank statement</b> for the month (PDF or CSV), strongly recommended: it is the only proof the payouts arrived</li>
       </ul>
     </div>
   </div>
@@ -381,7 +382,7 @@
     <dt>Payout</dt><dd>The lump sum your payment app sends to your bank, usually covering many sales at once<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
     <dt>Processing fee</dt><dd>What the payment app keeps for handling a card payment<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup><sup class="c"><a href="#src4" aria-label="source 4">4</a></sup><sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. A real business cost.</dd>
     <dt>Chargeback</dt><dd>A customer disputes a charge with their card issuer. The payment is reversed, and the amount plus a dispute fee is taken from your balance<sup class="c"><a href="#src10" aria-label="source 10">10</a></sup>.</dd>
-    <dt>Waiting room</dt><dd>Money the payment app owes you but hasn't sent yet. Accountants call it a clearing account<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. It should empty out every few days; if it keeps growing, something's wrong. That last rule is bookkeeping practice, not a published standard.</dd>
+    <dt>Waiting room</dt><dd>Money the payment app owes you but hasn't sent yet. Accountants call it a clearing account<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. In QuickBooks it is often Undeposited Funds or Payments to deposit, so the skill finds it by where your payment-app sales land, not by its name. It should empty out every few days; if it keeps growing, something's wrong. That last rule is bookkeeping practice, not a published standard.</dd>
     <dt>Reserve</dt><dd>Money the payment app holds back for a set time to cover possible refunds and disputes. It's paid out when the term ends, minus anything it had to cover<sup class="c"><a href="#src11" aria-label="source 11">11</a></sup>.</dd>
   </dl>
 </section>
@@ -408,7 +409,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. It describes the current version, which asks five questions first and accepts uploads. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. It describes the current version, which asks five questions first, plus an optional one about your fee rate, and accepts uploads. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 

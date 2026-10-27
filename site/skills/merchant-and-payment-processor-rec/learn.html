@@ -286,7 +286,7 @@
 <section>
   <span class="label">How it thinks</span>
   <h2>Five rules the whole skill runs on</h2>
-  <p class="muted">Everything on this page is one of these rules applied to a bigger situation. Tax and fee adjustments are left out of the examples to keep the arithmetic short; the skill handles them too.</p>
+  <p class="muted">Everything on this page is one of these rules applied to a bigger situation. The examples assume no sales tax and no fee adjustments, to keep the arithmetic short. Where there is tax, gross means what customers were charged, tax included, and the payment app pays the tax out to you inside the payout; the skill splits it out in your books instead of deducting it from the payout.</p>
   <div class="rules" id="rules"></div>
 </section>
 
@@ -310,16 +310,18 @@
     </div>
     <div class="inputs">
       <fieldset><legend>From your payment app</legend>
-        <label class="field"><span>Gross sales charged</span><input data-k="gross" inputmode="decimal"></label>
+        <label class="field"><span>Gross charged to customers, tax included</span><input data-k="gross" inputmode="decimal"></label>
+        <label class="field"><span>Sales tax inside those charges, after refunds</span><input data-k="tax" inputmode="decimal"></label>
         <label class="field"><span>Refunds</span><input data-k="refunds" inputmode="decimal"></label>
         <label class="field"><span>Chargebacks</span><input data-k="cb" inputmode="decimal"></label>
         <label class="field"><span>Processing fees</span><input data-k="fees" inputmode="decimal"></label>
+        <label class="field"><span>Adjustments (+ / −)</span><input data-k="adj" inputmode="decimal"></label>
         <label class="field"><span>Payouts sent to your bank</span><input data-k="payouts" inputmode="decimal"></label>
         <label class="field"><span>Balance it still holds at month end</span><input data-k="appbal" inputmode="decimal"></label>
       </fieldset>
       <fieldset><legend>From your books</legend>
         <label class="field"><span>Waiting-room balance at start of month</span><input data-k="opening" inputmode="decimal"></label>
-        <label class="field"><span>Sales recorded (after refunds)</span><input data-k="sales" inputmode="decimal"></label>
+        <label class="field"><span>Sales recorded from this payment app (after refunds, before tax)</span><input data-k="sales" inputmode="decimal"></label>
         <label class="field"><span>Processing fees recorded</span><input data-k="feesbk" inputmode="decimal"></label>
       </fieldset>
     </div>
@@ -333,7 +335,7 @@
       <label class="field"><span>Number of charges in the month</span><input data-k="charges" inputmode="numeric"></label>
     </fieldset>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">Published US rates as listed by Stripe<sup class="c"><a href="#src1">1</a></sup>, Square<sup class="c"><a href="#src5">5</a></sup> and PayPal<sup class="c"><a href="#src7">7</a></sup>, checked 20 October 2026. Your contract may differ, and international cards, currency conversion and other plans cost more. The skill says "revenue ≈ net payouts" and "a near-empty fee account" without fixing a number. This page treats <b>within 1%</b> as "≈" and <b>under 10% of the actual fees</b> as "near-empty". Your own judgement may differ.</p>
+    <p class="fine">Published US rates as listed by Stripe<sup class="c"><a href="#src1">1</a></sup>, Square<sup class="c"><a href="#src5">5</a></sup> and PayPal<sup class="c"><a href="#src7">7</a></sup>, checked 20 October 2026. Your contract may differ, and international cards, currency conversion and other plans cost more. The skill says "processor-channel revenue ≈ net payouts" and "a near-empty fee account" without fixing a number. This page treats <b>within 1%</b> as "≈" and <b>under 10% of the actual fees</b> as "near-empty". Your own judgement may differ.</p>
   </div>
 </section>
 
@@ -349,8 +351,8 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>MosoFin as the data source, or upload? Which payment app? Which month? Each sale or one entry per payout? Any money held back?</div>
-    <div><b>Needs</b>Your books, connected or exported, the payment app's payout report, and the bank statement.</div>
+    <div><b>Asks first</b>MosoFin as the data source, or upload? Which payment app? Which month? Each sale or one entry per payout? Any money held back? Optionally, your contracted fee rate, to check fees against it.</div>
+    <div><b>Needs</b>Your books, connected or exported, and the payment app's payout report. The bank statement is strongly recommended: without it, payouts are tied only to the deposits in your books, and the result says so.</div>
     <div><b>Gives back</b>Does it match, what's off and why, suggested corrections, and where every number came from.</div>
     <div><b>Never</b>Changes your books, moves money, or guesses a number. It reads nothing before you say yes.</div>
   </div>
@@ -379,18 +381,18 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 
 const RULES = [
   { id:"1", kind:"", title:"Break every payout into its parts",
-    formula:"Gross charges\n− refunds − chargebacks − fees\n= net settled to you",
-    plain:"Build this from the payment app, build it again from your books, and compare. That comparison is the reconciliation.",
+    formula:"Gross charged to customers, tax included\n− refunds − chargebacks − fees\n± adjustments\n= net settled to you",
+    plain:"Build this from the payment app, build it again from your books, and compare. That comparison is the reconciliation. Sales tax stays inside the payout; it comes off only where a marketplace collects and pays the tax for you.",
     where:"method.md · Step 2", cites:[2,3],
     backed:"Stripe defines each transaction's net as its gross amount minus its fee, and its payout report splits every payout into charges, refunds and fees." },
   { id:"2", kind:"", title:"The waiting room should empty out",
-    formula:"Opening balance\n+ gross charges − refunds − chargebacks − fees\n− payouts to your bank\n= closing balance",
-    plain:"The closing balance should match what the payment app says it still holds. Anything left too long is a warning.",
+    formula:"Opening balance\n+ gross charged (sales + tax)\n− refunds − chargebacks − fees ± adjustments\n− moved to a reserve + released from a reserve\n− payouts to your bank\n= closing balance",
+    plain:"The closing balance should match what the payment app says it still holds. Anything left too long is a warning. In QuickBooks the waiting room is often Undeposited Funds or Payments to deposit, so the skill finds it by where the sales land, not by its name.",
     where:"method.md · Step 4", cites:[3,4],
     backed:"Stripe's own balance summary uses the same roll-forward (starting balance, plus activity, minus payouts) and lists what is still unsettled at the end date." },
   { id:"3", kind:"", title:"Sales booked net of fees",
-    formula:"Sales ≈ payouts\nand fees ≈ $0\n→ sales were recorded net",
-    plain:"Profit still comes out right, which is why nobody notices. Sales and costs are both understated.",
+    formula:"Sales recorded from the payment app ≈ its payouts\nand fees ≈ $0\n→ sales were recorded net",
+    plain:"Profit still comes out right, which is why nobody notices. Sales and costs are both understated. The test uses only the sales that came through the payment app, not your total sales.",
     where:"edge-cases.md · Revenue recorded net of fees", cites:[8,9],
     backed:"For US tax reporting, the IRS treats gross receipts as the payments before fees and refunds, and has fees subtracted separately rather than left out of sales." },
   { id:"W", kind:"w", title:"Watch the trends",
@@ -414,7 +416,8 @@ const LEVELS = [
     situation:"A customer pays you $100 by card. Stripe keeps its fee and sends you the rest.",
     facts:["Stripe's standard US card price is 2.9% + 30¢ per charge "+C(1)+", so the fee on $100 is $2.90 + $0.30 = $3.20.","Stripe records net as the amount minus the fee "+C(2)+"."],
     visual:{type:"wf", start:["Customer pays",100], steps:[["Stripe's fee",-3.20]], end:["Stripe pays you",96.80], dec:2},
-    rule:{q:"Gross customer charges … Less: Processor fees … Equals: Net settled to entity", w:"method.md · Step 2"},
+    rule:{q:"Gross customer charges (tax included) … Less: Processor fees … Equals: Net settled to entity", w:"method.md · Step 2"},
+    rule2:{q:"Gross means the amount charged to customers, tax included. … so tax stays inside the settled amount. Deduct tax only for transactions where the processor or marketplace remits it", w:"method.md · Step 2"},
     math:[["Gross charge","$100.00"],["Fee: 2.9% × $100 + 30¢","$3.20"],["= net settled","$96.80",1],["Payout that reached the bank","$96.80"],["Difference","$0.00",1]],
     verdict:["ok","Ties. The payout is exactly the sale minus the published fee."] },
 
@@ -423,7 +426,7 @@ const LEVELS = [
     situation:"August on Stripe: 100 charges totalling $48,000, $1,200 refunded and $300 lost to chargebacks. Stripe paid $45,078 into your bank.",
     facts:["At 2.9% + 30¢ "+C(1)+", 100 charges on $48,000 cost $1,392 + $30 = $1,422.","Stripe's payout report breaks every payout into charges, refunds and fees "+C(3)+", the same parts the skill rebuilds from your books."],
     visual:{type:"wf", start:["Gross charges",48000], steps:[["Refunds",-1200],["Chargebacks",-300],["Processing fees",-1422]], end:["Net settled",45078], dec:0},
-    rule:{q:"each of A through F has a corresponding GL account, so the same decomposition can be built from the books and the two compared. That comparison is the reconciliation", w:"method.md · Step 2"},
+    rule:{q:"each component has a corresponding GL account, so the same decomposition can be built from the books and the two compared. That comparison is the reconciliation", w:"method.md · Step 2"},
     math:[["Gross charges","$48,000.00"],["− refunds","$1,200.00"],["− chargebacks","$300.00"],["− fees: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["= net settled","$45,078.00",1],["Payouts received in August","$45,078.00"],["Difference","$0.00",1],["Fee rate: 1,422 ÷ 48,000","2.96%"]],
     verdict:["ok","Ties to the cent. The fee rate, 2.96%, is just above 2.9% because of the 30¢ per charge, which is exactly what the published price predicts."] },
 
@@ -438,26 +441,28 @@ const LEVELS = [
 
   { n:4, title:"The mistake: sales booked net of fees",
     chips:["Stripe","Your books"], src:"Rule 3", cites:[8,9],
-    situation:"Same clean August as Level 2, but your bookkeeper recorded each bank deposit as the sale. The books show sales of $45,078 and no processing fees at all.",
+    situation:"Same clean August as Level 2, but your bookkeeper recorded each Stripe deposit as the sale. The books show Stripe sales of $45,078 and no processing fees at all. Sales invoiced to customers directly are left out of the test.",
     facts:["Payment processors report gross payments before any fees or refunds "+C(8)+".","The IRS has you report gross receipts and subtract fees and refunds separately "+C(9)+". The fees are a cost, not missing sales."],
     visual:{type:"compare",
       head:["","Should be","Your books"],
       rows:[["Gross sales","$48,000","—"],["Refunds & chargebacks","($1,500)","—"],["Net sales","$46,500",["$45,078","bad"]],["Processing fees","$1,422",["$0","bad"]],["Profit from these sales","$45,078","$45,078"]]},
-    rule:{q:"Revenue ≈ net payouts, a near-empty fee account, or no clearing account at all. Understates revenue and expense equally, so profit hides it.", w:"edge-cases.md · Revenue recorded net of fees"},
-    math:[["Sales in your books","$45,078.00"],["Payouts that month","$45,078.00"],["Sales ≈ payouts?","yes"],["Fees in your books","$0.00"],["Fee account near-empty?","yes",1],["Net sales should be: 48,000 − 1,500","$46,500.00"],["Understated by: 46,500 − 45,078","$1,422.00"],["…which is exactly the fees","$1,422.00",1]],
-    verdict:["flag","Sales are $1,422 too low and $1,422 of fees are invisible. Profit is the same either way, which is why it goes unnoticed."] },
+    rule:{q:"Processor-channel revenue ≈ net payouts, a near-empty fee account, or no clearing account at all. Understates revenue and expense equally, so profit hides it.", w:"edge-cases.md · Revenue recorded net of fees"},
+    rule2:{q:"compare this population, not total P&L revenue, and say which population was used", w:"method.md · Step 7"},
+    math:[["Sales recorded from Stripe deposits","$45,078.00"],["Payouts that month","$45,078.00"],["Sales ≈ payouts?","yes"],["Fees in your books","$0.00"],["Fee account near-empty?","yes",1],["Net sales should be: 48,000 − 1,500","$46,500.00"],["Understated by: 46,500 − 45,078","$1,422.00"],["…which is exactly the fees","$1,422.00",1],["Proposed: debit Merchant Processing Fees, credit Revenue","$1,422.00"],["Net sales after the correction: 45,078 + 1,422","$46,500.00",1]],
+    verdict:["flag","Sales are $1,422 too low and $1,422 of fees are invisible. Profit is the same either way, which is why it goes unnoticed. The skill proposes the correcting entry, debit Merchant Processing Fees $1,422 and credit Revenue $1,422, and a person posts it."] },
 
   { n:5, title:"Early warnings: fee rate and payout delay",
     chips:["Stripe","3 months"], src:"Watch the trends", cites:[1,4],
-    situation:"Three months on Stripe, same contract. June and July cost exactly the published price. In August Stripe charged $1,632, and payouts started taking 5 business days instead of 2.",
+    situation:"Three months on Stripe, same contract, and your contracted rate is the published price, which you gave the skill at the start. June and July cost exactly that. In August Stripe charged $1,632, and payouts started taking 5 business days instead of 2.",
     facts:["The published price, 2.9% + 30¢ "+C(1)+", sets the expected fee for any month: 2.9% of gross plus 30¢ per charge.","Stripe's US settlement timing is 2 business days "+C(4)+", so 5 is well outside the norm."],
     visual:{type:"table",
       head:["Month","Gross","Charges","Expected fee","Charged","Payout delay"],
       rows:[["June","$44,000","92","$1,303.60","$1,303.60","2 days"],["July","$46,000","96","$1,362.80","$1,362.80","2 days"],["August","$48,000","100","$1,422.00",["$1,632.00","bad"],["5 days","bad"]]]},
     rule:{q:"A lengthening lag is the earliest visible sign of a payout pause or a risk review", w:"method.md · Step 3"},
     rule2:{q:"The fee rate has drifted with no contract change … A measurable Step 9 exception.", w:"edge-cases.md"},
-    math:[["June expected: 2.9% × 44,000 + 30¢ × 92","$1,303.60"],["July expected: 2.9% × 46,000 + 30¢ × 96","$1,362.80"],["August expected: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["August charged","$1,632.00"],["Overcharge against the published price","$210.00",1],["August fee rate: 1,632 ÷ 48,000","3.40%"]],
-    verdict:["flag","Two flags. Fees ran $210 over the published price, and payouts slowed from 2 business days to 5. Worth a call to Stripe before a hold builds up."] },
+    rule3:{q:"Effective fee rate by period (trend) — [auto] … Fees vs contracted rate — [manual], only if the user supplied the contracted rate (intake F)", w:"method.md · Step 9"},
+    math:[["June expected: 2.9% × 44,000 + 30¢ × 92","$1,303.60"],["July expected: 2.9% × 46,000 + 30¢ × 96","$1,362.80"],["August expected: 2.9% × 48,000 + 30¢ × 100","$1,422.00"],["August charged","$1,632.00"],["Overcharge against the contracted rate","$210.00",1],["June fee rate: 1,303.60 ÷ 44,000","2.96%"],["July fee rate: 1,362.80 ÷ 46,000","2.96%"],["August fee rate: 1,632 ÷ 48,000","3.40%",1]],
+    verdict:["flag","Two flags. The fee rate jumped from 2.96% to 3.40%, which is $210 over the contracted rate, and payouts slowed from 2 business days to 5. Without the contracted rate the skill still flags the jump in the trend. Worth a call to Stripe before a hold builds up."] },
 
   { tier:"Cross source · several payment apps, or several companies" },
   { n:6, title:"Stripe, Square and PayPal into one bank",
@@ -546,7 +551,7 @@ function renderLevels(){
        <div class="block"><span class="label">The situation</span><p>${esc(L.situation)}</p></div>
        <div class="block"><span class="label">The facts it rests on</span><div class="facts">${L.facts.map(f=>`<div class="fact">${f}</div>`).join("")}</div></div>
        <div class="block"><span class="label">What the skill sees</span>${vis}</div>
-       <div class="block"><span class="label">The rule it applies</span>${rule(L.rule)}${L.rule2?rule(L.rule2):""}</div>
+       <div class="block"><span class="label">The rule it applies</span>${rule(L.rule)}${L.rule2?rule(L.rule2):""}${L.rule3?rule(L.rule3):""}</div>
        <details><summary>Check it yourself</summary><div class="math num">${math}</div></details>
        <div class="verdict ${L.verdict[0]}"><span class="ic">${ic}</span><span>${esc(L.verdict[1])}</span></div>`));
   });
@@ -554,28 +559,28 @@ function renderLevels(){
 
 /* --- calculator: Rules 1, 2 and 3 on the reader's own numbers --- */
 const PRESETS = {
-  clean:  {gross:48000,refunds:1200,cb:300,fees:1422,payouts:45078,appbal:0,   opening:0,   sales:46500,feesbk:1422,charges:100},
-  timing: {gross:48000,refunds:1200,cb:300,fees:1422,payouts:44598,appbal:2580,opening:2100,sales:46500,feesbk:1422,charges:100},
-  net:    {gross:48000,refunds:1200,cb:300,fees:1422,payouts:45078,appbal:0,   opening:0,   sales:45078,feesbk:0,charges:100},
-  blank:  {gross:"",refunds:"",cb:"",fees:"",payouts:"",appbal:"",opening:"",sales:"",feesbk:"",charges:""},
+  clean:  {gross:48000,tax:0,refunds:1200,cb:300,fees:1422,adj:0,payouts:45078,appbal:0,   opening:0,   sales:46500,feesbk:1422,charges:100},
+  timing: {gross:48000,tax:0,refunds:1200,cb:300,fees:1422,adj:0,payouts:44598,appbal:2580,opening:2100,sales:46500,feesbk:1422,charges:100},
+  net:    {gross:48000,tax:0,refunds:1200,cb:300,fees:1422,adj:0,payouts:45078,appbal:0,   opening:0,   sales:45078,feesbk:0,charges:100},
+  blank:  {gross:"",tax:"",refunds:"",cb:"",fees:"",adj:"",payouts:"",appbal:"",opening:"",sales:"",feesbk:"",charges:""},
 };
 const inputs=[...document.querySelectorAll("[data-k]")];
 const num = k => { const v=parseFloat(String(document.querySelector(`[data-k="${k}"]`).value).replace(/[$,\s]/g,"")); return isFinite(v)?v:0; };
 function load(p){ inputs.forEach(i=>i.value=PRESETS[p][i.dataset.k]); document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p)); run(); }
 function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
 function run(){
-  const g=num("gross"), r=num("refunds"), c=num("cb"), f=num("fees"), p=num("payouts"), ab=num("appbal"), o=num("opening"), s=num("sales"), fb=num("feesbk");
+  const g=num("gross"), t=num("tax"), r=num("refunds"), c=num("cb"), f=num("fees"), a=num("adj"), p=num("payouts"), ab=num("appbal"), o=num("opening"), s=num("sales"), fb=num("feesbk");
   const box=document.getElementById("results");
   if(!g){ box.innerHTML=res("", "Waiting", "—", "Enter at least the gross sales to start."); return; }
-  const net=g-r-c-f, close=o+g-r-c-f-p, diff=close-ab, rate=f/g*100, netSales=g-r-c;
-  let h = res("ok","Rule 1 · net settled", fmt(net), `${fmt(g)} − ${fmt(r+c)} refunds & chargebacks − ${fmt(f)} fees`);
+  const net=g-r-c-f+a, close=o+g-r-c-f+a-p, diff=Math.round((close-ab)*100)/100, rate=f/g*100, netSales=g-r-c-t;
+  let h = res("ok","Rule 1 · net settled", fmt(net), `${fmt(g)} − ${fmt(r+c)} refunds & chargebacks − ${fmt(f)} fees${a?` ${a>0?"+":"−"} ${fmt(Math.abs(a))} adjustments`:""}${t?`. The ${fmt(t)} of sales tax stays inside the payout; it is not deducted`:""}`);
   h += Math.abs(diff)<0.005
     ? res("ok","Rule 2 · waiting room", fmt(close), "Matches what the payment app says it holds.")
     : res("flag","Rule 2 · waiting room", fmt(close), `Payment app says ${fmt(ab)}; that is ${fmt(Math.abs(diff))} ${diff>0?"more in your books":"less in your books"}. Find the missing piece.`);
   const near = p>0 && Math.abs(s-p)<=0.01*p, empty = f>0 && fb < 0.10*f;
   if(s && near && empty) h += res("flag","Rule 3 · sales booked net?", "Yes", `Sales ${fmt(s)} ≈ payouts ${fmt(p)}, and fees recorded are ${fmt(fb)}. Sales look ${fmt(Math.max(netSales-s,0))} too low.`);
-  else if(s && Math.abs(s-netSales)<=0.005*netSales) h += res("ok","Rule 3 · sales booked net?", "No", `Sales ${fmt(s)} match gross less refunds and chargebacks (${fmt(netSales)}).`);
-  else if(s) h += res("note","Rule 3 · sales booked net?", "Unclear", `Sales ${fmt(s)} match neither ${fmt(netSales)} (gross after refunds) nor payouts ${fmt(p)}. Look closer.`);
+  else if(s && Math.abs(s-netSales)<=0.005*netSales) h += res("ok","Rule 3 · sales booked net?", "No", `Sales ${fmt(s)} match gross less refunds, chargebacks${t?" and sales tax":""} (${fmt(netSales)}).`);
+  else if(s) h += res("note","Rule 3 · sales booked net?", "Unclear", `Sales ${fmt(s)} match neither ${fmt(netSales)} (gross after refunds${t?" and tax":""}) nor payouts ${fmt(p)}. Look closer.`);
   h += res("", "Fee rate", rate.toFixed(2)+"%", "Compare with your contract and last month.");
   const PLAN={stripe:[.029,.30,1,"Stripe"],square:[.026,.15,5,"Square"],paypal:[.0349,.49,7,"PayPal"]}[document.querySelector('[data-k2="plan"]').value];
   const n=num("charges");

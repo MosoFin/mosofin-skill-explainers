@@ -345,8 +345,8 @@
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
     <div><b>Asks first</b>MosoFin as the data source, or upload? Which account(s)? Which period? The bank statement. When was it last reconciled? How small a difference is worth chasing?</div>
-    <div><b>Needs</b>Your books' cash activity and ending balance, connected or exported, and the bank statement, always. Last month's reconciliation helps.</div>
-    <div><b>Gives back</b>The two ladders, every match with the method that made it, the unmatched items sorted, proposed entries tied to statement lines, and a sign-off line for two different people<sup class="c"><a href="#src7">7</a></sup>.</div>
+    <div><b>Needs</b>Your books' cash activity and ending balance, connected or exported, and the bank statement, always. Last month's reconciliation helps: the skill checks this statement opens where that one ended, carries its open items forward, and checks the books for that closed month haven't changed since. The first days of next month's statement help confirm what has since cleared.</div>
+    <div><b>Gives back</b>The two ladders, every match with the method that made it, the unmatched items sorted, proposed entries each tied to its evidence (a statement line, or the ledger rows and source document for a book error), and a sign-off line for two different people<sup class="c"><a href="#src7">7</a></sup>.</div>
     <div><b>Never</b>Changes your books, marks anything cleared, signs off, calls a book-side total "reconciled", or shows a full account number. It reads nothing before you say yes.</div>
   </div>
 </section>
@@ -417,9 +417,9 @@ const LEVELS = [
     facts:["The IRS lists bank charges not yet recorded as a normal source of difference between the statement and the books "+C(1)+".","A returned deposited item is a cheque you deposited that was sent back because it couldn't be processed against the writer's account "+C(5)+". The bank takes the $300 back out."],
     visual:{type:"wf", start:["Book balance",12180.50], steps:[["Bank fee not recorded",-15],["Interest not recorded",4.50],["Customer cheque returned",-300]], end:["Adjusted book balance",11870], dec:2},
     rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"references/method.md · Step 2"},
-    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"references/method.md · Step 5"},
+    rule2:{q:"Every proposed entry names its evidence: the statement line for bank-originated items, and the GL rows and source document for book errors — an entry proposed without that evidence is a guess.", w:"references/method.md · Step 5"},
     math:[["Book balance","$12,180.50"],["− bank fee (statement line 14 Sep)","$15.00"],["+ interest (statement line 30 Sep)","$4.50"],["− returned deposit (statement line 19 Sep)","$300.00"],["= adjusted book balance","$11,870.00",1],["Adjusted bank balance (Level 1)","$11,870.00"],["Difference","$0.00",1]],
-    verdict:["ok","It ties after three entries the skill proposes, each pointing at its statement line: record the fee, record the interest, reverse the bounced receipt and chase the customer. A person posts them."] },
+    verdict:["ok","It ties after three entries the skill proposes, each pointing at its statement line: record the fee, record the interest, and reverse the bounced receipt back onto the customer's balance (debit Accounts Receivable, credit Cash), not to an expense, so someone chases the customer. A person posts them."] },
 
   { n:3, title:"The $25 that won't go away",
     chips:["Books vs books"], src:"Rule 3", cites:[3],
@@ -447,15 +447,16 @@ const LEVELS = [
 
   { n:5, title:"When timing stops being timing",
     chips:["Aging"], src:"Age the leftovers", cites:[2,4],
-    situation:"At 30 September two items are still outstanding from earlier months: a $980 deposit recorded on 14 August that the bank never credited, and cheque #0988 for $640 written on 2 June and never cashed.",
+    situation:"September's statement opens at the ending balance on the August reconciliation, so the skill loads that reconciliation's three open items and matches the statement against them first. Cheque #1019 for $410, written on 29 August, cleared on 3 September. Two items are still outstanding at 30 September: a $980 deposit recorded on 14 August that the bank never credited, and cheque #0988 for $640 written on 2 June and never cashed.",
     facts:["Deposits must generally be available by the second business day "+C(2)+". A deposit missing after 33 business days is not timing.","A cheque nobody cashes becomes unclaimed property after a state-set dormancy period, often a year or more, and the holder must then turn it over to the state "+C(4)+"."],
     visual:{type:"table",
       head:["Item","Recorded","Age at 30 Sep","Threshold","Status"],
-      rows:[["Deposit $980, \"Till, 14 Aug\"","14 Aug","33 business days","10 business days",["escalate","bad"]],["Cheque #0988 $640, J. Ortega","2 Jun","120 days","90 days",["escalate","bad"]],["Deposit $1,250, \"Till, 30 Sep\"","30 Sep","0 business days","10 business days","timing"],["Cheque #1043 $1,860","28 Sep","2 days","90 days","timing"]]},
+      rows:[["Cheque #1019 $410, brought forward","29 Aug","cleared 3 Sep","—","no entry"],["Deposit $980, \"Till, 14 Aug\"","14 Aug","33 business days","10 business days",["escalate","bad"]],["Cheque #0988 $640, J. Ortega","2 Jun","120 days","90 days",["escalate","bad"]],["Deposit $1,250, \"Till, 30 Sep\"","30 Sep","0 business days","10 business days","timing"],["Cheque #1043 $1,860","28 Sep","2 days","90 days","timing"]]},
     rule:{q:"Deposits-in-transit older than 10 business days escalated — money banked that the bank has not credited after two weeks is usually a lost deposit or a booking error, not timing", w:"references/method.md · Quality checks"},
     rule2:{q:"A duplicate payment about to be reissued — an old outstanding cheque that is really lost will be reissued, and if the original then clears the entity pays twice. Escalate cheques over 90 days rather than rolling them forward.", w:"references/edge-cases.md"},
-    math:[["14 Aug → 30 Sep, weekdays only","33 business days"],["Skill's threshold","10 business days"],["Over by","23 business days",1],["2 Jun → 30 Sep","120 days"],["Skill's threshold","90 days"],["Over by","30 days",1]],
-    verdict:["flag","Two escalations with an owner and a date each. The $980 is probably a deposit that never happened or was booked to the wrong account; the $640 cheque should be stopped before anyone reissues it, and if it is never claimed the state eventually gets it."] },
+    rule3:{q:"Agree the opening — [gated]: the statement's opening balance must equal the statement ending balance on the prior reconciliation … Load the prior reconciliation's outstanding cheques and deposits in transit as brought-forward items — they are matched first in Step 3. … Prior-period item cleared this period — a brought-forward cheque or deposit; no entry", w:"references/method.md · Steps 1 and 4"},
+    math:[["Cheque #1019: in the August books, on the 3 Sep statement line","no entry",1],["14 Aug → 30 Sep, weekdays only","33 business days"],["Skill's threshold","10 business days"],["Over by","23 business days",1],["2 Jun → 30 Sep","120 days"],["Skill's threshold","90 days"],["Over by","30 days",1]],
+    verdict:["flag","Cheque #1019 needs no entry: the August books already recorded it, and the September statement shows it clearing. Two escalations with an owner and a date each. The $980 is probably a deposit that never happened or was booked to the wrong account; the $640 cheque should be stopped before anyone reissues it, and if it is never claimed the state eventually gets it."] },
 
   { tier:"Cross account · cross company" },
   { n:6, title:"A transfer recorded once",
@@ -542,7 +543,7 @@ function renderLevels(){
        <div class="block"><span class="label">The situation</span><p>${esc(L.situation)}</p></div>
        <div class="block"><span class="label">The facts it rests on</span><div class="facts">${L.facts.map(f=>`<div class="fact">${f}</div>`).join("")}</div></div>
        <div class="block"><span class="label">What the skill sees</span>${vis}</div>
-       <div class="block"><span class="label">The rule it applies</span>${rule(L.rule)}${L.rule2?rule(L.rule2):""}</div>
+       <div class="block"><span class="label">The rule it applies</span>${rule(L.rule)}${L.rule2?rule(L.rule2):""}${L.rule3?rule(L.rule3):""}</div>
        <details><summary>Check it yourself</summary><div class="math num">${math}</div></details>
        <div class="verdict ${L.verdict[0]}"><span class="ic">${ic}</span><span>${esc(L.verdict[1])}</span></div>`));
   });

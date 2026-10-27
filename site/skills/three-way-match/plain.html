@@ -276,9 +276,9 @@
         <div class="row"><span>Ordered: 100 × $42.00</span><span class="v">$4,200.00</span></div>
         <div class="row"><span>Arrived and accepted</span><span class="v">96 chairs</span></div>
         <div class="row off"><span>Billed: 100 × $43.50</span><span class="v">$4,350.00</span></div>
-        <div class="row same"><span>Pay the matched part: 96 × $42.00</span><span class="v">$4,032.00</span></div>
+        <div class="row same"><span>Owed for what you kept: 96 × $42.00</span><span class="v">$4,032.00</span></div>
       </div>
-      <div class="verdict">Recommendation: pay $4,032, dispute $318: $150 of price and $168 for the four chairs that never stayed. Two exceptions, each with an owner.</div>
+      <div class="verdict">Recommendation: hold the bill. $318 is in dispute: $150 of price and $168 for the four chairs that never stayed. Each difference has an owner, and once the supplier credits it the bill is $4,032.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -304,7 +304,7 @@
   <span class="label">One honest limit</span>
   <h2>It can only match the documents you actually have</h2>
   <p>The invoice is always in your books. The purchase order often is: in QuickBooks Online, purchase orders exist only on the Plus and Advanced plans, and a PO is closed when it's added to a bill<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The delivery record usually isn't: receiving happens in a warehouse, on a clipboard, or nowhere. So the first thing the skill does is count the legs it has.</p>
-  <p>With all three it runs a three-way match. With orders and invoices but no delivery records it runs a two-way match and <b>says so</b>, in the report and in the file name, because the missing leg is the one that proves the goods arrived, and the five tests that depend on it did not run. Without that line, a test that never ran would look like one that passed.</p>
+  <p>With all three it runs a three-way match. With orders and invoices but no delivery records it runs a two-way match and <b>says so</b>, in the report and in the file name, because the missing leg is the one that proves the goods arrived, and the tests that depend on it did not run. Without that line, a test that never ran would look like one that passed. It still checks the quantity billed against the quantity ordered, and it recommends holding a bill for goods until something shows they arrived.</p>
 </section>
 
 <section>
@@ -342,6 +342,7 @@
         <li><b>Purchase order(s)</b>: PDF, spreadsheet or CSV</li>
         <li><b>Delivery record</b>: goods receipt, proof of delivery, or a signed service confirmation</li>
         <li><b>Invoice(s)</b>: PDF, spreadsheet or CSV</li>
+        <li><b>Earlier bills and payments</b> against the same orders, if a supplier bills an order in parts: without them the running total and the duplicate check can't run</li>
         <li>Helpful: your tolerance policy and approval limits, typed into the chat</li>
       </ul>
     </div>
@@ -352,10 +353,10 @@
   <span class="label">What you get back</span>
   <h2>Pay, hold or reject, and why, line by line</h2>
   <div class="gets">
-    <div class="get"><b>A recommendation per invoice</b><span>Pay, Hold or Reject, with the matched amount and the disputed amount. A person acts on it.</span></div>
+    <div class="get"><b>A recommendation per invoice</b><span>Pay, Hold or Reject, with the matched amount and the disputed amount. Any serious exception still open means Hold, and so does a bill for goods with no delivery record. A person acts on it.</span></div>
     <div class="get"><b>Every line, side by side</b><span>Ordered, received and billed quantities; ordered and billed prices; the difference; the tolerance applied; and how the line was matched.</span></div>
-    <div class="get"><b>Every exception, with an owner</b><span>Fifteen kinds, from price creep to a damaged delivery billed in full to an order nobody approved, each with a severity and a next step.</span></div>
-    <div class="get"><b>What only the whole month shows</b><span>A supplier always just inside tolerance; receipts posted in bulk on one date; goods received but never billed, which you owe for and should book<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</span></div>
+    <div class="get"><b>Every exception, with an owner</b><span>Fifteen kinds, from price creep to a damaged delivery billed in full to an order nobody approved, each with a severity and a next step. Payment terms shorter than the order's get a note too.</span></div>
+    <div class="get"><b>What only the whole month shows</b><span>A supplier always just inside tolerance; receipts posted in bulk on one date; goods received but never billed, which you owe for and should book<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>, valued at the order price, with a draft entry to record it.</span></div>
   </div>
 </section>
 
