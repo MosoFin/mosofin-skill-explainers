@@ -370,7 +370,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 
 const RULES = [
   { id:"1", kind:"", title:"Tie the statement to the card liability",
-    formula:"Card liability in the books\n+ charges in books, not yet on statement\n− charges on statement, not yet in books\n+ payments in transit ± FX timing\n= statement closing balance",
+    formula:"Card liability in the books, at the statement closing date\n− charges in books, not yet on statement\n+ charges on statement, not yet in books\n+ payments in transit ± one-sided credits and fees ± FX timing\n= statement closing balance",
     plain:"Every step on that ladder has a name. A difference left over is a charge or a payment nobody has explained, never rounding.",
     where:"references/method.md · Step 2", cites:[2],
     backed:"QuickBooks' own reconcile screen does the same for a credit card account, and finishes only at a difference of $0.00." },
@@ -402,11 +402,11 @@ const LEVELS = [
   { tier:"Single card · Northbrook Trading, Dana Reyes's corporate card, September statement" },
   { n:1, title:"One statement that ties on the first pass",
     chips:["Statement","Books"], src:"Rule 1", cites:[2,5],
-    situation:"The September statement closes at $8,432.10 with 42 charges and one payment. The card liability in Northbrook's books is $8,092.10. One $340 charge was posted in the books on 30 September; the issuer recorded it on 1 October.",
+    situation:"The September statement closes at $8,432.10 with 42 charges and one payment. The card liability in Northbrook's books at 30 September is $8,772.10. One $340 charge was posted in the books on 30 September; the issuer recorded it on 1 October.",
     facts:["In QuickBooks Online a credit card account is reconciled like a bank account: enter the statement's closing balance and date, tick what appears, finish at a difference of $0.00 "+C(2)+".","If a charge on the statement is wrong, the cardholder has 60 days from the statement to dispute it in writing, and the issuer 30 days to acknowledge "+C(5)+". The skill tracks a disputed amount and does not book the credit until the issuer decides."],
-    visual:{type:"wf", start:["Card liability in the books",8092.10], steps:[["Charge posted 30 Sep, on October's statement",340]], end:["Adjusted books",8432.10], dec:2},
+    visual:{type:"wf", start:["Card liability in the books",8772.10], steps:[["Charge posted 30 Sep, on October's statement",-340]], end:["Adjusted books",8432.10], dec:2},
     rule:{q:"The credit card liability on the GL should reconcile to the statement closing balance", w:"references/method.md · Step 2"},
-    math:[["Card liability in the books","$8,092.10"],["+ charge in books, not yet on statement","$340.00"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
+    math:[["Card liability in the books","$8,772.10"],["− charge in books, not yet on statement","$340.00"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
     verdict:["ok","Ties. The $340 is timing, nothing else. The skill records it as a reconciling item with its posting date, so next month's run expects it on October's statement."] },
 
   { n:2, title:"Receipts: matched, below threshold, missing",
@@ -423,12 +423,12 @@ const LEVELS = [
 
   { n:3, title:"The $148.50 nobody entered",
     chips:["Statement","Books"], src:"Rules 1 and 3", cites:[6],
-    situation:"Same statement, but the books show $8,240.60, and the bridge is $148.50 short. The missing charge is a Saturday grocery-store purchase that was never submitted, with no receipt and no business purpose.",
+    situation:"Same statement, but the books show $8,623.60, and after the $340 timing item the books are still $148.50 below the statement. The missing charge is a Saturday grocery-store purchase that was never submitted, with no receipt and no business purpose.",
     facts:["Asset misappropriation is the most common occupational fraud, in 89% of cases, with a median loss of $120,000; a third of frauds happen where controls are lacking "+C(6)+". Most unsubmitted charges are forgetfulness, which is exactly why the skill reports the facts and lets a person decide."],
-    visual:{type:"wf", start:["Card liability in the books",8240.60], steps:[["Charge posted 30 Sep, on October's statement",340],["Charge on statement, never entered",-148.50]], end:["Adjusted books",8432.10], dec:2, warn:true},
+    visual:{type:"wf", start:["Card liability in the books",8623.60], steps:[["Charge posted 30 Sep, on October's statement",-340],["Charge on statement, never entered",148.50]], end:["Adjusted books",8432.10], dec:2, warn:true},
     rule:{q:"Charges on the statement but not yet posted to GL → reconciling item (timing)", w:"references/method.md · Step 2"},
     rule2:{q:"Possible personal-use charges (groceries, personal services, weekend non-business locations)", w:"references/method.md · Step 6"},
-    math:[["Card liability in the books","$8,240.60"],["+ timing item","$340.00"],["− charge on statement not in books","$148.50"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
+    math:[["Card liability in the books","$8,623.60"],["− timing item","$340.00"],["+ charge on statement not in books","$148.50"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
     verdict:["flag","The bridge ties once the $148.50 is named, but naming it is the finding: a weekend grocery charge with no receipt and no purpose. The skill lists it as a possible personal charge with the cardholder as owner. It never calls it anything more than that."] },
 
   { n:4, title:"The laptop in office supplies",
@@ -549,9 +549,9 @@ function renderLevels(){
 
 /* --- calculator: the Step 2 bridge, the Step 3 receipt count, and one capital test --- */
 const PRESETS = {
-  clean:   {stmt:8432.10,notgl:0,     gl:8092.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:640},
-  missing: {stmt:8432.10,notgl:148.50,gl:8240.60,notstmt:340,transit:0,n:42,matched:31,below:6,cap:2500,big:640},
-  laptop:  {stmt:8432.10,notgl:0,     gl:8092.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:2900},
+  clean:   {stmt:8432.10,notgl:0,     gl:8772.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:640},
+  missing: {stmt:8432.10,notgl:148.50,gl:8623.60,notstmt:340,transit:0,n:42,matched:31,below:6,cap:2500,big:640},
+  laptop:  {stmt:8432.10,notgl:0,     gl:8772.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:2900},
   blank:   {stmt:"",notgl:"",gl:"",notstmt:"",transit:"",n:"",matched:"",below:"",cap:"",big:""},
 };
 const inputs=[...document.querySelectorAll("[data-k]")];
@@ -562,8 +562,8 @@ function run(){
   const stmt=num("stmt"), notgl=num("notgl"), gl=num("gl"), notstmt=num("notstmt"), transit=num("transit");
   const box=document.getElementById("results");
   if(!stmt && !gl){ box.innerHTML=res("", "Waiting", "—", "Enter the statement closing balance and the card liability in the books to start."); return; }
-  const adj = gl + notstmt - notgl + transit, diff = Math.round((adj-stmt)*100)/100;
-  let h = res("", "Rule 1 · adjusted books", fmt(adj), `${fmt(gl)} + ${fmt(notstmt)} not yet on statement − ${fmt(notgl)} not yet in books + ${fmt(transit)} in transit`);
+  const adj = gl - notstmt + notgl + transit, diff = Math.round((adj-stmt)*100)/100;
+  let h = res("", "Rule 1 · adjusted books", fmt(adj), `${fmt(gl)} − ${fmt(notstmt)} not yet on statement + ${fmt(notgl)} not yet in books + ${fmt(transit)} in transit`);
   h += Math.abs(diff)<0.005
     ? res("ok","Rule 1 · does it tie?", "Yes", "To the cent. Every reconciling item has a name.")
     : res("flag","Rule 1 · does it tie?", fmt(Math.abs(diff))+" apart", `Adjusted books are ${fmt(Math.abs(diff))} ${diff>0?"above":"below"} the statement after every named item. Start with charges on one side only, then the timing of the last payment.`);
