@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance Sheet Reconciliations Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the balance sheet reconciliations skill is built: a 161-line card, seven reference files, the run stage by stage, and seven audit findings, all fixed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .f ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+  .f li{font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f li b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Balance sheet reconciliations</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">balance-sheet-reconciliations · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the balance sheet reconciliation is built, and what it does</h1>
+  <p class="lede">A 161-line card with seven reference files behind it, split on 25 Oct 2026 from a 936-line SKILL.md. The skill ties each balance sheet account to its support — subledgers, schedules, outside documents — and gives every account a two-sided verdict, so an account whose support was never supplied, or is another view of the same ledger, is never called reconciled. This page shows where the weight sits, the run step by step, and what the 27 Oct audit found and how each finding was fixed.</p>
+</header>
+
+<section>
+  <div class="stats">
+<div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md, down from 936</span></div>
+<div class="stat"><span class="k">Content kept</span><span class="v">528/528</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+<div class="stat"><span class="k">Audit findings</span><span class="v">1·3·3</span><span class="s">high · medium · low, senior-bookkeeper audit of 27 Oct</span></div>
+<div class="stat"><span class="k">Fixed</span><span class="v">7/7</span><span class="s">7 fixed · 0 partly · 0 rejected, in ad37a25</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. The rules point to mosofin-protocol.md, read before the first call; stage 2 to gates.md; stages 3 to 6 to method.md, Steps 0 to 9; stages 3 to 5 also to edge-cases.md; stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 385 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, eight questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Map, read both sides</text>
+<text x="48" y="272">Stage 4 · Find the differences</text>
+<text x="48" y="312">Stage 5 · Correct, roll, present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g><line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="24" width="211" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="78" width="118" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">147</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">385</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="186" width="64" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">79</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="240" width="35" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">43</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">50</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">68</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 228 C 450 228, 450 202, 574 202" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 268 C 450 268, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 210, 574 210" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="100">before 1st call</text><text x="318" y="180">Gates 0–3</text><text x="458" y="300">Steps 0–9</text>
+<text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption><b>method.md</b> carries the accounting: the account-to-source table, the reconciling-items bridge, corrections, roll-forwards, materiality and the seven-section workpaper, Steps 0–9. Edge cases are read across three stages here, more than in the other cards, because the hard accounts (a subledger that does not tie to its own control, intercompany, merged accounts) turn up while mapping, investigating and correcting. <b>mosofin-protocol.md</b> is the shared onboarding and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1146" role="img" aria-label="Stage 1 asks eight questions: Mosofin or upload, which company, which accounts, the period end, where outside support lives, materiality, last period&#x27;s reconciliation, and preparer and reviewer. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company files, check intercompany and platform connections, and resolve each account&#x27;s GL side and support side separately; otherwise the user uploads a trial balance, support per account and a chart of accounts. Both paths read back and wait for a yes. Steps 0 to 2 fetch and map each account; an account without supplied support is reported not reconciled. Steps 3 to 4 type and investigate differences. Steps 5 to 8 propose corrections, roll forward, age and build the workpaper. Step 9 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+<polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,454 230,490 400,490" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,454 690,490 520,490" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="522" x2="460" y2="552" marker-end="url(#a2)"/>
+<line x1="460" y1="733" x2="460" y2="763" marker-end="url(#a2)"/>
+<line x1="460" y1="874" x2="460" y2="904" marker-end="url(#a2)"/>
+<line x1="460" y1="1036" x2="460" y2="1066" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="282" y="74"><tspan font-weight="600">B</tspan> Which company, or entities?</text>
+<text x="518" y="74"><tspan font-weight="600">C</tspan> Which accounts?</text>
+<text x="672" y="74"><tspan font-weight="600">D</tspan> Period-end date</text>
+<text x="80" y="100"><tspan font-weight="600">E</tspan> Support kept outside the books — where?</text>
+<text x="399" y="100"><tspan font-weight="600">F</tspan> Materiality threshold</text>
+<text x="594" y="100"><tspan font-weight="600">G</tspan> Last period&#x27;s rec?</text>
+<text x="80" y="126"><tspan font-weight="600">H</tspan> Who prepares, who reviews?</text>
+</g>
+<polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="80" y="292" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="98" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="98" y="342" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="98" y="366" xml:space="preserve">G1  company files · both intercompany</text>
+<text x="98" y="390" xml:space="preserve">     sides? payroll, stock, payments?</text>
+<text x="98" y="414" xml:space="preserve">G2  each account&#x27;s GL side and support</text>
+<text x="98" y="438" xml:space="preserve">     side resolved apart; balance ≠ aging</text>
+</g>
+<rect x="540" y="292" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="558" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="558" y="342" xml:space="preserve">Trial balance at period end, required</text>
+<text x="558" y="366" xml:space="preserve">Support for each account, required</text>
+<text x="558" y="390" xml:space="preserve">Chart of accounts, required</text>
+<text x="558" y="414" xml:space="preserve">GL detail, prior rec, recommended</text>
+<text x="558" y="438" xml:space="preserve">Materiality, preparer, reviewer</text>
+</g>
+<rect x="400" y="474" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="503" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="216" fill="var(--manual)">no, or not connected</text></g>
+<rect x="60" y="554" width="800" height="179" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="580" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–2 · FETCH, MAP EACH ACCOUNT, READ BOTH SIDES</text>
+<text x="80" y="606" font-size="13" font-weight="600" fill="var(--ink)">Mosofin, one batch, data_source_id on every call, mock flag checked</text>
+<text x="80" y="627" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_trial_balance · get_balance_sheet · search_accounts</text>
+<text x="80" y="648" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_general_ledger · get_aged_receivables · get_aged_payables</text>
+<text x="80" y="669" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_journal_entries · get_company_info</text>
+<text x="80" y="694" font-size="13.5" fill="var(--ink)">Source per account from the table; not listed → ask, never guess</text>
+<text x="80" y="715" font-size="13.5" fill="var(--ink)">Suspense and clearing first: should be zero, every line explained</text>
+<rect x="640" y="596" width="202" height="74" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="741" y="620" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">Support not supplied?</text>
+<text x="741" y="640" text-anchor="middle" font-size="12" fill="var(--ink)">reported not reconciled, with</text>
+<text x="741" y="658" text-anchor="middle" font-size="12" fill="var(--ink)">a named gap and an owner</text>
+<rect x="60" y="765" width="800" height="109" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="791" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–4 · RECONCILING ITEMS, INVESTIGATION</text>
+<text x="80" y="814" font-size="13.5" fill="var(--ink)">GL bridged to support; every item typed timing, permanent or investigating</text>
+<text x="80" y="835" font-size="13.5" fill="var(--ink)">A/R and A/P: the aging tie is mechanical, plus an aging review and one independent test</text>
+<text x="80" y="856" font-size="13.5" fill="var(--ink)">Checks that found nothing are documented: prior rec, cut-offs, mispostings, FX, rounding</text>
+<rect x="60" y="906" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="932" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 5–8 · CORRECTIONS, ROLL-FORWARD, AGING, WORKPAPER</text>
+<text x="80" y="955" font-size="13.5" fill="var(--ink)">Permanent → proposed entry; timing documented, never adjusted; investigating → owner and date</text>
+<text x="80" y="976" font-size="13.5" fill="var(--ink)">Write-off only below the approved limit, to a P&amp;L account, with reviewer approval</text>
+<text x="80" y="997" font-size="13.5" fill="var(--ink)">Opening balance agreed to last period&#x27;s rec · aged against materiality, over 3 months escalated</text>
+<text x="80" y="1018" font-size="13.5" fill="var(--ink)">One tab per account, seven sections, two-sided coverage sheet, sign-off dates left blank</text>
+<rect x="60" y="1068" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1094" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: source map, materiality, write-off account and limit, owners</text>
+<text x="80" y="1114" font-size="13.5" fill="var(--muted)">never balances, reconciling-item detail or the workpaper · explicit yes, after results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: Mosofin can read the GL side and the A/R, A/P and clearing support, but not a prepaid schedule, an asset register, a loan schedule or a bank statement, and an account whose support never arrives stays in the workpaper as <i>not reconciled</i>. Since the audit, an A/R or A/P aging read from the same books counts only as a mechanical tie, not as independent support.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Seven findings, all fixed on 27 Oct</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper review of the card and every reference file. Verdict: fit with fixes. The finding that mattered most was that the skill's central rule contradicted its own A/R, A/P and suspense rows.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — A/R, A/P and suspense were "[auto] support" and also "another view of the same ledger"</h3>
+<p>The card says no account is reconciled to another view of itself, yet Step 1 marked the A/R and A/P support side <code>[auto]</code> from the same books, where the aging ties to the control account by construction. A run either passed a mechanical tie as assurance, overstating how much of the balance sheet is evidenced, or failed every integrated subledger.</p>
+<p class="fix"><b>Fix.</b> Integrated subledgers get their own verdict: the aging tie is reported as "agrees to subledger (same system)", a mechanical check, and the account is reconciled only with an aging review (name-less journal entries, credit balances, unapplied items, items over 90 days) plus at least one independent test — subsequent receipts or payments <code>[auto]</code>, vendor statements or customer confirmations <code>[manual]</code>. Suspense and clearing are tested as "zero, every line explained".</p>
+<p><b>Basis:</b> standard practice for integrated subledgers: the aging-to-GL tie is a necessary mechanical check; assurance comes from reviewing the aging and from independent evidence.</p>
+<span class="where">SKILL.md · method.md Steps 1, 4 · overview.md · edge-cases.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — "Write off small residuals to a cleanup account" was a plug by another name</h3>
+<p>Step 5 said to "write off small immaterial residuals to a cleanup account", and the status list had "Within tolerance". An unexplained residual moved to another balance sheet account is a plug, against the card's own "never plugs a difference".</p>
+<p class="fix"><b>Fix.</b> A write-off is proposed only below an approved limit the user gives, after the Step 4 checks are documented, to a P&L account named from the chart, with reviewer approval — never to a balance sheet suspense account. The card now asks for the limit and the account; Step 9 saves them.</p>
+<p><b>Basis:</b> common bookkeeping practice for immaterial differences: the cause understood or the search documented, an approved limit, a P&L account, reviewer sign-off.</p>
+<span class="where">method.md Steps 5, 8, 9 · SKILL.md Mosofin path, Stages 5–6</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — The opening balance was never agreed to last period's reconciled balance</h3>
+<p>The roll-forward started at "Opening balance" and the carry-forward check looked only at items. A back-dated entry or an edit to a closed period would surface as an unexplained difference this month.</p>
+<p class="fix"><b>Fix.</b> Step 6 gains an opening check: the opening balance must equal the GL balance on the prior reconciliation (or the prior close as read today, said so). A difference means a closed period changed; transactions dated on or before the prior period end but created or modified after it are listed as a possible prior-period adjustment.</p>
+<p><b>Basis:</b> standard roll-forward practice: agree the opening balance to the prior signed reconciliation first.</p>
+<span class="where">method.md Step 6 · edge-cases.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — Customer and vendor balance reports were offered as the support side</h3>
+<p>Step 0 and the tool table listed <code>get_customer_balance</code> and <code>get_vendor_balance</code> as alternatives to the agings, while Gate 2 and the card say a balance report confirms a total but not the items in it.</p>
+<p class="fix"><b>Fix.</b> Both are now marked "total only — not a substitute for the aging"; if the aging tool is disabled, the support side is <code>[manual]</code> and an aging export is requested.</p>
+<p><b>Basis:</b> the skill's own Gate 2 rule that a near-substitute is not a substitute; standard tie-out practice works item by item.</p>
+<span class="where">method.md Step 0 · tools-and-glossary.md</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+<h3>Three low findings, all fixed</h3>
+<ul>
+<li><b>L1 · Common small-business accounts missing from the map.</b> Rows added for Undeposited Funds, Credit Card Liability (to <code>credit-card-reconciliation</code>), shareholder or owner loans and retained earnings, so a run no longer falls back to "ask" for accounts that sit in almost every company file.</li>
+<li><b>L2 · Three status vocabularies.</b> One list everywhere: Reconciled / Reconciled — immaterial residual, approved write-off proposed / Investigating / Not reconciled — support not supplied. The card's key verdict now has a place on the account tab.</li>
+<li><b>L3 · Sign-off without dates.</b> Section 1 gains "Prepared on / Reviewed on", left blank for the people who sign; the skill fills in neither. Basis: a review without a date is not evidence of timely review.</li>
+</ul>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+<li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <code>validate-skill.sh</code> checked 31 skills, 0 failures (run 27 Oct 2026, after the audit fixes).</span></li>
+<li><span class="ok">PASS</span><span>The shared onboarding and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+<li><span class="ok">PASS</span><span>Every relative link in the card and its reference files resolves to a file in the skill folder (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>Every Step the card cites (Steps 0–9) exists as a heading in <code>references/method.md</code> (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>The description is 1012 characters, within the 1,024-character limit; it is written in the third person, says what and when, and names the upload path.</span></li>
+<li><span class="ok">PASS</span><span>Content kept at the split: 528 of 528 original content lines present in the reference files, checked by script (8729449). The audit fixes then edited only the lines listed in the fix log.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> every account gets a two-sided verdict, and one whose support was never supplied stays in the workpaper as not reconciled, with a named gap and owner.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> the account-to-source table, with "if the account type isn't listed, ask; never guess".</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> timing items are documented, not adjusted, and investigating items carry an owner and a target date.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> the investigation checks that found nothing are documented, with a cut-off check for items dated in the period but entered after it.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> roll-forward movements tie to the activity, and the intercompany mirror check is deliberate and per entity.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a connected company file with outside schedules supplied for prepaids, fixed assets and loans. The tool names in method.md were not checked against a live tool catalogue in this pass, only against the skill's own text. Two points from the card split are still open: Gate 3 marks the materiality threshold "Recommended" while Step 7 depends on it, without saying what the output states when none is given; and Step 8 names "a combined view" in a multi-entity run while the entity rules forbid merging subledger detail.</p>
+</section>
+
+<footer>On branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to <code>main</code>. Cross-references to unshipped skills removed in c667dc1; card split in 8729449 (re-applied unchanged as d4ef930 and 5d38260); audit fixes in ad37a25. Audited 27 Oct 2026. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

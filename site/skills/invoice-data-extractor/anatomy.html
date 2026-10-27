@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Data Extractor Skill Anatomy | MosoFin</title>
+<meta name="description" content="Inside the invoice data extractor skill: a 150-line card, seven reference files, extraction then validation against the books, and eight audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .f ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+  .f li{font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f li b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Invoice data extractor</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">invoice-data-extractor · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the invoice data extractor is built, and what it does</h1>
+  <p class="lede">A 150-line card with seven reference files behind it, split on 25 Oct 2026 from a 970-line SKILL.md, the longest original of this group. The skill turns a vendor invoice — PDF, scan or photo — into fields a system can use, never guessing a field it cannot see, then checks each invoice against the books before anyone pays it: duplicate number, already paid, Bill-To, vendor, terms, PO. This page shows where the weight sits, the run step by step, and what the 27 Oct audit found and how each finding was handled.</p>
+</header>
+
+<section>
+  <div class="stats">
+<div class="stat"><span class="k">Card</span><span class="v">150</span><span class="s">lines in SKILL.md, down from 970</span></div>
+<div class="stat"><span class="k">Content kept</span><span class="v">550/550</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+<div class="stat"><span class="k">Audit findings</span><span class="v">2·3·3</span><span class="s">high · medium · low, senior-bookkeeper audit of 27 Oct</span></div>
+<div class="stat"><span class="k">Fixed</span><span class="v">7/8</span><span class="s">7 fixed · 1 partly · 0 rejected, in 2850d13</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 150-line card with rules and six stages. The rules point to mosofin-protocol.md, read before the first call; stage 2 to gates.md; stages 3 to 6 to method.md, Steps 0 to 8; stages 3 and 4 also to edge-cases.md; stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 391 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 150</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, five questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Extract the fields</text>
+<text x="48" y="272">Stage 4 · Validate, classify</text>
+<text x="48" y="312">Stage 5 · Present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g><line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="24" width="208" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="78" width="109" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">138</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">391</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="186" width="72" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">91</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="240" width="43" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">54</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">57</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">57</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 228 C 450 228, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 268 C 450 268, 450 208, 574 208" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="100">before 1st call</text><text x="318" y="180">Gates 0–3</text><text x="458" y="300">Steps 0–8</text>
+<text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption><b>method.md</b> holds the field-by-field extraction rules, line items, totals and tax, the validation reads, the Clean / Review / Stop status and the six-sheet output, Steps 0–8. The stages do not follow the step numbers in order: extraction (Steps 1–5) comes first, because the document is the user's own, and the validation reads of Step 0 run once the header fields are out. <b>mosofin-protocol.md</b> is the shared onboarding and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1099" role="img" aria-label="Stage 1 asks five questions: Mosofin or upload, the invoice documents, which entity is invoiced, the output format, and whether any document is not an invoice. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company files and check that the posted-bill read is enabled; otherwise the user uploads the invoices, the entity name, the vendor transaction history and a vendor list. Both paths read back and wait for a yes. Steps 1 to 5 extract each document; there is no document store and the bank-detail check is not run. Step 0 and Step 6 validate against the books and set Clean, Review or Stop. Step 7 presents. Step 8 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+<polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,428 230,464 400,464" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,428 690,464 520,464" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="496" x2="460" y2="526" marker-end="url(#a2)"/>
+<line x1="460" y1="658" x2="460" y2="688" marker-end="url(#a2)"/>
+<line x1="460" y1="869" x2="460" y2="899" marker-end="url(#a2)"/>
+<line x1="460" y1="989" x2="460" y2="1019" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="282" y="74"><tspan font-weight="600">B</tspan> The invoice documents</text>
+<text x="477" y="74"><tspan font-weight="600">C</tspan> Which entity is invoiced?</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Output: xlsx, csv or JSON?</text>
+<text x="309" y="100"><tspan font-weight="600">E</tspan> Anything that is not an invoice?</text>
+</g>
+<polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="80" y="266" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="98" y="316" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="98" y="340" xml:space="preserve">G1  company files the batch may be</text>
+<text x="98" y="364" xml:space="preserve">     billed to · Bill-To per entity</text>
+<text x="98" y="388" xml:space="preserve">G2  posted-bill read enabled? if not,</text>
+<text x="98" y="412" xml:space="preserve">     no duplicate check, said up front</text>
+</g>
+<rect x="540" y="266" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="558" y="316" xml:space="preserve">Invoice documents, required</text>
+<text x="558" y="340" xml:space="preserve">Entity legal name, required</text>
+<text x="558" y="364" xml:space="preserve">Vendor history, open and paid bills</text>
+<text x="558" y="388" xml:space="preserve">     (aged payables alone: not enough)</text>
+<text x="558" y="412" xml:space="preserve">Vendor list · mapping file, optional</text>
+</g>
+<rect x="400" y="448" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="477" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="190" fill="var(--manual)">no, or not connected</text></g>
+<rect x="60" y="528" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="554" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–5 · READ EACH DOCUMENT, EXTRACT THE FIELDS</text>
+<text x="80" y="577" font-size="13.5" fill="var(--ink)">Filename, pages, bundles split · the vendor&#x27;s labels as ground truth</text>
+<text x="80" y="598" font-size="13.5" fill="var(--ink)">Dates in ISO · anything not visible is null · no currency defaulted</text>
+<text x="80" y="619" font-size="13.5" fill="var(--ink)">Lines as printed: never merged, split or defaulted; qty × price ≠ amount flagged</text>
+<text x="80" y="640" font-size="13.5" fill="var(--ink)">Subtotal + Tax + Shipping − Discount = Total; tax-inclusive gets its own check</text>
+<rect x="640" y="570" width="202" height="74" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="741" y="594" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No document store</text>
+<text x="741" y="614" text-anchor="middle" font-size="12" fill="var(--ink)">invoices always come from you;</text>
+<text x="741" y="632" text-anchor="middle" font-size="12" fill="var(--ink)">bank-detail check NOT RUN</text>
+<rect x="60" y="690" width="800" height="179" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="716" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 0 + STEP 6 · VALIDATE AGAINST THE BOOKS, CLASSIFY</text>
+<text x="80" y="742" font-size="13" font-weight="600" fill="var(--ink)">Mosofin, one batch once the header fields are out, mock flag checked</text>
+<text x="80" y="763" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_vendors · get_vendor · search_bills · search_payments</text>
+<text x="80" y="784" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_purchases · search_purchase_orders · get_aged_payables</text>
+<text x="80" y="805" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_profit_and_loss · get_general_ledger · get_company_info</text>
+<text x="80" y="830" font-size="13.5" fill="var(--ink)">Look-back: open and paid bills, payments and direct purchases by vendor, over a window agreed and stated</text>
+<text x="80" y="851" font-size="13.5" fill="var(--ink)">Clean · Review · Stop — Stop on a duplicate, already paid, or a Bill-To for another entity</text>
+<rect x="60" y="901" width="800" height="88" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="927" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 7 · PRESENT THE EXTRACTION</text>
+<text x="80" y="950" font-size="13.5" fill="var(--ink)">One invoice inline plus a file; a batch as one workbook — Invoices, Line Items, Tax Detail,</text>
+<text x="80" y="971" font-size="13.5" fill="var(--ink)">Source Reference, Validation Results, Coverage — or JSON; every figure traced to file and page</text>
+<rect x="60" y="1021" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1047" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 8 · Offer to save</tspan>: naming conventions, invoice-number formats, match tolerances, Bill-To names</text>
+<text x="80" y="1067" font-size="13.5" fill="var(--muted)">never invoice contents, amounts, bank details or remit-to addresses · explicit yes, after results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths meet at the read-back; extraction may start earlier, since the document is the user's, but nothing is validated until the workspace is confirmed. The highlighted box is the clause the skill is built around: there is no document store and no vendor bank data on this surface, so the invoices always come from the user and the bank-detail check is always reported as not run — the remit-to comparison never stands in for it.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings: seven fixed, one partly fixed on 27 Oct</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper review of the card and every reference file. Verdict: fit with fixes. The finding that mattered most was that the duplicate and already-paid checks had no defined look-back.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — The duplicate and already-paid checks could run against a population with no paid bills in it</h3>
+<p>The upload row asked for "an AP listing or aged payables". Aged payables lists open bills only, so a re-submitted invoice already paid last quarter passed both checks and came back Clean. On the Mosofin path the bill search had no date range, and payments made outside the bill process were not read.</p>
+<p class="fix"><b>Fix.</b> Step 0 defines the look-back: by vendor, open and paid bills, payments and direct purchases, over a window the user agrees (or the saved tolerance), stated on the Validation Results row; a match is the same normalized invoice number, or the same amount within that window. The upload row is now "vendor transaction history", and aged payables alone is not accepted. No fixed 18-month or 30-day figure, because the house brief forbids hard-coded windows.</p>
+<p><b>Basis:</b> standard AP practice: check a new invoice against the vendor's full billing and payment history, open and paid.</p>
+<span class="where">method.md Step 0 · SKILL.md upload checklist</span>
+</div></div>
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H2 — Tax-inclusive invoices failed the cross-check or had their tax counted twice</h3>
+<p>"Subtotal (pre-tax) = sum of line subtotals" picks up gross line amounts on a tax-inclusive invoice; adding the tax on top broke the cross-check by exactly the tax, or left a pre-tax column overstated by the recoverable tax.</p>
+<p class="fix"><b>Fix.</b> Step 4 gains a tax-inclusive rule: lines sum to Total; Subtotal = Total − the tax printed on the invoice; two cross-checks; if no tax amount is printed, Subtotal and Tax stay null and are flagged. Tax is never calculated from a rate.</p>
+<p><b>Basis:</b> VAT and GST rules: input tax on a valid tax invoice is recorded apart from the net cost.</p>
+<span class="where">method.md Step 4 · SKILL.md Stage 3</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — "Never guesses a field" was broken by quantity defaults and calculated amounts</h3>
+<p>Quantity was "default 1 if not shown", the line subtotal was "Quantity × Unit price", and the due date could be "calculated from terms" without saying so — values not on the document, hiding a line where the printed amount differs.</p>
+<p class="fix"><b>Fix.</b> Quantity and unit price as shown, else null; the line amount as printed, with any qty × price ≠ amount flagged; the due date as printed, and a date derived from terms goes in a separate <code>due_date_calculated</code> field.</p>
+<p><b>Basis:</b> the skill's own output standard that every figure traces to the source document by file and page.</p>
+<span class="where">method.md Steps 2–3 · JSON</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — "A row I can post", but no account or tax code in the output</h3>
+<p>Neither sheet had a column for account, tax code or the period the cost belongs to, though the vendor's default account and coding history are already read; and nothing flagged a service period outside the invoice month.</p>
+<p class="fix"><b>Fix.</b> Sheet 2 gains Tax Code (as printed) and Suggested Account (with its source), marked as suggestions; Review gains "service period not within the invoice month — a prepaid or accrual decision is needed".</p>
+<p><b>Basis:</b> accrual-basis cut-off: a cost booked in the wrong period is a cut-off error (prepaid and accrued expense practice, ASC 340).</p>
+<span class="where">method.md Sheet 2, Step 6</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — The PO check ran, but its result never reached a status</h3>
+<p>An invoice citing a PO missing from the books, closed, or for another vendor could still be Clean; the result only appeared on Sheet 5.</p>
+<p class="fix"><b>Fix.</b> Clean now requires a cited PO to be found and open; Review covers a PO not found, closed, for a different vendor, or exceeded by the invoice total, pointing to <code>three-way-match</code> for line-level matching.</p>
+<p><b>Basis:</b> standard purchase-to-pay control: an invoice citing a PO is checked against that PO before payment.</p>
+<span class="where">method.md Step 6</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · partly</span><div class="body">
+<h3>Three low findings: two fixed, one partly fixed</h3>
+<ul>
+<li><b>L1 · Fields that drive a Stop missing from the main sheet.</b> Sheet 1 and the JSON gain Bill-To, Remit-to (masked), Amount Paid and Balance Due, so a reviewer can see what triggered a "Stop — Bill-To is a different entity". Fixed.</li>
+<li><b>L2 · Credit memos checked against bills, not vendor credits.</b> A credit memo is now checked against posted vendor credits, with whether it is already applied. <i>Partly fixed:</i> the audit's tool name <code>search_vendor_credits</code> was not written in, because this skill does not name it; the read is resolved from the Gate 2 catalogue.</li>
+<li><b>L3 · "Reads nothing until Stage 1" beside "extraction may start before the gates".</b> The card rule now reads "Reads nothing <b>from your books</b> until Stage 1 is answered", so reading the user's own document is not a breach. Fixed.</li>
+</ul>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+<li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <code>validate-skill.sh</code> checked 31 skills, 0 failures (run 27 Oct 2026, after the audit fixes).</span></li>
+<li><span class="ok">PASS</span><span>The shared onboarding and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+<li><span class="ok">PASS</span><span>Every relative link in the card and its reference files resolves to a file in the skill folder (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>Every Step the card cites (Steps 0–8) exists as a heading in <code>references/method.md</code> (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>The description is 1010 characters, within the 1,024-character limit; it is written in the third person, says what and when, and names the upload path.</span></li>
+<li><span class="ok">PASS</span><span>Content kept at the split: 550 of 550 original content lines present, checked by script (b23a893). After the audit fixes, 536 of 550 remain word for word; the 14 others are the lines deliberately edited, plus two pointers already changed before the fixes.</span></li>
+<li><span class="ok">PASS</span><span>Gate 3's pointer to the save step now names Step 8, the step that exists (7975b74, one of four contradictions found while splitting).</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> extraction confidence is kept apart from validation status: a legible invoice whose number is already posted is not rated High.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> it never defaults a currency or a date format; "$" is ambiguous, and the vendor's history is a cue, not proof.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> the bank-detail check is reported as NOT RUN, the remit-to comparison is labelled a partial stand-in, and out-of-band verification is named as the real control.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> failed arithmetic is captured as printed and flagged, never forced to agree; the invoice is the legal document.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> statements and pro formas are set aside, and a Bill-To matching no connected entity stops the invoice rather than routing it to the nearest match.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a connected company file with a batch of real invoice scans. The tool names in method.md were not checked against a live tool catalogue in this pass, only against the skill's own text. Still open from the card split: the remit-to field is marked <code>[gated]</code> in the Step 2 field table and the remit-to comparison <code>[auto]</code> in Step 5.</p>
+</section>
+
+<footer>On branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to <code>main</code>. Cross-references to unshipped skills removed in e908d5d; card split in b23a893; gates.md pointer fixed in 14f616a and the Gate 3 step number in 7975b74; audit fixes in 2850d13. Audited 27 Oct 2026. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Accrual Cutoff Skill Anatomy | MosoFin</title>
+<meta name="description" content="Inside the AP accrual cutoff skill: its 161-line card, seven reference files, the three accrual populations, and eleven audit findings, all fixed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .f ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+  .f li{font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f li b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← AP accrual cutoff</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">ap-accrual-cutoff · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the AP accrual cutoff is built, and what it does</h1>
+  <p class="lede">A 161-line card with seven reference files behind it, split on 25 Oct 2026 from a 903-line SKILL.md. The skill finds costs that belong in the month being closed but have no bill yet — goods received not invoiced, a recurring bill that has not arrived, a late invoice for earlier work — prices each one, and drafts the accrual with its reversing entry; it also refuses to accrue an open purchase order nobody received. This page shows where the weight sits, the run step by step, and what the 27 Oct audit found.</p>
+</header>
+
+<section>
+  <div class="stats">
+<div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md, down from 903</span></div>
+<div class="stat"><span class="k">Content kept</span><span class="v">502/502</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+<div class="stat"><span class="k">Audit findings</span><span class="v">2·6·3</span><span class="s">high · medium · low, senior-bookkeeper audit of 27 Oct</span></div>
+<div class="stat"><span class="k">Fixed</span><span class="v">11/11</span><span class="s">11 fixed · 0 partly · 0 rejected, in 6815813</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. The rules point to mosofin-protocol.md, read before the first call; stage 2 to gates.md; stages 3 to 6 to method.md, Steps 0 to 8; stage 4 also to edge-cases.md; stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 361 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, seven questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read the evidence</text>
+<text x="48" y="272">Stage 4 · Find the candidates</text>
+<text x="48" y="312">Stage 5 · Price, entries, present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g><line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="24" width="225" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="78" width="124" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">144</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">361</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="186" width="78" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">91</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect class="bar" x="580" y="240" width="33" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">38</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">27</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">68</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 268 C 450 268, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="100">before 1st call</text><text x="318" y="180">Gates 0–3</text><text x="458" y="300">Steps 0–8</text>
+<text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption><b>method.md</b> carries the accounting: the three populations, pricing, the tax rule, the accrual and reversing entries, the materiality screen and the seven sheets, Steps 0–8. <b>overview.md</b> is unusually short, 27 lines, because the card itself states the two things the connection cannot see — goods receipts and bills still in an inbox. <b>mosofin-protocol.md</b> is the shared onboarding and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1078" role="img" aria-label="Stage 1 asks seven questions: Mosofin or upload, the period and accounting basis, where goods receipts are logged, the late-invoice window, the accrued-liability account, whether input tax is recoverable, and materiality. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company files and check the purchase-order tool; otherwise the user uploads open purchase orders, goods receipts, bills, a chart of accounts and history. Both paths read back and wait for a yes. Step 0 reads the evidence; goods receipts and unposted bills are asked of the user. Steps 1 to 3 find GRNI, recurring and late-invoice accruals. Steps 4 to 7 price, draft entries, screen and build seven sheets. Step 8 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+<polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,428 230,464 400,464" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,428 690,464 520,464" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="496" x2="460" y2="526" marker-end="url(#a2)"/>
+<line x1="460" y1="686" x2="460" y2="716" marker-end="url(#a2)"/>
+<line x1="460" y1="827" x2="460" y2="857" marker-end="url(#a2)"/>
+<line x1="460" y1="968" x2="460" y2="998" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="282" y="74"><tspan font-weight="600">B</tspan> Period, and accrual or cash basis?</text>
+<text x="567" y="74"><tspan font-weight="600">C</tspan> Where are goods receipts logged?</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Late-invoice window</text>
+<text x="261" y="100"><tspan font-weight="600">E</tspan> Accrued-liability account</text>
+<text x="483" y="100"><tspan font-weight="600">F</tspan> Input tax recoverable?</text>
+<text x="685" y="100"><tspan font-weight="600">G</tspan> Materiality</text>
+</g>
+<polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="80" y="266" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="98" y="316" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="98" y="340" xml:space="preserve">G1  company files · inactive ones named</text>
+<text x="98" y="364" xml:space="preserve">     as excluded, costs left unaccrued</text>
+<text x="98" y="388" xml:space="preserve">G2  purchase-order tool enabled? if not,</text>
+<text x="98" y="412" xml:space="preserve">     GRNI [manual]: never vendor spend</text>
+</g>
+<rect x="540" y="266" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="558" y="316" xml:space="preserve">Open POs with line detail, required</text>
+<text x="558" y="340" xml:space="preserve">Goods receipts, required for GRNI</text>
+<text x="558" y="364" xml:space="preserve">Bills: period + late window, required</text>
+<text x="558" y="388" xml:space="preserve">Chart of accounts, accrued account</text>
+<text x="558" y="412" xml:space="preserve">Bill history · TB · last accruals</text>
+</g>
+<rect x="400" y="448" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="477" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="190" fill="var(--manual)">no, or not connected</text></g>
+<rect x="60" y="528" width="800" height="158" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="554" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 0 · READ THE EVIDENCE</text>
+<text x="80" y="580" font-size="13" font-weight="600" fill="var(--ink)">Mosofin, one batch per entity, data_source_id on every call, mock flagged</text>
+<text x="80" y="601" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_purchase_orders · get_purchase_order · search_bills</text>
+<text x="80" y="622" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_vendor_expenses · search_accounts · get_trial_balance</text>
+<text x="80" y="643" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">get_balance_sheet · search_journal_entries · get_company_info</text>
+<text x="80" y="668" font-size="13.5" fill="var(--ink)">Open POs, bills in the period and after it, spend history, last accruals</text>
+<rect x="640" y="570" width="202" height="74" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="741" y="594" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No receipts, no inbox</text>
+<text x="741" y="614" text-anchor="middle" font-size="12" fill="var(--ink)">goods receipts and unposted</text>
+<text x="741" y="632" text-anchor="middle" font-size="12" fill="var(--ink)">bills asked of the user</text>
+<rect x="60" y="718" width="800" height="109" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="744" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–3 · THREE POPULATIONS</text>
+<text x="80" y="767" font-size="13.5" fill="var(--ink)">GRNI: every PO open at period end — received to period end × PO price − billed to period end</text>
+<text x="80" y="788" font-size="13.5" fill="var(--ink)">Recurring vendors with no bill for this period&#x27;s service · late invoices judged by service period</text>
+<text x="80" y="809" font-size="13.5" fill="var(--ink)">Each cost in one population only: GRNI first, then subsequent invoice, then recurring</text>
+<rect x="60" y="859" width="800" height="109" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="885" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 4–7 · PRICE, ENTRIES, SCREEN, WORKPAPER</text>
+<text x="80" y="908" font-size="13.5" fill="var(--ink)">Net of recoverable tax, no input-tax line · debit inventory, fixed asset or expense per PO line</text>
+<text x="80" y="929" font-size="13.5" fill="var(--ink)">Accrual plus reversing entry on day 1 · last period&#x27;s reversals checked · roll-forward to TB</text>
+<text x="80" y="950" font-size="13.5" fill="var(--ink)">Materiality screen, skipped items tested in aggregate · seven sheets, sign-off left blank</text>
+<rect x="60" y="1000" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1026" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 8 · Offer to save</tspan>: Gate 3 answers, recurring vendors and amounts, account mapping, exclusions</text>
+<text x="80" y="1046" font-size="13.5" fill="var(--muted)">never connections, company files, tool policies or mock status · explicit yes, after results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: most accounting connections carry orders and bills but no receipt record, and none can see a bill still in an inbox or approval queue, so both are asked for. An open purchase order without receipt evidence is a commitment, not a liability, and is not accrued.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eleven findings, all fixed on 27 Oct</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper review of the card and every reference file. Verdict: fit with fixes. The finding that mattered most was the tax default, which overstated expense and accrued liabilities whenever input tax could be recovered.</p>
+  <div class="findings">
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H1 — "Gross of recoverable tax" overstated the accrual, and the edge-case file said the opposite</h3>
+<p>The card and method said "the conservative default is the expense gross of recoverable tax, with no input-tax line", while edge-cases.md said to accrue "on the expense amount, not the gross". Accruing tax the entity can recover puts it into expense and accrued liabilities for a month it never belonged to.</p>
+<p class="fix"><b>Fix.</b> The estimate and the default are now net of recoverable tax, with no input-tax line; the tax is recognised when the tax invoice posts. Where tax is not recoverable it is part of the cost and accrued with it. The read-back says "accrued net of recoverable tax".</p>
+<p><b>Basis:</b> recoverable input tax is never part of cost under IAS 2, IAS 16 and IAS 38, or under standard VAT and GST bookkeeping.</p>
+<span class="where">method.md Step 4 · SKILL.md Stage 5, read-back</span>
+</div></div>
+<div class="f high done"><span class="sev">High · fixed</span><div class="body">
+<h3>H2 — Every accrual debited an expense account, including GRNI on stock and capital items</h3>
+<p>One template, "DR Expense account … CR Accrued Liabilities", for every accrual. A received stock item posts through Inventory Asset when the bill arrives, so the day-one reversal credited expense while the bill debited inventory — and "netting clean" failed.</p>
+<p class="fix"><b>Fix.</b> The accrual debits the account the PO line will post to — Inventory Asset for stock, the fixed-asset account for capital items, otherwise expense — read from <code>get_purchase_order</code>; the reversal credits the same account. Sheet 2 gains Debit Account and Debit account type.</p>
+<p><b>Basis:</b> goods received and controlled at period end belong in inventory (ASC 330, IAS 2) or property and equipment (ASC 360, IAS 16), not expense.</p>
+<span class="where">method.md Step 5, Sheet 2</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M1 — The GRNI population was cut wrong</h3>
+<p>"Pull all open POs with receipts in the period" left out goods received earlier and still unbilled; a PO search by the month's dates missed older open POs; and bills netted against GRNI had no date limit, so a bill dated 5 October could reduce September GRNI and also be picked up as a late invoice.</p>
+<p class="fix"><b>Fix.</b> Every PO open at period end, whatever its date; receipts on or before period end only; only bills dated on or before period end are netted, and a later bill for those goods stays GRNI and is excluded from Step 3.</p>
+<p><b>Basis:</b> standard cut-off practice: GRNI = cumulative received to period end × PO price − cumulative invoiced to period end, per line.</p>
+<span class="where">method.md Step 1 · edge-cases.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M2 — Recurring and late-invoice accruals could count the same bill twice</h3>
+<p>A utility bill for September dated 4 October qualified under Step 2 (no bill in September) and Step 3 (September service, found in the window), and Step 2 tested by bill date, not service period.</p>
+<p class="fix"><b>Fix.</b> A precedence rule in Step 4: each cost lands in exactly one population — GRNI, then subsequent invoice, then recurring. Step 2 looks for a bill covering this period's service. The card rule and output standard now cover all three populations.</p>
+<p><b>Basis:</b> standard accrual practice: one liability, recorded once.</p>
+<span class="where">method.md Steps 2, 4 · SKILL.md rules · output.md</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M3 — Unposted bills were "not an accrual", wrong for bills dated after period end</h3>
+<p>"A received but unposted bill is not an accrual, it should simply be posted." A 6 October invoice for September work posts into October when entered, so posting does nothing for September; and Step 3 searched only bills already in the books.</p>
+<p class="fix"><b>Fix.</b> Only an unposted bill dated on or before period end is "just post it"; later-dated ones go to Step 3, and the user is asked to send invoices received since period end and not yet entered.</p>
+<p><b>Basis:</b> the search for unrecorded liabilities, a standard cut-off procedure built on late-arriving invoices.</p>
+<span class="where">edge-cases.md · method.md Step 3 · SKILL.md Mosofin path, upload row</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M4 — The upload path marked bills "Recommended", though two populations need them</h3>
+<p>The row's own reason showed bills were needed to net GRNI and for the late-invoice review; without them GRNI is gross received value and one of three populations has no data.</p>
+<p class="fix"><b>Fix.</b> Bills are now Required on the upload checklist, with the consequence stated if they are missing: GRNI cannot be netted and the late-invoice review is not performed, and the output says so.</p>
+<p><b>Basis:</b> the house rule that both paths run the same checks.</p>
+<span class="where">SKILL.md upload checklist</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M5 — No roll-forward or tie-out of the accrued-liability account</h3>
+<p>The workpaper checked only that last period's reversals posted. Nothing agreed the opening balance, nothing proved the proposed closing balance, and non-AP accruals in the same account were not separated.</p>
+<p class="fix"><b>Fix.</b> Sheet 1 gains a roll-forward: opening per trial balance, agreed to last period's schedule, − reversals + proposed accruals ± other postings = proposed closing; residual items older than one period listed with owner and action; non-AP accruals shown apart.</p>
+<p><b>Basis:</b> standard close practice: an accrual account is signed off on its roll-forward.</p>
+<span class="where">method.md Sheet 1</span>
+</div></div>
+<div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+<h3>M6 — A multi-currency reversal could use a different rate</h3>
+<p>"The reversal in the new period uses the same rate — or rebooks at the new-period rate per policy." A reversal at another rate leaves a residue in accrued liabilities that nothing clears.</p>
+<p class="fix"><b>Fix.</b> The reversal mirrors the accrual exactly, at the same rate; any revaluation is a separate FX task.</p>
+<p><b>Basis:</b> a reversing entry is the exact mirror of the original; rate movement is revaluation under ASC 830 and IAS 21.</p>
+<span class="where">edge-cases.md · multi-currency</span>
+</div></div>
+<div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+<h3>Three low findings, all fixed</h3>
+<ul>
+<li><b>L1 · Verdict labels used two ways.</b> Step 2 now marks the most recent invoice or schedule <code>[auto]</code> and the contract amount <code>[manual]</code>; Step 3's judgment is "[manual] (judgment)", not <code>[gated]</code>, which means a permission policy elsewhere.</li>
+<li><b>L2 · The GRNI sheet could not prove its figure.</b> Sheet 2 gains cumulative quantity received to period end, cumulative amount invoiced to period end, and match type (linked or inferred), so each row's GRNI can be read off.</li>
+<li><b>L3 · No owners on exceptions, no review evidence.</b> Sheet 6 gains Owner, Action needed, Due by and Effect if unresolved; Sheet 1 gains Prepared by / date and Reviewed by / date, left blank.</li>
+</ul>
+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+<li><span class="ok">PASS</span><span>The repository's validator passes on the branch: <code>validate-skill.sh</code> checked 31 skills, 0 failures (run 27 Oct 2026, after the audit fixes).</span></li>
+<li><span class="ok">PASS</span><span>The shared onboarding and write-guardrail blocks are in sync: <code>sync-shared.sh --check</code> reports 31 skills in sync.</span></li>
+<li><span class="ok">PASS</span><span>Every relative link in the card and its reference files resolves to a file in the skill folder (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>Every Step the card cites (Steps 0–8) exists as a heading in <code>references/method.md</code> (checked by script).</span></li>
+<li><span class="ok">PASS</span><span>The description is 1020 characters, within the 1,024-character limit; it is written in the third person, says what and when, and names the upload path.</span></li>
+<li><span class="ok">PASS</span><span>Content kept at the split: 502 of 502 original content lines present, checked by script (18c96df). After the audit fixes, 473 of 502 remain word for word; the 29 others are the lines deliberately edited, each listed in the fix log.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> it refuses to treat an open PO as received without receipt evidence, and refuses a vendor-spend report as a stand-in for POs — textbook commitment-versus-liability judgments.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> the service period, not the invoice date, decides a late invoice; straddles are pro-rated and an unclear service period goes to exceptions.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> GRNI is tracked line by line and cumulatively, so netting at PO level cannot hide an unbilled line.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> the aggregate materiality of skipped items is tested, and with no threshold it accrues everything and says so.</span></li>
+<li><span class="ok">PASS</span><span><i>Audit, what is right:</i> it checks that last period's reversals posted and investigates accruals reversed where no invoice followed.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a connected company file with open purchase orders and a goods-receipt log. The tool names in method.md were not checked against a live tool catalogue in this pass, only against the skill's own text. Still open from the card split: the card asks for the accounting basis (intake B), but the Gate 3 ask-the-user table has no row for it.</p>
+</section>
+
+<footer>On branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to <code>main</code>. Cross-references to unshipped skills removed in 475ea95; card split in 18c96df; audit fixes in 6815813. Audited 27 Oct 2026. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>
