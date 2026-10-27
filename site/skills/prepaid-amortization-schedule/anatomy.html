@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prepaid Amortization Schedule Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the prepaid amortization skill is built: a 155-line card over six reference files, the run step by step, and the nine audit findings fixed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin);overflow-wrap:anywhere}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f .std{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+  .f .std b{font-weight:500;color:var(--ink)}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.partial{border-left-color:var(--manual)}
+  .f.partial .sev{white-space:normal}
+  .f ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}.f .sev{justify-self:start}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px;min-width:0}
+  .pass li span:last-child{min-width:0;overflow-wrap:anywhere}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  .gaps{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14.5px;max-width:72ch}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Prepaid amortization schedule</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">prepaid-amortization-schedule · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the prepaid amortization schedule is built, and what it does</h1>
+  <p class="lede">A 155-line card with six reference files behind it, split on 25 Oct 2026 from a 925-line file. It builds and maintains the schedule for expenses paid in advance, spreads each over its coverage period, drafts the monthly entry and ties the running balance to the general ledger. Its premise is that the ledger holds the prepaid balance but not the schedule, so a roll-forward is never reported as a reconciliation. This page shows where the weight sits, the run step by step, what the 27 Oct bookkeeping audit found and how each finding was fixed.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">155</span><span class="s">lines in SKILL.md, down from 925</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">440/440</span><span class="s">original content lines moved into 6 reference files at the split</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·4·4</span><span class="s">high · medium · low, from the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">9/9</span><span class="s">fixed in 4591599 · 0 partly · 0 rejected</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, six files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 155-line card with rules and six stages. The rules point to mosofin-protocol.md (262 lines), Stage 2 to gates.md (104), Stages 3 to 6 to method.md (436, the largest), Stage 4 also to edge-cases.md (33), Stage 5 also to output.md (76). overview.md (59) is read on demand. The skill has no tools-and-glossary file.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 155</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, eight questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Account shape, candidates</text>
+<text x="48" y="272">Stage 4 · Build the schedule</text>
+<text x="48" y="312">Stage 5 · Entries, tie-out, present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="186" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="74" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">104</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">436</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="23" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">33</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="54" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">76</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">59</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 270 C 450 270, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="566" y="32" text-anchor="end">before 1st call</text>
+<text x="566" y="86" text-anchor="end">Gates 0–3</text>
+<text x="566" y="138" text-anchor="end">Steps 0–10</text>
+<text x="318" y="398" fill="var(--muted)">dashed box: read only when a user asks why</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage points to the file it needs. <b>method.md</b> holds the verdict key, the Inputs table, Steps 0–10 and the “Seed to evolved” section that Stage 6 cites by name. <b>output.md</b> is larger here than in the sibling skills because the anti-patterns list (a roll-forward reported as a reconciliation, a fixture tie-out shown as clean) moved there at the split. There is no tools-and-glossary file: the original had no tool table or glossary. The honesty clause (coverage dates live on contracts, never in the ledger) sits at the top of the card.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1127" role="img" aria-label="Stage 1 asks whether to use Mosofin, which entity, which prepaid accounts, coverage dates per item and any existing schedule, the materiality threshold, whole-month or daily proration, recoverable tax, and functional currency and FX policy. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and each tool policy, and warn that a clean tie-out on mock data proves nothing; otherwise the user uploads the prepaid account detail, coverage dates and the chart of accounts. Both paths read back and wait for a yes. Steps 0 and 1 read the account and find candidates. Steps 2 to 5 build the schedule; coverage dates come only from contracts. Steps 6 to 10 draft entries, tie out three ways and handle cancellations. The seed-to-evolved section offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+<polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,454 230,498 398,498" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,454 690,498 522,498" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="522" x2="460" y2="552" marker-end="url(#a2)"/>
+<line x1="460" y1="662" x2="460" y2="692" marker-end="url(#a2)"/>
+<line x1="460" y1="878" x2="460" y2="908" marker-end="url(#a2)"/>
+<line x1="460" y1="1039" x2="460" y2="1069" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="300" y="74"><tspan font-weight="600">B</tspan> Which company or entities?</text>
+<text x="560" y="74"><tspan font-weight="600">C</tspan> Which prepaid accounts?</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Coverage dates per item; existing schedule</text>
+<text x="420" y="100"><tspan font-weight="600">E</tspan> Materiality threshold</text>
+<text x="620" y="100"><tspan font-weight="600">F</tspan> Whole-month or daily?</text>
+<text x="80" y="126"><tspan font-weight="600">G</tspan> Recoverable tax split out at payment?</text>
+<text x="420" y="126"><tspan font-weight="600">H</tspan> Functional currency; FX policy for prepaids</text>
+</g>
+<polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="80" y="292" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="98" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="98" y="342" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="98" y="366" xml:space="preserve">G1  company file · entity scenario</text>
+<text x="98" y="390" xml:space="preserve">G2  effective_policy per tool;</text>
+<text x="98" y="414" xml:space="preserve">      Gate 2 wins over any default</text>
+<text x="98" y="438" xml:space="preserve">      · mock data: a clean tie-out proves nothing</text>
+</g>
+<rect x="540" y="292" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="558" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="558" y="342">Prepaid account detail, required</text>
+<text x="558" y="366">Coverage dates per item, required</text>
+<text x="558" y="390">Chart of accounts, required</text>
+<text x="558" y="414">Existing schedule, to reconcile</text>
+<text x="558" y="438">Expense GL 12–24 months, bills, credits</text>
+</g>
+<rect x="400" y="474" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="503" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="216" fill="var(--manual)">no, or not connected</text></g>
+<rect x="60" y="554" width="800" height="108" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="580" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · READ THE SHAPE OF THE ACCOUNT, FIND THE CANDIDATES</text>
+<text x="80" y="604" font-size="13.5" fill="var(--ink)">Read back to the oldest open item (at least 24 months); items must explain the opening balance</text>
+<text x="80" y="625" font-size="13.5" fill="var(--ink)">Four ledger tests: does it ever come down, what the credits look like, odd items, balance &gt; 12 months</text>
+<text x="80" y="646" font-size="13.5" fill="var(--ink)">Expense accounts ranked by lumpiness · deposits, equipment, inventory, investments flagged as not prepaid</text>
+<rect x="60" y="694" width="800" height="184" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="720" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–5 · BUILD THE SCHEDULE</text>
+<text x="80" y="744" font-size="13.5" fill="var(--ink)">Materiality applied, its aggregate effect shown · period set from the coverage start, not payment</text>
+<text x="80" y="765" font-size="13.5" fill="var(--ink)">Straight-line or day-prorated, one method per item · rounding in the last period</text>
+<text x="80" y="786" font-size="13.5" fill="var(--ink)">Three internal checks on the schedule: a floor, not a result</text>
+<rect x="80" y="802" width="760" height="70" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="96" y="822" font-size="12.5" font-weight="600" fill="var(--high)">Coverage dates come from contracts, never from the ledger</text>
+<text x="96" y="841" font-size="12.5" fill="var(--ink)">Never derived from the payment date or a memo such as “annual renewal”: an unknown date stays blank</text>
+<text x="96" y="860" font-size="12.5" fill="var(--ink)">and flagged. And without the schedule there is no reconciliation, only the same ledger read twice.</text>
+<rect x="60" y="910" width="800" height="129" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="936" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–10 · ENTRIES, TIE-OUT, CANCELLATIONS, SEVEN SHEETS</text>
+<text x="80" y="960" font-size="13.5" fill="var(--ink)">Initial booking with the coverage period in the memo · a prepaid expensed in error: unexpired part only</text>
+<text x="80" y="981" font-size="13.5" fill="var(--ink)">Catch-up entries for missed months and expired residue · the monthly entry, recurring set-up is the user&#x27;s</text>
+<text x="80" y="1002" font-size="13.5" fill="var(--ink)">Three-way tie-out, naming the shape of any variance · cancellations settled against the refund</text>
+<text x="80" y="1023" font-size="13.5" fill="var(--ink)">Every entry marked PROPOSED — NOT POSTED · coverage and provenance sheet mandatory</text>
+<rect x="60" y="1071" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1099" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Seed to evolved · Offer to save</tspan>: accounts, convention, threshold, renewal months, coverage dates · explicit yes</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: the ledger can show that a balance is suspicious, but only dates from the contracts can say what it should be, so the dates are always asked and a missing one is shown as missing.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Nine findings, all fixed on 27 Oct, with the standard behind each</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit read the card and every reference file and called it the strongest of the four skills it reviewed in that batch; each finding was checked against the skill before acting. Severity is the auditor's.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>The correcting entries were wrong or missing for the very errors the skill finds</h3>
+      <p>Step 6 said “If the entire amount was already expensed in error, reverse the expense to set up the prepaid asset.” A $12,000 annual premium expensed in March and found in September has six months left, so a full reversal sets up $6,000 too much; a charge in a closed prior year would distort this year's P&amp;L; and missed months and expired residue got no entry at all.</p>
+      <p class="fix"><b>Fix.</b> The correction sets up only the unexpired portion at the correction date, with a worked example. If the charge fell in a closed prior year, the user is asked whether it is material: if not, it goes through current-year expense; if so, it is referred as a prior-period adjustment. Step 7 and Sheet 4 add catch-up entries for missed months and expired residue.</p>
+      <p class="std"><b>Behind it:</b> ASC 250 and IAS 8: a material amount belonging to a closed prior year is a prior-period error, not a current-year credit.</p>
+      <span class="where">references/method.md · Steps 6 and 7 · Sheet 4 · SKILL.md Stage 5</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The tax-inside-the-asset test would fire on insurance and on unregistered vendors</h3>
+      <p>The test reported an error whenever prepaid additions equalled the gross bill in a jurisdiction that allows recovery. Insurance, the commonest prepaid, is exempt from VAT/GST in many regimes, insurance premium tax is not recoverable, and unregistered vendors charge no recoverable tax, so gross is correct there.</p>
+      <p class="fix"><b>Fix.</b> The test fires only where the bill carries a recoverable tax code or amount; exempt, out-of-scope and non-recoverable tax belongs in the asset.</p>
+      <p class="std"><b>Behind it:</b> VAT and GST rules in the UK, EU and Australia, which exempt insurance; insurance premium tax is not recoverable.</p>
+      <span class="where">references/method.md · Step 6 · references/edge-cases.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The upload checklist did not ask for what three of the promised tests need</h3>
+      <p>It asked for the “Expense ledger for the period”: one month cannot give a monthly average, so the expensed-in-one-hit scan could not run. Bills with tax lines and vendor credits and receipts were not requested, so the tax test and refund detection did nothing on uploads.</p>
+      <p class="fix"><b>Fix.</b> The expense row asks for 12–24 months of GL detail and says the scan is not performed without it; a new row asks for the bills behind each addition with tax lines and for vendor credits and receipts. Tests not run are named on the coverage sheet.</p>
+      <p class="std"><b>Behind it:</b> the skill's own protocol: both paths run the same checks, and a check not run is named.</p>
+      <span class="where">SKILL.md upload checklist</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The items could fail to explain the opening balance</h3>
+      <p>A fixed 24-month read misses a three-year policy paid 30 months ago that still carries a balance, and the client's existing schedule was asked for only on the upload path.</p>
+      <p class="fix"><b>Fix.</b> Step 0 reads back to the oldest item still carried (at least 24 months), uses the existing schedule, and confirms the items sum to the opening GL balance, any remainder a named exception. Intake D asks for the existing schedule on both paths.</p>
+      <p class="std"><b>Behind it:</b> standard schedule practice: explain the full opening balance item by item before adding new items.</p>
+      <span class="where">references/method.md · Step 0 · SKILL.md intake D and Stage 3</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The installment option grossed up an executory contract</h3>
+      <p>The edge case allowed setting up “the entire contract value … as prepaid with an offsetting payable for the unpaid installments”, which books a liability for services not yet received.</p>
+      <p class="fix"><b>Fix.</b> The grossed-up option is deleted. Each installment paid or invoiced is its own prepaid over the coverage it buys; unbilled future installments are a commitment, disclosed if material; leases follow the lease standards.</p>
+      <p class="std"><b>Behind it:</b> US GAAP and IFRS treatment of executory contracts (not recognised until one side performs); ASC 842 and IFRS 16 for leases.</p>
+      <span class="where">references/edge-cases.md · installments</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Four low findings, all fixed</h3>
+      <ul><li><b>“Total Amount” could carry the gross figure</b>, against the net rule; Sheet 1 gains “Prepaid amount (net of recoverable tax)”, used by the Step 4 formulas, with gross kept for reference.</li><li><b>Step 10 said “Deliver an .xlsx”</b> and later said to ask first; it now says “Offer an .xlsx workpaper”.</li><li><b>No current / non-current split on any sheet</b>, and some terms unexplained; Sheet 1 gains both columns, and “non-monetary” and “ROU (right-of-use) asset” are glossed.</li><li><b>Cancellation entry accounts.</b> The refund side is cash or a vendor receivable or credit, not customer A/R; an excess refund goes to the original expense account unless policy says otherwise.</li></ul>
+      <span class="where">references/method.md · Steps 4, 9, 10, Sheet 1 · references/edge-cases.md</span>
+      </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures; the shared blocks are in sync (31 skills), both run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its six reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 10, exists as a heading in method.md, and the “Seed to evolved” section Stage 6 names exists.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,018 characters, under the 1,024-character limit, third person, with the upload path in it.</span></li>
+    <li><span class="ok">PASS</span><span>At the split, 440 of 440 original content lines were present in the reference files (8f065ee); every line that differs now is one the audit fixes edited on purpose.</span></li>
+    <li><span class="ok">PASS</span><span>The save step now carries the “only after the results, only on an explicit yes” rule in the skill itself (baf43ef), so the card's Stage 6 rests on the skill's text.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: a roll-forward is never presented as a reconciliation; only the schedule leg tests the balance.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: coverage dates are never taken from the payment date or a memo; unknown dates stay blank and flagged.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: the Step 0 ledger tests (never comes down, hand-keyed round credits, deposits and fixed assets in the account, balance above twelve months of additions) are the highest-value checks on neglected books.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: amortization starts at the coverage start, one convention per item, rounding in the last period; cancellations settle against the refund and changes apply prospectively.</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What this page cannot vouch for</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file with a real prepaid account and contract coverage dates.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass; the skill has no tool table, so typical tool names appear only in prose.</li>
+    <li>The new correction and catch-up entries, and the recoverable-tax condition, were checked as text only, not against a real prior-year expensing error or an exempt insurance bill.</li>
+  </ul>
+</section>
+
+<footer>Skill in <code>MosoFin/mosofin-finance-skills</code>, on the branch <code>claude/trusting-ramanujan-8k8te1</code>, not yet merged to <code>main</code>. Commits: cross-references to unshipped skills removed in ab15414; card-format split in 8f065ee; ask-before-saving rule in baf43ef; audit fixes in 4591599 (27 Oct 2026). Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

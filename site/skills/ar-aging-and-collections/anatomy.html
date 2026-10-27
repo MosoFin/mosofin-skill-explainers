@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A/R Aging and Collections Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the A/R aging and collections skill is built: a 154-line card over seven reference files, the run step by step, and the eight audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin);overflow-wrap:anywhere}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f .std{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+  .f .std b{font-weight:500;color:var(--ink)}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.partial{border-left-color:var(--manual)}
+  .f.partial .sev{white-space:normal}
+  .f ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}.f .sev{justify-self:start}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px;min-width:0}
+  .pass li span:last-child{min-width:0;overflow-wrap:anywhere}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  .gaps{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14.5px;max-width:72ch}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← A/R aging and collections</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">ar-aging-and-collections · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the A/R aging and collections skill is built, and what it does</h1>
+  <p class="lede">A 154-line card with seven reference files behind it, split on 25 Oct 2026 from an 845-line file. It answers who owes us money, how late they are and who to chase first: an aging on each invoice's open balance, tied back to the aging summary, a ranked collection plan, the receivables metrics, and reminder drafts that a person reviews and sends. This page shows where the weight sits, the run step by step, what the 27 Oct bookkeeping audit found and how each finding was handled.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">154</span><span class="s">lines in SKILL.md, down from 845</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">475/475</span><span class="s">original content lines moved into 7 reference files at the split</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·4·3</span><span class="s">high · medium · low, from the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">7/8</span><span class="s">fixed in 4e8a3ac · 1 partly · 0 rejected</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 154-line card with rules and six stages. The rules point to mosofin-protocol.md (262 lines), Stage 2 to gates.md (168), Stages 3 to 6 to method.md (291, the largest after the protocol), Stage 4 also to edge-cases.md (61), Stage 5 also to output.md (41). overview.md (20) and tools-and-glossary.md (87) are read on demand.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 154</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, seven questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Pull, normalise aging</text>
+<text x="48" y="272">Stage 4 · Reconcile, gaps, analyse</text>
+<text x="48" y="312">Stage 5 · Aging, plan, drafts</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="279" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="179" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">168</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">291</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="65" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">61</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="44" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">41</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">20</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">87</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 270 C 450 270, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="566" y="32" text-anchor="end">before 1st call</text>
+<text x="566" y="86" text-anchor="end">Gates 0–3</text>
+<text x="566" y="138" text-anchor="end">Steps 1–7</text>
+<text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage points to the file it needs. <b>method.md</b> uses numbered sections rather than “Step N” headings (1. Pull and confirm … 7. Evolve the skill), plus both entity scenarios and the validation scenarios; the card calls them Steps 1–7 and says so. <b>gates.md</b> also carries the guardrails that hold for the whole run, and <b>output.md</b> is the completion-check list, moved there at the split. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. The honesty clause (disputes, credit holds, tiers, payment history and collection policy are not reliably in the books) sits at the top of the card.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1130" role="img" aria-label="Stage 1 asks whether to use Mosofin, the as-of date, what is needed and for whom, states that an aging is always on invoices issued, asks the DSO period and credit sales, disputes, holds, tiers and payment history, and the collection policy. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company file, stop if disconnected, and treat aging summary and detail as separate capabilities; otherwise the user uploads an A/R aging detail exported by report date, a summary and the control balance. Both paths read back and wait for a yes. Steps 1 and 2 pull and normalise the aging. Steps 3 to 5 reconcile, ask one gap question and analyse; disputes and holds come only from the user. Step 6 delivers the aging, plan and drafts, none sent. Step 7 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+<polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="230,478 230,522 398,522" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="690,478 690,522 522,522" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="546" x2="460" y2="576" marker-end="url(#a2)"/>
+<line x1="460" y1="686" x2="460" y2="716" marker-end="url(#a2)"/>
+<line x1="460" y1="923" x2="460" y2="953" marker-end="url(#a2)"/>
+<line x1="460" y1="1042" x2="460" y2="1072" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="300" y="74"><tspan font-weight="600">B</tspan> As of which date?</text>
+<text x="520" y="74"><tspan font-weight="600">C</tspan> Aging, plan, DSO, drafts? Whom?</text>
+<text x="80" y="100"><tspan font-weight="600">D</tspan> Stated: an aging is always on invoices issued</text>
+<text x="520" y="100"><tspan font-weight="600">E</tspan> DSO period; credit sales</text>
+<text x="80" y="126"><tspan font-weight="600">F</tspan> Disputes, holds, tiers, payment history</text>
+<text x="520" y="126"><tspan font-weight="600">G</tspan> Collection policy, wording, contact</text>
+</g>
+<polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<rect x="80" y="292" width="300" height="186" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="98" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="98" y="342" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="98" y="366" xml:space="preserve">G1  company file · disconnected: stop,</text>
+<text x="98" y="390" xml:space="preserve">      show reconnect_url</text>
+<text x="98" y="414" xml:space="preserve">G2  aging summary and aging detail are</text>
+<text x="98" y="438" xml:space="preserve">      separate capabilities; a search is</text>
+<text x="98" y="462" xml:space="preserve">      enrichment, never the population</text>
+</g>
+<rect x="540" y="292" width="300" height="186" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="558" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="558" y="342">A/R Aging Detail, Report date, required</text>
+<text x="558" y="366">A/R Aging Summary, the tie-out</text>
+<text x="558" y="390">A/R control balance, for a GL tie</text>
+<text x="558" y="414">Credit sales, only for exact DSO</text>
+<text x="558" y="438">Company, as-of date, currency, typed</text>
+<text x="558" y="462">Disputes, policy, when needed</text>
+</g>
+<rect x="400" y="498" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="527" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="216" fill="var(--manual)">no, or not connected</text></g>
+<rect x="60" y="578" width="800" height="108" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="604" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–2 · PULL THE AGING AND NORMALISE IT</text>
+<text x="80" y="628" font-size="13.5" fill="var(--ink)">Aging detail and unfiltered summary for the same date, aging_method = Report_Date on both</text>
+<text x="80" y="649" font-size="13.5" fill="var(--ink)">Invoice search only for enrichment · each result&#x27;s mock flag checked</text>
+<text x="80" y="670" font-size="13.5" fill="var(--ink)">One row per invoice, aged on the open balance: Current, 1-30, 31-60, 61-90, 91-120, Over 120</text>
+<rect x="60" y="718" width="800" height="205" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="744" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–5 · RECONCILE, ASK ONCE, ANALYSE</text>
+<text x="80" y="768" font-size="13.5" fill="var(--ink)">Detail tied to summary by customer, by bucket and in total at 0.01 · unresolved variance disclosed</text>
+<text x="80" y="789" font-size="13.5" fill="var(--ink)">Net aging agreed to the A/R control account; only then “reconciled to the general ledger”</text>
+<text x="80" y="810" font-size="13.5" fill="var(--ink)">One consolidated gap question · metrics on the net balance · DSO on credit sales, any proxy labelled</text>
+<text x="80" y="831" font-size="13.5" fill="var(--ink)">Overdue customers ranked by age and balance · net credit balances to exceptions · insolvency stops dunning</text>
+<rect x="80" y="847" width="760" height="70" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="96" y="867" font-size="12.5" font-weight="600" fill="var(--high)">Disputes, credit holds, tiers, payment history and policy come from the user</text>
+<text x="96" y="886" font-size="12.5" fill="var(--ink)">The books do not reliably hold them, so they are never inferred: asked when the plan or drafts need them,</text>
+<text x="96" y="905" font-size="12.5" fill="var(--ink)">otherwise left out and disclosed. A disputed invoice is routed to resolution, not chased as late.</text>
+<rect x="60" y="955" width="800" height="87" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="981" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 6 · DELIVER THE AGING, THE PLAN AND THE DRAFTS</text>
+<text x="80" y="1005" font-size="13.5" fill="var(--ink)">Run context, aging summary and detail, collection plan, drafts, exceptions with owners, coverage</text>
+<text x="80" y="1026" font-size="13.5" fill="var(--ink)">Every draft marked REVIEW REQUIRED - NOT SENT · no invented fees, holds or threats · one Data sources line</text>
+<rect x="60" y="1074" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1102" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 7 · Offer to save</tspan>: tiers, standing holds and disputes, policy, bands; never contacts, balances, drafts · explicit yes</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: the ledger shows who has not paid, not why, so anything that changes the tone of a reminder comes from the user, and the skill never contacts a customer itself.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings: seven fixed and one partly fixed on 27 Oct, with the practice behind each</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit read the card and every reference file; each finding was checked against the skill before acting. Severity is the auditor's.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>The aging method was never set to the as-of date, so buckets could be counted to today</h3>
+      <p>The skill named the <code>aging_method</code> argument (Current / Report_Date) but never said which to pass, and the upload row did not say how to export. A month-end aging run weeks later on the Current method ages every invoice that much too old, and Step 3 tied only totals by customer, which match either way, so the error passed the tie-out.</p>
+      <p class="fix"><b>Fix.</b> Summary and detail are read with the as-of date and <code>aging_method = Report_Date</code>; uploads ask for an export with “Aging method: Report date”. Step 3 also compares by bucket and re-pulls on a bucket-only difference, and the recomputed days past due are the authority.</p>
+      <p class="std"><b>Behind it:</b> standard bookkeeping practice: an aging “as of” a date is aged to that date.</p>
+      <span class="where">references/method.md · Steps 1 and 3 · SKILL.md upload checklist</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The metrics never said whether they ran on gross invoices or the net balance</h3>
+      <p>The population was pulled invoice-only, the summary nets unapplied payments and credit memos, and Step 5 computed total A/R, overdue % and DSO without saying which. A customer with a net credit balance was not handled at all.</p>
+      <p class="fix"><b>Fix.</b> Metrics run on the net open balance that ties to the summary, with gross invoices and unapplied items shown above it. Customers with a net credit balance go to exceptions as “refund or reclassify”, out of the plan and the concentration ranking; the plan ranks on net balance.</p>
+      <p class="std"><b>Behind it:</b> ASC 210-10-45 and IAS 1 on offsetting: a customer credit balance is a liability, listed separately.</p>
+      <span class="where">references/method.md · Step 5</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The tie to the A/R control account was named but never a step</h3>
+      <p>Step 3 said to call the result “a summary-to-detail reconciliation unless a GL control balance was separately tested”, but no step tested it.</p>
+      <p class="fix"><b>Fix.</b> A new Step 3 bullet agrees the net aging to the A/R balance on the balance sheet (or the trial balance on uploads) at 0.01, lists each A/R account, and sends differences to exceptions; the output may say “reconciled to the general ledger” only when it agrees.</p>
+      <p class="std"><b>Behind it:</b> standard close practice: the aging total is agreed to the A/R control account before it is used.</p>
+      <span class="where">references/method.md · Step 3</span>
+      </div></div>
+    <div class="f med done partial"><span class="sev">Medium · partly fixed</span><div class="body">
+      <h3>Asking “accrual or cash basis?” for an aging was a false choice that could stall the run</h3>
+      <p>Intake D asked the question and stopped before reading data if cash was wanted. An A/R aging lists unpaid invoices, so it is accrual by nature whatever basis the owner files on.</p>
+      <p class="fix"><b>Fix.</b> Intake D is now a statement (an aging is always on invoices issued; only DSO and any income figure depend on basis), and the edge case stops only if the user explicitly asks for a cash-basis aging. <b>Partly fixed:</b> the gates.md guardrail was left as written, because it already applies only “if cash basis is requested” and is shared gate wording.</p>
+      <p class="std"><b>Behind it:</b> standard bookkeeping practice: on a true cash basis there are no receivables to age.</p>
+      <span class="where">SKILL.md intake D · references/edge-cases.md · references/gates.md unchanged</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Credit sales were always asked of the user, though the books hold them</h3>
+      <p>Intake E required credit sales from the user, and the tools file called Sales by Customer “a credit-sales basis”, although that report includes sales receipts, which are cash sales.</p>
+      <p class="fix"><b>Fix.</b> On the Mosofin path credit sales are invoices less credit memos dated in the period, derivation shown; uploads ask for an invoice-filtered list. The tools file now warns that Sales by Customer includes cash sales.</p>
+      <p class="std"><b>Behind it:</b> standard DSO practice: the denominator is credit sales, not total income.</p>
+      <span class="where">references/method.md · Step 5 · references/tools-and-glossary.md · SKILL.md intake E · references/gates.md</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Three low findings, all fixed</h3>
+      <ul><li><b>The wrong reason for flooring Current at zero.</b> Current invoices are not paid early, they are not yet due; the reason now says so.</li><li><b>“Current” meant two things</b>, a bucket and an aging method; the glossary now defines the aging method separately.</li><li><b>Exceptions had no owner and nothing recorded review.</b> Exceptions now carry Item, Amount, Cause, Proposed action, Owner and Due, and the run context gains a Prepared / Reviewed line.</li></ul>
+      <span class="where">references/method.md · Steps 5 and 6 · references/tools-and-glossary.md</span>
+      </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures; the shared blocks are in sync (31 skills), both run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 1 to 7, exists as a numbered section heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 997 characters, under the 1,024-character limit, third person, with the upload path in it.</span></li>
+    <li><span class="ok">PASS</span><span>At the split, 475 of 475 original content lines were present in the reference files (461438f); the 10 lines that differ now are the ones the audit fixes edited on purpose.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: an invoice search is treated as enrichment, never the population, and a customer balance report is never presented as an aging.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: the aging runs on open balance, not original amount, with both shown for partly paid invoices.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: DSO is on credit sales, and any total-income proxy is labelled, approved, and said to read lower.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: disputes go to resolution, an insolvency notice stops dunning, intercompany balances are kept out of collections, and currencies are kept separate.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: drafts use neutral wording with no fees or threats, each marked REVIEW REQUIRED - NOT SENT.</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What this page cannot vouch for</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file with a real A/R aging detail and summary for a past as-of date.</li>
+    <li>Tool names, and whether the aging tools accept <code>aging_method = Report_Date</code>, were not checked against a live tool catalogue in this pass.</li>
+    <li>The gates.md cash-basis guardrail was deliberately left as is (finding M3, partly fixed).</li>
+  </ul>
+</section>
+
+<footer>Skill in <code>MosoFin/mosofin-finance-skills</code>, on the branch <code>claude/trusting-ramanujan-8k8te1</code>, not yet merged to <code>main</code>. Commits: cross-reference to an unshipped skill removed in 30b49fd; card-format split in 461438f (reverted and re-applied in bf6a205 and 7d59bae, with no net change); audit fixes in 4e8a3ac (27 Oct 2026). Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>
