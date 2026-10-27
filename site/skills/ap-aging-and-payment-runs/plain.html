@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Aging and Payment Runs in Plain English | MosoFin</title>
+<meta name="description" content="What an AP aging and payment run shows: how late each bill is, who to pay first with the cash you choose to spend, and what waits. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← AP aging and payment runs</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · AP aging and payment runs, in plain words</span>
+  <h1>Who do we pay this week, with the cash we actually have?</h1>
+  <p class="lede">Every week a business has more bills than cash. This skill sorts every unpaid bill by <b>how late it is</b>. Then it proposes <b>who to pay first</b> with the cash you choose to spend this week.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a date and the amount of cash you choose to spend. It reads your open bills, terms and vendors, from your books or from your files. It sorts each bill into a band of lateness. It finds discounts that end soon and late fees that grow. It ranks the bills and stops when the next bill does not fit the cash. It shows what stays unpaid. The run is a proposal. A person approves it and pays it in the bank or accounting system.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Nine bills at Northbrook Trading on Friday 6 November</h2>
+  <p>Northbrook Trading pays its bills once a week. The as-of date is Friday 6 November 2026. Northbrook has nine open bills, all in US dollars. The skill calculates the days past due from the as-of date for each bill. Then it puts each bill in a band of lateness. Accountants call these bands aging buckets.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's nine open bills on 6 November 2026, with due date, days past due and bucket">
+        <thead><tr><th scope="col" style="text-align:left">Vendor</th><th scope="col">Open $</th><th scope="col" style="text-align:left">Due</th><th scope="col">Days past due</th><th scope="col" style="text-align:left">Bucket</th><th scope="col" style="text-align:left">What the skill sees</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Power Co</th><td>3,400</td><td class="t">Fri 30 Oct</td><td>7</td><td class="t">1–30</td><td class="t">Critical, as you said</td></tr>
+        <tr><th scope="row">PayrollCo</th><td>1,200</td><td class="t">Tue 10 Nov</td><td>−4</td><td class="t">Not yet due</td><td class="t">Critical, as you said</td></tr>
+        <tr class="breach"><th scope="row">Crestline Logistics</th><td>12,500</td><td class="t">Tue 22 Sep</td><td>45</td><td class="t">31–60</td><td class="t">Late fee of 1.5% a month in the terms: $187.50 a month</td></tr>
+        <tr class="breach"><th scope="row">Lakeside Freight</th><td>7,200</td><td class="t">Mon 12 Oct</td><td>25</td><td class="t">1–30</td><td class="t">Final notice, with a collection threat. An email on 3 Nov sent new bank details</td></tr>
+        <tr><th scope="row">Harbor Office Supply</th><td>8,000</td><td class="t">Sun 29 Nov</td><td>−23</td><td class="t">Not yet due</td><td class="t h">2/10 Net 30, billed 30 Oct. Pay by Mon 9 Nov to save $160</td></tr>
+        <tr><th scope="row">Summit Cleaning</th><td>950</td><td class="t">Sun 8 Nov</td><td>−2</td><td class="t">Not yet due</td><td class="t">Due this week</td></tr>
+        <tr><th scope="row">Pinnacle Design</th><td>14,000</td><td class="t">Thu 12 Nov</td><td>−6</td><td class="t">Not yet due</td><td class="t">Due next week</td></tr>
+        <tr><th scope="row">Brightline Software</th><td>6,000</td><td class="t">Fri 4 Dec</td><td>−28</td><td class="t">Not yet due</td><td class="t">Discretionary, as you said</td></tr>
+        <tr><th scope="row">Acme Corp</th><td>9,600</td><td class="t">Sun 2 Aug</td><td>96</td><td class="t">91–120</td><td class="t a">On hold: you dispute the invoice</td></tr>
+        <tr class="tot"><th scope="row">Total open</th><td class="c">62,850</td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. A negative number of days means the bill is not yet due. The skill takes the critical and discretionary tiers from you, because your books do not hold them.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Not yet due</span><span class="v num">$30,150</span><span class="s">1,200 + 8,000 + 950 + 14,000 + 6,000</span></div>
+    <div class="stat"><span class="label">1–30 days late</span><span class="v num hold">$10,600</span><span class="s">3,400 + 7,200</span></div>
+    <div class="stat"><span class="label">31–60 days late</span><span class="v num wrong">$12,500</span><span class="s">Crestline. The 61–90 bucket is $0</span></div>
+    <div class="stat"><span class="label">91–120 days late</span><span class="v num wrong">$9,600</span><span class="s">Acme, on hold. Over 120 days is $0. All buckets: 30,150 + 10,600 + 12,500 + 9,600 = 62,850</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Who gets paid first</span>
+  <h2>$62,850 of bills and $40,000 to spend</h2>
+  <p>Northbrook has more money in the bank. The owner keeps $10,000 in reserve and chooses to spend $40,000 this week. That $40,000 is the cash available for the run. It is what the owner chooses to spend, not the bank balance. The skill asks for this figure every run.</p>
+  <p>The skill ranks the bills in its default order. It adds each bill to the run until the next bill does not fit the cash.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The ranked payment run: six bills for $33,090, then Pinnacle stops the run because it would make $47,090">
+        <thead><tr><th scope="col" style="text-align:left">Rank</th><th scope="col" style="text-align:left">Vendor</th><th scope="col" style="text-align:left">Why it is here</th><th scope="col">Pay</th><th scope="col">Running total</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">1</th><td class="t">Power Co</td><td class="t">Critical: the service stops without payment</td><td>3,400</td><td>3,400</td></tr>
+        <tr><th scope="row">1</th><td class="t">PayrollCo</td><td class="t">Critical</td><td>1,200</td><td>4,600</td></tr>
+        <tr><th scope="row">2</th><td class="t">Crestline Logistics</td><td class="t">Late, with a late fee that grows</td><td>12,500</td><td>17,100</td></tr>
+        <tr><th scope="row">2</th><td class="t">Lakeside Freight</td><td class="t">Late, with a collection threat. To the bank account on file</td><td>7,200</td><td>24,300</td></tr>
+        <tr><th scope="row">3</th><td class="t">Harbor Office Supply</td><td class="t">Discount ends Mon 9 Nov, before the next run on Fri 13 Nov. 8,000 − 160</td><td>7,840</td><td>32,140</td></tr>
+        <tr><th scope="row">4</th><td class="t">Summit Cleaning</td><td class="t">Due this week</td><td>950</td><td class="c">33,090</td></tr>
+        <tr class="breach"><th scope="row">5</th><td class="t">Pinnacle Design</td><td class="t w">Due next week. 33,090 + 14,000 = 47,090, more than 40,000. The run stops here</td><td>0</td><td>33,090</td></tr>
+        <tr><th scope="row">6</th><td class="t">Brightline Software</td><td class="t">Discretionary and not due: wait</td><td>0</td><td>33,090</td></tr>
+        <tr><th scope="row">Held</th><td class="t">Acme Corp</td><td class="t a">On hold. The run never pays a held bill</td><td>0</td><td>33,090</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The ranking order is the skill's own default. You can give it a different order. Pinnacle is not late. It waits for the next run on Friday 13 November.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Proposed run</span><span class="v num good">$33,090</span><span class="s">3,400 + 1,200 + 12,500 + 7,200 + 7,840 + 950, as a proposal</span></div>
+    <div class="stat"><span class="label">Cash left</span><span class="v num">$6,910</span><span class="s">40,000 − 33,090, from the cash you chose to spend</span></div>
+    <div class="stat"><span class="label">Left unpaid</span><span class="v num hold">$29,600</span><span class="s">Pinnacle 14,000 + Brightline 6,000 + Acme 9,600 on hold</span></div>
+    <div class="stat"><span class="label">Discount saved</span><span class="v num good">$160</span><span class="s">2% of 8,000. The parts re-add: 33,090 + 160 + 29,600 = 62,850</span></div>
+  </div>
+  <p>The skill shows the unpaid bills on the face of the result, not in a note. Those are the bills you must make a decision about.</p>
+  <p>Why does a small discount rank above a bill that is due? Harbor gives 2% for payment within 10 days, instead of 30. The skill calculates the return a year as 2% × 365 / (30 − 10) = 36.5%. A finance textbook calculates the cost of a missed 2/10, net 30 discount as 36.73% a year, with a slightly fuller formula<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Both give about 36% a year.</p>
+  <p>Crestline's terms add 1.5% a month to a late bill: 12,500 × 1.5% = $187.50 a month. So Crestline ranks above the larger Pinnacle bill, which costs nothing to wait on. The skill takes a late fee from the terms in your books. If the fee is only in a contract, it asks you.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The email that asks you to pay a new bank account</h2>
+  <p>Lakeside Freight is late and sent a final notice. On Tuesday 3 November, an email came "from Lakeside" with new bank details. A request to change bank details is a common way for businesses to lose money. The skill flags the change and does not use the new details.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">The run uses the bank account already on file</span>
+      <div class="rows num">
+        <div class="row"><span>Lakeside, in the run</span><span class="v">$7,200</span></div>
+        <div class="row"><span>Pay to</span><span class="v">account on file</span></div>
+        <div class="row off"><span>New details from the 3 Nov email</span><span class="v">held</span></div>
+      </div>
+      <div class="verdict">You confirm the change through a channel the vendor did not supply, for example the phone number already on file. Only then can a payment go to the new account. The skill never saves bank details.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Update the vendor record from the email</span>
+      <div class="rows num">
+        <div class="row"><span>Lakeside, paid</span><span class="v">$7,200</span></div>
+        <div class="row off"><span>Pay to</span><span class="v">new account</span></div>
+        <div class="row off"><span>Lakeside receives</span><span class="v">$0</span></div>
+      </div>
+      <div class="verdict">If the email was false, $7,200 goes to a stranger. Lakeside is still unpaid and still sends a final notice.</div>
+    </div>
+  </div>
+  <p>The FBI gives the same advice. Confirm a request to change payment or account details through a second channel, such as a phone number you already have. Do not use a number or link in the request<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Reported losses, 2024</span><span class="v num wrong">$2.77 billion</span><span class="s">From business email compromise in the US, $2,770,151,146 in total<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
+    <div class="stat"><span class="label">Complaints, 2024</span><span class="v num">21,442</span><span class="s">Business email compromise complaints in the same report<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
+    <div class="stat"><span class="label">Who decides</span><span class="v num good">A person</span><span class="s">The skill proposes the run. A person approves it. The bank or the accounting system pays it. Splitting those roles between people helps prevent fraud, waste and abuse<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup></span></div>
+  </div>
+  <p class="muted" style="font-size:15px">Most changes of bank details are real. The skill does not know which kind it found. It flags the change, and you decide after you confirm it through a second channel.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>It asks six questions before it reads anything</h2>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files and the skill does the same work. The skill asks this only if your account has a MosoFin connection. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">The as-of date for the aging.</div><div class="why">Required. The aging changes from day to day. The skill never picks a date for you.</div></li>
+    <li><div class="q">How much cash is available for this payment run?</div><div class="why">Required for the payment run. The run stops when the cash ends. Give the amount after payments you already promised, your float and any reserve. Without it, the skill builds the aging only. It never reads a bank balance and calls it available.</div></li>
+    <li><div class="q">Which vendors are critical, standard or discretionary?</div><div class="why">Optional. Your books do not know which supplier stops service first. Without the tiers, the skill ranks on dates, discounts and late fees only, and says so.</div></li>
+    <li><div class="q">How you pay each vendor, and any terms or holds you keep outside the books.</div><div class="why">Recommended. The books hold the names of the payment methods. They often do not show which vendor gets which method. Without your answer, that column reads "to confirm".</div></li>
+    <li><div class="q">If your bills are in more than one currency: the exchange rate and its source.</div><div class="why">Required if several currencies appear. No accounting connection supplies a live rate for a bank transfer. The skill never assumes a rate.</div></li>
+  </ol>
+  <p>Then it reads your answers back and waits for your yes. For Northbrook, the read-back is like this:</p>
+  <blockquote><i>"Aging as at Friday 6 November for Northbrook Trading, read from your Mosofin connection. Payment run for $40,000 of available cash, after the $10,000 you keep back. Power Co and PayrollCo are critical. Default buckets. All bills in USD. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload your open bills</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it the decisions no ledger holds</h3>
+      <ul>
+        <li>It reads the open bills and the aging report, if your workspace allows it</li>
+        <li>It reads the payments already made and the open vendor credits</li>
+        <li>It reads the payment terms, including discount terms, and the vendor records</li>
+        <li>It reads the balance of your accounts payable account, to compare the aging with it</li>
+        <li>You still give it the <b>as-of date</b> and the <b>cash available</b>, every run. You also give it the <b>vendor tiers</b> and any late fee that is only in a contract</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the open bills, and more if you have them</h3>
+      <ul>
+        <li><b>Open bills</b>: vendor, bill number, bill date, due date or terms, open amount, currency. An aged payables or open bills export, CSV or XLSX, required</li>
+        <li><b>Payments already made or in progress</b>, and <b>open vendor credits</b>, CSV or XLSX, recommended</li>
+        <li><b>Vendor list</b> with terms and payment method, CSV or XLSX, recommended</li>
+        <li><b>The accounts payable balance</b> from the balance sheet or trial balance, recommended</li>
+        <li>The as-of date, cash available, tiers and exchange rate, typed in the chat</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Six sheets: the aging, the run, and what it could not read</h2>
+  <div class="gets">
+    <div class="get"><b>Aging summary</b><span>Each vendor against each bucket, with totals. It says if the aging came from your report or if the skill built it from the bills.</span></div>
+    <div class="get"><b>Aging detail</b><span>Every bill with its dates, days past due, bucket, terms, discount, late fee, tier and status.</span></div>
+    <div class="get"><b>Proposed payment run</b><span>Each payment with its reason, the total, the cash available, the cash left and the bills that wait. Headed as a proposal: no payment has been made or scheduled.</span></div>
+    <div class="get"><b>Discounts</b><span>Every discount with its last day, its amount and its return a year, highest return first.</span></div>
+    <div class="get"><b>Exceptions</b><span>Bills with data problems to correct before payment, and any due date the skill calculated from the terms.</span></div>
+    <div class="get"><b>Coverage</b><span>For each task, what the skill read, with which tool, and what you must supply because it could not read it.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your vendor tiers, payment methods, holds and ranking order for the next run. It never saves bank details or the cash available.</p>
+</section>
+
+<section>
+  <div class="never">
+    <span class="label">What it never does</span>
+    <ul>
+      <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
+      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never sends, releases or schedules a payment, changes bank details or puts a vendor on hold.</b> The run is a proposal, headed as one. A person approves it and pays it.</li>
+      <li><b>Never picks the as-of date, the cash available or the company for you.</b> A bank balance is not available cash. It asks every run.</li>
+      <li><b>Never proposes a real payment run from test data.</b> If any figure is test data, the run is an illustration only, and says so at the top.</li>
+      <li><b>Never saves vendor bank details.</b> You confirm a change through a channel the vendor did not supply. Only then can a payment go to the new account.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Accounts payable</dt><dd>The bills you owe to suppliers and have not paid yet. Accountants write A/P or AP.</dd>
+    <dt>Aging</dt><dd>A table that sorts every unpaid bill by how late it is.</dd>
+    <dt>Aging bucket</dt><dd>One band of lateness, for example 1–30 days late. The skill's default bands go from "not yet due" to "over 120 days".</dd>
+    <dt>Payment run</dt><dd>The group of payments you send at one time, often once a week.</dd>
+    <dt>Cash available</dt><dd>The amount you choose to spend in this run. It is your decision, not the bank balance.</dd>
+    <dt>2/10 Net 30</dt><dd>Payment terms: 2% off if you pay within 10 days, otherwise the full amount is due in 30 days<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Credit hold</dt><dd>You keep a bill unpaid on purpose, for example during a dispute. The run never pays it.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a finance textbook, two FBI publications on email fraud and a US control standard. We found each one on 27 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="the 2/10, net 30 example"><a href="https://openstax.org/books/principles-finance/pages/19-2-what-is-trade-credit" rel="noopener">OpenStax: Principles of Finance, 19.2 What Is Trade Credit?</a><span class="what">For terms of 2/10, net 30, the annual cost of not taking the discount is 36.73 percent. A late payment instead of an early one has a cost: the discount you lose.</span></li>
+    <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Tips to protect yourself"><a href="https://www.ic3.gov/PSA/2023/psa230609" rel="noopener">FBI IC3: Public Service Announcement I-060923-PSA, Business Email Compromise</a><span class="what">Confirm a request to change payment or account details through a second channel, for example a phone number already on file. Do not use a number or link in the request.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="loss table, Business Email Compromise"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" rel="noopener">FBI IC3: 2024 Internet Crime Report</a><span class="what">Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints.</span></li>
+    <li id="src4" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Principle 10, Segregation of Duties, ¶10.21–10.23"><a href="https://www.gao.gov/assets/gao-25-107721.pdf" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721</a><span class="what">Separating authority, custody and accounting among different people helps prevent fraud, waste and abuse.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the default buckets, the ranking order, the vendor tiers or the six sheets. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>ap-aging-and-payment-runs</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and has not shipped. It is not yet on the main branch. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its vendors and every figure in the example. They are not your data. The tiers, the reserve and the ranking are the company's own choices. The textbook, the FBI publications and the control standard are US sources. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
