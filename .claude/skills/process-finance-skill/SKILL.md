@@ -23,8 +23,22 @@ reference. When this file and a reference disagree, follow this file and say so.
 
 ### 1. Choose the skill
 
-Take the next skill in the same family as the last one, from `tracker.tsv` and the skills repository's
-`deploy-queue.tsv`. A skill whose pages are all `todo` and whose `SKILL.md` has no `references/`
+Take the next skill from the priority list below, in order. Each one has the question an owner asks,
+which is the hook for its plain page. When the list is done, take the next skill in the same family as
+the last one, from `tracker.tsv` and the skills repository's `deploy-queue.tsv`.
+
+| # | Skill | The owner's question |
+|---|---|---|
+| 1 | cash-flow-forecast-13-week | Will I make payroll in 6 weeks? |
+| 2 | duplicate-invoice-detection | Did I pay the same bill twice? |
+| 3 | expense-report-processor | Who still owes me a receipt? |
+| 4 | budget-vs-actual-analysis | Where did the money go? |
+| 5 | ap-aging-and-payment-runs | Who do I pay this week, and who can wait without a late fee? |
+| 6 | customer-invoicing | How do I get paid faster? |
+| 7 | month-end-close-checklist | Are the books done? |
+
+Done so far: merchant-and-payment-processor-rec, bank-reconciliation, three-way-match,
+credit-card-reconciliation, vendor-statement-reconciliation. A skill whose pages are all `todo` and whose `SKILL.md` has no `references/`
 folder is a candidate. Say which skill you chose, and why, before you start.
 
 ### 2. Audit it
