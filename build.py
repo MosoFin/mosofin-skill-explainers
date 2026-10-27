@@ -517,6 +517,56 @@ def sitemap(rows):
     body = "".join(f"  <url>\n    <loc>{e(u)}</loc>\n" + (f"    <lastmod>{e(d)}</lastmod>\n" if d else "") + "  </url>\n" for u, d in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + "</urlset>\n")
 
+def robots_txt():
+    return ("User-agent: *\n"
+            "Allow: /\n\n"
+            f"Sitemap: {SITE_URL}sitemap.xml\n"
+            f"# AI-readable site overview: {SITE_URL}llms.txt\n")
+
+def llms_txt(rows, pages):
+    def entry(relative):
+        path = os.path.join(SITE, relative)
+        source = pages[path]
+        title = re.search(r"<title>(.*?)</title>", source, re.S)
+        desc = re.search(r'<meta name="description" content="(.*?)"', source, re.S)
+        title = html.unescape(title.group(1).strip()) if title else relative
+        desc = html.unescape(desc.group(1).strip()) if desc else ""
+        url_path = "" if relative == "index.html" else relative.removesuffix("index.html") if relative.endswith("/index.html") else relative
+        return f"- [{title}]({SITE_URL}{url_path})" + (f": {desc}" if desc else "")
+
+    landing_paths = [f"skills/{r['skill']}/index.html" for r in rows if published_kinds(r)]
+    sections = [
+        ("Start here", ["index.html"]),
+        ("Skill guides", landing_paths),
+    ]
+    for kind, label in [("plain", "Plain-language guides"), ("learn", "Step-by-step guides"),
+                        ("anatomy", "Skill anatomy guides")]:
+        paths = [f"skills/{r['skill']}/{kind}.html" for r in rows if r[kind] == "published"]
+        if paths:
+            sections.append((label, paths))
+
+    lines = [
+        "# MosoFin Finance Skill Explainers",
+        "> Public, source-linked guides explain accounting workflows and the finance skills that support them.",
+        "",
+        "This site explains finance workflows for business owners, bookkeepers, and finance automation reviewers. It is an educational guide site; the pages do not install or run accounting skills.",
+        "",
+    ]
+    for heading, paths in sections:
+        lines.extend([f"## {heading}", ""])
+        lines.extend(entry(path) for path in paths)
+        lines.append("")
+    lines.extend([
+        "## Topics",
+        "",
+        "Published topics include bank reconciliation, cash flow forecasting, credit card reconciliation, duplicate invoice detection, payment processor reconciliation, three-way matching, and vendor statement reconciliation.",
+        "",
+        f"- Sitemap: {SITE_URL}sitemap.xml",
+        f"- Source skills: {SKILLS_REPO}",
+        "",
+    ])
+    return "\n".join(lines)
+
 def outputs(rows):
     out = {os.path.join(SITE, "index.html"): index(rows)}
     for r in rows:
@@ -531,6 +581,8 @@ def outputs(rows):
                 t = re.sub(re.escape(CITE_START) + r".*?" + re.escape(CITE_END) + r"\n?", "", open(p).read(), flags=re.S)
                 out[p] = t.replace("</body>", cite_block(r["verified"]) + "</body>", 1)
     out[os.path.join(SITE, "sitemap.xml")] = sitemap(rows)
+    out[os.path.join(SITE, "robots.txt")] = robots_txt()
+    out[os.path.join(SITE, "llms.txt")] = llms_txt(rows, out)
     return out
 
 # Voice. Public explainers are written for people, so the habits that make prose read as machine-made fail the build.

@@ -48,9 +48,9 @@ The tracker is the source of truth for each skill and page status. Read the [wri
 
 ## Search and page metadata
 
-Each published page has a unique title and description. The build script adds canonical URLs, social sharing metadata, structured data, and a sitemap. The sitemap includes published pages only.
+Each published page has a unique title and description. The build script adds canonical URLs, social sharing metadata, structured data, a sitemap, and an `llms.txt` overview for AI agents. `robots.txt` allows public crawlers and points to the sitemap. The sitemap and `llms.txt` include published pages only; the Pages staging step copies both files to the site root.
 
-After deployment, submit `https://skills.mosofin.com/sitemap.xml` to [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters/). The custom domain supports a root-level `robots.txt` file that points crawlers to the sitemap.
+After deployment, submit `https://skills.mosofin.com/sitemap.xml` to [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters/). Search engines can use the sitemap for page discovery; AI agents can start with `https://skills.mosofin.com/llms.txt`.
 
 ## Writing standard
 

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://skills.mosofin.com/sitemap.xml
+# AI-readable site overview: https://skills.mosofin.com/llms.txt

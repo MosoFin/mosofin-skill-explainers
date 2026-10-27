@@ -1,0 +1,45 @@
+# MosoFin Finance Skill Explainers
+> Public, source-linked guides explain accounting workflows and the finance skills that support them.
+
+This site explains finance workflows for business owners, bookkeepers, and finance automation reviewers. It is an educational guide site; the pages do not install or run accounting skills.
+
+## Start here
+
+- [Finance Workflow Guides | MosoFin-Skill-Explainer](https://skills.mosofin.com/): Explore MosoFin finance workflow guides: bank reconciliation, cash forecasts, invoice checks, and payment matching, with cited examples and practical steps.
+
+## Skill guides
+
+- [Bank reconciliation: guides and examples | MosoFin](https://skills.mosofin.com/skills/bank-reconciliation/): Proves your bank statement and your books differ only for reasons you can name (timing, fees, bounced items) and finds what is left over.
+- [13-week cash flow forecast: guides and examples | MosoFin](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/): Projects cash in and cash out week by week for 13 weeks, times receipts by how late each customer really pays, and finds the lowest point, the runway and the…
+- [Credit card reconciliation: guides and examples | MosoFin](https://skills.mosofin.com/skills/credit-card-reconciliation/): Ties the company card statement to your books, matches receipts to charges, and lists what is missing, personal, duplicated or in the wrong account.
+- [Duplicate invoice detection: guides and examples | MosoFin](https://skills.mosofin.com/skills/duplicate-invoice-detection/): Scans your bills and payments for the same bill entered or paid twice, a supplier under two records, and credit notes nobody used, and lists the unpaid…
+- [Payment processor reconciliation: guides and examples | MosoFin](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/): Checks that what Stripe, Square or PayPal says you were paid matches your books, and catches revenue recorded net of processor fees.
+- [Three-way match: guides and examples | MosoFin](https://skills.mosofin.com/skills/three-way-match/): Checks that what you ordered, what arrived and what the supplier billed agree, line by line, before anything is paid, and says which of the three it had.
+- [Vendor statement reconciliation: guides and examples | MosoFin](https://skills.mosofin.com/skills/vendor-statement-reconciliation/): Ties a supplier's own statement to your accounts payable, item by item, to find invoices your books never saw and credit notes nobody claimed.
+
+## Plain-language guides
+
+- [Bank Reconciliation Explained in Plain English | MosoFin](https://skills.mosofin.com/skills/bank-reconciliation/plain.html): What a bank reconciliation checks, why your books and bank statement differ, and the mistake it catches. Explained in plain English, with every fact cited.
+- [13-Week Cash Flow Forecast in Plain English | MosoFin](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/plain.html): What a 13-week cash flow forecast shows: cash in and out each week, the lowest point, the week that breaks your floor, and whether you make payroll.
+- [Credit Card Reconciliation Explained in Plain English | MosoFin](https://skills.mosofin.com/skills/credit-card-reconciliation/plain.html): What a corporate card reconciliation checks: the statement tied to your books, receipts matched, and the charges that hide in a total. Facts cited.
+- [Duplicate Invoice Detection in Plain English | MosoFin](https://skills.mosofin.com/skills/duplicate-invoice-detection/plain.html): What a duplicate invoice scan checks: your bills and payments for the same bill entered or paid twice, a supplier under two records, and unused credits.
+- [Payment Processor Reconciliation in Plain English | MosoFin](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/plain.html): Does Stripe, Square or PayPal match your books? What a payment processor reconciliation checks, and the common mistake of booking sales net of fees.
+- [Three-Way Match Explained: Pay, Hold or Reject | MosoFin](https://skills.mosofin.com/skills/three-way-match/plain.html): How a three-way match compares the purchase order, goods receipt and invoice before you pay: what it catches, what it asks, what it never does. Sources cited.
+- [Vendor Statement Reconciliation in Plain English | MosoFin](https://skills.mosofin.com/skills/vendor-statement-reconciliation/plain.html): What a vendor statement reconciliation checks: a supplier's statement against your accounts payable, to find missing invoices and unclaimed credits.
+
+## Step-by-step guides
+
+- [Bank Reconciliation Worked Examples, Step by Step | MosoFin](https://skills.mosofin.com/skills/bank-reconciliation/learn.html): Seven worked bank reconciliation examples, from one uncashed cheque to two companies sharing an account, with a calculator and cited sources.
+- [13-Week Cash Flow Forecast Worked Examples | MosoFin](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn.html): Six worked cash forecast examples, from one week's chain to the week that breaks a covenant floor, with a 13-week calculator. Rules quoted, facts cited.
+- [Credit Card Reconciliation Worked Examples | MosoFin](https://skills.mosofin.com/skills/credit-card-reconciliation/learn.html): Seven worked corporate-card examples, from a statement that ties to a card paying another company's bills, with a calculator. Rules quoted, facts cited.
+- [Duplicate Invoice Detection Worked Examples | MosoFin](https://skills.mosofin.com/skills/duplicate-invoice-detection/learn.html): Six worked duplicate-bill examples, from one invoice number entered twice to the fraud test the scan cannot run, with a calculator. Rules quoted, facts cited.
+- [Stripe, Square and PayPal Reconciliation Examples | MosoFin](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/learn.html): Seven worked examples, from one $100 sale to Stripe, Square and PayPal feeding one bank account, with a calculator. Every rule quoted, every fact cited.
+- [Three-Way Match Worked Examples and Calculator | MosoFin](https://skills.mosofin.com/skills/three-way-match/learn.html): Seven worked three-way match examples, from a perfect match to a month of invoices, with a pay-or-dispute calculator. Every rule quoted, every fact cited.
+- [Vendor Statement Reconciliation Worked Examples | MosoFin](https://skills.mosofin.com/skills/vendor-statement-reconciliation/learn.html): Six worked supplier-statement examples, from one invoice number spelled two ways to a payment sent elsewhere, with a calculator. Rules quoted, facts cited.
+
+## Topics
+
+Published topics include bank reconciliation, cash flow forecasting, credit card reconciliation, duplicate invoice detection, payment processor reconciliation, three-way matching, and vendor statement reconciliation.
+
+- Sitemap: https://skills.mosofin.com/sitemap.xml
+- Source skills: https://github.com/MosoFin/mosofin-finance-skills
