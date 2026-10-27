@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Credit Card Rec Anatomy</title>
+<title>Credit Card Reconciliation Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the credit card reconciliation skill is built: a 144-line card, seven reference files, the run step by step, and the 27 Oct 2026 bookkeeping audit fixes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -85,6 +86,8 @@
   .f cite a{color:var(--mosofin)}
   .f .sev{padding:3px 6px;white-space:nowrap}
   @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
   .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
   .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
   .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
@@ -96,17 +99,17 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Credit card reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">credit-card-reconciliation · audited 22 Oct 2026 · both findings fixed 25 Oct · card format, in review</div>
+  <div class="eyebrow">credit-card-reconciliation · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
   <h1>How the credit card reconciliation is built, and what it does</h1>
-  <p class="lede">A 143-line card with seven reference files behind it, split on 25 Oct 2026 from a 973-line file, the largest of the reconciliation skills. What sets it apart is a richer book side: card charges are posted one by one, so duplicates, recurring subscriptions and capital purchases can be tested every month from the books alone, statement or not. This page shows where the weight sits, the run step by step, what the audit found, and how its tool list fares against a live QuickBooks catalogue.</p>
+  <p class="lede">A 144-line card with seven reference files behind it, split on 25 Oct 2026 from a 973-line file, the largest of the reconciliation skills, then corrected on 27 Oct after a senior-bookkeeper audit found the statement-to-GL bridge adding and subtracting its two timing items the wrong way round. What sets it apart is a richer book side: card charges are posted one by one, so duplicates, recurring subscriptions and capital purchases can be tested every month from the books alone, statement or not. This page shows where the weight sits, the run step by step, what both audits found and how each finding was fixed.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">Card</span><span class="v">143</span><span class="s">lines in SKILL.md, down from 973</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">535/535</span><span class="s">original lines, moved into 7 reference files</span></div>
-    <div class="stat"><span class="k">Tool names</span><span class="v">21/21</span><span class="s">exist in the live catalogue; 2 disabled, 2 gated there</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">2/2</span><span class="s">fixed in e36452b and 40d71c4, in review</span></div>
+    <div class="stat"><span class="k">Card</span><span class="v">144</span><span class="s">lines in SKILL.md, down from 973</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">522/546</span><span class="s">original lines unchanged; the other 24 are the lines the audit fixes rewrote</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">2·4·4</span><span class="s">high · medium · low, bookkeeping audit of 27 Oct 2026</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">10/10</span><span class="s">none partial, none rejected, in 689932a; the earlier 2 also fixed</span></div>
   </div>
 </section>
 
@@ -115,10 +118,10 @@
   <p class="sec-title">One card, seven files behind it</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 143-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 391 lines.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 144-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 429 lines.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
-        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 143</text>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 144</text>
         <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
           <text x="48" y="78" font-weight="600">What it does · the honest limit</text>
           <text x="48" y="112" font-weight="600">Rules that never bend</text>
@@ -131,7 +134,7 @@
         </g>
         <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
-          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="208" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g><g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="115" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">145</text></g><g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">391</text></g><g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="67" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">84</text></g><g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="33" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">41</text></g><g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">45</text></g><g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">65</text></g>
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="189" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g><g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="105" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">145</text></g><g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">429</text></g><g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="62" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">86</text></g><g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="30" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">41</text></g><g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">46</text></g><g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">65</text></g>
         </g>
         <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
           <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
@@ -151,7 +154,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the accounting: Steps 0–9 and both entity scenarios, just over half the original text, because this skill also codes transactions, handles tax and drafts the posting entry. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause (Mosofin reads the books, never the issuer or a receipt, and a run without the statement is a posted-charge review) now sits at the top of the card as well as in overview.md.</figcaption>
+    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the accounting: Steps 0–9 and both entity scenarios, now 429 lines after the audit added the statement proof, line matching, the corrected bridge and two entry templates, because this skill also codes transactions, handles tax and drafts the posting entry. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause (Mosofin reads the books, never the issuer or a receipt, and a run without the statement is a posted-charge review) now sits at the top of the card as well as in overview.md.</figcaption>
   </figure>
 </section>
 
@@ -160,7 +163,7 @@
   <p class="sec-title">What the skill does, step by step</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 1010" role="img" aria-label="Stage 1 asks for the card and cardholder, the statement period, the statement and receipts, the receipt and capitalisation thresholds, and the tax jurisdiction. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and the read-only tool catalogue; otherwise the user uploads the statement, receipts and a books export. Both paths read back and wait for a yes. Step 0 batches the reads. Step 1 parses the statement. Step 2 ties the statement to the liability, or stops if there is no statement. Step 3 matches receipts. Step 4 codes. Step 5 handles tax. Step 6 flags exceptions and runs three monthly tests. Step 7 drafts the entry. Step 8 outputs six sheets. Step 9 offers to save.">
+      <svg viewBox="0 0 920 1116" role="img" aria-label="Stage 1 asks for the card and cardholder, the statement period, the statement and receipts, the receipt and capitalisation thresholds, and the tax jurisdiction. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and the read-only tool catalogue; otherwise the user uploads the statement, receipts and a books export. Both paths read back and wait for a yes. Step 0 batches the reads. Step 1 parses the statement, proves its arithmetic, agrees the opening to the prior closing balance and brings last month's reconciling items forward. Step 2 matches each statement line to a posted charge, then ties the GL liability at the statement closing date: GL minus book-only charges plus statement-only charges plus payments in transit equals the statement, or stops if there is no statement. Step 3 matches receipts. Step 4 codes. Step 5 handles tax. Step 6 flags exceptions and runs three monthly tests. Step 7 drafts the entry, including a personal-charge reclass once a person confirms it. Step 8 outputs six sheets. Step 9 offers to save.">
         <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
           <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
@@ -169,13 +172,13 @@
           <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
           <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
           <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
-          <line x1="460" y1="640" x2="460" y2="670" marker-end="url(#a2)"/>
-          <line x1="460" y1="750" x2="460" y2="780" marker-end="url(#a2)"/>
-          <line x1="460" y1="860" x2="460" y2="890" marker-end="url(#a2)"/>
-          <line x1="460" y1="938" x2="460" y2="958" marker-end="url(#a2)"/>
+          <line x1="460" y1="746" x2="460" y2="776" marker-end="url(#a2)"/>
+          <line x1="460" y1="856" x2="460" y2="886" marker-end="url(#a2)"/>
+          <line x1="460" y1="966" x2="460" y2="996" marker-end="url(#a2)"/>
+          <line x1="460" y1="1044" x2="460" y2="1064" marker-end="url(#a2)"/>
         </g>
         <g font-family="Archivo,sans-serif">
-          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <rect x="60" y="36" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
           <g font-size="13.5" fill="var(--ink)">
             <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
@@ -208,8 +211,8 @@
           <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
           <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
 
-          <rect x="60" y="510" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–2 · FETCH, PARSE THE STATEMENT, TIE TO THE LIABILITY</text>
+          <rect x="60" y="510" width="800" height="236" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–2 · FETCH, PROVE THE STATEMENT, TIE AT THE STATEMENT CLOSING DATE</text>
           <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">QuickBooks, one batch, data_source_id on every call</text>
           <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
             <text x="80" y="584">search_purchases · get_general_ledger · get_trial_balance</text>
@@ -220,22 +223,29 @@
           <text x="741" y="576" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No statement?</text>
           <text x="741" y="596" text-anchor="middle" font-size="12" fill="var(--ink)">do not build the bridge: a</text>
           <text x="741" y="614" text-anchor="middle" font-size="12" fill="var(--ink)">posted-charge review, labelled</text>
+          <line x1="80" y1="642" x2="840" y2="642" stroke="var(--rule)"/>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="664"><tspan font-weight="600">Step 1</tspan> · opening + charges − credits + interest/fees − payments = closing; opening = prior closing;</text>
+            <text x="80" y="684">last month's reconciling items brought forward, and any that has not cleared is escalated</text>
+            <text x="80" y="708"><tspan font-weight="600">Step 2</tspan> · match statement lines to postings, then GL at statement close <tspan font-weight="600">X − Y + Z + A</tspan> ± C ± B = statement</text>
+          </g>
+          <text x="80" y="728" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--muted)">Y book-only charges · Z statement-only charges · A payments in transit · charges after the close are accrued</text>
 
-          <rect x="60" y="672" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="696" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–5 · RECEIPTS, CODING, TAX</text>
-          <text x="80" y="719" font-size="13.5" fill="var(--ink)">Matched · below threshold · missing · disputed · refunded; "file attached" kept apart from "receipt matched"</text>
-          <text x="80" y="739" font-size="13.5" fill="var(--ink)">Coding against your chart · tax only with a valid invoice</text>
+          <rect x="60" y="778" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="802" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–5 · RECEIPTS, CODING, TAX</text>
+          <text x="80" y="825" font-size="13.5" fill="var(--ink)">Matched · below threshold · missing · disputed · refunded; "file attached" kept apart from "receipt matched"</text>
+          <text x="80" y="845" font-size="13.5" fill="var(--ink)">Coding against your chart · tax only with a valid invoice</text>
 
-          <rect x="60" y="782" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="806" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–7 · EXCEPTIONS, THREE MONTHLY TESTS, THE ENTRY</text>
-          <text x="80" y="829" font-size="13.5" fill="var(--ink)">Missing receipts · personal · duplicates · subscriptions annualised · capital purchases · suspense</text>
-          <text x="80" y="849" font-size="13.5" fill="var(--ink)">Tax with no invoice · proposed entry in real account names, never posted</text>
+          <rect x="60" y="888" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="912" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–7 · EXCEPTIONS, THREE MONTHLY TESTS, THE ENTRY</text>
+          <text x="80" y="935" font-size="13.5" fill="var(--ink)">Missing receipts · personal · duplicates within a few days · subscriptions annualised · capital purchases</text>
+          <text x="80" y="955" font-size="13.5" fill="var(--ink)">Option A net/gross · Option B new charges − credits · personal reclass once confirmed · never posted</text>
 
-          <rect x="60" y="892" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="921" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8 · Six sheets</tspan>: summary, detail with source column, exceptions, posting, receipts, coverage</text>
+          <rect x="60" y="998" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="1027" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8 · Six sheets</tspan>: summary, detail with source column, exceptions, posting, receipts, coverage</text>
 
-          <rect x="60" y="960" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
-          <text x="80" y="986" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: card list, thresholds, coding map; never card numbers, spending or receipts · explicit yes, after results</text>
+          <rect x="60" y="1066" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1092" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: card list, thresholds, coding map; never card numbers, spending or receipts · explicit yes, after results</text>
 
           <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
             <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
@@ -244,24 +254,85 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: without a statement balance, Step 2 does not build the bridge and the output is labelled a posted-charge review. Steps 3 to 6 run either way, which is why this skill is useful even in an accounting-only workspace.</figcaption>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: without a statement balance, Step 2 does not build the bridge and the output is labelled a posted-charge review. Since the 27 Oct audit the bridge is taken at the statement closing date, not the month end, and reads GL − book-only charges + statement-only charges + payments in transit = statement; on the old signs a $50 timing charge showed as a $100 difference. Steps 3 to 6 run either way, which is why this skill is useful even in an accounting-only workspace.</figcaption>
   </figure>
 </section>
 
 <section>
+  <h2>Bookkeeping audit, 27 Oct 2026</h2>
+  <p class="sec-title">Ten findings from a senior-bookkeeper review, all ten fixed in 689932a</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent audit read the card and every reference file as a senior bookkeeper would, and judged the skill fit with fixes. The two high findings produced wrong numbers on every run that used them. Every finding below is fixed; none was partly fixed or rejected.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>The bridge added and subtracted the two charge-timing items the wrong way round</h3>
+      <p>Step 2 read “GL balance $X + Charges in GL not yet on statement $Y − Charges on statement not yet in GL $Z + Payments in transit $A”. With a statement closing at $950 and a GL at $1,000 because a $50 charge was booked on 30 September and reached the card on 1 October, the old formula gave $1,050 against $950: a false difference of twice the item, which a preparer might plug.</p>
+      <p class="fix"><b>Fix.</b> The bridge is now X − Y + Z + A ± C ± B: book-only charges subtracted, statement-only charges added, with a new one-sided line C for credits, refunds and issuer interest or fees, and the $950 / $1,000 / $50 worked example under the format.</p>
+      <cite>Standard bookkeeping practice: the liability bridge, GL less book-only charges plus statement-only charges plus payments in transit equals the statement.</cite>
+      <span class="where">references/method.md · Step 2</span>
+    </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>The Option B entry did not balance</h3>
+      <p>“DR Expense accounts — $statement charges / CR Credit Card Liability — $statement closing balance”. The closing balance is opening + charges − credits + interest/fees − payments, so it equals the charges only by coincidence; forcing it to balance either double-counts the opening balance or expenses the payments.</p>
+      <p class="fix"><b>Fix.</b> Both sides are now new charges less credits for the statement period; interest and fees go on their own lines, and a note says payments are recorded when made (DR Liability / CR Bank), not in this entry.</p>
+      <cite>Double-entry bookkeeping: debits equal credits in every entry.</cite>
+      <span class="where">references/method.md · Step 7, Option B</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Statement close and “period end” were mixed in the tie-out</h3>
+      <p>Step 2 tied the statement to the GL “at period end”. For a card that runs from the 16th to the 15th these are different dates, so every charge and payment between them became a bridge item; the skill's own edge case calls this the commonest reason a card reconciliation will not tie.</p>
+      <p class="fix"><b>Fix.</b> A “Tie-out date” paragraph: read the GL liability as of the statement closing date, and separately confirm charges from the close to the period end are recorded, proposing an accrual for any that are not. Step 0, Gate 3, the edge case and the card's upload row all ask for the balance at the statement close and at period end.</p>
+      <cite>Standard practice: tie the liability at the statement date; cut-off for the accounting period is a separate accrual.</cite>
+      <span class="where">references/method.md · Steps 0 and 2 · gates.md · edge-cases.md · SKILL.md</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>No step matched statement lines to posted charges, though the bridge depends on it</h3>
+      <p>Step 3 matched receipts to transactions, but nothing matched each statement line to a GL posting, so Y and Z were guesses and a charge entered twice (once from a bank feed, once from a receipt tool) went unseen.</p>
+      <p class="fix"><b>Fix.</b> Step 2 now matches first: exact amount and transaction date within the posting lag, then amount and merchant, then reference, with the method recorded. Unmatched statement lines are Z; unmatched book lines are Y, or duplicates and mis-postings to investigate. The date window is stated per run rather than fixed at the audit's ±3 days.</p>
+      <cite>Standard bookkeeping practice: line-by-line matching before a reconciliation bridge.</cite>
+      <span class="where">references/method.md · Step 2</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Opening balance and statement arithmetic were captured but never checked</h3>
+      <p>Step 1 captured opening, charges, credits, interest and fees, payments and closing, but never proved that they add up, that the opening equals last statement's closing, or that last month's reconciling items cleared.</p>
+      <p class="fix"><b>Fix.</b> Step 1 proves the statement (opening + charges − credits + interest/fees − payments = closing), agrees the opening to the prior closing, and rolls last month's reconciling items forward, escalating any that has not cleared. The card's upload checklist gains a recommended row, “Last month's reconciliation”.</p>
+      <cite>Standard practice: a roll-forward of the prior period's reconciling items.</cite>
+      <span class="where">references/method.md · Step 1 · SKILL.md upload checklist</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Personal charges were flagged but no correcting entry was proposed</h3>
+      <p>The skill identified possible personal use but Step 7 had no template, so the expense stayed in the profit and loss.</p>
+      <p class="fix"><b>Fix.</b> A Step 7 template: DR Owner's draws or Shareholder loan (owner) or Due from employee (staff), CR the expense account originally coded, proposed only after a person confirms the charge is personal; the skill asks which owner account applies. The audit's tax citation was not added to the skill text, which stays jurisdiction-neutral.</p>
+      <cite>IRC §162 (only ordinary and necessary business expenses are deductible), named by the audit; owner's draws and employee receivables are standard small-business practice.</cite>
+      <span class="where">references/method.md · Step 7</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · 4 fixed</span><div class="body">
+      <h3>Four smaller corrections</h3>
+      <ul>
+        <li><b>Option A gross or net.</b> “DR Expense $charges … CR Liability $charges + tax” overstated the liability if charges were tax-inclusive. Now expense at net of tax, liability at the card amount (gross).</li>
+        <li><b>Edge-case heading contradicted its example.</b> “Card payments from non-business funds” described business funds paying a personal card. Retitled to cover both directions, with a draw or loan to the owner for one and a contribution or loan from the owner for the other.</li>
+        <li><b>Duplicate test limited to the same day.</b> Card duplicates usually differ by a day or two. Now the same merchant and amount within a few days, with same-day as the high-confidence tier.</li>
+        <li><b>Gate 3 asked for “Cardholder name”</b> while the card records cards by role. Now “Cardholder (role; a name only if the user offers it)”.</li>
+      </ul>
+      <cite>Standard bookkeeping practice.</cite>
+      <span class="where">method.md Steps 6–7 · edge-cases.md · overview.md · gates.md Gate 3</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Two findings, both fixed on 25 Oct, with the published guidance behind each</p>
+  <p class="sec-title">Earlier audit, 22 Oct: two findings, both fixed on 25 Oct</p>
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>973 lines in one file, against a 500-line guide</h3>
       <p>The largest of the reconciliation skills. Split the way the other three cards were, in 40d71c4: a 143-line card with seven intake questions, the honesty clause, the three monthly tests and the rules that never bend, and the original text moved unchanged into <code>references/</code>, 535 of 535 content lines, checked by script. The description was rewritten in third person, says what and when, triggers on uploads too, and fits the 1,024-character limit (1,014).</p>
-      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite>Anthropic · Skill authoring best practices</cite></blockquote>
       <span class="where">SKILL.md</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>Two cross-references pointed at skills that are not in the repository</h3>
       <p>Step 6 sends sanctions screening to <code>aml-kyc-procedures</code> and the multi-entity section sends cross-company charges to <code>intercompany-reconciliation</code>. Both are queued and not shipped. Fixed in e36452b the same way as three-way-match: each sentence now stands on its own, and nothing else in the text changed.</p>
-      <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <blockquote>“Keep references one level deep from SKILL.md.”<cite>Anthropic · Skill authoring best practices</cite></blockquote>
       <span class="where">references/method.md · Step 6 · Both entity scenarios</span>
     </div></div>
   </div>
@@ -271,19 +342,20 @@
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>Every QuickBooks tool named, 21, exists in the live catalogue read on 21 Oct 2026 (workspace Online Shop, company file Northwood, 73 read tools, none write-capable).</span></li>
-    <li><span class="ok">PASS</span><span>Policies are read per run, as the skill says. In that workspace <code>get_attachable</code> and <code>search_vendor_credits</code> are <code>disabled</code>, so the receipt-file check falls back to <code>search_attachables</code> and merchant credits go [manual]; <code>search_vendors</code> and <code>get_account</code> are <code>permission</code>-gated, so the vendor map goes [gated]. The verdict table handles all four.</span></li>
-    <li><span class="ok">PASS</span><span>The statement and the receipts are Required and [manual] in Gate 3; Step 2 refuses to build the bridge without a statement; the output names which of the two it produced.</span></li>
-    <li><span class="ok">PASS</span><span>"A file is attached" and "a receipt was matched" are separate columns in Sheet 2 and separate facts in the output standards.</span></li>
-    <li><span class="ok">PASS</span><span>The three monthly tests (duplicates, recurring subscriptions with annualised cost, capitalisation breaches) run with or without a statement, and the thresholds are never defaulted.</span></li>
-    <li><span class="ok">PASS</span><span>No card numbers, cardholder spending, receipt images or transaction detail are persisted; no exception is raised against a named employee on fixture data.</span></li>
-    <li><span class="ok">PASS</span><span>The spreadsheet instruction is the ask-first sentence applied across all 31 skills in 4d5637c, with the file name <code>CC_Recon_[Cardholder]_[YYYY-MM].xlsx</code>.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes on the card (31 skills, 0 failures); the shared blocks are in sync; every relative link in the card and its references resolves; every Step the card cites exists in method.md.</span></li>
-    <li><span class="ok">PASS</span><span>Every rule quoted on the learn page, 11, matches the text of the reference files word for word after the split, checked by script.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes after the audit fixes: 31 skills, 0 failures. The shared onboarding, scope and write-guardrail blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its references resolves, and every Step the card cites (0–9) is a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,014 characters, inside the 1,024 limit.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage against the original: 522 of 546 content lines unchanged; the 24 others are the lines the fixes deliberately rewrote, plus one cross-entity line already reworded before them.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: a run with no statement is labelled a review of posted charges, never a reconciliation, and the liability balance is never used to test itself.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: an attached file is kept apart from a matched receipt, and a recoverable tax code with no receipt is flagged as an exposure.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: a card slip is not a valid tax invoice, and foreign-currency tax is often not recoverable.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: the three monthly tests (duplicates, recurring subscriptions with annualised cost, capitalisation breaches) and the listing of suspense and “ask my accountant” postings.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: the ledger is read to see whether the entity posts per charge (Option A) or monthly (Option B) before an entry is proposed, and a card used for another entity's costs goes to intercompany, not expense.</span></li>
+    <li><span class="ok">PASS</span><span>Earlier, 21 Oct: every QuickBooks tool named, 21, existed in the live catalogue read that day (73 read tools, none write-capable), with <code>get_attachable</code> and <code>search_vendor_credits</code> disabled and two tools permission-gated, all handled by the verdict table.</span></li>
   </ul>
-  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real card statement and receipts. Whether <code>search_attachables</code> returns per-transaction links in practice, which the receipt-file check depends on, was not exercised; only the tool's existence and policy were confirmed.</p>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a connected company file with a real card statement and receipts. Tool names were not re-checked against a live catalogue in this pass. Whether <code>search_attachables</code> returns per-transaction links in practice was not exercised. The matching date window and the duplicate window are set per run, not fixed, so they depend on the preparer stating them.</p>
 </section>
 
-<footer>Shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-card-reconciliation">MosoFin/mosofin-finance-skills</a>; the approved=true limit is d86fa27, the spreadsheet fix 4d5637c. Audited 22 Oct 2026; both findings fixed on 25 Oct in e36452b and 40d71c4, on the branch claude/trusting-ramanujan-8k8te1 until it merges. Still to do: a live run with a real statement.</footer>
+<footer>Card format and audit fixes on the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to <code>main</code>. Cross-references to unshipped skills removed in e36452b; split into the card format in 40d71c4; gates cross-entity pointer in 14f616a; the ten bookkeeping-audit fixes of 27 Oct 2026 in 689932a. Earlier: the approved=true limit d86fa27 and the spreadsheet fix 4d5637c. Still to do: merge to main, and a live run with a real statement and receipts.</footer>
 
 </div>

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash Application Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the cash application skill is built: a 155-line card, seven reference files, the payment-matching run step by step, and the 27 Oct 2026 audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Cash application</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">cash-application · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How cash application is built, and what it does</h1>
+  <p class="lede">A 155-line card with seven reference files behind it, split on 25 Oct 2026 from a 909-line file. It decides which open invoices each customer payment was meant to settle, works out why a short pay is short, parks overpayments as customer credit and drafts the entry, all as proposals. A senior-bookkeeper audit on 27 Oct found a short pay on a home-currency invoice being booked as an FX loss instead of collected; that and seven other findings are fixed. This page shows where the weight sits, the run step by step, and what the audit found.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">155</span><span class="s">lines in SKILL.md, down from 909</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">488/502</span><span class="s">original lines unchanged; 502/502 at the split, the rest rewritten by the fixes</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·4·3</span><span class="s">high · medium · low, bookkeeping audit of 27 Oct 2026</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">8/8</span><span class="s">none partial, none rejected, in 38aef1c</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 155-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 373 lines.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 155</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, seven questions</text>
+          <text x="48" y="192">Stage 2 · Confirm scope</text>
+          <text x="48" y="232">Stage 3 · Read, parse both sides</text>
+          <text x="48" y="272">Stage 4 · Match, explain differences</text>
+          <text x="48" y="312">Stage 5 · Entry &amp; present</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="218" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g><g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="117" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">141</text></g><g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">373</text></g><g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="68" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">82</text></g><g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="37" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">44</text></g><g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">43</text></g><g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">67</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="100">before 1st call</text>
+          <text x="318" y="180">Gates 0–3</text>
+          <text x="440" y="300">Steps 0–8, Review mode</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card is what loads every time. Each stage points to exactly one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the accounting: Steps 0–8, the six-level match hierarchy, the short-pay reason table, the entry template, the new Review mode for payments already recorded, and both entity scenarios. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause, that no accounting connection holds a lockbox file, a remittance advice or an FX rate, sits at the top of the card as well as in overview.md.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1100" role="img" aria-label="Stage 1 asks whether to use Mosofin, which payments and as of what date, for remittance advices, the tolerance, the application order, any FX rate and its source, and whether customers withhold tax. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and that invoice-level open items are readable; otherwise the user uploads the payments file and open invoices. Both paths read back and wait for a yes. Steps 0 and 1 read the books and parse both sides, matching on the open balance, and first remove file rows already recorded. Lockbox files, remittances and FX rates come only from the user. Steps 2 to 5 match through six levels, test each residual against the tolerance, explain short pays, park overpayments as credit and handle FX only on foreign-currency invoices. Steps 6 and 7 draft the entry debits first and present five sheets with a control tie-out. Review mode handles payments already recorded. Step 8 offers to save.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="710" x2="460" y2="740" marker-end="url(#a2)"/>
+          <line x1="460" y1="840" x2="460" y2="870" marker-end="url(#a2)"/>
+          <line x1="460" y1="950" x2="460" y2="980" marker-end="url(#a2)"/>
+          <line x1="460" y1="1028" x2="460" y2="1048" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> Recorded payments or a file? As of when?</text>
+            <text x="660" y="74"><tspan font-weight="600">C</tspan> Remittance advices?</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> Tolerance, never invented</text>
+            <text x="270" y="100"><tspan font-weight="600">E</tspan> FIFO or another order?</text>
+            <text x="460" y="100"><tspan font-weight="600">F</tspan> FX rate and its source</text>
+            <text x="670" y="100"><tspan font-weight="600">G</tspan> Withholding tax?</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · processor connected?</text>
+            <text x="98" y="364">G2  invoice-level open items readable?</text>
+            <text x="98" y="388">     A/R aging as population, window stated</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Customer payments file, required</text>
+            <text x="558" y="340">Open A/R invoices, required</text>
+            <text x="558" y="364">FX rate and source, if currencies differ</text>
+            <text x="558" y="388">Remittances and customer master</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="200" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · FETCH, THEN PARSE PAYMENTS AND INVOICES</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">QuickBooks, one batch, per entity</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="584">get_aged_receivables · search_invoices · search_customers</text>
+            <text x="80" y="604">search_payments · search_deposits · search_sales_receipts</text>
+            <text x="80" y="624">search_credit_memos · search_terms · search_accounts</text>
+          </g>
+          <rect x="626" y="552" width="216" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="734" y="576" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">Lockbox, remittance, FX rate?</text>
+          <text x="734" y="596" text-anchor="middle" font-size="12" fill="var(--ink)">no connection holds them: asked</text>
+          <text x="734" y="614" text-anchor="middle" font-size="12" fill="var(--ink)">for, a rate never defaulted</text>
+          <line x1="80" y1="642" x2="840" y2="642" stroke="var(--rule)"/>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="664"><tspan font-weight="600">Step 1</tspan> · match on the open balance, never the original amount; a supplied file is first checked</text>
+            <text x="80" y="684">against payments already recorded (payer, amount, date ±3 days, reference): those go to review, no entry</text>
+          </g>
+
+          <rect x="60" y="742" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="766" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–5 · MATCH, SHORT PAYS, OVERPAYMENTS, CURRENCY</text>
+          <text x="80" y="789" font-size="13.5" fill="var(--ink)">Six levels: invoice ref · payer + amount · lump (FIFO only if confirmed) · payer only · ambiguous · unidentified</text>
+          <text x="80" y="809" font-size="13.5" fill="var(--ink)">Residual within tolerance → small-balance adjustment; above it → reason, checked against credits and terms</text>
+          <text x="80" y="829" font-size="13.5" fill="var(--ink)">Overpay → customer credit, duplicate checked first · FX gain or loss only on a foreign-currency invoice</text>
+
+          <rect x="60" y="872" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="896" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–7 · THE ENTRY, THEN FIVE SHEETS</text>
+          <text x="80" y="919" font-size="13.5" fill="var(--ink)">Debits first: cash or Undeposited Funds, discount, fee, WHT, FX · CR A/R invoice amounts settled · never posted</text>
+          <text x="80" y="939" font-size="13.5" fill="var(--ink)">Control tie-out: payments = applied − discounts − fees − WHT ± FX + credit + unidentified, difference 0</text>
+
+          <rect x="60" y="982" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="1011" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Review mode</tspan> · unapplied cash beside open invoices · levels 1–3 re-run · discounts vs terms · ageing</text>
+
+          <rect x="60" y="1050" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1076" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 8 · Offer to save</tspan>: payer aliases, tolerance, order, accounts; never balances or remittances · explicit yes</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: the books show open invoices and recorded payments, but the lockbox file, the remittance advice and any FX rate come only from the user. Since the 27 Oct audit a supplied file is checked against payments already recorded before matching, every residual is tested against the tolerance, a short pay on a home-currency invoice stays open rather than becoming an FX loss, and Sheet 1 proves its own totals.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Bookkeeping audit, 27 Oct 2026</h2>
+  <p class="sec-title">Eight findings from a senior-bookkeeper review, all eight fixed in 38aef1c</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent audit read the card and every reference file as a senior bookkeeper would, and judged the skill fit with fixes. Each finding was checked against the skill before acting; every one below is fixed, none partly fixed or rejected.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>A “rounding / FX difference” short pay went to FX gain or loss whatever the invoice currency</h3>
+      <p>The short-pay table read “Rounding / FX difference — Apply payment + book FX Gain/Loss for the difference”. On a USD invoice paid short because the customer's bank converted from EUR at a poor rate, the entity has no exchange exposure: the customer simply paid too little. The row turned an uncollected receivable into an FX loss and bypassed the skill's own rule that an unexplained residual stays open.</p>
+      <p class="fix"><b>Fix.</b> Split in two: an FX difference on a foreign-currency invoice goes to Step 5 (invoice rate against receipt rate) and FX gain or loss; a conversion shortfall or rounding on a base-currency invoice stays open, or, within the user's tolerance, becomes a proposed small-balance write-off to the account the user's policy names, for approval.</p>
+      <cite>ASC 830 and IAS 21: exchange differences arise only on monetary items denominated in a foreign currency.</cite>
+      <span class="where">references/method.md · Step 3 short-pay table</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The tolerance was collected but no step used it</h3>
+      <p>Intake D asks for a short- and over-pay tolerance because it “decides what counts as a short or over pay at all”, yet Steps 2–4 never tested a residual against it, so every 50-cent short pay became a collections exception.</p>
+      <p class="fix"><b>Fix.</b> Step 3 tests each residual first: within tolerance, a small-balance adjustment is proposed and marked “within tolerance”, with the account asked from the user's policy; above it, the reason table applies; with no tolerance supplied, every residual is above it. The card's “never absorbs” rule names the exception.</p>
+      <cite>Standard cash-application policy: write off residuals within tolerance, route the rest to collections.</cite>
+      <span class="where">references/method.md · Step 3 · SKILL.md rules</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Payments in an uploaded file were never checked against payments already recorded</h3>
+      <p>In QuickBooks Online, bank-feed rules and payment sync apps often record some of a day's receipts automatically, so a lockbox or deposit file overlaps the books. Applying a payment that is already applied produces a duplicate receipt, double-crediting receivables and doubling the cash.</p>
+      <p class="fix"><b>Fix.</b> Step 1 compares each file row with recorded payments and deposits (customer or payer, amount, date within three days, reference); rows already recorded move to the review population with no new entry, and the count removed is reported. Intake B says so.</p>
+      <cite>Standard bookkeeping practice: de-duplicate a batch against the ledger before posting.</cite>
+      <span class="where">references/method.md · Step 1 · SKILL.md intake B</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The “review of already-applied payments” path had no procedure</h3>
+      <p>The card offered a review as one of its two jobs, but Steps 2–6 only described applying new payments, and matching against open balances fails when the invoices are already closed.</p>
+      <p class="fix"><b>Fix.</b> A new Review mode section in method.md: customers carrying both unapplied payments or credits and open invoices, with the application proposed; levels 1–3 re-run for each recorded payment against the invoices it was applied to; discounts checked against terms; unapplied cash and unidentified deposits aged. The card's intake B and edge-cases.md point to it.</p>
+      <cite>Standard accounts-receivable review practice.</cite>
+      <span class="where">references/method.md · Review mode · edge-cases.md · SKILL.md</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The output did not prove its own totals</h3>
+      <p>Sheet 1 listed totals processed, applied, parked, unidentified and short-pay residual, but nothing required them to add up or tied the population to the file control total or the deposit, so a dropped or double-counted row went unseen.</p>
+      <p class="fix"><b>Fix.</b> Sheet 1 has a control tie-out: total payments (the file control total or deposit total) = applied to receivables − discounts − fees − withholding tax ± FX + customer credit + unidentified, with the difference shown even when nil.</p>
+      <cite>Standard practice: a batch control total on every cash-application run.</cite>
+      <span class="where">references/method.md · Step 7, Sheet 1</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · 3 fixed</span><div class="body">
+      <h3>Three smaller corrections</h3>
+      <ul>
+        <li><b>The entry template was ambiguous</b> and had no unidentified-deposit entry. Debits now come first; the receivables line reads “invoice amounts settled (= cash + discount + fee + WHT ± FX)”; “Unidentified: DR Bank (or Undeposited Funds), CR Unapplied cash” is added, with a note that batched receipts debit Undeposited Funds so the deposit matches the statement.</li>
+        <li><b>The tolerance default contradicted itself</b> (“Default exact” beside “never default the tolerance”). Now “never invent a tolerance; with none supplied, match exact and say so” in gates.md and on the card.</li>
+        <li><b>FIFO was a default in Step 2</b> but “confirm rather than assume” at intake. Now oldest first only if the user confirmed FIFO; otherwise the candidate allocation is presented for approval.</li>
+      </ul>
+      <cite>Standard bookkeeping practice.</cite>
+      <span class="where">references/method.md · Steps 2 and 6 · gates.md Gate 3 · SKILL.md</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes after the audit fixes: 31 skills, 0 failures. The shared onboarding, scope and write-guardrail blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its references resolves, and every Step the card cites (0–8) is a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,003 characters, inside the 1,024 limit.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage: 502 of 502 content lines at the split in b2f0563; 488 of 502 unchanged now, the 14 others being the lines the fixes rewrote plus one reworded earlier by the cross-reference fix.</span></li>
+    <li><span class="ok">PASS</span><span>No reference to a skill that is not in the library: the two found were reworded in 4d28f6b.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: matching is on the open balance, never the original amount, and the A/R aging is the population so a search window cannot drop old invoices.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: the six-level hierarchy records the level per match, fuzzy matches carry a score and alternatives, and the skill never picks silently between same-amount invoices or customers.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: credit memos and terms are checked before a short-pay reason is named, and a discount taken outside the window is an unauthorised deduction.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: an overpayment goes to customer credit, never revenue, after a duplicate check; withholding tax is a receivable aged until the certificate arrives; intermediary bank fees are reconciled to the customer's intended amount.</span></li>
+    <li><span class="ok">PASS</span><span>The audit: the payer-alias map is the main thing persisted, keyed by entity; balances, payment detail and remittance contents never are.</span></li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a connected company file with a real lockbox or deposit file and remittances. Tool names were not checked against a live catalogue in this pass. The duplicate check against recorded payments uses a three-day window that has not been tried on real bank-feed data. One point from the split report remains open: “[gated]” is still used in Steps 2 and 5 to mean “a person chooses” as well as the Gate 2 permission bucket.</p>
+</section>
+
+<footer>Card format and audit fixes on the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to <code>main</code>. Cross-references to unshipped skills removed in 4d28f6b; split into the card format in b2f0563; gates cross-entity pointer in 14f616a; the eight bookkeeping-audit fixes of 27 Oct 2026 in 38aef1c. Earlier: the approved=true limit d86fa27 and the spreadsheet fix 4d5637c. Still to do: merge to main, and a live run with a real payments file and remittances.</footer>
+
+</div>
