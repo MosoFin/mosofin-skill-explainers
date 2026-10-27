@@ -1,57 +1,70 @@
-# MosoFin Finance Skill Explainers
+# MosoFin Finance Workflow Explainers
 
-[Read the finance guides](https://skills.mosofin.com/)
+This repository builds the public [MosoFin finance workflow guides](https://skills.mosofin.com/). The guides explain how MosoFin finance skills work. The executable skills live in [MosoFin/mosofin-finance-skills](https://github.com/MosoFin/mosofin-finance-skills).
 
-The public site features guides to bank reconciliation, credit card reconciliation, payment processor reconciliation, and three-way matching. This repository also tracks guides in progress for cash flow forecasting, duplicate invoice detection, and vendor statement reconciliation.
+**For people and agents:** [Browse the guides](https://skills.mosofin.com/) · [AI-readable index](https://skills.mosofin.com/llms.txt) · [Sitemap](https://skills.mosofin.com/sitemap.xml)
 
-The published guides explain what each skill checks, how its steps work, and how reviewers can inspect its design. The site serves business owners, bookkeepers, and finance automation reviewers.
+## Project scope and current content
 
-## Explore the guides
+The site provides static, source-linked explanations for accounting workflows. It does not install skills, connect to accounting data, or run reconciliations.
 
-Each skill can have three pages:
+The tracker lists 32 shipped skills. Seven have public guide sets with a plain-language overview and a step-by-step guide. The other 25 have no explainer pages. Each published skill also has an anatomy page marked `internal`. The Pages workflow omits those pages. This GitHub repository is public. The `internal` status controls website publication, but it does not make source files private. Do not commit confidential information.
 
-| Page | What you can learn |
-|---|---|
-| Plain-language guide | What the skill checks and which errors it can find. |
-| Step-by-step guide | How the rules work, with cited facts, worked examples, and a calculator. |
-| Skill anatomy | How the skill is built, which stages it runs, and how reviewers can audit it. |
+## Published guide index
 
-The guides link to outside authorities for finance facts. They identify skill rules and label examples so readers can review the source of each claim.
+| Finance workflow | Guide | Plain-language overview | Step-by-step examples |
+|---|---|---|---|
+| Bank reconciliation | [Guide](https://skills.mosofin.com/skills/bank-reconciliation/) | [Overview](https://skills.mosofin.com/skills/bank-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/bank-reconciliation/learn.html) |
+| 13-week cash flow forecast | [Guide](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/) | [Overview](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/plain.html) | [Examples](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn.html) |
+| Credit card reconciliation | [Guide](https://skills.mosofin.com/skills/credit-card-reconciliation/) | [Overview](https://skills.mosofin.com/skills/credit-card-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/credit-card-reconciliation/learn.html) |
+| Duplicate invoice detection | [Guide](https://skills.mosofin.com/skills/duplicate-invoice-detection/) | [Overview](https://skills.mosofin.com/skills/duplicate-invoice-detection/plain.html) | [Examples](https://skills.mosofin.com/skills/duplicate-invoice-detection/learn.html) |
+| Payment processor reconciliation | [Guide](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/) | [Overview](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/plain.html) | [Examples](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/learn.html) |
+| Three-way match | [Guide](https://skills.mosofin.com/skills/three-way-match/) | [Overview](https://skills.mosofin.com/skills/three-way-match/plain.html) | [Examples](https://skills.mosofin.com/skills/three-way-match/learn.html) |
+| Vendor statement reconciliation | [Guide](https://skills.mosofin.com/skills/vendor-statement-reconciliation/) | [Overview](https://skills.mosofin.com/skills/vendor-statement-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/vendor-statement-reconciliation/learn.html) |
 
-## About this project
+Public pages separate skill rules from outside finance facts. Each page links skill rules to the source. It links factual claims to outside authorities. Worked examples use labeled figures. The pages explain the skills. They do not access a reader's books.
 
-The explainers describe skills from [MosoFin finance skills](https://github.com/MosoFin/mosofin-finance-skills). This repository stores the human-facing guides separately from those skills. Nothing here is installed as a finance skill.
+## Repository map
 
-The public site is built with static HTML and hosted by GitHub Pages. GitHub Actions checks the site and publishes it from `main`. The deployment stages only pages marked `published` in `tracker.tsv`. Pages marked `internal` stay out of the deployed site. This public repository still contains its source files, so do not put confidential material in it.
+- [`tracker.tsv`](tracker.tsv) is the source of truth for skill names, publication status, source counts, verification dates, summaries, and notes. Page statuses are `published`, `internal`, or `todo`.
+- [`build.py`](build.py) checks tracker and page consistency, generates the homepage and skill landing pages, adds search metadata, and generates `robots.txt`, `sitemap.xml`, and `llms.txt`.
+- [`site/`](site/) contains hand-authored explainer HTML, generated pages, styles, scripts, and crawler files.
+- [`.claude/skills/write-skill-explainers/SKILL.md`](.claude/skills/write-skill-explainers/SKILL.md) describes the content and citation workflow for new explainers.
+- [`.github/workflows/check.yml`](.github/workflows/check.yml) checks the repository on pushes and pull requests. [`.github/workflows/pages.yml`](.github/workflows/pages.yml) stages and deploys the static site to GitHub Pages.
 
-## Build and check the site
+## Build, check, and preview
 
-Python 3 is the only build requirement. The build script has no external dependencies.
+Python 3 is the only build requirement. The build script uses the standard library and needs no package installation.
 
-```bash
+```sh
 python3 build.py --check
 python3 build.py
-python3 build.py --stage
+python3 build.py --stage _site
+python3 -m http.server 8765 --directory site
 ```
 
-`--check` verifies that the tracker and generated pages agree. `build.py` updates the index and skill landing pages. `--stage` creates `_site/` with published pages only.
+- `--check` checks tracker statuses, required source citations, page metadata and headings, generated files, and selected prose rules.
+- `build.py` updates generated pages and crawler files. Do not hand-edit generated files. Edit the source page or tracker, then rebuild.
+- `--stage _site` copies the deployable site and leaves out pages marked `internal`. It includes `robots.txt`, `sitemap.xml`, and `llms.txt` at the site root.
+- The local server command serves the site at `http://127.0.0.1:8765/`. Stop it with Ctrl+C.
 
-## Add or update a guide
+## Update and publish a guide
 
-1. Add the page at `site/skills/<skill>/<kind>.html`.
-2. Set its status in `tracker.tsv` to `published`, `internal`, or `todo`.
-3. Add source counts and the last verified date to the tracker.
-4. Run `python3 build.py` and `python3 build.py --check`.
-5. Commit the page, tracker, and generated files together.
+1. Read the [explainer writing workflow](.claude/skills/write-skill-explainers/SKILL.md) and the source skill in `MosoFin/mosofin-finance-skills`.
+2. Edit or add `site/skills/<skill>/<kind>.html`, where `<kind>` is `plain`, `learn`, or `anatomy`.
+3. Update the matching row in `tracker.tsv`, including publication status, source count, and verification date.
+4. Run `python3 build.py`, then `python3 build.py --check`.
+5. Commit the source page, tracker, and generated files together. A push to `main` that changes `site/**`, `tracker.tsv`, or `build.py` runs the Pages deployment workflow.
 
-The tracker is the source of truth for each skill and page status. Read the [writing workflow](.claude/skills/write-skill-explainers/SKILL.md) before you create an explainer.
+The `plain` and `learn` pages are public when their tracker status is `published`. `anatomy` pages are internal by default and should only be published after an explicit review.
 
-## Search and page metadata
+## Search and AI-agent discovery
 
-Each published page has a unique title and description. The build script adds canonical URLs, social sharing metadata, structured data, a sitemap, and an `llms.txt` overview for AI agents. `robots.txt` allows public crawlers and points to the sitemap. The sitemap and `llms.txt` include published pages only; the Pages staging step copies both files to the site root.
+- [`site/robots.txt`](site/robots.txt) allows public crawlers and points to the sitemap and AI-readable index.
+- [`site/sitemap.xml`](site/sitemap.xml) lists canonical URLs for the homepage and published explainer pages.
+- [`site/llms.txt`](site/llms.txt) gives AI agents a concise site description and links with page summaries. `build.py` generates it from published pages.
+- After a deployment, submit `https://skills.mosofin.com/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) or [Bing Webmaster Tools](https://www.bing.com/webmasters/) to monitor discovery. These files help crawlers find pages but do not guarantee indexing.
 
-After deployment, submit `https://skills.mosofin.com/sitemap.xml` to [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters/). Search engines can use the sitemap for page discovery; AI agents can start with `https://skills.mosofin.com/llms.txt`.
+## Help and source material
 
-## Writing standard
-
-Project documentation and public guides follow the structural rules of ASD Simplified Technical English. The checks favor short, active sentences and clear terms. They do not check the approved-word dictionary, so this project does not claim full STE compliance.
+For a page correction, open an [issue in this repository](https://github.com/MosoFin/mosofin-skill-explainers/issues). For a question about the finance skill's behavior, use the source skill in [MosoFin/mosofin-finance-skills](https://github.com/MosoFin/mosofin-finance-skills).
