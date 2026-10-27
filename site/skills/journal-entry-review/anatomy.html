@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Entry Review Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the journal entry review skill is built: a 162-line card over seven reference files, the screening run step by step, and seven audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .lows b{color:var(--ink);font-weight:600}
+  .lows .where{display:block}
+  .gaps{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Journal entry review</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">journal-entry-review · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the journal entry review is built, and what it does</h1>
+  <p class="lede">A 162-line card with seven reference files behind it, split from a 941-line SKILL.md: 160 lines at the split, two more from the audit fixes. It screens every journal entry in a period for the signs that tend to accompany error or manipulation, scores them with weighted combinations, and puts the few worth a closer look at the top. It identifies risk indicators and never concludes that fraud occurred. This page shows where the weight sits, the run step by step, and the seven findings from the 27 Oct bookkeeping audit.</p>
+</header>
+
+<section id="stats">
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">162</span><span class="s">lines in SKILL.md, down from 941</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">522/522</span><span class="s">original content lines, moved into 7 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·4·2</span><span class="s">high · medium · low, in the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">7/7</span><span class="s">fixed in 510b0ca · 0 partly fixed · 0 rejected</span></div>
+  </div>
+</section>
+
+<section id="construction">
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 484" role="img" aria-label="SKILL.md is a 162-line card with the rules and six stages. The rules point to mosofin-protocol.md, read before the first tool call; Stage 2 to gates.md; Stages 3 to 6 to method.md, which holds Steps 0 to 9; Stages 3 to 5 also to edge-cases.md and Stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 369 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="408" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 162</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, nine questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read, derive baseline</text>
+<text x="48" y="272">Stage 4 · Screen, score, patterns</text>
+<text x="48" y="312">Stage 5 · Follow up and present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="126" x2="286" y2="126" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="220" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="122" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">145</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">369</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="70" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">83</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="44" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">52</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">59</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">58</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 38, 574 38" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 92, 574 92" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 228 C 450 228, 450 200, 574 200" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 268 C 450 268, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 208, 574 208" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 254, 574 254" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="450">rules: before the 1st call · Stage 2: Gates 0–3 · Stages 3–6: Steps 0–9</text>
+<text x="318" y="470" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage names the file it needs. <b>method.md</b> carries the screen: Steps 0–9, the twenty-one indicators, the scoring, the pattern tests, the follow-up and the nine-sheet workpaper. <b>edge-cases.md</b> is read across Stages 3 to 5, because routine period-end entries, round numbers, reversals and system labels can turn up at any of them. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+  </figure>
+</section>
+
+<section id="run">
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1432" role="img" aria-label="Stage 1 asks nine questions: Mosofin or upload, the period, the authorization thresholds, materiality, adjustments made outside the books, who may see the output, whether approval is required and can be exported, the closed-through and close dates, and sensitive accounts. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file, whether a consolidation platform is connected, and the fields the entry read returns; otherwise the user uploads the full journal, the opening and closing trial balance and supporting files. Both paths read back and wait for a yes. Step 0 reads the population; approval data, documents, explanations and unconnected topside entries cannot be read. Step 1 proves the population against the ledger and derives normal. Steps 2 to 5 screen, score and find patterns. Steps 6 to 8 follow up, assess controls and build the workpaper. Step 9 offers to save the method.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="206" x2="460" y2="236" marker-end="url(#a2)"/>
+<polyline points="330,288 240,288 240,352" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,288 680,288 680,352" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="240,572 240,608 400,608" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="680,572 680,608 520,608" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="632" x2="460" y2="662" marker-end="url(#a2)"/>
+<line x1="460" y1="885" x2="460" y2="915" marker-end="url(#a2)"/>
+<line x1="460" y1="1030" x2="460" y2="1060" marker-end="url(#a2)"/>
+<line x1="460" y1="1175" x2="460" y2="1205" marker-end="url(#a2)"/>
+<line x1="460" y1="1320" x2="460" y2="1350" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="480" y="74"><tspan font-weight="600">B</tspan> Which period is under review?</text>
+<text x="80" y="100"><tspan font-weight="600">C</tspan> Authorization thresholds (never defaulted)</text>
+<text x="480" y="100"><tspan font-weight="600">D</tspan> Materiality threshold</text>
+<text x="80" y="126"><tspan font-weight="600">E</tspan> Adjustments made outside the books?</text>
+<text x="480" y="126"><tspan font-weight="600">F</tspan> Who may see the output?</text>
+<text x="80" y="152"><tspan font-weight="600">G</tspan> Is approval required? Can it be exported?</text>
+<text x="480" y="152"><tspan font-weight="600">I</tspan> Closed or locked through; close date</text>
+<text x="80" y="178"><tspan font-weight="600">H</tspan> Sensitive accounts, known risk areas</text>
+</g>
+<polygon points="460,238 590,288 460,338 330,288" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="284" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="301" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<text x="246" y="278" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="674" y="278" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="60" y="354" width="360" height="218" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="404" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="428" xml:space="preserve">G1  company file · an excluded entity is named</text>
+<text x="78" y="452" xml:space="preserve">      consolidation platform connected? if not,</text>
+<text x="78" y="476" xml:space="preserve">      topside entries are outside the population</text>
+<text x="78" y="500" xml:space="preserve">G2  tool catalogue · fields the entry read returns</text>
+<text x="78" y="524" xml:space="preserve">      writes out of scope</text>
+</g>
+<rect x="500" y="354" width="360" height="218" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="518" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="518" y="404" xml:space="preserve">Journal, all transaction types, + next month</text>
+<text x="518" y="428" xml:space="preserve">  (QBO Journal or Audit Log; Xero Journal Report)</text>
+<text x="518" y="452" xml:space="preserve">Opening and closing trial balance (required)</text>
+<text x="518" y="476" xml:space="preserve">Prior periods' entries · chart with types</text>
+<text x="518" y="500" xml:space="preserve">Approval log · P&amp;L and balance sheet by period</text>
+<text x="518" y="524" xml:space="preserve">Period, entity, calendar, who may see it</text>
+<text x="518" y="548" xml:space="preserve">Thresholds; where topside entries live</text>
+</g>
+<rect x="400" y="584" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="613" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="664" width="800" height="221" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="690" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 0 · READ THE POPULATION, ONE BATCH</text>
+<text x="80" y="716" font-size="13" font-weight="600" fill="var(--ink)">Read-only, data_source_id on every call; a mock: true read stops the run</text>
+<text x="80" y="738" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_journal_entries (period, prior periods, next month) · get_journal_entry</text>
+<text x="80" y="758" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · get_general_ledger · get_profit_and_loss · get_balance_sheet</text>
+<rect x="80" y="774" width="760" height="91" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="98" y="796" font-size="12.5" font-weight="600" fill="var(--high)">What no connection can supply</text>
+<text x="98" y="816" font-size="12.5" fill="var(--ink)">Approval data is generally not readable; supporting documents and anyone's explanation never are:</text>
+<text x="98" y="835" font-size="12.5" fill="var(--ink)">the four approval indicators are NOT RUN without a log. Topside entries in an unconnected system are</text>
+<text x="98" y="854" font-size="12.5" fill="var(--ink)">not in the population at all, and the header says so.</text>
+<rect x="60" y="917" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="943" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 1 · PROVE THE POPULATION, THEN DERIVE NORMAL</text>
+<text x="80" y="969" font-size="13.5" fill="var(--ink)">Extract summed by account, agreed to the period's ledger movement, the difference reported</text>
+<text x="80" y="990" font-size="13.5" fill="var(--ink)">"Screen complete" only on a nil tie-out · a JE-type read misses deposits, cheques, transfers</text>
+<text x="80" y="1011" font-size="13.5" fill="var(--ink)">Profile by number, value, source, account, user and period · baseline from prior periods</text>
+<rect x="60" y="1062" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1088" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–5 · SCREEN, SCORE, ANALYSE, FIND THE PATTERNS</text>
+<text x="80" y="1114" font-size="13.5" fill="var(--ink)">21 indicators: ten run as queries, seven need a threshold or a field, four need approval data</text>
+<text x="80" y="1135" font-size="13.5" fill="var(--ink)">Back-dating: created timestamp later than transaction date · timing tests need the close date</text>
+<text x="80" y="1156" font-size="13.5" fill="var(--ink)">Weighted scores, weights stated · one account adjusted each quarter-end · reserves vs earnings</text>
+<rect x="60" y="1207" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1233" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 6–8 · FOLLOW UP, CONTROLS, THE WORKPAPER</text>
+<text x="80" y="1259" font-size="13.5" fill="var(--ink)">Each item legitimate, error or escalate · follow-up: owner, due date, support, reviewer</text>
+<text x="80" y="1280" font-size="13.5" fill="var(--ink)">No approval step: "Control not in place", not NOT RUN · description quality measured</text>
+<text x="80" y="1301" font-size="13.5" fill="var(--ink)">Nine sheets, patterns first · criteria not run on their own sheet · an anomaly is no finding</text>
+<rect x="60" y="1352" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1380" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 9 · Offer to save</tspan>: criteria set, weights, sensitive accounts, thresholds, escalation path</text>
+<text x="80" y="1400" font-size="13.5" fill="var(--muted)">never flagged entries, risk scores, user names or explanations · explicit yes, after the results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the limit the skill is built around: the books show who posted what and when, but not who approved it, why, or what was adjusted somewhere else. Step 1 is the audit's main addition: until the extract ties to the ledger's movement, the header may not call the screen complete.</figcaption>
+  </figure>
+</section>
+
+<section id="audit">
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Seven findings, all fixed in 510b0ca</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 judged the skill <i>fit with fixes</i>: the criteria, the scoring and the “a flag is a question” stance are professional, but the skill called its screen complete without ever proving the population was complete. Every finding was accepted and fixed in one commit.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — “The screen was complete” with no test that the population is complete</h3>
+      <p>Complete meant only that every row the read returned was screened; nothing tied those rows to the ledger. On QuickBooks Online and Xero a journal-entry search also returns only journal-type transactions, so hand-keyed deposits, cheques, transfers and inventory adjustments fell outside the screen, and the manual-versus-system split could not be computed.</p>
+      <p class="fix"><b>Fix.</b> Step 1 now proves the population first: the extract is summed by account and agreed to the period's ledger movement, and the difference reported. A journal-type read is flagged as excluding other manual transaction types. The header says “screen complete” only on a nil tie-out; the upload path asks for the all-types Journal report and the opening and closing trial balance.</p>
+      <span class="where">Basis: AU-C 240.32 and A47–A48; PCAOB AS 2401.58–61 (journal-entry testing starts from a complete population) · references/method.md Steps 1 and 8 · SKILL.md · output.md · overview.md · edge-cases.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — The back-dating test asked for fields QuickBooks and Xero do not have</h3>
+      <p>The test compared “posting date” with “effective date”. In QuickBooks Online and Xero the meaningful pair is the transaction date against the created timestamp, and the poster is “Created by”, so the test could compare two columns that both mean transaction date and pass silently.</p>
+      <p class="fix"><b>Fix.</b> Back-dating is now a created date and time later than the transaction date, [gated] on a created timestamp and NOT RUN without one. The upload row names the exports: QuickBooks Journal report or Audit Log with Create date and Created by; Xero Journal Report with Created/Posted.</p>
+      <span class="where">Basis: how QuickBooks Online and Xero record the transaction date and the created timestamp · references/method.md Step 2 · edge-cases.md · SKILL.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — The close date and post-close entries were never collected</h3>
+      <p>Three timing indicators need the date the books were closed through and the date of the close, and reversal pairs need the month after the period. Stage 1 asked for neither, yet “entries to prior closed periods” was marked [auto].</p>
+      <p class="fix"><b>Fix.</b> Stage 1 has a new question I for the closed-through date and the close date. Step 0 and the upload list read the first month after the period. Without a close date the after-close and prior-closed tests are NOT RUN; prior-closed is now [gated].</p>
+      <span class="where">Basis: AU-C 240.A47 (entries made at the end of a period or after closing are the core cut-off population) · SKILL.md Stage 1 · references/method.md Steps 0 and 2</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — No approval data and no approval control were treated as the same</h3>
+      <p>The skill only asked for an approval log and otherwise reported four indicators NOT RUN. Most small businesses on QuickBooks or Xero have no approval step at all, and “not run” reads as “the control may be fine”.</p>
+      <p class="fix"><b>Fix.</b> Question G now asks whether anyone must approve a manual journal entry, then whether it can be exported. No approval step is recorded as “Control not in place” on the controls sheet; a step with no log stays NOT RUN.</p>
+      <span class="where">Basis: AU-C 265 (a missing control is a design deficiency) · SKILL.md G · references/method.md Steps 2 and 7</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — The follow-up sheet had no owner, due date or closure evidence</h3>
+      <p>Step 6 recorded the entry, the flag, the explanation and a resolution, but nobody was named to answer and no supporting document was referenced at closure.</p>
+      <p class="fix"><b>Fix.</b> Sheet 6 columns are now JE number, why flagged, asked of (role), date asked, due, support obtained (document reference), resolution, and reviewed by and date.</p>
+      <span class="where">Basis: standard audit workpaper practice for clearing flagged items · references/method.md Step 8, Sheet 6</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · all fixed</span><div class="body">
+      <h3>L1, L2 — two smaller corrections, both fixed</h3>
+      <ul class="lows">
+        <li><b>L1 — Indicator counts did not add up.</b> Nineteen bullets were described as including four approval-based ones (there were two), and “fifteen run as queries” counted four [gated] items. The approval bullets are now split into four, for twenty-one in all: ten run as queries, seven need a threshold or a field, four need approval data. <span class="where">Basis: internal consistency between the criteria sheet and the criteria-not-run sheet</span></li>
+        <li><b>L2 — The topside question was pitched at a group.</b> “Do topside or consolidation entries exist?” is jargon to an owner. Question E now asks about adjustments made outside the books by the accountant, in tax software or in a consolidation spreadsheet, keeping “topside” as the term. <span class="where">Basis: plain language for a single-entity business</span></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="passed">
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures, re-run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync across all 31 skills (<code>sync-shared.sh --check</code>).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 9, exists as a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,010 characters, under the 1,024 limit; it no longer names an unshipped skill.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage at the split (fad4441): 522 of 522 original content lines present in the reference files. The lines that differ now are the audit edits plus one earlier pointer rewording in gates.md.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: flags are questions, never findings, with the user-name-is-not-a-person caveat, and nothing about people is persisted.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: weighted combinations of criteria, with the weights stated, instead of single-criterion flags.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: “normal” is derived from several prior periods per entity, not one group baseline.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: patterns lead the output, including recurring period-end adjustments to one account and reserves against pre-reserve earnings.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: criteria not run get their own sheet, and an empty one beside a clean flag list is called out as misleading.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: description quality is quantified as a measurable control observation.</span></li>
+  </ul>
+</section>
+
+<section id="not-tested">
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What no check in this pass could reach</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file: the population tie-out has not been run against a real ledger in this pass.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass. The fix names <code>get_general_ledger</code> for the tie-out because the skill has no trial-balance tool; whether it returns period movement in a form that sums cleanly by account is untested.</li>
+    <li>Whether the entry read returns a created timestamp at all, on which the back-dating test now depends, has not been seen in a live response.</li>
+    <li>Left open from the split: method.md Step 6 and overview.md still say the fraud skill's rules apply and “Read it before proceeding”, but that skill is not in the library. The card states the rules itself.</li>
+  </ul>
+</section>
+
+<footer>On the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet on <code>main</code>. Cross-references removed in a4aea7a; split into the card format in fad4441; gates pointer named in 14f616a; audit fixes in 510b0ca. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recurring Transaction Builder Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the recurring transaction builder skill is built: a 164-line card over six reference files, the schedule run step by step, and eight audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .lows b{color:var(--ink);font-weight:600}
+  .lows .where{display:block}
+  .gaps{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Recurring transaction builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">recurring-transaction-builder · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the recurring transaction builder is built, and what it does</h1>
+  <p class="lede">A 164-line card with six reference files behind it, split from a 771-line SKILL.md: 159 lines at the split, five more from the audit fixes. It builds the schedule for a journal entry, bill or invoice that repeats on a cadence and computes every future occurrence, with rolls, escalations and memos resolved. With the books it validates the template against the live chart, checks whether the recurrence already exists, and audits whether existing recurring entries actually ran. It never creates, posts or schedules anything. This page shows where the weight sits, the run step by step, and the eight findings from the 27 Oct bookkeeping audit.</p>
+</header>
+
+<section id="stats">
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">164</span><span class="s">lines in SKILL.md, down from 771</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">336/336</span><span class="s">original content lines, moved into 6 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·5·2</span><span class="s">high · medium · low, in the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">8/8</span><span class="s">fixed in 46708f0 · 0 partly fixed · 0 rejected</span></div>
+  </div>
+</section>
+
+<section id="construction">
+  <h2>Construction</h2>
+  <p class="sec-title">One card, six files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 468" role="img" aria-label="SKILL.md is a 164-line card with the rules and six stages. The rules point to mosofin-protocol.md, read before the first tool call; Stage 1 reads the Inputs table in method.md; Stage 2 points to gates.md; Stages 3 to 6 to method.md, which holds Steps 1 to 6 with 2b to 2d and 5b, and Seed to evolved; Stages 4 and 5 also to edge-cases.md and Stage 5 also to output.md. overview.md is read on demand. There is no tools-and-glossary file. method.md is the largest file at 310 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="392" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 164</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, ten questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Type, schedule, books</text>
+<text x="48" y="272">Stage 4 · Occurrences, escalation</text>
+<text x="48" y="312">Stage 5 · Spec, run audit, present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="126" x2="286" y2="126" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="262" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="99" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">99</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">310</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="29" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">29</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="57" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">57</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">68</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 38, 574 38" marker-end="url(#a1)"/>
+<path d="M300 148 C 450 148, 450 146, 574 146" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 188 C 440 188, 440 92, 574 92" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 162, 574 162" marker-end="url(#a1)"/>
+<path d="M300 268 C 450 268, 450 200, 574 200" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 254, 574 254" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="434">rules: before 1st call · Stage 1: Inputs · Stage 2: Gates 0–3 · Stages 3–6: Steps 1–6</text>
+<text x="318" y="454" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage names the file it needs. This is a seed-style skill, so <b>method.md</b> is shaped differently from the numbered-step skills: verdicts, the Inputs table that Stage 1 collects, Steps 1–6 with the Mosofin additions 2b–2d and 5b, and <i>Seed to evolved</i> for Stage 6. It has no tools section, so there is no tools-and-glossary.md and the Files table leaves it out. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy.</figcaption>
+  </figure>
+</section>
+
+<section id="run">
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1455" role="img" aria-label="Stage 1 asks ten questions: Mosofin or upload, type and counterparty, amount and currency, start and end, cadence and day rule, coding, payment terms, holiday calendar and roll policy, escalation and stop terms, and pro-ration. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and the tool catalogue, with creating tools out of scope; otherwise the user types the schedule and uploads the chart, lists, template list and history. Both paths read back and wait for a yes. Steps 1 and 2 validate the schedule and the lock date. Steps 2b to 2d validate against the chart, check for an existing recurrence and find hand-keyed repeats; the skill can never create, post or schedule, and contract terms come from the user. Steps 3 and 4 generate the occurrences and apply escalation. Steps 5 and 6 build the specification, audit past runs and produce six sheets. Seed to evolved offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="206" x2="460" y2="236" marker-end="url(#a2)"/>
+<polyline points="330,288 240,288 240,352" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,288 680,288 680,352" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="240,572 240,608 400,608" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="680,572 680,608 520,608" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="632" x2="460" y2="662" marker-end="url(#a2)"/>
+<line x1="460" y1="756" x2="460" y2="786" marker-end="url(#a2)"/>
+<line x1="460" y1="1053" x2="460" y2="1083" marker-end="url(#a2)"/>
+<line x1="460" y1="1198" x2="460" y2="1228" marker-end="url(#a2)"/>
+<line x1="460" y1="1343" x2="460" y2="1373" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="480" y="74"><tspan font-weight="600">B</tspan> Type, and which vendor or customer?</text>
+<text x="80" y="100"><tspan font-weight="600">C</tspan> Amount and currency per occurrence</text>
+<text x="480" y="100"><tspan font-weight="600">D</tspan> Start; end date or number of occurrences</text>
+<text x="80" y="126"><tspan font-weight="600">E</tspan> Cadence and day rule, not just “monthly”</text>
+<text x="480" y="126"><tspan font-weight="600">F</tspan> Coding: accounts, item, tax code</text>
+<text x="80" y="152"><tspan font-weight="600">F2</tspan> Payment terms, for bills and invoices</text>
+<text x="480" y="152"><tspan font-weight="600">G</tspan> Holiday calendar and roll policy</text>
+<text x="80" y="178"><tspan font-weight="600">H</tspan> Escalation, stop or pause terms</text>
+<text x="480" y="178"><tspan font-weight="600">I</tspan> Partial period: pro-rate, or contract?</text>
+</g>
+<polygon points="460,238 590,288 460,338 330,288" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="284" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="301" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<text x="246" y="278" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="674" y="278" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="60" y="354" width="360" height="218" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="404" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="428" xml:space="preserve">G1  company file · one chart, not portable</text>
+<text x="78" y="452" xml:space="preserve">      no connection: computed, said unvalidated</text>
+<text x="78" y="476" xml:space="preserve">G2  tool catalogue · a tool that creates or posts</text>
+<text x="78" y="500" xml:space="preserve">      is out of scope whatever its policy</text>
+<text x="78" y="524" xml:space="preserve">      mock: true validates cleanly by construction</text>
+</g>
+<rect x="500" y="354" width="360" height="218" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="518" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="518" y="404" xml:space="preserve">Type, payee, amount, dates, cadence, day rule</text>
+<text x="518" y="428" xml:space="preserve">Coding and template · payment terms (required)</text>
+<text x="518" y="452" xml:space="preserve">Chart of accounts and item list, for validation</text>
+<text x="518" y="476" xml:space="preserve">Vendor or customer list · tax code list</text>
+<text x="518" y="500" xml:space="preserve">Recurring or repeating template list</text>
+<text x="518" y="524" xml:space="preserve">Counterparty transactions, last 12–24 months</text>
+<text x="518" y="548" xml:space="preserve">Holiday calendar, roll policy · the contract</text>
+</g>
+<rect x="400" y="584" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="613" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="664" width="800" height="92" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="690" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–2 · IDENTIFY THE TYPE, VALIDATE THE SCHEDULE</text>
+<text x="80" y="716" font-size="13.5" fill="var(--ink)">Start, end or count, cadence and day rule all unambiguous · the closed-through date asked</text>
+<text x="80" y="737" font-size="13.5" fill="var(--ink)">Occurrences on or before it: “Closed period — do not load without accountant approval”</text>
+<rect x="60" y="788" width="800" height="265" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="814" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2b–2d · CHECK THE BOOKS, ONE BATCHED READ</text>
+<text x="80" y="840" font-size="13" font-weight="600" fill="var(--ink)">Chart, vendor and customer lists, tax codes, recurring-template list and posting history</text>
+<text x="80" y="862" font-size="13.5" fill="var(--ink)">2b each account exists, is active, of the right type · counterparty, tax code and item exist</text>
+<text x="80" y="883" font-size="13.5" fill="var(--ink)">2c the platform's recurring-template list first, then 12–24 months of history: does it exist?</text>
+<text x="80" y="904" font-size="13.5" fill="var(--ink)">2d hand-keyed repeats over twelve months, presented as candidates, not a plan</text>
+<text x="80" y="925" font-size="13.5" fill="var(--ink)">On the upload path the same checks run on the exported files, labelled user-supplied</text>
+<rect x="80" y="942" width="760" height="91" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="98" y="964" font-size="12.5" font-weight="600" fill="var(--high)">What no connection can supply</text>
+<text x="98" y="984" font-size="12.5" fill="var(--ink)">It can never create the template, post an occurrence or schedule anything.</text>
+<text x="98" y="1003" font-size="12.5" fill="var(--ink)">The contract's escalation and stop terms, the holiday calendar, the inflation assumption and the</text>
+<text x="98" y="1022" font-size="12.5" fill="var(--ink)">pro-ration choice come from you.</text>
+<rect x="60" y="1085" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1111" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–4 · GENERATE THE OCCURRENCES, APPLY ESCALATION</text>
+<text x="80" y="1137" font-size="13.5" fill="var(--ink)">One row per occurrence: number, date, amount, period covered, memo with {month} {year} filled</text>
+<text x="80" y="1158" font-size="13.5" fill="var(--ink)">The 31st rolls to the last day of short months · one roll direction · period-end JEs stay put</text>
+<text x="80" y="1179" font-size="13.5" fill="var(--ink)">Escalation at the right anniversary, written into each memo · CPI only with your index and rate</text>
+<rect x="60" y="1230" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1256" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 5–6 · THE SPECIFICATION, THE RUN AUDIT, SIX SHEETS</text>
+<text x="80" y="1282" font-size="13.5" fill="var(--ink)">Template per occurrence, for a person to enter or load · billed in advance: Deferred Revenue</text>
+<text x="80" y="1303" font-size="13.5" fill="var(--ink)">5b did each expected period post, at the expected amount and accounts? did the reversals post?</text>
+<text x="80" y="1324" font-size="13.5" fill="var(--ink)">Every occurrence Pending · NOT POSTED in the header · validation status in Sheet 1</text>
+<rect x="60" y="1375" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1403" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Seed to evolved · Offer to save</tspan>: holiday calendar, roll policy, CPI index source, chart mapping</text>
+<text x="80" y="1423" font-size="13.5" fill="var(--muted)">never a rate of any kind, never the capability map · explicit yes, after the results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The arithmetic needs no ledger at all; the reads in Steps 2b–2d and 5b are what turn a computed schedule into a checked one. The highlighted box is the clause the skill is built around: a schedule is not a template, and the terms that drive it live in the contract, not the books.</figcaption>
+  </figure>
+</section>
+
+<section id="audit">
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings, all fixed in 46708f0</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 judged the skill <i>fit with fixes</i>: the schedule arithmetic, the “a schedule is not a template” honesty and the Pending double-load control are strong, but the upload path dropped every check that protects money. Every finding was accepted and fixed in one commit.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — The upload path declared the protective checks impossible instead of asking for the files</h3>
+      <p>The card said “Without a connection the validation, duplicate check, discovery and run audit cannot run; the schedule is computed only,” and the upload checklist asked only for typed parameters. Every file those checks need is a standard QuickBooks or Xero export, so an upload user got an unchecked 24-bill rent file.</p>
+      <p class="fix"><b>Fix.</b> The upload checklist now asks for the chart of accounts and item list, the vendor or customer list, the tax code list, the recurring-template list and 12–24 months of counterparty transactions. Steps 2b–2d and 5b run on those files, labelled user-supplied; only a check whose file was not supplied is NOT VALIDATED, and Sheet 1 says which.</p>
+      <span class="where">Basis: the skill's own protocol that both paths run identical checks · SKILL.md upload checklist · references/method.md verdicts and Step 6</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — The duplicate check ignored the platform's own recurring-template list</h3>
+      <p>Whether a recurrence “already exists” was answered only from posted history. A template set up last week, set to start next month, or saved as a reminder or draft has no postings and passed the check.</p>
+      <p class="fix"><b>Fix.</b> Step 2c reads the platform's recurring-template list first where the Gate 2 catalogue exposes a read, otherwise asks for the export, and matches counterparty, amount and next date before reading history. Step 5b seeds its register from that list on a first run.</p>
+      <span class="where">Basis: how QuickBooks Online and Xero hold scheduled, reminder and draft recurring templates · references/method.md Steps 2c and 5b</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — Advance-billed subscriptions were coded to revenue, and the deferral misstated</h3>
+      <p>Recurring invoices went to a revenue account, and the text said an annual-in-advance invoice “produces eleven months of deferred revenue on day one.” On the invoice date all twelve months are unearned.</p>
+      <p class="fix"><b>Fix.</b> An invoice covering a service period beyond the invoice month is coded to Deferred Revenue with a release schedule by service period; the sentence now reads “twelve months of deferred revenue on the invoice date, released one month at a time.”</p>
+      <span class="where">Basis: ASC 606-10-45-2 and IFRS 15.106 (contract liability, recognised as the service is provided) · references/method.md Step 5</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — A business-day roll could push a period-end entry into the next period</h3>
+      <p>One roll direction applied to a last-day-of-month accrual rolled 31 August 2025, a Sunday, forward to 1 September, so the entry landed in the wrong month and the reversal timing broke.</p>
+      <p class="fix"><b>Fix.</b> A roll never moves an occurrence out of its period. Period-end JEs keep the calendar month-end date; where a forward roll would cross a month end, that occurrence rolls back, noted in its memo.</p>
+      <span class="where">Basis: period-end cut-off and the modified-following business-day convention · references/method.md Step 3</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — Intake missed what a bill or invoice template needs</h3>
+      <p>Bills and invoices need payment terms, and a QuickBooks Online invoice line takes a product or service item, not a GL account. Neither was asked or validated, so Step 5 could not produce the due date it promised.</p>
+      <p class="fix"><b>Fix.</b> Question F now asks for accounts, item or product/service item by type, plus tax code; a new F2 asks for payment terms. The Inputs table matches, Step 2b checks the item exists and is active with its account, and Step 5 sets the due date from the terms.</p>
+      <span class="where">Basis: how QuickBooks Online codes invoice lines by product or service item · SKILL.md F, F2 · references/method.md Inputs, Steps 2b and 5</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M5 — Escalating rent built straight to Rent Expense with no lease-accounting flag</h3>
+      <p>The read-back example coded rent with a 3% annual increase to Rent Expense. For an entity reporting under US GAAP or IFRS, an escalating lease is not expensed as billed.</p>
+      <p class="fix"><b>Fix.</b> A new edge case, “Lease payments with escalations”: the schedule is the cash or bill side; under GAAP or IFRS, or for a lease over 12 months, flag “lease accounting may apply — expense is not the billed amount”, ask the reporting basis and code per the user's accountant.</p>
+      <span class="where">Basis: ASC 842-20-25-6 (straight-line operating-lease cost) and IFRS 16 · references/edge-cases.md · SKILL.md Stage 4</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · all fixed</span><div class="body">
+      <h3>L1, L2 — two smaller corrections, both fixed</h3>
+      <ul class="lows">
+        <li><b>L1 — Backfilled schedules could land in closed periods.</b> Backfilling was allowed with no check against the lock date. Step 2 now asks the closed-through date and marks any occurrence on or before it “Closed period — do not load without accountant approval”. <span class="where">Basis: standard close practice</span></li>
+        <li><b>L2 — Pro-ration and the holiday calendar were missing from the Inputs table.</b> The card collects “the Inputs table in references/method.md”, which had no rows for either. Both rows are now in the table. <span class="where">Basis: internal consistency between card and method</span></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="passed">
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures, re-run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync across all 31 skills (<code>sync-shared.sh --check</code>).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its six reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 1 to 6 with 2b–2d and 5b, exists as a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,024 characters, exactly at the 1,024 limit.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage at the split (f476f57): 336 of 336 original content lines present in the reference files; the lines that differ now are the ones fixes.md lists as deliberately edited.</span></li>
+    <li><span class="ok">PASS</span><span>The save step asks only after the results and on an explicit yes, added for the seed-style skills in baf43ef.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: every occurrence starts Pending, the header says NOT POSTED, and statuses are reconciled back to the ledger after loading, a real double-load control.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: the 31st rolls to the last day of short months instead of skipping, and the roll direction is held consistent.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: no inflation rate, tax rate or holiday calendar is ever defaulted or persisted; only the index source is saved.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: a variable component such as CAM is never averaged into a fixed schedule, and a mid-term change becomes a new sub-schedule.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: occurrences stay in the contract currency, and the run audit, including unreversed accruals, is the right ongoing deliverable.</span></li>
+  </ul>
+</section>
+
+<section id="not-tested">
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What no check in this pass could reach</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file: no schedule has been validated against a real chart, template list or history in this pass.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass. The skill names no read tool for the recurring-template list; whether the catalogue exposes one is unknown, so the export fallback may be the usual route.</li>
+    <li>Left open: gates.md's “No datasource connected” row still says the validation does not run at all, while the card and method.md now run the checks on uploaded files. The two should be brought into line.</li>
+    <li>Left open from the split: Seed to evolved persists the holiday calendar while saying no calendar may be frozen into the seed; consistent once read closely, easy to misread.</li>
+  </ul>
+</section>
+
+<footer>On the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet on <code>main</code>. Cross-references removed in 6d251a4; split into the card format in f476f57; save-step timing added in baf43ef; audit fixes in 46708f0. Still to do: align the gates.md no-connection row with the upload checks, merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

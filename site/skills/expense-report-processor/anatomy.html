@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expense Report Processor Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the expense report processor skill is built: a 158-line card over seven reference files, the claim run step by step, and eight audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .lows b{color:var(--ink);font-weight:600}
+  .lows .where{display:block}
+  .gaps{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Expense report processor</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">expense-report-processor · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the expense report processor is built, and what it does</h1>
+  <p class="lede">A 158-line card with seven reference files behind it, split from a 1,020-line SKILL.md: 155 lines at the split, three more from the audit fixes. It takes an employee expense report and works out what the employee is actually owed: each line checked against the T&amp;E policy, coded to the real chart, personal and duplicate claims flagged, company-paid items taken out, and the posting inputs prepared for a person to post. This page shows where the weight sits, the run step by step, and the eight findings from the 27 Oct bookkeeping audit.</p>
+</header>
+
+<section id="stats">
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">158</span><span class="s">lines in SKILL.md, down from 1,020</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">581/581</span><span class="s">original content lines, moved into 7 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">2·4·2</span><span class="s">high · medium · low, in the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">8/8</span><span class="s">fixed in dc58f7d · 0 partly fixed · 0 rejected</span></div>
+  </div>
+</section>
+
+<section id="construction">
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 484" role="img" aria-label="SKILL.md is a 158-line card with the rules and six stages. The rules point to mosofin-protocol.md, read before the first tool call; Stage 2 to gates.md; Stages 3 to 6 to method.md, which holds Steps 0 to 7; Stage 4 also to edge-cases.md and Stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 433 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="408" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 158</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, ten questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read books, parse report</text>
+<text x="48" y="272">Stage 4 · Validate, code, compute</text>
+<text x="48" y="312">Stage 5 · Posting inputs, present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="126" x2="286" y2="126" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="188" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="100" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">140</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">433</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="62" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">87</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="37" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">52</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">68</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">64</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 38, 574 38" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 92, 574 92" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 268 C 450 268, 450 200, 574 200" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 254, 574 254" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="450">rules: before the 1st call · Stage 2: Gates 0–3 · Stages 3–6: Steps 0–7</text>
+<text x="318" y="470" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage names the file it needs. <b>method.md</b> carries the claim work: Steps 0–7, the policy checks by category, the personal-expense patterns, duplicate detection, coding, the reimbursement calculation and the posting inputs. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause (it can never read the policy, the receipt images, or any rate, table or cap) sits at the top of the card and again in overview.md.</figcaption>
+  </figure>
+</section>
+
+<section id="run">
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1336" role="img" aria-label="Stage 1 asks ten questions: Mosofin or upload, the reports, the T&amp;E policy, the receipts, the tax jurisdiction, the mileage rate, the per-diem table, the FX source, how card charges are booked, and approval. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and a T&amp;E platform, and the tool catalogue; otherwise the user uploads the report, policy, receipts, chart and ledger detail. Both paths read back and wait for a yes. Steps 0 and 1 read the books and parse the report; the policy, receipts and every rate must come from the user. Steps 2 to 4 validate, code and calculate the amount owed. Steps 5 and 6 prepare the posting inputs and the workpaper. Step 7 offers to save.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="206" x2="460" y2="236" marker-end="url(#a2)"/>
+<polyline points="330,288 240,288 240,352" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,288 680,288 680,352" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="240,572 240,608 400,608" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="680,572 680,608 520,608" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="632" x2="460" y2="662" marker-end="url(#a2)"/>
+<line x1="460" y1="913" x2="460" y2="943" marker-end="url(#a2)"/>
+<line x1="460" y1="1079" x2="460" y2="1109" marker-end="url(#a2)"/>
+<line x1="460" y1="1224" x2="460" y2="1254" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="480" y="74"><tspan font-weight="600">B</tspan> Which reports: employees and period?</text>
+<text x="80" y="100"><tspan font-weight="600">C</tspan> Your T&amp;E policy or its parameters</text>
+<text x="480" y="100"><tspan font-weight="600">D</tspan> The receipts</text>
+<text x="80" y="126"><tspan font-weight="600">E</tspan> Tax jurisdiction, deductibility rules</text>
+<text x="480" y="126"><tspan font-weight="600">F</tspan> Mileage rate, per km or per mile</text>
+<text x="80" y="152"><tspan font-weight="600">G</tspan> Per-diem table</text>
+<text x="480" y="152"><tspan font-weight="600">H</tspan> FX rate source</text>
+<text x="80" y="178"><tspan font-weight="600">I</tspan> Card charges: to clearing, or from the feed?</text>
+<text x="480" y="178"><tspan font-weight="600">J</tspan> Approved, and by whom?</text>
+</g>
+<polygon points="460,238 590,288 460,338 330,288" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="284" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="301" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<text x="246" y="278" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="674" y="278" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="60" y="354" width="360" height="218" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="404" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="428" xml:space="preserve">G1  company file · a T&amp;E or spend platform live?</text>
+<text x="78" y="452" xml:space="preserve">      if not, the report is supplied by hand</text>
+<text x="78" y="476" xml:space="preserve">G2  tool catalogue · chart read enabled? if not:</text>
+<text x="78" y="500" xml:space="preserve">      PLACEHOLDER — REMAP REQUIRED</text>
+<text x="78" y="524" xml:space="preserve">      writes out of scope</text>
+</g>
+<rect x="500" y="354" width="360" height="218" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="518" y="378" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="518" y="404" xml:space="preserve">Expense report, CSV, XLSX or PDF (required)</text>
+<text x="518" y="428" xml:space="preserve">T&amp;E policy (required for policy validation)</text>
+<text x="518" y="452" xml:space="preserve">Receipts · chart of accounts</text>
+<text x="518" y="476" xml:space="preserve">Card charges and expenses posted in the period</text>
+<text x="518" y="500" xml:space="preserve">GL detail: card clearing, reimbursement payable</text>
+<text x="518" y="524" xml:space="preserve">Approved-but-unpaid reports · past reimbursements</text>
+<text x="518" y="548" xml:space="preserve">Rates, per-diems, FX source where they apply</text>
+</g>
+<rect x="400" y="584" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="613" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="664" width="800" height="249" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="690" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · READ THE BOOKS, THEN PARSE THE REPORT</text>
+<text x="80" y="716" font-size="13" font-weight="600" fill="var(--ink)">Read-only, data_source_id on every call, the mock flag checked</text>
+<text x="80" y="738" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · search_employees · search_expenses · search_purchases · search_bills</text>
+<text x="80" y="758" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_credit_card_charges · get_general_ledger (clearing, payable, merchant history)</text>
+<text x="80" y="783" font-size="13.5" fill="var(--ink)">Each line: date, category, merchant, purpose, amount, tax, tip, currency, payment method</text>
+<text x="80" y="804" font-size="13.5" fill="var(--ink)">Company-paid separated from out-of-pocket · each claimant matched to an employee record</text>
+<rect x="80" y="821" width="760" height="72" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="98" y="843" font-size="12.5" font-weight="600" fill="var(--high)">What no connection can supply</text>
+<text x="98" y="863" font-size="12.5" fill="var(--ink)">The T&amp;E policy, receipt images, mileage rates, per-diem tables, deductibility rules and gift caps</text>
+<text x="98" y="882" font-size="12.5" fill="var(--ink)">always come from you. Without a policy, policy validation is “not performed”, never passed.</text>
+<rect x="60" y="945" width="800" height="134" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="971" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–4 · VALIDATE, CODE, CALCULATE WHAT IS OWED</text>
+<text x="80" y="997" font-size="13.5" fill="var(--ink)">Policy checks only with a policy · personal patterns · duplicates run with or without one</text>
+<text x="80" y="1018" font-size="13.5" fill="var(--ink)">Out-of-pocket lines vs card charges already posted (±3 days) and the prior 90 days' claims</text>
+<text x="80" y="1039" font-size="13.5" fill="var(--ink)">Coded to a real account, transaction-level history · approval per the report or not evidenced</text>
+<text x="80" y="1060" font-size="13.5" fill="var(--ink)">Submitted − company-paid − disallowed − personal = net reimbursable, footed to the line detail</text>
+<rect x="60" y="1111" width="800" height="113" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1137" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 5–6 · POSTING INPUTS AND THE WORKPAPER</text>
+<text x="80" y="1163" font-size="13.5" fill="var(--ink)">Expenses by account, recoverable tax, reimbursable and card-paid amounts, as a proposal</text>
+<text x="80" y="1184" font-size="13.5" fill="var(--ink)">Card lines get an entry only where charges sit in clearing · clearing test with its oldest item</text>
+<text x="80" y="1205" font-size="13.5" fill="var(--ink)">Payable test by employee against approved-but-unpaid reports · exceptions by severity</text>
+<rect x="60" y="1256" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1284" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 7 · Offer to save</tspan>: policy parameters and version, rates with dates, category map, FX source</text>
+<text x="80" y="1304" font-size="13.5" fill="var(--muted)">never names, claims, amounts, card numbers, addresses or itineraries · explicit yes, after results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: the books show what was already paid, but the rules that decide what is reimbursable are the user's. Steps 2–4 carry the audit's two high findings: the double-reimbursement match now runs on out-of-pocket lines only, and the amount owed is computed so it foots to the line detail.</figcaption>
+  </figure>
+</section>
+
+<section id="audit">
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings, all fixed in dc58f7d</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 judged the skill <i>fit with fixes</i>: the policy discipline (no remembered rates, “not performed” rather than “passed”, receipts “per the report”) is exactly right, but the reimbursement formula could double-count, and company-card lines were both rejected as duplicates and posted to expense a second time. Every finding was accepted and fixed in one commit.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — The net-reimbursable formula double-counted and double-deducted</h3>
+      <p>Step 4 started from “Sum of all approved lines”, then deducted policy violations and added mileage. Deducting from approved lines removed violations twice, mileage lines were counted twice, and company-paid lines sat ambiguously in the total, so the amount owed could be wrong either way.</p>
+      <p class="fix"><b>Fix.</b> The table is now: total submitted (mileage valued at distance × the supplied rate) − company-paid − disallowed − personal = net reimbursable out-of-pocket − any Due-from-Employee offset, only if the policy allows netting = amount to pay. Net reimbursable must equal the reimbursable column of Sheet 2.</p>
+      <span class="where">Basis: standard reimbursement practice: the amount paid foots to the line detail · references/method.md Step 4 · output.md</span>
+      </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H2 — Company-card lines were rejected as duplicates, then posted to expense again</h3>
+      <p>The match against posted card charges ran on every line, so every legitimate card line on a Brex, Ramp or Expensify report was marked Reject. Step 5 then posted card-paid amounts DR Expense / CR Clearing without asking how the feed was booked; where charges are coded straight to expense, that doubles the expense.</p>
+      <p class="fix"><b>Fix.</b> The against-the-books match runs on out-of-pocket lines only; a company-paid match is recorded as “matched — card charge”. A new intake question I asks how card charges are booked; card lines get DR Expense / CR Clearing only where charges sit in clearing, otherwise a recode proposal at most.</p>
+      <span class="where">Basis: standard bookkeeping practice for company-card feeds · references/method.md Steps 2, 5 and 6 · SKILL.md I · output.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — The reimbursement-payable “reconciliation” had no test or population</h3>
+      <p>“The proposed net reimbursable, added to the existing balance, should explain that account's movement once paid” is not a test a reviewer can sign, and neither path asked for the approved-but-unpaid list.</p>
+      <p class="fix"><b>Fix.</b> The payable test compares the balance by employee at the report date with approved reports not yet paid, from the T&amp;E tool's list or open employee bills, and lists each difference; without the list it is not performed. The upload checklist asks for it.</p>
+      <span class="where">Basis: standard balance-sheet reconciliation practice · references/method.md Step 4 · SKILL.md upload checklist · output.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — The duplicate check did not look at earlier reports</h3>
+      <p>The population was the current period and the current report, so a receipt reimbursed on August's report and resubmitted on September's fell outside both.</p>
+      <p class="fix"><b>Fix.</b> The population now includes reimbursements to the claimant for expense dates in the prior 90 days, matched on merchant, amount and expense date.</p>
+      <span class="where">Basis: standard expense-audit practice: resubmission across reports is the commonest duplicate · references/method.md Steps 0 and 2</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — No flag for reimbursements that may be taxable pay</h3>
+      <p>Mileage above the tax-authority rate, per-diems above the official table, and unsubstantiated reimbursements are commonly taxable wages, but the skill compared claims to the policy rate only.</p>
+      <p class="fix"><b>Fix.</b> A new edge case: if the policy rate exceeds the rate the user says the tax authority allows, or a line lacks business purpose or a required receipt, flag “excess may be taxable pay — confirm with payroll”. The tax-free rate is asked, never supplied.</p>
+      <span class="where">Basis: US accountable-plan rules, Treasury Regulation §1.62-2 and IRS Publication 463; UK approved mileage allowance payments · references/edge-cases.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — No evidence of approval before the amount owed was stated</h3>
+      <p>The skill computed the amount to pay but never asked whether the report was approved or by whom; the gates text noted that approval is not in the ledger and then dropped it.</p>
+      <p class="fix"><b>Fix.</b> A new intake question J asks for approval and approver. Sheet 1 says “Approval: per the report / not evidenced”, and self-approval or an approver junior to the claimant is a Review.</p>
+      <span class="where">Basis: basic T&amp;E control: no payment without independent approval · SKILL.md J · references/method.md Step 6, Sheet 1</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · all fixed</span><div class="body">
+      <h3>L1, L2 — two smaller corrections, both fixed</h3>
+      <ul class="lows">
+        <li><b>L1 — “Policy violation” with no policy supplied.</b> Personal-pattern flags run without a policy but were labelled “Policy violation — possible personal”. They now read “Possible personal — confirm business purpose”; “Policy violation” is used only with a cited policy rule. <span class="where">Basis: the card's rule that unchecked policy is reported as not performed</span></li>
+        <li><b>L2 — Merchant history read from a P&amp;L summary.</b> A P&amp;L by department cannot show how one merchant was coded, yet Step 3 cited “coded there 12 of 12 times”. Merchant history now comes from transaction-level reads by vendor; the P&amp;L is used only for the dimensions in use. <span class="where">Basis: traceable support: a cited figure must trace to the read behind it</span></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="passed">
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures, re-run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync across all 31 skills (<code>sync-shared.sh --check</code>).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 7, exists as a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,017 characters, under the 1,024 limit; it no longer names an unshipped skill or promises to post.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage at the split (8621528): 581 of 581 original content lines present in the reference files; the lines that differ now are the ones fixes.md lists, plus two earlier rewordings.</span></li>
+    <li><span class="ok">PASS</span><span>Duplicate detection runs with or without a policy, fixed in 76cfa0e after the split report flagged that Step 2 skipped it.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: mileage rates, per-diems, receipt thresholds, deductibility splits, gift caps and FX sources are never defaulted, and stored rates carry effective dates.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: without a policy, Step 2's policy checks are “not performed”, never passed, and receipts are “per the report”, never verified.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: a personal charge on a corporate card goes to Due from Employee, not expense, with the ageing balance surfaced.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: card-versus-claim matching uses a stated ±3-day window, and a near-amount (tip) match is a review, not a reject.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: the employing and cost-bearing entities are kept apart, conference packages are never allocated arbitrarily, and prepaid items go to Prepaid Expenses.</span></li>
+  </ul>
+</section>
+
+<section id="not-tested">
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What no check in this pass could reach</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file and a T&amp;E platform: no report has been processed against real card charges in this pass.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass, including <code>search_credit_card_charges</code>, which the card-versus-claim match depends on.</li>
+    <li>Whether a connected T&amp;E platform returns an approval status, which question J now relies on, has not been seen in a live response.</li>
+  </ul>
+</section>
+
+<footer>On the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet on <code>main</code>. Cross-references removed in 6fe4bc0 and split into the card format in 8621528 (a repeat of the earlier pair 7608e4c and dc8452f); gates pointer named in 14f616a; duplicate detection without a policy in 76cfa0e; audit fixes in dc58f7d. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

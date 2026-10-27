@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GL Coding Assistant Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the GL coding assistant skill is built: a 159-line card over seven reference files, the coding run step by step, and its eight audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .lows b{color:var(--ink);font-weight:600}
+  .lows .where{display:block}
+  .gaps{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← GL coding assistant</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">gl-coding-assistant · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the GL coding assistant is built, and what it does</h1>
+  <p class="lede">A 159-line card with seven reference files behind it, split from a 983-line SKILL.md: 155 lines at the split, four more from the audit fixes. It works out which account, expense category and tax code each payment or receipt belongs in, says how sure it is and why, and separates the easy ones from the ones a person should look at. Its strongest evidence is the entity's own coding history, reported as consistency, never as correctness. This page shows where the weight sits, the run step by step, and the eight findings from the 27 Oct bookkeeping audit.</p>
+</header>
+
+<section id="stats">
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">159</span><span class="s">lines in SKILL.md, down from 983</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">548/548</span><span class="s">original content lines, moved into 7 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">2·4·2</span><span class="s">high · medium · low, in the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">7/8</span><span class="s">fixed in 7109642 · 1 partly fixed · 0 rejected</span></div>
+  </div>
+</section>
+
+<section id="construction">
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 484" role="img" aria-label="SKILL.md is a 159-line card with the rules and six stages. The rules point to mosofin-protocol.md, read before the first tool call; Stage 2 to gates.md; Stages 3 to 6 to method.md, which holds Steps 0 to 6 and the Learning Loop; Stage 4 also to edge-cases.md and Stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 429 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="408" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 159</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, seven questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read, parse, normalize</text>
+<text x="48" y="272">Stage 4 · Classify, tax, flags</text>
+<text x="48" y="312">Stage 5 · Present the coded list</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="126" x2="286" y2="126" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="189" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="103" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">142</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">429</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="48" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">67</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="35" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">48</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">61</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">61</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 38, 574 38" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 92, 574 92" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 268 C 450 268, 450 200, 574 200" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 254, 574 254" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="450">rules: before the 1st call · Stage 2: Gates 0–3 · Stages 3–6: Steps 0–6</text>
+<text x="318" y="470" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage names the file it needs. <b>method.md</b> carries the coding: Steps 0–6, the five tiers, the special-case rules, the output sheets and the Learning Loop, which Stages 5 and 6 both point at. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause (no tax rule engine, no capitalization policy and no receipt image on this surface) sits at the top of the card and again in overview.md.</figcaption>
+  </figure>
+</section>
+
+<section id="run">
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1392" role="img" aria-label="Stage 1 asks seven questions: Mosofin or upload, which transactions to code, which entity, tax codes and jurisdiction, the capitalization threshold, house coding rules, and owner and family names. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the entity and the tool catalogue; otherwise the user uploads the transactions, the chart of accounts and supporting exports. Both paths read back and wait for a yes. Step 0 reads the chart, history and suspense accounts; bank-feed items awaiting review, tax rules, the capitalization policy and receipts cannot be read. Step 1 normalizes vendors. Steps 2 to 4 classify through five tiers, assign tax codes and run the special cases on every row. Step 5 presents the coded list. Step 6 offers to save the rules.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="180" x2="460" y2="210" marker-end="url(#a2)"/>
+<polyline points="330,262 240,262 240,326" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,262 680,262 680,326" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="240,546 240,582 400,582" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="680,546 680,582 520,582" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="606" x2="460" y2="636" marker-end="url(#a2)"/>
+<line x1="460" y1="866" x2="460" y2="896" marker-end="url(#a2)"/>
+<line x1="460" y1="990" x2="460" y2="1020" marker-end="url(#a2)"/>
+<line x1="460" y1="1156" x2="460" y2="1186" marker-end="url(#a2)"/>
+<line x1="460" y1="1280" x2="460" y2="1310" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="160" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="480" y="74"><tspan font-weight="600">B</tspan> Which transactions? Or shall I find them?</text>
+<text x="80" y="100"><tspan font-weight="600">C</tspan> Which entity is each batch for?</text>
+<text x="480" y="100"><tspan font-weight="600">D</tspan> Tax codes? Jurisdiction and code list</text>
+<text x="80" y="126"><tspan font-weight="600">E</tspan> Capitalization threshold (always asked)</text>
+<text x="480" y="126"><tspan font-weight="600">F</tspan> House coding rules over past practice?</text>
+<text x="80" y="152"><tspan font-weight="600">G</tspan> Owner, family, other businesses (optional)</text>
+</g>
+<polygon points="460,212 590,262 460,312 330,262" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="258" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="275" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<text x="246" y="252" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="674" y="252" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="60" y="328" width="360" height="218" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="352" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="378" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="402" xml:space="preserve">G1  company file · which entity each batch is for</text>
+<text x="78" y="426" xml:space="preserve">G2  tool catalogue · is the chart read enabled?</text>
+<text x="78" y="450" xml:space="preserve">      if not: the fallback in use, and why</text>
+<text x="78" y="474" xml:space="preserve">      writes out of scope</text>
+</g>
+<rect x="500" y="328" width="360" height="218" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="518" y="352" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="518" y="378" xml:space="preserve">Transactions to code: date, payee, signed amount</text>
+<text x="518" y="402" xml:space="preserve">Chart of accounts, numbers and names (required)</text>
+<text x="518" y="426" xml:space="preserve">Entity; jurisdiction and tax code list for tax</text>
+<text x="518" y="450" xml:space="preserve">Exports for every bank and card account</text>
+<text x="518" y="474" xml:space="preserve">Coded GL export, last 12 months (Tier 1)</text>
+<text x="518" y="498" xml:space="preserve">Open invoices (AR aging) if there are deposits</text>
+<text x="518" y="522" xml:space="preserve">Capitalization threshold; house policy</text>
+</g>
+<rect x="400" y="558" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="587" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="638" width="800" height="228" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="664" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · READ THE BOOKS, THEN NORMALIZE EACH VENDOR</text>
+<text x="80" y="690" font-size="13" font-weight="600" fill="var(--ink)">Read-only, data_source_id on every call; fixture history caps confidence at Low</text>
+<text x="80" y="712" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · get_general_ledger (uncategorized, suspense, AR, clearing) · search_vendors</text>
+<text x="80" y="732" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_purchases · search_expenses · search_bills · search_tax_codes · search_employees</text>
+<text x="80" y="757" font-size="13.5" fill="var(--ink)">Vendor names stripped of suffixes, trailing IDs, processor prefixes · known, new or duplicate</text>
+<rect x="80" y="774" width="760" height="72" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="98" y="796" font-size="12.5" font-weight="600" fill="var(--high)">What no connection can supply</text>
+<text x="98" y="816" font-size="12.5" fill="var(--ink)">Tax rules, the capitalization threshold, house policy and receipt images come from you. Bank-feed</text>
+<text x="98" y="835" font-size="12.5" fill="var(--ink)">items awaiting review are not in the ledger, so the work list covers posted items only.</text>
+<rect x="60" y="898" width="800" height="92" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="924" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 2 · FIVE TIERS, IN ORDER, STOP AT THE FIRST CONFIDENT MATCH</text>
+<text x="80" y="950" font-size="13.5" fill="var(--ink)">1 vendor history, with counts · 2 vendor type · 3 keywords, sign-aware · 4 amount · 5 review</text>
+<text x="80" y="971" font-size="13.5" fill="var(--ink)">Frequency is not correctness: a split history is reported as a split, never resolved</text>
+<rect x="60" y="1022" width="800" height="134" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1048" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 3–4 · TAX CODES, THEN SPECIAL CASES ON EVERY ROW</text>
+<text x="80" y="1074" font-size="13.5" fill="var(--ink)">Tax codes only from the configured list, with a jurisdiction · cross-border items flagged</text>
+<text x="80" y="1095" font-size="13.5" fill="var(--ink)">Receipts matched to open invoices or clearing before any income code · payouts gross less fees</text>
+<text x="80" y="1116" font-size="13.5" fill="var(--ink)">Capex · unusual amount · personal use · splits · transfers, both legs · related party</text>
+<text x="80" y="1137" font-size="13.5" fill="var(--ink)">Loan split from the lender statement · any Step 4 flag caps confidence at Medium</text>
+<rect x="60" y="1188" width="800" height="92" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1214" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 5 · THE CODED LIST</text>
+<text x="80" y="1240" font-size="13.5" fill="var(--ink)">Evidence and Verdict columns · confidence bands · flags · % coded by band</text>
+<text x="80" y="1261" font-size="13.5" fill="var(--ink)">Header says whether the chart was read · Uncoded Population and Coverage sheets</text>
+<rect x="60" y="1312" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1340" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 6 · Offer to save</tspan>: vendor-to-account rules, house policy, threshold, tax mapping</text>
+<text x="80" y="1360" font-size="13.5" fill="var(--muted)">never transaction lists, amounts or the history itself · explicit yes, after the results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the limit the skill is built around: history shows how things were coded, never whether that was right, and the rules that decide tax and capitalization are the user's. Steps 3 and 4 are where the audit changed the most: special cases now run on every row, not only on rows the tiers left uncertain.</figcaption>
+  </figure>
+</section>
+
+<section id="audit">
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eight findings: seven fixed, one partly fixed, in 7109642</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 judged the skill <i>fit with fixes</i>: history with counts as Tier 1 evidence and the “frequency is not correctness” stance are excellent, but the skill had no rule for money coming in, so a deposit could be coded to income when the sale was already booked. Every finding was accepted; one was fixed in part.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — A receipt could be coded to income when the sale was already booked</h3>
+      <p>The skill codes “each payment or receipt”, but nothing told it to check whether an inflow pays an open invoice, deposits Undeposited Funds, or is a processor payout of sales less fees. Tier 1 history (“customer X → 4000 Sales, 20 of 20”) would recommend income with High confidence, double-counting revenue.</p>
+      <p class="fix"><b>Fix.</b> A new Step 4 “Receipts” rule: before any income code, match the inflow to open invoices and to Undeposited Funds or a processor clearing account, and flag “Possible invoice payment / deposit — match, do not code to income”. Processor payouts are gross sales less fees. The upload checklist asks for the AR aging when the batch has deposits.</p>
+      <span class="where">Basis: standard bookkeeping practice: match receipts before treating anything as new income · references/method.md Steps 0 and 4 · SKILL.md</span>
+      </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H2 — The uncoded work list missed everything still in the bank feed</h3>
+      <p>The Mosofin path finds uncoded items by reading Uncategorized and suspense accounts, but in QuickBooks Online and Xero most uncoded lines sit in the bank-feed review queue, unposted. An owner told “38 transactions to code” might have 400 unreviewed bank lines.</p>
+      <p class="fix"><b>Fix.</b> Step 0 and the Uncoded Population sheet header now say the list covers posted items only, that bank-feed items awaiting review are not visible, and that statement CSVs can be uploaded to code them. The read-back example names the limit.</p>
+      <span class="where">Basis: how QuickBooks Online and Xero hold bank-feed lines outside the ledger until reviewed · references/method.md Steps 0 and 5 · overview.md · edge-cases.md · SKILL.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — “Stop at the first confident match” let Tier 1 skip the capex check</h3>
+      <p>A $3,200 laptop from Amazon matched Tier 1 (Office Supplies, 43 of 45) and stopped with High confidence; the capitalization test sat in Tier 4 and never ran. No rule produced the “Unusual amount” flag the output defined.</p>
+      <p class="fix"><b>Fix.</b> Step 4 now runs on every transaction regardless of tier, and any Step 4 flag caps confidence at Medium. A new Unusual-amount rule flags an amount well outside the vendor's historical range, with the measure stated, or at or above the capitalization threshold. The auditor's fixed “3× median” was not adopted, to keep thresholds out of the skill.</p>
+      <span class="where">Basis: ASC 360 and the IRS de minimis safe harbor election (expensing versus capitalising) · references/method.md Steps 2 and 4 · SKILL.md Stage 4</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — The keyword map ignored the direction of the money</h3>
+      <p>“interest” always went to Interest Expense and “dividend” to Owner Distributions, so interest credited by the bank and dividends received were sent to expense or equity.</p>
+      <p class="fix"><b>Fix.</b> Both rows are sign-aware: interest outflow to Interest Expense, inflow to Interest Income; dividend or distribution outflow to Owner Distributions or Dividends Paid, inflow to Dividend or Investment Income.</p>
+      <span class="where">Basis: standard bookkeeping practice · references/method.md Step 2, Tier 3</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — The loan principal was “often revealed” by the ledger</h3>
+      <p>Movement in the loan account shows how past payments were booked, not how this one splits; if past payments went wholly to expense there is no movement at all.</p>
+      <p class="fix"><b>Fix.</b> The split comes from the lender statement or amortization schedule, [manual]; the ledger only confirms the post-payment balance. Without the statement the full payment goes to the loan account flagged “split required”, never to expense.</p>
+      <span class="where">Basis: the lender statement or amortization schedule as the source of the split · references/method.md Step 4, Loan payments · tools-and-glossary.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — Owner and family names were never collected</h3>
+      <p>Personal-use and related-party detection compared payees with the employee list, but owners are often not on payroll and family members and the owner's other businesses never are.</p>
+      <p class="fix"><b>Fix.</b> Stage 1 has a new optional question G for owners, family members on the books and the owner's other businesses, used only for the flag and never stored.</p>
+      <span class="where">Basis: standard bookkeeping practice for owner-managed books · SKILL.md Stage 1 · references/method.md Step 4</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · 1 fixed, 1 partly fixed</span><div class="body">
+      <h3>L1, L2 — two smaller corrections</h3>
+      <ul class="lows">
+        <li><b>L1 — One export, so transfers stayed one-sided (fixed).</b> The upload checklist now asks for exports of every bank and card account for the period, and marks the coded GL export (QuickBooks Transaction Detail by Account or Xero Account Transactions, last 12 months) Recommended. <span class="where">Basis: the skill's rule that both paths run the same checks</span></li>
+        <li><b>L2 — The capitalization threshold was asked before the batch was seen (partly fixed).</b> Question E is now always asked in the Stage 1 batch, in plain words, and a blank answer means large equipment purchases are flagged for the owner to decide. Partly fixed: the suggested “many small businesses use $2,500” hint was not added, because the card never picks a threshold. <span class="where">Basis: the card's rule against defaulting a capitalization threshold</span></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="passed">
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures, re-run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync across all 31 skills (<code>sync-shared.sh --check</code>).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 6, exists as a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,018 characters, under the 1,024 limit; it no longer names an unshipped skill.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage at the split (87288f7): 548 of 548 original content lines present in the reference files. The lines that differ now are the audit edits plus one earlier pointer rewording in gates.md.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: Tier 1 evidence is reported as account, count and recency, and an inconsistent history is reported as a split.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: a supplied policy or stored correction beats history, and the conflict is reported.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: whether a matching account exists is stated as a fact, with the nearest account named; accounts are never invented.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: credit-card payments are transfers, and refunds are contra to the original expense, not Other Income.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: tax codes come only from the codes configured in the books, with cross-border items flagged.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: personal and related-party flags are surfaced, never concluded, and never stored against a named person.</span></li>
+  </ul>
+</section>
+
+<section id="not-tested">
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What no check in this pass could reach</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file: no batch has been coded against a real chart and history in this pass.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass. The skill has no invoice tool, so the receipts rule reads AR, Undeposited Funds and clearing through <code>get_general_ledger</code> and uses an open-invoice read only where the Gate 2 catalogue lists one; that fallback is untested.</li>
+    <li>L2 is partly fixed by choice: no example threshold is offered at intake.</li>
+    <li>Left open from the split: Tier 2 is headed [gated] while its text calls the matching-account check [auto].</li>
+  </ul>
+</section>
+
+<footer>On the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet on <code>main</code>. Cross-references removed in 4978bff; split into the card format in 87288f7; gates pointer named in 14f616a; audit fixes in 7109642. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>

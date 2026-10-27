@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Entry Builder Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the journal entry builder skill is built: a 160-line card over seven reference files, its run stage by stage, and the ten audit findings fixed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  .lows{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .lows b{color:var(--ink);font-weight:600}
+  .lows .where{display:block}
+  .gaps{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Journal entry builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">journal-entry-builder · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the journal entry builder is built, and what it does</h1>
+  <p class="lede">A 160-line card with seven reference files behind it, split from a 1,038-line SKILL.md: 157 lines at the split, three more from the audit fixes. It turns an accounting event into a proposed journal entry that balances to the penny against the entity's real chart of accounts, validates it check by check, and posts nothing. This page shows where the weight sits, the run step by step, and the ten findings from the 27 Oct bookkeeping audit.</p>
+</header>
+
+<section id="stats">
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">160</span><span class="s">lines in SKILL.md, down from 1,038</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">602/602</span><span class="s">original content lines, moved into 7 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">1·7·2</span><span class="s">high · medium · low, in the 27 Oct audit</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">10/10</span><span class="s">fixed in 3814b2d · 0 partly fixed · 0 rejected</span></div>
+  </div>
+</section>
+
+<section id="construction">
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 484" role="img" aria-label="SKILL.md is a 160-line card with the rules and six stages. The rules point to mosofin-protocol.md, read before the first tool call; Stage 2 to gates.md; Stages 3 to 6 to method.md, which holds Steps 0 to 8; Stage 4 also to edge-cases.md and Stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 458 lines.">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect x="30" y="20" width="270" height="408" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 160</text>
+<g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+<text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+<text x="48" y="112" font-weight="600">Rules that never bend</text>
+<text x="48" y="152" font-weight="600">Stage 1 · Intake, eight questions</text>
+<text x="48" y="192">Stage 2 · Confirm scope</text>
+<text x="48" y="232">Stage 3 · Read the chart and books</text>
+<text x="48" y="272">Stage 4 · Classify and construct</text>
+<text x="48" y="312">Stage 5 · Validate and present</text>
+<text x="48" y="352">Stage 6 · Offer to save</text>
+</g>
+<line x1="44" y1="126" x2="286" y2="126" stroke="var(--mosofin)" stroke-opacity=".35"/>
+<g font-family="'IBM Plex Mono',monospace" font-size="12">
+<g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="177" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+<g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="100" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">148</text></g>
+<g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">458</text></g>
+<g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="52" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">77</text></g>
+<g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="35" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">52</text></g>
+<g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">76</text></g>
+<g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">59</text></g>
+</g>
+<g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+<path d="M300 108 C 440 108, 440 38, 574 38" marker-end="url(#a1)"/>
+<path d="M300 188 C 440 188, 440 92, 574 92" marker-end="url(#a1)"/>
+<path d="M300 228 C 440 228, 440 146, 574 146" marker-end="url(#a1)"/>
+<path d="M300 268 C 440 268, 440 150, 574 150" marker-end="url(#a1)"/>
+<path d="M300 308 C 440 308, 440 154, 574 154" marker-end="url(#a1)"/>
+<path d="M300 348 C 440 348, 440 158, 574 158" marker-end="url(#a1)"/>
+<path d="M300 268 C 450 268, 450 200, 574 200" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+<path d="M300 308 C 450 308, 450 254, 574 254" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+</g>
+<g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+<text x="318" y="450">rules: before the 1st call · Stage 2: Gates 0–3 · Stages 3–6: Steps 0–8</text>
+<text x="318" y="470" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+</g></svg>
+    </div>
+    <figcaption>The card is what loads every time; each stage names the one file it needs. <b>method.md</b> carries the accounting: Steps 0–8, the JE patterns, the validation set, the import formats and the pitfalls, at 458 lines the bulk of the original. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honesty clause (it can never read the event being recorded, the materiality threshold, the tax rules or a document outside the system) sits at the top of the card and again in overview.md.</figcaption>
+  </figure>
+</section>
+
+<section id="run">
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+<svg viewBox="0 0 920 1408" role="img" aria-label="Stage 1 asks eight questions: Mosofin or upload, the transaction or event, the posting date, the entity, the tax effect and jurisdiction, the materiality threshold, the source document and reversal, and the closed-through date. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file and the tool catalogue; otherwise the user uploads the event, the chart of accounts and supporting ledgers. Both paths read back and wait for a yes. Step 0 reads the chart and the books in one batch; the event, threshold, tax rules, closed-through date and loan split must come from the user. Steps 1 to 5 classify and construct the entry. Step 6 runs nine checks and six pitfall checks. Step 7 presents the proposed entry, never posted. Step 8 offers to save conventions.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+<line x1="460" y1="180" x2="460" y2="210" marker-end="url(#a2)"/>
+<polyline points="330,262 240,262 240,326" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="590,262 680,262 680,326" marker-end="url(#a2)" color="var(--manual)"/>
+<polyline points="240,546 240,582 400,582" marker-end="url(#a2)" color="var(--mosofin)"/>
+<polyline points="680,546 680,582 520,582" marker-end="url(#a2)" color="var(--manual)"/>
+<line x1="460" y1="606" x2="460" y2="636" marker-end="url(#a2)"/>
+<line x1="460" y1="840" x2="460" y2="870" marker-end="url(#a2)"/>
+<line x1="460" y1="1006" x2="460" y2="1036" marker-end="url(#a2)"/>
+<line x1="460" y1="1172" x2="460" y2="1202" marker-end="url(#a2)"/>
+<line x1="460" y1="1296" x2="460" y2="1326" marker-end="url(#a2)"/>
+</g>
+<g font-family="Archivo,sans-serif">
+<rect x="60" y="20" width="800" height="160" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+<g font-size="13.5" fill="var(--ink)">
+<text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+<text x="480" y="74"><tspan font-weight="600">B</tspan> What transaction or event, with amounts?</text>
+<text x="80" y="100"><tspan font-weight="600">C</tspan> The posting date</text>
+<text x="480" y="100"><tspan font-weight="600">D</tspan> Which entity (both, if intercompany)?</text>
+<text x="80" y="126"><tspan font-weight="600">E</tspan> Tax effect, and in which jurisdiction?</text>
+<text x="480" y="126"><tspan font-weight="600">F</tspan> Materiality threshold for a review flag</text>
+<text x="80" y="152"><tspan font-weight="600">G</tspan> Source document; should it reverse?</text>
+<text x="480" y="152"><tspan font-weight="600">H</tspan> Books closed or locked through when?</text>
+</g>
+<polygon points="460,212 590,262 460,312 330,262" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="460" y="258" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+<text x="460" y="275" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+<text x="246" y="252" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--mosofin)">yes, use my books</text>
+<text x="674" y="252" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--manual)">no, or not connected</text>
+<rect x="60" y="328" width="360" height="218" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+<text x="78" y="352" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+<g font-size="13" fill="var(--ink)">
+<text x="78" y="378" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+<text x="78" y="402" xml:space="preserve">G1  company file · both entities if intercompany</text>
+<text x="78" y="426" xml:space="preserve">G2  tool catalogue · is the chart read enabled?</text>
+<text x="78" y="450" xml:space="preserve">      if not: PLACEHOLDER — REMAP REQUIRED</text>
+<text x="78" y="474" xml:space="preserve">      writes out of scope</text>
+</g>
+<rect x="500" y="328" width="360" height="218" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+<text x="518" y="352" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+<g font-size="13" fill="var(--ink)">
+<text x="518" y="378" xml:space="preserve">The event: what, amounts, date (required)</text>
+<text x="518" y="402" xml:space="preserve">Chart of accounts, CSV or XLSX (required)</text>
+<text x="518" y="426" xml:space="preserve">Entity, currency, year-end, cash or accrual basis</text>
+<text x="518" y="450" xml:space="preserve">Import template · tax jurisdiction if taxed</text>
+<text x="518" y="474" xml:space="preserve">TB or GL detail: accrual, prepaid, clearing</text>
+<text x="518" y="498" xml:space="preserve">Threshold · the original, for a reversal</text>
+<text x="518" y="522" xml:space="preserve">Open invoices or bills · the loan statement</text>
+</g>
+<rect x="400" y="558" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+<text x="460" y="587" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+<rect x="60" y="638" width="800" height="202" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="664" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 0 · FETCH THE CHART AND THE BOOKS, ONE BATCH</text>
+<text x="80" y="690" font-size="13" font-weight="600" fill="var(--ink)">Read-only, data_source_id on every call, the mock flag checked</text>
+<text x="80" y="712" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_accounts · get_trial_balance · get_balance_sheet · get_general_ledger</text>
+<text x="80" y="732" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">search_invoices · search_bills · search_journal_entries · get_company_info</text>
+<rect x="80" y="748" width="760" height="72" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+<text x="98" y="770" font-size="12.5" font-weight="600" fill="var(--high)">What no connection can supply</text>
+<text x="98" y="790" font-size="12.5" fill="var(--ink)">The event being recorded, the materiality threshold, the tax rules, the closed-through date and</text>
+<text x="98" y="809" font-size="12.5" fill="var(--ink)">any document outside the system, all asked at Stage 1. A loan split comes from the lender statement.</text>
+<rect x="60" y="872" width="800" height="134" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="898" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 1–5 · CLASSIFY AND CONSTRUCT THE ENTRY</text>
+<text x="80" y="924" font-size="13.5" fill="var(--ink)">JE type in the header · normal-balance rules · accounts exactly as the live chart has them</text>
+<text x="80" y="945" font-size="13.5" fill="var(--ink)">Patterns: accrual, prepaid, deferred, depreciation, reclass, correction, intercompany, reversal</text>
+<text x="80" y="966" font-size="13.5" fill="var(--ink)">Cash, AR and AP legs through the subledger · reversals dated the first day of the next period</text>
+<text x="80" y="987" font-size="13.5" fill="var(--ink)">No closing entry for QuickBooks Online or Xero · tax lines only with a jurisdiction</text>
+<rect x="60" y="1038" width="800" height="134" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1064" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 6 · VALIDATE: NINE CHECKS AND SIX PITFALL CHECKS</text>
+<text x="80" y="1090" font-size="13.5" fill="var(--ink)">Balances to the penny · every account in the chart, or a hard stop · signs match account types</text>
+<text x="80" y="1111" font-size="13.5" fill="var(--ink)">Period open against the closed-through date · the accrual and its reversal read before any bill</text>
+<text x="80" y="1132" font-size="13.5" fill="var(--ink)">No open invoice for a receipt · no control account · materiality · clearing balance and age</text>
+<text x="80" y="1153" font-size="13.5" fill="var(--ink)">Each check reported with its evidence; a check that could not run is named as not run</text>
+<rect x="60" y="1204" width="800" height="92" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+<text x="80" y="1230" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 7 · PROPOSED ENTRY — NOT POSTED</text>
+<text x="80" y="1256" font-size="13.5" fill="var(--ink)">One entry inline; several as an import file in the platform's own columns</text>
+<text x="80" y="1277" font-size="13.5" fill="var(--ink)">Validation Results and Coverage sheets · never a Rounding plug · nothing is posted</text>
+<rect x="60" y="1328" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+<text x="80" y="1356" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 8 · Offer to save</tspan>: account map, entry templates, import format, materiality, reversal policy</text>
+<text x="80" y="1376" font-size="13.5" fill="var(--muted)">never amounts, balances or entry contents · explicit yes, after the results</text>
+</g></svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the clause the skill is built around: the books can show the chart, the balances and the open items, but the event, the threshold, the tax rules and the lock date come from the person asking. Step 6 is where the reads pay off: the accrual double-count, the open-invoice and the control-account checks are queries, not intentions.</figcaption>
+  </figure>
+</section>
+
+<section id="audit">
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Ten findings, all fixed in 3814b2d</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 judged the skill <i>fit with fixes</i>: the build-and-validate loop is sound, but the multi-currency rule booked an exchange-difference plug and several stock patterns journalled straight into control accounts. Every finding was accepted and fixed in one commit.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — An FX gain or loss plug at initial recognition</h3>
+      <p>The multi-currency edge case said “post in functional currency with an FX gain / loss plug.” At the transaction date no exchange difference exists, so the line was a made-up P&amp;L figure covering a rate or arithmetic error, and it contradicted the card's own ban on a Rounding plug.</p>
+      <p class="fix"><b>Fix.</b> Every line is translated at the spot rate on the transaction date, with the rate and its source stated. If the translated lines do not balance, the rate or an amount is wrong: stop and ask. Realised gains and losses arise only at settlement, unrealised ones only at period-end remeasurement.</p>
+      <span class="where">Basis: ASC 830-20-30-1 and IAS 21.21 (initial recognition at spot); ASC 830-20-35 and IAS 21.23 (later differences) · references/edge-cases.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — Stock patterns journalled into the control accounts the skill calls red flags</h3>
+      <p>The prepaid, deferred-revenue and intercompany patterns debited or credited Cash, AR and AP by journal, and Pitfall 2 said “the receipt clears AR.” In QuickBooks Online and Xero a journal line to AR or AP does not apply against the open invoice, so the aging and the control account stop agreeing.</p>
+      <p class="fix"><b>Fix.</b> Step 4 now says cash, AR and AP legs go through the subledger (bill, bill payment, receive payment, deposit), with a journal only where none fits and the customer or vendor named on the line. Pitfall 2 applies the receipt to the open invoice as a customer payment.</p>
+      <span class="where">Basis: standard bookkeeping practice: settlements go through the subledger · references/method.md Step 4, Pitfall 2 · edge-cases.md · overview.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — The loan interest and principal split was said to be readable from the ledger</h3>
+      <p>The text claimed the loan liability's movement “shows the principal portion.” Past movement cannot split this payment, and it may be the very error being fixed.</p>
+      <p class="fix"><b>Fix.</b> The check is now [manual]: the split comes from the lender statement or amortization schedule, and the ledger balance only confirms the post-payment balance agrees. The loan statement is on the upload checklist and asked on the Mosofin path.</p>
+      <span class="where">Basis: the lender statement or amortization schedule as the source of the interest figure, which must agree to Form 1098 where one is issued · SKILL.md · references/method.md Step 6, Pitfall 5 · overview.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — The open-period check rested on evidence that cannot show it</h3>
+      <p>Entries dated after the posting date were treated as a sign the period was open. Neither a QuickBooks closing date nor a Xero lock date shows in a journal search, and neither intake path asked for one.</p>
+      <p class="fix"><b>Fix.</b> Stage 1 has a new question H: the date the books are closed or locked through, and whether any later period has been reported. It is recorded as user-asserted unless the platform setting is readable; entries after a date are no longer evidence.</p>
+      <span class="where">Basis: standard close practice: posting into a reported period changes figures already given out · SKILL.md Stage 1 · references/method.md Steps 0 and 6 · overview.md</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — The accrual double-count check could cause the opposite error</h3>
+      <p>“Always check if a prior accrual covers the same item, and clear it” did not tell a reversed accrual from an open one. Where September's accrual reversed on 1 October, clearing it again leaves a debit in accruals and understates expense.</p>
+      <p class="fix"><b>Fix.</b> The check reads the accrual and its reversal. A reversed accrual means the bill posts to expense as normal; only an accrual still open is cleared on settlement. The reversal policy is asked if the ledger does not show it.</p>
+      <span class="where">Basis: standard accrual practice: reverse on the first day of the next period · references/method.md Step 6, Pitfall 1</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M5 — No rule for correcting an error in a closed, reported year</h3>
+      <p>The correcting-entry pattern offered reverse-and-rebook or a net correction without asking whether the original sits in a period already closed and reported.</p>
+      <p class="fix"><b>Fix.</b> A correction to a closed or reported period is dated in the current open period. Immaterial: through the current-period account, referencing the original. Material: against opening retained earnings, flagged for the accountant. Materiality is the user's call; never date into a closed period without their say-so.</p>
+      <span class="where">Basis: ASC 250-10-45-23 and IAS 8.42 (material prior-period errors through opening retained earnings) · references/method.md Step 4, Correcting prior error</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M6 — The upload checklist missed inputs the checks depend on</h3>
+      <p>The cash-basis, cross-year and open-invoice checks need the accounting basis, the fiscal year-end and the open items, but the upload path asked only for a trial balance or GL detail, so those checks ran on guesses or not at all.</p>
+      <p class="fix"><b>Fix.</b> The entity row now asks for fiscal year-end and accounting basis, and a new row asks for open invoices or bills (AR or AP aging detail) and, for a loan payment, the loan statement.</p>
+      <span class="where">Basis: the skill's rule that both paths run the same checks · SKILL.md upload checklist</span>
+      </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M7 — The QuickBooks and Xero import columns were incomplete</h3>
+      <p>The QuickBooks Online template had no Name column, which an AR or AP line needs. Xero needs one signed Amount column and a tax rate on every line; neither was stated, so an “import-ready” Xero file could load with every credit as a debit.</p>
+      <p class="fix"><b>Fix.</b> QuickBooks Online adds Name, Class and Location, with Name filled on every AR and AP line. Xero uses one signed *Amount column (debits positive, credits negative) and *TaxRate on every line, taken from the user's answer to E and never defaulted.</p>
+      <span class="where">Basis: the QuickBooks Online and Xero manual-journal import formats · references/method.md Step 7</span>
+      </div></div>
+    <div class="f low done"><span class="sev">Low · all fixed</span><div class="body">
+      <h3>L1, L2 — two smaller corrections, both fixed</h3>
+      <ul class="lows">
+        <li><b>L1 — Closing-entry detection.</b> The heuristic “P&amp;L accounts at zero after year-end means the system closed it” is wrong for QuickBooks Online and Xero, which never post a closing entry. Now: no closing entry for either; other platforms, ask. <span class="where">Basis: how QuickBooks Online and Xero roll net income into retained earnings</span></li>
+        <li><b>L2 — The check count was stated three ways.</b> The model validation line said “9 of 9” over a set of fifteen. Now “validated: 13 of 15 run, 13 passed; materiality not run (no threshold given); loan split n/a”, and the stale “four of the seven” count is gone. <span class="where">Basis: internal consistency</span></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section id="passed">
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures, re-run on 27 Oct 2026 after the audit fixes.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync across all 31 skills (<code>sync-shared.sh --check</code>).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 8, exists as a heading in method.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,015 characters, under the 1,024 limit; third person, what and when, uploads included.</span></li>
+    <li><span class="ok">PASS</span><span>Coverage at the split (fa70d32): 602 of 602 original content lines present in the reference files. Of the 31 lines that differ now, 29 are the audit edits and two are earlier pointer rewordings.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: an account missing from the chart is a hard stop, with PLACEHOLDER — REMAP REQUIRED when no chart exists.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: corrections never alter the posted original and reference it by number and date from the ledger.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: reversals are dated the first day of the next period, and year-end accruals reverse in period 1.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: validation is reported check by check with its evidence, and a check that did not run is named.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: intercompany entries are built against each entity's own chart, and consolidation-only eliminations are labelled so nobody imports them.</span></li>
+    <li><span class="ok">PASS</span><span>Audit, what is right: rounding goes to the largest line with a memo, never to a Rounding account.</span></li>
+  </ul>
+</section>
+
+<section id="not-tested">
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What no check in this pass could reach</p>
+  <ul class="gaps">
+    <li>A live run against a connected company file: no entry has been built and validated against a real chart in this pass.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass.</li>
+    <li>The corrected QuickBooks Online and Xero import columns come from the audit's reading of the formats; no file has been test-imported.</li>
+    <li>Left open from the split: overview.md says six of the nine original validations become queries, while its table marks seven (four [auto], three [gated]).</li>
+  </ul>
+</section>
+
+<footer>On the branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet on <code>main</code>. Cross-references removed in 1e11edd; split into the card format in fa70d32; gates pointer named in 14f616a and the Step 8 pointer corrected in 7975b74; audit fixes in 3814b2d. Still to do: merge to main, then a live run against a connected company file.</footer>
+
+</div>
+</body>
+</html>
