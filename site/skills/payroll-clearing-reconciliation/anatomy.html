@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Clearing Reconciliation Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the payroll clearing reconciliation skill is built: a 165-line card, seven reference files, the run step by step and nine audit fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .f ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:66ch}
+  .f ul b{color:var(--ink);font-weight:600}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+
+  .f .std{display:block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);font-style:normal}
+  .f .std b{color:var(--faint);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+  .lows{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  .lows li{font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+  .lows li > b{color:var(--ink);font-weight:600}
+  .lows .fix{color:var(--ink)}
+  .notyet{margin:0;padding-left:20px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll clearing reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">payroll-clearing-reconciliation · card format and audit fixes on branch claude/trusting-ramanujan-8k8te1 · audited 27 Oct 2026</div>
+  <h1>How the payroll clearing reconciliation is built, and what it does</h1>
+  <p class="lede">A 165-line card with seven reference files behind it, split on 25 Oct 2026 from a 1,001-line SKILL.md, then corrected on 27 Oct after a senior-bookkeeper audit found that two of its own automatic tests gave wrong answers on ordinary books: the never-clearing residual read a normal month's carry as a permanent balance, and the year-to-date identity left out the opening balance. The skill reconciles every payroll control account at month end, rolls each forward against its expected balance, ages every balance, tests it against its remittance cadence and finds the stale balances that never clear, including unclaimed pay that may be escheatable. This page shows where the weight sits, the run step by step, what the audit found and how each finding was fixed.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">165</span><span class="s">lines in SKILL.md, down from 1,001</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">561/561</span><span class="s">original content lines, moved into 7 reference files</span></div>
+    <div class="stat"><span class="k">Audit findings</span><span class="v">2·4·3</span><span class="s">high · medium · low, 9 in all</span></div>
+    <div class="stat"><span class="k">Fixed</span><span class="v">9/9</span><span class="s">0 partly fixed, 0 rejected · cbfbd99</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 165-line card with rules and six stages. The rules point to mosofin-protocol.md, read before the first call; stage 2 to gates.md; stages 3 to 6 to method.md; stage 4 also to edge-cases.md and stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 415 lines.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 165</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+        <text x="48" y="78" font-weight="600">What it does · the honest limit</text>
+        <text x="48" y="112" font-weight="600">Rules that never bend</text>
+        <text x="48" y="152" font-weight="600">Stage 1 · Intake, eight questions</text>
+        <text x="48" y="192">Stage 2 · Confirm scope</text>
+        <text x="48" y="232">Stage 3 · Read, age every balance</text>
+        <text x="48" y="272">Stage 4 · Roll forward, investigate</text>
+        <text x="48" y="312">Stage 5 · Cleanup entries, present</text>
+        <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+        <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="196" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+        <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="104" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">139</text></g>
+        <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">415</text></g>
+        <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="62" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">83</text></g>
+        <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="41" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">55</text></g>
+        <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">64</text></g>
+        <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">65</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+        <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+        <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+        <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+        <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+        <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+        <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+        <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+        <text x="318" y="126">before 1st call</text>
+        <text x="318" y="206">Gates 0–3</text>
+        <text x="318" y="372">Steps 0–10 → method.md</text>
+        <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g></svg>
+    </div>
+    <figcaption>The card is what loads every time. Each stage points to one file, so a model reads the method only once it is doing the method. <b>method.md</b> carries the reconciliation: Steps 0–10, including Step 0b, which ages every balance and tests its behaviour before anything else, and the one-tab-per-account workpaper in Step 9. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. The honest limit sits at the top of the card: the books surface holds no payroll register, benefit provider statement, court order or bank statement, and the remittance cadence is always the user's to state.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1056" role="img" aria-label="Stage 1 asks eight questions: Mosofin or upload, the entity and payroll accounts, the period, the remittance cadence per liability, the payroll register, the bank statement, the write-off threshold and approver, and any authority or provider statement of account. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace, the company file, whether a payroll platform is connected, and the read-only tool catalogue; otherwise the user uploads twelve months of GL detail, the register and remittance records. Both paths read back and wait for a yes. Steps 0 to 1 read twelve months, age every balance and find the never-clearing residual. Steps 2 to 7 roll each account forward, tie remittances per deposit period and investigate stale balances; without the register, the expected balance rests on a stated journal proxy, because no connection supplies it. Steps 8 to 9 propose cleanup entries and the workpaper. Step 10 offers to save the account list and cadences.">
+          <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+          <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="152" x2="460" y2="182" marker-end="url(#a2)"/>
+          <polyline points="330,234 230,234 230,298" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,234 690,234 690,298" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,446 230,490 400,490" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,446 690,490 520,490" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="514" x2="460" y2="544" marker-end="url(#a2)"/>
+          <line x1="460" y1="674" x2="460" y2="704" marker-end="url(#a2)"/>
+          <line x1="460" y1="856" x2="460" y2="886" marker-end="url(#a2)"/>
+          <line x1="460" y1="972" x2="460" y2="1002" marker-end="url(#a2)"/>
+          </g>
+          <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="132" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE SHORT BATCH, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+          <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+          <text x="340" y="74"><tspan font-weight="600">B</tspan> Entity, payroll accounts</text>
+          <text x="600" y="74"><tspan font-weight="600">C</tspan> Which period?</text>
+          <text x="80" y="100"><tspan font-weight="600">D</tspan> Remittance cadence each</text>
+          <text x="340" y="100"><tspan font-weight="600">E</tspan> The payroll register(s)</text>
+          <text x="600" y="100"><tspan font-weight="600">F</tspan> The bank statement</text>
+          <text x="80" y="126"><tspan font-weight="600">G</tspan> Write-off threshold</text>
+          <text x="340" y="126"><tspan font-weight="600">H</tspan> Statements of account</text>
+          </g>
+          <polygon points="460,184 590,234 460,284 330,234" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="230" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="247" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5"><text x="236" y="224" text-anchor="end" fill="var(--mosofin)">yes, use my books</text><text x="684" y="224" fill="var(--manual)">no, or not connected</text></g>
+          <rect x="80" y="300" width="300" height="146" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="324" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">GATES 0–2</text>
+          <g font-size="13" fill="var(--ink)">
+          <text x="98" y="350" xml:space="preserve">G0  workspace, by name, explicit yes</text>
+          <text x="98" y="374" xml:space="preserve">G1  company file · payroll platform?</text>
+          <text x="98" y="398" xml:space="preserve">     clearing account is per entity</text>
+          <text x="98" y="422" xml:space="preserve">G2  tool catalogue · writes out of scope</text>
+          </g>
+          <rect x="540" y="300" width="300" height="146" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="324" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+          <text x="558" y="350" xml:space="preserve">GL detail, period + prior twelve months</text>
+          <text x="558" y="374" xml:space="preserve">Payroll register(s) for the period</text>
+          <text x="558" y="398" xml:space="preserve">Remittance records: payee, date, amount</text>
+          <text x="558" y="422" xml:space="preserve">Bank statement (recommended)</text>
+          </g>
+          <rect x="400" y="466" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="495" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+          <rect x="60" y="546" width="800" height="128" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="570" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 0–1 · READ, AGE EVERY BALANCE, SETTLE THE ACCOUNT LIST</text>
+          <text x="80" y="592" font-size="13.5" fill="var(--ink)">Twelve months of GL on every payroll account · aged FIFO unless a remittance memo names its period</text>
+          <text x="80" y="614" font-size="13.5" fill="var(--ink)">Never-clearing residual: the trough after each remittance, less what the cadence carries</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+          <text x="80" y="636">get_general_ledger · get_trial_balance · search_accounts</text>
+          <text x="80" y="656">search_payments · search_checks · search_journal_entries</text>
+          </g>
+          <rect x="60" y="706" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="730" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 2–7 · ROLL FORWARD, TIE, INVESTIGATE</text>
+          <text x="80" y="752" font-size="13.5" fill="var(--ink)">Expected = opening + accrued − remitted,</text>
+          <text x="80" y="774" font-size="13.5" fill="var(--ink)">basis stated · difference shown even when zero</text>
+          <text x="80" y="796" font-size="13.5" fill="var(--ink)">Net pay per cycle; taxes per deposit period</text>
+          <text x="80" y="818" font-size="13.5" fill="var(--ink)">YTD test with the opening balance · stale:</text>
+          <text x="80" y="840" font-size="13.5" fill="var(--ink)">clearing over 60 days, liabilities past a cycle</text>
+          <rect x="608" y="722" width="234" height="88" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="725" y="744" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No register?</text>
+          <text x="725" y="762" text-anchor="middle" font-size="12" fill="var(--ink)">no connection supplies it:</text>
+          <text x="725" y="780" text-anchor="middle" font-size="12" fill="var(--ink)">the journal proxy, stated,</text>
+          <text x="725" y="798" text-anchor="middle" font-size="12" fill="var(--ink)">proves only the arithmetic</text>
+          <rect x="60" y="888" width="800" height="84" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="912" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEPS 8–9 · PROPOSE CLEANUP, PRESENT</text>
+          <text x="80" y="934" font-size="13.5" fill="var(--ink)">Reclasses and small write-offs as proposals; tax and benefit residuals need the statement of account</text>
+          <text x="80" y="956" font-size="13.5" fill="var(--ink)">Unclaimed pay never written off · one tab per account, opening agreed to the prior rec, sign-off</text>
+          <rect x="60" y="1004" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1030" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 10 · Offer to save</tspan>: account list, cadences, payroll calendar, payees; never anyone's pay or balances · explicit yes</text>
+          </g>
+          </svg>
+    </div>
+    <figcaption>Both paths converge on the read-back, and nothing is read before it. The highlighted box is the honest limit the skill is built around: the accrued half of every roll-forward comes from the payroll register, which the books do not hold. Without it the payroll journal is used as a stated proxy, and the output says the comparison then proves only that the account moved as the journals say. The bank tie-out says, likewise, whether it was to the statement or to recorded disbursements.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Nine findings, all fixed on 27 Oct, with the standard behind each</p>
+  <p style="color:var(--muted);font-size:14.5px">An independent senior-bookkeeper audit on 27 Oct 2026 gave the verdict <b>fit with fixes</b>. Each finding was checked against the skill before acting; all nine were fixed in cbfbd99, none partly, none rejected.</p>
+  <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H1 — The never-clearing residual was measured at month end</h3>
+      <p>Step 0b took “the minimum balance the account has reached over the last twelve periods” from period-end balances. A monthly-remitted withholding account correctly carries the month's withholdings at every month end, so its normal carry was reported as a permanent balance, the headline finding.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> The residual is now the lowest balance reached immediately after each remittance over twelve cycles, less what the cadence says should still be carried; for clearing and suspense accounts, the lowest running balance from GL detail. edge-cases.md and the card match.</p>
+      <cite class="std"><b>Behind it</b> · standard liability reconciliation practice: judge a balance against its remittance cycle</cite>
+      <span class="where">references/method.md Step 0b · SKILL.md Stage 3 · references/edge-cases.md</span>
+    </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>H2 — The YTD identity left out the opening balance</h3>
+      <p>Cumulative accruals less cumulative remittances “should differ by exactly the outstanding liability”. That ignores the balance brought into the year, so the test broke by that amount almost every year, and once corrected it is ledger arithmetic that cannot fail.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> Step 6 now includes the opening liability, then ties YTD withholdings per the register to YTD remittances plus closing less opening liability, a two-source test; without the register it says the test proves only ledger arithmetic. output.md and the card match.</p>
+      <cite class="std"><b>Behind it</b> · ledger roll-forward arithmetic (opening + credits − debits = closing)</cite>
+      <span class="where">references/method.md Step 6 · SKILL.md Stage 4 · output.md</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M1 — On the connected path without a payroll platform, the register was never asked for</h3>
+      <p>Intake E fell back to the journal proxy at once, and the Mosofin path's “still ask for” list left the register out, so the connected path gave less assurance than the upload path.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> Intake E now asks the user to upload the register when no payroll platform is connected; the proxy is used only if they cannot. The Mosofin-path bullet includes it.</p>
+      <cite class="std"><b>Behind it</b> · standard practice: reconcile to the independent source when it can be had</cite>
+      <span class="where">SKILL.md intake E and Mosofin path</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M2 — “Exact” ageing assumed open-item matching</h3>
+      <p>The skill promised exact ages and item counts, but a liability account is a running balance; remittances are not matched to the accruals they settle.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> Step 0b ages by FIFO unless a remittance memo names its period, and the convention is stated on the workpaper; “exact” is replaced by “aged by the stated convention” on the card and in output.md.</p>
+      <cite class="std"><b>Behind it</b> · audit practice: state the ageing convention</cite>
+      <span class="where">references/method.md Steps 0b, 7 · SKILL.md · output.md</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M3 — Write-offs did not separate money owed to an authority from a true residual</h3>
+      <p>The only restriction was not to write off what is owed to a person. An old credit on a withholding account is presumptively tax not yet paid; an old debit is a refund to claim. Neither can be judged from the ledger.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> Step 8 requires the authority's or provider's statement of account before any write-off on those accounts: an unexplained credit is a remittance to make, a debit a refund to claim, neither written off. New intake H asks for the statement.</p>
+      <cite class="std"><b>Behind it</b> · ASC 405-20-40-1 (a liability is derecognised only when paid or legally released)</cite>
+      <span class="where">references/method.md Step 8 · SKILL.md intake H</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>M4 — Tax remittances were tied per payroll cycle</h3>
+      <p>“For each payroll cycle … tax remittances = sum of withholdings + employer share” shows a difference on every cycle a monthly or quarterly depositor does not remit.</p>
+      <p class="fix"><b>Fixed in cbfbd99.</b> Net pay is still tied per cycle; tax and benefit remittances are tied per deposit period set by the cadence (intake D).</p>
+      <cite class="std"><b>Behind it</b> · tax deposit schedules (monthly, semi-weekly, quarterly depositors)</cite>
+      <span class="where">references/method.md Step 5 · output.md</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed ×3</span><div class="body">
+      <h3>Three smaller points, all fixed in cbfbd99</h3>
+      <ul class="lows">
+        <li><b>L1 — The 60-day stale threshold ignored the cadence</b><span>The card applied it to every account, the method to clearing only; a quarterly-remitted liability legitimately holds older amounts.</span><span class="fix"><b style="color:var(--mosofin);font-weight:600">Fixed.</b> Clearing and suspense balances over 60 days, and liability amounts older than one remittance cycle plus its due-date lag; the card uses the same words.</span><cite class="std"><b>Behind it</b> · standard stale-balance review</cite></li>
+        <li><b>L2 — The upload path asked for “several prior periods”</b><span>The residual and behaviour tests need twelve.</span><span class="fix"><b style="color:var(--mosofin);font-weight:600">Fixed.</b> The upload row and Step 0 ask for the prior twelve months.</span><cite class="std"><b>Behind it</b> · the skill's own twelve-cycle test</cite></li>
+        <li><b>L3 — No opening agreement, no sign-off, no entity in the file name</b><span>Nothing agreed the opening balance to last period's reconciliation, there were no preparer or reviewer fields, and <code>Payroll_Recs_[YYYY-MM].xlsx</code> would collide across entities.</span><span class="fix"><b style="color:var(--mosofin);font-weight:600">Fixed.</b> Each account's header gains opening agreed to prior reconciliation (Y/N, difference, carried items) and Prepared by / Reviewed by with dates; the file is now <code>Payroll_Recs_[YYYY-MM]_[EntityName].xlsx</code>.</span><cite class="std"><b>Behind it</b> · standard reconciliation workpaper practice</cite></li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes (<code>.github/validate-skill.sh skills</code>: 31 skills checked, 0 failures), run on 27 Oct 2026 on the branch checkout.</span></li>
+    <li><span class="ok">PASS</span><span>The shared blocks are in sync (<code>.github/sync-shared.sh --check</code>: in sync, 31 skills).</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the card and its seven reference files resolves (checked by script).</span></li>
+    <li><span class="ok">PASS</span><span>Every Step the card cites, 0 to 10, exists as a heading in method.md (Step 0b sits between Steps 0 and 1).</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,013 characters, under the 1,024 limit (the original was 1,066, over it).</span></li>
+    <li><span class="ok">PASS</span><span>Content kept at the split: 561 of 561 original content lines present in the reference files, checked by script (commit 77d991c).</span></li>
+    <li><span class="ok">PASS</span><span>From the audit's “What is right”: the basis of every expected balance, register or journal proxy, is stated, and a nil difference from common postings is described as proving only arithmetic.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: recorded disbursements are kept distinct from the bank statement, and the tie-out says which was used.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: unclaimed pay is never written off to income and escheatment is treated as a compliance obligation; a small write-off that recurs every period is called a process fault.</span></li>
+    <li><span class="ok">PASS</span><span>From the audit: the reconciliation runs per entity, so a group balance netting to nil cannot hide one entity's debt; garnishments are reported only as totals and counts, by reference number.</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Not yet tested</h2>
+  <p class="sec-title">What this pass did not prove</p>
+  <ul class="notyet">
+    <li>A live run against a connected company file. Every check on this page is a read of the text, not a run.</li>
+    <li>Tool names were not checked against a live tool catalogue in this pass; they are as the skill names them.</li>
+    <li>The post-remittance trough has not been computed on a real twelve-month GL; how it behaves with irregular or lump remittances is untested.</li>
+    <li>Left open at the split: output.md still says “YTD figures verified against payroll register”, which a run without the register cannot meet as worded.</li>
+  </ul>
+</section>
+
+<footer>Branch <code>claude/trusting-ramanujan-8k8te1</code> of MosoFin/mosofin-finance-skills, not yet merged to main. Cross-references to unshipped skills removed in b399502; split into the card format in 77d991c; the Gates cross-entity pointer in 14f616a; the nine audit fixes in cbfbd99 on 27 Oct 2026. Still to do: merge to main, then a live run against a connected company file with twelve months of payroll history.</footer>
+
+</div>
