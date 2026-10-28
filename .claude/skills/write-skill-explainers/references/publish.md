@@ -69,11 +69,11 @@ gh run watch <id> -R MosoFin/mosofin-skill-explainers --exit-status
 ```
 
 - Then confirm the live URL serves the new content (`curl -s <url> | grep -c 'id="src'`),
-  and that an internal page returns 404, and that `/sitemap.xml` lists the new URLs. Crawlers only read
-`robots.txt` at a domain's root, which a GitHub Pages project site cannot serve, so the sitemap is
-submitted in Google Search Console and Bing Webmaster Tools instead of being declared there. Pages can take a minute after the deploy job ends.
+  and that an internal page returns 404, and that `/sitemap.xml` lists the new URLs. The site is served
+at the root of its own domain, so `site/robots.txt` is read by crawlers and declares the sitemap. Submit the
+sitemap in Google Search Console and Bing Webmaster Tools as well. Pages can take a minute after the deploy job ends.
 
-Live site: https://mosofin.github.io/mosofin-skill-explainers/
+Live site: https://skills.mosofin.com/ (custom domain; every canonical URL, Open Graph URL and sitemap entry uses it).
 
 ## Keeping explainers current
 
