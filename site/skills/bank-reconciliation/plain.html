@@ -19,7 +19,7 @@
 <meta property="og:url" content="https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/plain.html">
 <meta property="og:title" content="Bank Reconciliation Explained in Plain English | MosoFin">
 <meta property="og:description" content="What a bank reconciliation checks, why your books and bank statement differ, and the mistake it catches. Explained in plain English, with every fact cited.">
-<meta property="article:modified_time" content="2026-10-21">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bank Reconciliation Explained in Plain English | MosoFin">
 <meta name="twitter:description" content="What a bank reconciliation checks, why your books and bank statement differ, and the mistake it catches. Explained in plain English, with every fact cited.">
@@ -58,7 +58,7 @@
         "@type": "CollectionPage",
         "@id": "https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/#page"
       },
-      "dateModified": "2026-10-21",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "bank-reconciliation",
@@ -270,7 +270,7 @@
       <span class="who">Finds the $25 before anyone dismisses it</span>
       <div class="rows num">
         <div class="row"><span>Adjusted bank balance</span><span class="v">$11,870.00</span></div>
-        <div class="row"><span>Adjusted book balance</span><span class="v">$11,895.00</span></div>
+        <div class="row"><span>Adjusted book balance</span><span class="v">$11,845.00</span></div>
         <div class="row off"><span>Unexplained</span><span class="v">$25.00</span></div>
         <div class="row same"><span>Found: the same $25 supplier payment recorded twice</span><span class="v">fix it</span></div>
       </div>
@@ -281,8 +281,8 @@
       <span class="who">Post $25 to "miscellaneous" and continue</span>
       <div class="rows num">
         <div class="row"><span>Adjusted bank balance</span><span class="v">$11,870.00</span></div>
-        <div class="row"><span>Adjusted book balance</span><span class="v">$11,895.00</span></div>
-        <div class="row off"><span>"Misc. adjustment"</span><span class="v">−$25.00</span></div>
+        <div class="row"><span>Adjusted book balance</span><span class="v">$11,845.00</span></div>
+        <div class="row off"><span>"Misc. adjustment"</span><span class="v">+$25.00</span></div>
         <div class="row same"><span>Duplicate payment still in the books</span><span class="v">hidden</span></div>
       </div>
       <div class="verdict">The month closes. The duplicate stays. If that cheque is ever reissued, you pay twice.</div>
@@ -300,7 +300,7 @@
   <span class="label">One honest limit</span>
   <h2>It can read your books. It cannot read your bank.</h2>
   <p>With MosoFin connected, the skill reads one side of the bridge directly: the cash balance, every payment, deposit and transfer in your books. No accounting connection shows it the bank statement. So it always asks you for the statement. It says exactly what it did and did not conclude. Comparing the books to the books is not a reconciliation, and the skill will not call it one.</p>
-  <p>Without the statement, the skill still does useful work. It builds the whole book side, and it lists the cheques and deposits that are <i>probably</i> still outstanding. It finds duplicates and wrong-date entries. It gives you a template. The only remaining job is to match the template against the statement when the statement arrives.</p>
+  <p>Without the statement, the skill still does useful work. It builds the whole book side, and it lists the cheques and deposits that are <i>probably</i> still outstanding. It finds duplicate entries and entries posted to the wrong account. It flags possible wrong amounts and wrong dates. Only the statement or the source document can prove those. It gives you a template. The only remaining job is to match the template against the statement when the statement arrives.</p>
 </section>
 
 <section>
@@ -311,7 +311,7 @@
     <li><div class="q">Which bank account, or accounts?</div><div class="why">It lists the cash accounts from your books by name. It never shows or stores a full account number.</div></li>
     <li><div class="q">Which period?</div><div class="why">It never assumes a month.</div></li>
     <li><div class="q">Can you give the bank statement as a PDF or CSV, or at least the ending balance and the lines?</div><div class="why">The statement is the one thing the skill cannot see. The skill asks early so you know what the result will and won't be.</div></li>
-    <li><div class="q">When did you last reconcile this account?</div><div class="why">Without that date, an item that looks new may be months old. It will tell you the bridge starts blind.</div></li>
+    <li><div class="q">When did you last reconcile this account?</div><div class="why">Without that date, an item that looks new may be months old. It will tell you the bridge starts blind. It will not suggest an entry for a bank item that may be an old book item that cleared late.</div></li>
     <li><div class="q">How small a difference is worth chasing?</div><div class="why">Your threshold decides which items get an owner and a date. The bridge still has to tie exactly.</div></li>
   </ol>
   <p>Then it repeats your answers: <i>"Reconciling the Operating account (…4471) for September against the statement you uploaded. Go ahead?"</i> It waits for your yes.</p>
@@ -328,16 +328,17 @@
         <li>It reads the cash balance, payments, deposits, transfers and manual entries from your books. You do not export anything.</li>
         <li>It finds your bank accounts by name from your chart of accounts</li>
         <li>You still give the <b>bank statement</b>, every time</li>
-        <li>Helpful but optional: last month's reconciliation report</li>
+        <li>Helpful but optional: last month's reconciliation report, and the first days of next month's statement</li>
       </ul>
     </div>
     <div class="card">
       <span class="tag up">Uploading instead</span>
-      <h3>Bring two files, three if you have them</h3>
+      <h3>Bring two files, more if you have them</h3>
       <ul>
         <li><b>Bank statement</b> for the period (PDF or CSV)</li>
         <li><b>Your books' cash activity</b> for the same account and period: a general ledger export, plus the ending balance (a trial balance works)</li>
         <li><b>Last reconciliation</b> if you have one: the report, or just the date you last reconciled the account</li>
+        <li><b>The first days of next month's statement</b> if you have them. They show which deposits and cheques cleared after the month end.</li>
       </ul>
     </div>
   </div>
@@ -347,10 +348,10 @@
   <span class="label">What you get back</span>
   <h2>A bridge that balances, or the exact reason it doesn't</h2>
   <div class="gets">
-    <div class="get"><b>The two ladders</b><span>It shows the bank side and the book side. They meet to the cent, or they do not. It states the unexplained amount plainly and says whether you gave a statement.</span></div>
+    <div class="get"><b>The two ladders</b><span>First, it checks that this month's opening balance agrees with last month's reconciliation. It also checks that nobody changed the closed month in your books. Then it shows the bank side and the book side. They meet to the cent, or they do not. It states the unexplained amount plainly and says whether you gave a statement.</span></div>
     <div class="get"><b>Every match, and how the skill made it</b><span>Each match uses one method. The methods are: same amount and date, same amount and similar wording, a cheque number or reference, or one bank line that covers several entries. The weaker the method, the more you should look.</span></div>
-    <div class="get"><b>What's unmatched, sorted</b><span>The skill sorts each unmatched item into fees, interest, a bounced payment, a card dispute, a loan debit, or "unknown". An "unknown" item gets an owner and a date to learn what it is.</span></div>
-    <div class="get"><b>Suggested entries, and a sign-off line</b><span>The skill suggests the fee and interest entries your bookkeeper would post. It ties each entry to the statement line that proves it. Then it gives you a sign-off line for two named people to prepare and review. They can't be the same person.</span></div>
+    <div class="get"><b>What's unmatched, sorted</b><span>The skill sorts each unmatched item into fees, interest, a bounced payment, a card dispute, a loan debit, or "unknown". A cheque or deposit from last month that clears now gets its own group and no entry. An "unknown" item gets an owner and a date to learn what it is.</span></div>
+    <div class="get"><b>Suggested entries, and a sign-off line</b><span>The skill suggests the entries your bookkeeper would post: fees, interest, bounced payments, loan payments, processor reserves and chargebacks. It ties each entry to its evidence. For a bank item, that is the statement line. For an error in your books, it is the book entries and the source document. It does not split a loan payment without the lender's statement. Then it gives you a sign-off line for two named people to prepare and review. They can't be the same person.</span></div>
   </div>
 </section>
 
@@ -427,7 +428,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-21", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
