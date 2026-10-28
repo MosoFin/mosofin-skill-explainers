@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accruals and Deferrals in Plain English | MosoFin</title>
+<meta name="description" content="How month-end accruals and deferrals put costs and income in the month they happened, and the missed reversal the skill catches. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Accruals and deferrals</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Accruals and deferrals, in plain words</span>
+  <h1>The month is over. Are its costs and income in the right month?</h1>
+  <p class="lede">Some costs and income belong to a different month from the bill or the payment. This skill finds those items at month end. It calculates <b>the amount that belongs to the month</b>, and it writes <b>draft entries</b> for a person to post.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a company and a month. It reads your books, or the files that you upload, and it asks you for the facts that your books do not hold. It calculates each cost that the month used but nobody billed yet. It moves income that a customer paid early into the months of the work. It checks that last month's accruals reversed. It never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">The idea</span>
+  <h2>The month that it happened, and not the month of the bill</h2>
+  <p>Accrual accounting puts income and costs in the month that you earn the income or use the service. The date of the cash does not decide the month<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The international framework for financial reports states the same idea<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. So the books need two kinds of month-end entry.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 330" role="img" aria-label="A timeline with three columns: September, October, and November 2026 to August 2027. Top row, electricity: Northbrook uses electricity for all 30 days of September, and the bill arrives in October. An accrual puts 2,100 dollars of cost into September. Bottom row, Pinnacle Clinics: the customer pays 36,000 dollars on 1 September for a year of service. September earns 3,000 dollars. The other 33,000 dollars waits as deferred revenue and moves into income at 3,000 dollars a month, from October 2026 to August 2027.">
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <text x="210" y="30" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">SEPTEMBER 2026</text>
+          <text x="440" y="30" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">OCTOBER</text>
+          <text x="590" y="30" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">NOV 2026 TO AUG 2027</text>
+          <line x1="200" y1="42" x2="200" y2="316" stroke="var(--rule-strong)"/>
+          <line x1="430" y1="42" x2="430" y2="316" stroke="var(--rule-strong)" stroke-dasharray="4 4"/>
+          <line x1="580" y1="42" x2="580" y2="316" stroke="var(--rule-strong)" stroke-dasharray="4 4"/>
+
+          <text x="16" y="84" font-weight="700" fill="var(--ink)">Electricity</text>
+          <text x="16" y="104" font-size="13" fill="var(--muted)">Cost used now,</text>
+          <text x="16" y="121" font-size="13" fill="var(--muted)">bill comes later</text>
+          <rect x="208" y="64" width="214" height="44" rx="8" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="315" y="83" text-anchor="middle" font-size="13" fill="var(--ink)">Used: 30 days × $70</text>
+          <text x="315" y="100" text-anchor="middle" font-weight="700" fill="var(--green)">$2,100 in September</text>
+          <rect x="440" y="64" width="130" height="44" rx="8" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="505" y="83" text-anchor="middle" font-size="13" fill="var(--ink)">Bill arrives</text>
+          <text x="505" y="100" text-anchor="middle" font-size="13" fill="var(--muted)">in October</text>
+          <text x="208" y="134" font-size="13" fill="var(--muted)">Accrual: the cost goes into September, the month of use.</text>
+
+          <line x1="16" y1="160" x2="864" y2="160" stroke="var(--rule)"/>
+
+          <text x="16" y="196" font-weight="700" fill="var(--ink)">Pinnacle Clinics</text>
+          <text x="16" y="216" font-size="13" fill="var(--muted)">Cash came first,</text>
+          <text x="16" y="233" font-size="13" fill="var(--muted)">work comes later</text>
+          <rect x="208" y="176" width="214" height="44" rx="8" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="315" y="195" text-anchor="middle" font-size="13" fill="var(--ink)">Paid $36,000 on 1 Sep</text>
+          <text x="315" y="212" text-anchor="middle" font-size="13" fill="var(--muted)">for 12 months of service</text>
+          <rect x="208" y="232" width="214" height="40" rx="8" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="315" y="257" text-anchor="middle" font-weight="700" fill="var(--green)">$3,000 earned</text>
+          <rect x="440" y="232" width="130" height="40" rx="8" fill="var(--panel)" stroke="var(--hold)"/>
+          <text x="505" y="257" text-anchor="middle" font-size="13" fill="var(--ink)">$3,000</text>
+          <rect x="590" y="232" width="274" height="40" rx="8" fill="var(--panel)" stroke="var(--hold)"/>
+          <text x="727" y="257" text-anchor="middle" font-size="13" fill="var(--ink)">$3,000 a month, 10 more months</text>
+          <text x="208" y="300" font-size="13" fill="var(--muted)">Deferral: $33,000 waits as deferred revenue and moves into income month by month.</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, Northbrook Trading. 2,170 ÷ 31 = 70 a day, from the August bill. 36,000 ÷ 12 = 3,000 a month, and 36,000 − 3,000 = 33,000 still to earn. Accountants call the top row an accrual and the bottom row a deferral.</figcaption>
+  </figure>
+  <p>An accounting textbook gives the two kinds names<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. An <b>accrual</b> records income that you earned or a cost that you used before anybody billed or paid it. Examples are interest and wages that you owe. A <b>deferral</b> records cash that moved first. The amount stays on the balance sheet until you earn the income or use the cost. The same textbook pairs each cost with the income that it helped to earn. Accountants call this the matching principle<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+  <p>The skill covers bonus, commission, vacation and payroll accruals, interest, utilities and services, professional fees, accrued revenue and deferred revenue. Two kinds of month-end item go to other MosoFin skills. Goods that you received without a supplier invoice go to <code>ap-accrual-cutoff</code>. Costs that you paid in advance, for example insurance, go to <code>prepaid-amortization-schedule</code>.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Seven items at Northbrook Trading for September 2026</h2>
+  <p>Northbrook Trading keeps its books on the accrual basis, in US dollars, with a calendar year. The month is Tuesday 1 September to Wednesday 30 September 2026. The owner answers all nine intake questions. The skill reads the books through MosoFin and asks the owner for the facts that the books do not hold.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's seven accrual and deferral items for September 2026, with the calculation, where each input came from, and the amount">
+        <thead><tr><th scope="col" style="text-align:left">Item</th><th scope="col" style="text-align:left">How the skill calculates it</th><th scope="col" style="text-align:left">Inputs from</th><th scope="col">Amount $</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Bonus</th><td class="t">The managing director's best estimate of the 2026 payout is 240,000. Nine months of twelve give 180,000. The books already hold 160,000, so the entry is 180,000 − 160,000</td><td class="t">You, and your books</td><td>20,000.00</td></tr>
+        <tr><th scope="row">Payroll tax on the bonus</th><td class="t">8% × 20,000, on its own line. The 8% is an example rate from the owner. It is not a legal rate</td><td class="t">You</td><td>1,600.00</td></tr>
+        <tr><th scope="row">Interest on the term loan</th><td class="t">300,000 × 6.5% × 15 days ÷ 365. The loan paid interest on 15 September, so 15 days are unpaid at 30 September</td><td class="t">Your books for the loan balance. You for the rate and the day count</td><td>801.37</td></tr>
+        <tr><th scope="row">Electricity</th><td class="t">The August bill was 2,170 for 31 days, so 70.00 a day. 70.00 × 30 days of September</td><td class="t">Your books</td><td>2,100.00</td></tr>
+        <tr><th scope="row">Audit fees</th><td class="t">The engagement letter fee is 12,000. The auditor says that 75% of the work was complete at 30 September</td><td class="t">You</td><td>9,000.00</td></tr>
+        <tr class="tot"><th scope="row">Accrual entries</th><td class="t">20,000 + 1,600 + 801.37 + 2,100 + 9,000</td><td></td><td class="c">33,501.37</td></tr>
+        <tr><th scope="row">Pinnacle Clinics</th><td class="t">Paid 36,000 on 1 September for a year of service. The receipt went to income in full. September earns 3,000, so the skill moves 33,000 out of income</td><td class="t">Your books for the receipt. You for the contract dates</td><td>33,000.00</td></tr>
+        <tr><th scope="row">Lakeside Freight</th><td class="t">Paid 48,000 on 1 July for 24 months. The receipt went to deferred revenue. September earns 2,000, so the skill moves 2,000 into income</td><td class="t">Your books for the receipt. You for the contract dates</td><td>2,000.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The 6.5% rate and the actual/365 day count are the example loan's own terms. Actual/360 gives 812.50 for the same 15 days, so the skill uses the day count in your loan agreement.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Accrual entries</span><span class="v num">$33,501.37</span><span class="s">Five draft entries that add cost to September</span></div>
+    <div class="stat"><span class="label">Income moved out</span><span class="v num hold">$31,000</span><span class="s">−33,000 + 2,000. The two contracts leave 3,000 + 2,000 = 5,000 of September income</span></div>
+    <div class="stat"><span class="label">Still to earn</span><span class="v num hold">$75,000</span><span class="s">33,000 + 42,000. Of that, 57,000 is for the next 12 months and 18,000 for later</span></div>
+    <div class="stat"><span class="label">Reverse on 1 October</span><span class="v num">$11,100</span><span class="s">Electricity 2,100 + audit fees 9,000</span></div>
+  </div>
+  <p>Why does the skill move Pinnacle's money out of income? Pinnacle paid for a year of service, and Northbrook still owes 11 months of it. A US revenue standard calls money that a customer pays before the work a liability. It measures that liability at the amount that the customer paid<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill does not re-enter the receipt, because the receipt is already in the books. It drafts one entry that moves 33,000 from income to deferred revenue. The skill does not do the full revenue-standard work. That is a separate revenue recognition task.</p>
+  <p>Some accruals reverse on 1 October and some do not. Northbrook's policy is "reverse on day one", so the electricity and audit fee accruals reverse on Thursday 1 October. The October bills then go to the expense accounts in the usual way. The bonus, its payroll tax and the interest do not reverse, although the policy is "reverse on day one". The skill treats them as cumulative: each month, it brings the balance to the amount that Northbrook owes at that date. For the interest, that amount is 801.37 for 15 days.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>Last month's electricity estimate never left the books</h2>
+  <p>At 31 August, Northbrook accrued 2,040 for August electricity. That estimate had to reverse on 1 September. It did not. The real August bill of 2,170 came on 9 September and went straight to the expense account. So August's electricity is in September twice: once as the old estimate and once as the bill.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">It looks for last month's reversals in the first days of September</span>
+      <div class="rows num">
+        <div class="row"><span>Accrued electricity, before the correction</span><span class="v">$4,140</span></div>
+        <div class="row"><span>What it should hold: September's accrual</span><span class="v">$2,100</span></div>
+        <div class="row off"><span>Excess: 4,140 − 2,100</span><span class="v">$2,040</span></div>
+      </div>
+      <div class="verdict">It finds no reversal of the August estimate. It reports the 2,040 excess and the likely cause. It drafts a correcting entry for 2,040. You decide whether to post it.</div>
+    </div>
+    <div class="book bad">
+      <h3>Without the check</h3>
+      <span class="who">The new accrual goes on top of the old one</span>
+      <div class="rows num">
+        <div class="row"><span>The August bill, in September</span><span class="v">$2,170</span></div>
+        <div class="row"><span>September's accrual</span><span class="v">$2,100</span></div>
+        <div class="row off"><span>September electricity cost</span><span class="v">$4,270</span></div>
+      </div>
+      <div class="verdict">With the correction, the cost is 4,270 − 2,040 = 2,230. That is September's 2,100 plus 130. The 130 is August's bill minus August's estimate, 2,170 − 2,040.</div>
+    </div>
+  </div>
+  <p>The skill builds a table for each category that shows how its balance moved in the month. Accountants call it a roll-forward. For electricity: 2,040 at the start + 2,100 accrued − 0 reversed = 4,140. For an accrual that reverses each month, the end balance must equal this month's accrual, 2,100. The skill's own rule says what to do with a higher balance:</p>
+  <blockquote>A balance above that expected figure means a reversal did not post or an item was booked twice: investigate.<br><span class="muted" style="font-size:14.5px">references/method.md, Step 6</span></blockquote>
+  <p>The skill's own file names a missed reversal as the most common cause. After the proposed correction, all five accrual balances agree with their expected figures. Their total is 180,000 + 14,400 + 801.37 + 2,100 + 9,000 = $206,301.37. The net cost that September gains from the run is 33,501.37 − 2,040 = $31,461.37.</p>
+</section>
+
+<section>
+  <span class="label">Small items, and items for other skills</span>
+  <h2>Two small items stay out, and their total stays in view</h2>
+  <p>Northbrook set a limit of $500. Accountants call this a materiality threshold. A water estimate of 180 and a courier service of 260 are each below 500. The skill does not accrue them. It lists them, with their total of 180 + 260 = $440. Small items can add up, and an auditor asks for that total. The interest of 801.37 is above 500, so the skill accrues it. If you set no limit, the skill accrues everything that it finds and says so. It never chooses a limit for you.</p>
+  <div class="two">
+    <div class="card">
+      <span class="tag up">Goes to ap-accrual-cutoff</span>
+      <h3>Stock received on 29 September, $4,800</h3>
+      <p>The goods arrived and no supplier invoice came yet. Accountants call this goods received, not invoiced. Another skill handles it.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">Goes to prepaid-amortization-schedule</span>
+      <h3>Insurance paid on 1 September, $7,200</h3>
+      <p>Northbrook paid 12 months of cover in advance. That is a prepaid cost. Another skill spreads it over the months.</p>
+    </div>
+  </div>
+  <p>Then the owner says: "Just post these in QuickBooks." The skill declines once, in plain words, and gives the owner the drafts. It cannot change data in a connected system. Every entry on its output carries the mark of a proposal.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Nine questions, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. The skill recommends questions H and I and requires the others.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. The skill asks only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">Which company? For a group, which companies?</div><div class="why">The skill runs each company on its own, and every accrual carries the company's name. It never chooses a company for you. On the MosoFin path, it asks for the company by name.</div></li>
+    <li><div class="q">Which period, with the exact first and last dates?</div><div class="why">The dates set every read, the cutoff and the date of each reversal. The skill never chooses a period for you.</div></li>
+    <li><div class="q">Which categories are in scope: pay, interest, utilities and services, revenue, deferred revenue, professional fees, tax?</div><div class="why">The answer decides what the skill looks for. It gives you the categories as a checklist.</div></li>
+    <li><div class="q">The facts behind each category: bonus pool, commission plan, pay rates, payroll register, pay calendar, loan rate, day count, contract terms, time sheets, engagement letters.</div><div class="why">Most amounts depend on these facts, and your books do not hold them. The skill asks only for what the books cannot show, and it tells you which is which. A missing fact stays on the output as a named gap.</div></li>
+    <li><div class="q">Do accruals reverse automatically on the first day of the next month? Or does the next bill go straight against the accrual?</div><div class="why">Both methods are correct. The answer changes the reversing entries, and the output states your policy.</div></li>
+    <li><div class="q">Do you keep the books on the accrual basis or the cash basis?</div><div class="why">Books on the cash basis can correctly hold no accruals at all. The skill never chooses the basis for you. On the cash basis, it says so and does not report "no accruals found". It asks if you want to change to the accrual basis.</div></li>
+    <li><div class="q">What materiality threshold applies?</div><div class="why">The skill can skip items below the limit, but it still totals them. It never chooses a limit. If you set none, it accrues everything that it finds and says so.</div></li>
+    <li><div class="q">Which reporting framework, and which tax country or state?</div><div class="why">The framework affects how the output shows some items and how it measures them. The tax rules affect tax recovery and the employer's payroll tax on pay accruals.</div></li>
+  </ol>
+  <p>The basis question matters because the two bases put the same item in different years. For US tax, the cash method reports income when you receive it and usually deducts a cost in the year that you pay it<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The accrual method includes income when all events that create your right to it occur and you can calculate the amount. It deducts a cost when all events that create the obligation occur and the other party provides the service<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. Those are tax rules. Your books and your tax return can put an item in different years, so ask your accountant about tax.</p>
+  <p>Then the skill reads the plan back and waits for your yes. This is the skill's own example:</p>
+  <blockquote><i>"Accruing for Northbrook Trading for 1–30 September, accrual basis, with the books read from your Mosofin connection. In scope: bonus (from the $240k pool you gave me), interest on the term loan, utilities, audit fees and deferred revenue. Accruals reverse on day one; materiality $500. Shall I go ahead?"</i></blockquote>
+  <p>On this page, the $240k is the managing director's best estimate of the year's bonus payout. The skill's example calls it a pool. The skill accrues the estimate month by month.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload six kinds of file</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads the chart of accounts, the trial balance and the detail of the accrual and deferred-revenue accounts</li>
+        <li>It reads last month's accruals and checks that they reversed. It also reads supplier bills, unbilled hours, invoices and customer money received in advance</li>
+        <li>It takes the currency and the financial year from your company profile. The year sets the months for a bonus accrual</li>
+        <li>It asks you which accounts hold the accruals and the deferred revenue. Names differ between companies, so it never guesses an account</li>
+        <li>You still give it the <b>bonus plans</b>, <b>pay rates and vacation balances</b>, <b>loan rates and day counts</b>, <b>contract service dates</b> and <b>fee estimates</b>. They are not in the books</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the facts and the ledger</h3>
+      <ul>
+        <li><b>The facts for each category in scope</b>: bonus plan, commission plan, payroll register, vacation balances, loan agreements, contracts, time sheets, engagement letters. PDF, CSV or XLSX, required for each category</li>
+        <li><b>Chart of accounts</b>, with the accrual, deferred-revenue and expense accounts. CSV or XLSX, required</li>
+        <li>Period, company, categories, reversal policy and basis, typed in the chat, required</li>
+        <li><b>Trial balance</b> at month end and <b>ledger detail</b> for the accrual and deferred-revenue accounts, with last month's accruals, reversals and closing schedule. CSV or XLSX. Without them, the output has no roll-forward sheets, and it says so</li>
+        <li>Supplier bills or billing history for utilities and services, and customer money received in advance. CSV or XLSX, recommended</li>
+        <li>Materiality threshold, reporting framework and tax country, typed in the chat, recommended</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Eight sheets, from the summary to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Summary</b><span>Each category: reversing or cumulative, this month's accrual, last month's reversal, the net effect and the end balance.</span></div>
+    <div class="get"><b>Category detail</b><span>The method, each input and its origin, the result and the entry.</span></div>
+    <div class="get"><b>Period entries</b><span>Every accrual and deferral entry for the month, each marked as a proposal.</span></div>
+    <div class="get"><b>Reversal entries</b><span>The entries for the first day of the next month. At Northbrook, 11,100 on 1 October.</span></div>
+    <div class="get"><b>Deferred revenue</b><span>Each contract: received, start, end, earned to date, still to earn, and the split between the next 12 months and later.</span></div>
+    <div class="get"><b>Roll-forward</b><span>Each category from its start balance to its end balance, against the expected figure.</span></div>
+    <div class="get"><b>Small items</b><span>The items below your limit that the skill did not accrue, with their total.</span></div>
+    <div class="get"><b>Coverage</b><span>For each item, what came from your books and with which tool, and what you supplied. It names each gap.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your categories, limit, framework, tax country, reversal policy, accounts and methods for the next run. It saves them only if you say yes. It never saves your connections, tool settings or test-data status.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never proposes an accrual without a basis.</b> It asks you for each fact that the books cannot supply. It records each bonus estimate with the name of the person who made it.</li>
+      <li><b>Never chooses the period, the accounting method or the company for you, and never invents a materiality limit.</b> If you decline a limit, it accrues everything that it finds and says so.</li>
+      <li><b>Never guesses an account from a name that only looks correct.</b> No proposed entry rests on test data.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Accrual basis</dt><dd>You record income and costs when they happen, whatever the date of the cash<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. On the cash basis, you record them when the cash moves.</dd>
+    <dt>Accrual</dt><dd>An entry for a cost or income that happened before anybody billed or paid it<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Deferral</dt><dd>An entry that moves income or a cost into a later month, because the cash moved before the work<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Deferred revenue</dt><dd>Money that customers paid you for work that you still owe them. It is a liability<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+    <dt>Reversing entry</dt><dd>An entry on the first day of the next month that cancels an accrual. The real bill can then go to the expense account without a double count.</dd>
+    <dt>Roll-forward</dt><dd>A table that shows how a balance moved from the start of the month to the end.</dd>
+    <dt>Materiality threshold</dt><dd>The size below which an item is not worth an entry. The skill still totals the small items.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are two sections of an accounting textbook, an international framework, a US standard update and a US tax publication. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="accrual accounting"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-1-explain-the-concepts-and-guidelines-affecting-adjusting-entries" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.1 Explain the Concepts and Guidelines Affecting Adjusting Entries</a><span class="what">Accrual accounting records income and costs in the period that you earn or use them, whatever the timing of the cash.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="paragraph 1.17 (per search results)"><a href="https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2021/issued/part-a/conceptual-framework-for-financial-reporting.pdf" rel="noopener">IFRS Foundation: Conceptual Framework for Financial Reporting</a><span class="what">Accrual accounting shows the effects of events in the periods in which they occur, even if the cash moves in a different period.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="revenue recognition and expense recognition (matching) principles; deferrals; accruals"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-2-discuss-the-adjustment-process-and-illustrate-common-types-of-adjusting-entries" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.2 Discuss the Adjustment Process and Illustrate Common Types of Adjusting Entries</a><span class="what">The matching principle puts each cost in the period of the income that it helped to earn. Deferrals are prepaid costs and unearned income. Accruals are income earned but not yet billed, and costs used but not yet paid, for example interest and wages.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://storage.fasb.org/ASU%202014-09_Section%20A.pdf" rel="noopener">FASB: Accounting Standards Update No. 2014-09, Revenue from Contracts with Customers (Topic 606)</a><span class="what">Money that a customer pays before the business delivers the goods or services is a liability. The standard measures it at the amount that the customer paid. This is a US standard.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="Accounting Methods: &quot;Cash Method&quot; and &quot;Accrual Method&quot; (all-events test, economic performance; advance payments)"><a href="https://www.irs.gov/publications/p538" rel="noopener">IRS: Publication 538 (01/2022), Accounting Periods and Methods</a><span class="what">Under the cash method, you report income when you receive it, and you usually deduct costs in the year that you pay them. Under the accrual method, the all-events test and economic performance decide the year. This is US tax only, and advance payments have their own rules.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the nine intake questions, the split between reversing and cumulative accruals, the eight sheets or the $500 limit. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page, including the 8% payroll tax rate. The 6.5% rate and the actual/365 day count are the example loan's own terms. They are not market figures.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>accruals-and-deferrals</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/accruals-and-deferrals">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a commit from the bookkeeping audit followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its customers and every figure in the example. They are not your data. The tax publication is a US source, and it covers tax only. Your books and your tax return can put an item in different years. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
