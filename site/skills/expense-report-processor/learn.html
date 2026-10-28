@@ -227,10 +227,11 @@
     </div>
     <div class="inputs">
       <fieldset><legend>The report</legend>
-        <label class="field"><span>Total claimed on the report (all lines)</span><input data-k="C" inputmode="decimal"></label>
-        <label class="field"><span>Corporate-card-paid items</span><input data-k="K" inputmode="decimal"></label>
+        <label class="field"><span>Report lines other than mileage (company-paid lines too)</span><input data-k="C" inputmode="decimal"></label>
+        <label class="field"><span>Company-paid lines (corporate or prepaid card)</span><input data-k="K" inputmode="decimal"></label>
         <label class="field"><span>Disallowed or rejected</span><input data-k="D" inputmode="decimal"></label>
         <label class="field"><span>Personal portion</span><input data-k="P" inputmode="decimal"></label>
+        <label class="field"><span>Due from Employee offset, only if your policy allows netting</span><input data-k="O" inputmode="decimal"></label>
       </fieldset>
       <fieldset><legend>Mileage</legend>
         <label class="field"><span>Miles with a full log</span><input data-k="M" inputmode="decimal"></label>
@@ -240,7 +241,7 @@
     </div>
     <div class="math num" id="steps" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">The page computes net reimbursable = claimed − card-paid − disallowed − personal + miles × rate. The "Priya Nair, September" preset gives $1,450.00 − $790.00 − $442.00 − $0.00 + 120 × $0.45 = $272.00. The "Marcus Bell" preset gives $150.60, with no mileage. A figure from the calculator is a proposal. A manager still approves each line.</p>
+    <p class="fine">The page computes total submitted = report lines + miles × rate. Net reimbursable = total submitted − company-paid − disallowed − personal. Amount to pay = net reimbursable − Due from Employee offset. The "Priya Nair, September" preset gives $1,450.00 + 120 × $0.45 = $1,504.00. Then $1,504.00 − $790.00 − $442.00 − $0.00 = $272.00, with no offset. The "Marcus Bell" preset gives $166.59 − $15.99 = $150.60, with no mileage and no offset. A figure from the calculator is a proposal. A manager still approves each line.</p>
   </div>
 </section>
 
@@ -248,8 +249,8 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which reports, which employees, which period, and from which tool? What is your expense policy? Which mileage rate and per-diem table are in force, and from which date? Which tax jurisdiction and rules apply? For foreign claims, which exchange-rate source do you use?</div>
-    <div><b>Needs</b>The skill needs every line of the expense reports. It needs the chart of accounts for coding, and the posted transactions and card activity for the duplicate check. You type in the policy, the rates and the exchange-rate source, because no ledger holds them. An employee list makes the result better.</div>
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which reports, which employees, which period, and from which tool? What is your expense policy? Where are the receipts? Which mileage rate and per-diem table are in force, and from which date? Which tax jurisdiction and rules apply? For foreign claims, which exchange-rate source do you use? Do you book card charges to a clearing account or to expense? Who approved each report?</div>
+    <div><b>Needs</b>The skill needs every line of the expense reports. It uses the chart of accounts for coding, and the posted transactions and card activity for the duplicate check. The approved reports not yet paid are for the payable test. You type in the policy, the rates and the exchange-rate source, because no ledger holds them. An employee list makes the result better.</div>
     <div><b>Gives back</b>The skill gives back six sheets: a summary, the line detail, the exceptions, the posting inputs, the ledger checks and a coverage sheet. It asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never approves, rejects, pays or posts anything. It never supplies a rate, a threshold or an account number from memory. It never reports a receipt as verified. It never saves names, claims or amounts.</div>
   </div>
@@ -260,11 +261,11 @@
   <h2>Where every fact on this page comes from</h2>
   <p class="muted">The rules are the skill's own. The facts below come from seven outside sources. They are three IRS pages, a GSA per-diem bulletin, an ACFE fraud study, the GAO Green Book and an HMRC page. MosoFin checked each one on 27 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
   <ol class="srcs" id="srclist"></ol>
-  <p class="fine"><b>Not backed by an outside authority.</b> The six stages, the ±3 day match window, the three severities and the six output sheets are the skill's own. The mileage rate, the receipt threshold and the meal cap in the examples are Northbrook's made-up policy. They are not tax rates. The page marks them where they appear.</p>
+  <p class="fine"><b>Not backed by an outside authority.</b> The six stages, the ±3 day match window, the 90-day look-back, the three severities and the six output sheets are the skill's own. The mileage rate, the receipt threshold and the meal cap in the examples are Northbrook's made-up policy. They are not tax rates. The page marks them where they appear.</p>
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code> and <code>references/method.md</code>. These files come from the card-format rewrite of the skill. The rewrite is on a branch and has not shipped. The skill on main holds the same text in one longer file. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1 to 6 are US sources. Source 7 is a UK source. Check with your accountant which rules apply to you. This page explains <code>expense-report-processor</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format on main of MosoFin/mosofin-finance-skills. The card format was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1 to 6 are US sources. Source 7 is a UK source. Check with your accountant which rules apply to you. This page explains <code>expense-report-processor</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -283,7 +284,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The fourteen quotes, word for word from the skill's files (markdown bold removed). Section names are written as the files write them. */
+/* The quotes, word for word from the skill's files (markdown bold removed). Section names are written as the files write them. */
 const Q = {
   q1:{q:"ask — never guess jurisdiction-specific numbers.", w:"references/overview.md · Expense Report Processor (Mosofin)"},
   q2:{q:"An out-of-pocket claim for something the company card already paid is the classic double reimbursement", w:"references/overview.md · What the workspace changes about this skill"},
@@ -293,12 +294,16 @@ const Q = {
   q6:{q:"a duplicate check against fixture transactions proves nothing", w:"references/method.md · Step 0 — Fetch the evidence (grounding) — Mosofin addition"},
   q7:{q:"company-paid lines are the ones that should already exist in the ledger", w:"references/method.md · Step 1 — Parse the report"},
   q8:{q:"Policy validation only runs if the user provided a policy.", w:"references/method.md · Step 2 — Validate against policy"},
-  q9:{q:"A claim for a charge the company already paid is a double reimbursement", w:"references/method.md · Step 2 — Validate against policy"},
+  q9:{q:"An out-of-pocket claim for a charge the company already paid is a double reimbursement", w:"references/method.md · Step 2 — Validate against policy"},
   q10:{q:"treat a near-amount match (tip added later) as a review, not a reject.", w:"references/method.md · Step 2 — Validate against policy"},
   q11:{q:"Account numbers come from the user's COA only. Never invent account numbers.", w:"references/method.md · Step 3 — Code to GL accounts"},
   q12:{q:"A payable balance that does not correspond to outstanding claims means either a claim was paid twice or one was never paid", w:"references/method.md · Step 4 — Calculate reimbursement"},
   q13:{q:"Report the residual with its oldest item", w:"references/method.md · Step 5 — Construct the GL posting"},
   q14:{q:"Persist the policy and the mapping; never the claims.", w:"references/method.md · Step 7 — Evolve the skill (Mosofin-specific, final step)"},
+  q15:{q:"Duplicate detection, below, needs no policy and runs either way.", w:"references/method.md · Step 2 — Validate against policy"},
+  q16:{q:"Net reimbursable must equal the sum of the reimbursable column in Sheet 2.", w:"references/method.md · Step 4 — Calculate reimbursement"},
+  q17:{q:"Ask for the tax-free rate; never supply it.", w:"references/edge-cases.md · Edge Cases"},
+  q18:{q:"A company-paid line matching its card charge is the expected link, not an exception.", w:"references/method.md · Step 6 — Output"},
 };
 
 const RULES = [
@@ -320,16 +325,16 @@ const RULES = [
   { id:"7", title:"Who paid comes first", r:Q.q7, cites:[],
     plain:"A line that the company card paid should already be in the books. The skill keeps those lines apart from the lines the employee paid." },
   { id:"8", title:"No policy, no policy check", r:Q.q8, cites:[2],
-    plain:"Without your policy, the skill still codes the lines and checks the arithmetic. It reports Step 2 as not performed, never as passed.",
+    plain:"Without your policy, the skill still codes the lines, checks the arithmetic and runs the duplicate check. It reports the policy checks as not performed, never as passed.",
     backed:"Under IRS rules, a receipt is not required for an expense under $75, except lodging. A company policy can ask for more than that." },
   { id:"9", title:"Paid once, claimed again", r:Q.q9, cites:[],
-    plain:"The skill marks a claim that matches a card charge as Reject, because the money already left the company. It does not mark it Review." },
+    plain:"The skill marks an out-of-pocket claim that matches a posted card charge as Reject, because the money already left the company. It does not mark it Review. A company-paid line that matches its own card charge is the expected link." },
   { id:"10", title:"A tip is not a new charge", r:Q.q10, cites:[],
     plain:"A card amount and a claim can differ by a tip that the employee added later. The skill puts that near match in front of a manager as a Review." },
   { id:"11", title:"Only your accounts", r:Q.q11, cites:[],
     plain:"Every account number comes from your chart of accounts. If the skill cannot read the chart, it labels each account PLACEHOLDER and says why." },
   { id:"12", title:"The payable must tie", r:Q.q12, cites:[3],
-    plain:"The skill compares Employee Reimbursement Payable with the approved claims that are still unpaid. It reports a gap, and does not guess which cause it is.",
+    plain:"The skill tests Employee Reimbursement Payable by employee against the approved reports not yet paid. It reports each gap, and does not guess the cause. Without the list of unpaid reports, it reports the test as not performed.",
     backed:"Under an accountable plan, the employee accounts for expenses in a reasonable time and returns any excess. Amounts not substantiated or returned in time are wages." },
   { id:"13", title:"Age tells timing from a break", r:Q.q13, cites:[],
     plain:"The skill reports a residual in the clearing account with its oldest item. The age of that item shows if the residual is timing or a real break." },
@@ -350,9 +355,9 @@ const LEVELS = [
     visual:{type:"table",
       head:["Line","Amount","Paid by","Receipt","Policy threshold"],
       rows:[["P5 taxi, Denver","$38.00","Priya","none, per the report",["$25.00","bad"]]]},
-    rules:[Q.q8, Q.q5],
+    rules:[Q.q8, Q.q15, Q.q5],
     math:[["Taxi, out of pocket","$38.00"],["Receipt threshold in the company's policy","$25.00"],["$38.00 − $25.00","$13.00 above",1],["IRS receipt threshold, for comparison","$75.00"],["Threshold the skill applies","the policy's $25.00",1],["Receipt status","per the report"]],
-    verdict:["note","The taxi is $13.00 above the policy threshold, so the skill marks it Review. The IRS would not need a receipt below $75, but the skill applies your policy. Without a policy, Step 2 would not run, and the skill would say so.","REVIEW"] },
+    verdict:["note","The taxi is $13.00 above the policy threshold, so the skill marks it Review. The IRS would not need a receipt below $75, but the skill applies your policy. Without a policy, the skill would skip the policy checks and say so. The duplicate check would still run.","REVIEW"] },
 
   { n:2, title:"Mileage: the rate comes from you",
     chips:["Expense report","Policy v3 mileage rate"], src:"Rules 1 and 5", cites:[1,7],
@@ -362,9 +367,9 @@ const LEVELS = [
     visual:{type:"table",
       head:["Line","Miles","Log","Rate (company policy)","Amount"],
       rows:[["P6 Priya","120","complete","$0.45 from 1 Jan",["$54.00","good"]],["M4 Marcus","300","no start, end or purpose","$0.45 from 1 Jan",["$135.00 held","bad"]]]},
-    rules:[Q.q5, Q.q1],
-    math:[["Priya: 120 miles × $0.45","$54.00",1],["Rate source","policy v3, effective 1 January"],["Marcus: 300 miles × $0.45","$135.00"],["Marcus's mileage paid now","$0.00",1],["IRS rate from 1 July, for comparison","76 cents"]],
-    verdict:["ok","Priya's $54.00 uses the company's rate, with its date. The skill holds Marcus's $135.00 until he logs the trips. It never supplies a rate. Without the policy, it would flag both lines as missing a rate.","PER POLICY"] },
+    rules:[Q.q5, Q.q1, Q.q17],
+    math:[["Priya: 120 miles × $0.45","$54.00",1],["Rate source","policy v3, effective 1 January"],["Marcus: 300 miles × $0.45","$135.00"],["Marcus's mileage paid now","$0.00",1],["IRS rate from 1 July, for comparison","76 cents"],["$0.45 against the IRS rate","below it, no taxable-pay flag"]],
+    verdict:["ok","Priya's $54.00 uses the company's rate, with its date. The skill holds Marcus's $135.00 until he logs the trips. It never supplies a rate. Without the policy, it would flag both lines as missing a rate. The skill would flag a rate above the tax-free rate that you give as possible taxable pay.","PER POLICY"] },
 
   { n:3, title:"The meal cap, at home and abroad",
     chips:["Expense report","Policy v3 meal cap","Exchange rate"], src:"Rules 1 and 8", cites:[2,4],
@@ -386,9 +391,9 @@ const LEVELS = [
     visual:{type:"table",
       head:["Test","Card charge P1","Claim P3","Match"],
       rows:[["Merchant","United","Flight to Denver","airline, same trip"],["Amount","$412.00","$412.00",["same","bad"]],["Date","2 Sep","2 Sep",["0 days","bad"]],["Paid by","corporate card","out of pocket",["both","bad"]]]},
-    rules:[Q.q2, Q.q7, Q.q9, Q.q10],
-    math:[["Amount difference: $412.00 − $412.00","$0.00"],["Date difference","0 days, inside ±3"],["Result for P3","Reject, $412.00",1],["A tip added later, for example $412.00 against $430.00","Review, not Reject"],["Netflix on the card, every month since March","$15.99"],["Code to Due from Employee 1350","Marcus owes $15.99",1]],
-    verdict:["flag","The skill proposes a Reject for the $412.00 claim, because the card already paid it. It names the matched charge. It codes the Netflix charge to Due from Employee, because Marcus owes the company $15.99.","REJECT"] },
+    rules:[Q.q2, Q.q7, Q.q9, Q.q18, Q.q10],
+    math:[["Amount difference: $412.00 − $412.00","$0.00"],["Date difference","0 days, inside ±3"],["Result for P3","Reject, $412.00",1],["P1, company-paid, against its own card charge","expected link, no exception"],["A tip added later, for example $412.00 against $430.00","Review, not Reject"],["Netflix on the card, every month since March","$15.99"],["Code to Due from Employee 1350","Marcus owes $15.99",1]],
+    verdict:["flag","The skill proposes a Reject for the $412.00 claim, because the card already paid it. It names the matched charge. It runs this match on out-of-pocket lines only. It codes the Netflix charge to Due from Employee, because Marcus owes the company $15.99.","REJECT"] },
 
   { n:5, title:"Coding with history, then the net",
     chips:["Chart of accounts","Coding history","Step 4 table"], src:"Rules 3 and 11", cites:[],
@@ -397,21 +402,21 @@ const LEVELS = [
     visual:{type:"table",
       head:["Line","Proposed account","Support","Flag"],
       rows:[["M1 Amazon, $86.40","Office Supplies 6210","14 of 16 times",["2 to Software 6250","bad"]],["P6 mileage, $54.00","Travel: Local Transport 6430","category map",""],["P4 dinner, $180.00","Meals 6450","category map",""]]},
-    rules:[Q.q11, Q.q3],
-    math:[["Priya: total claimed (412 + 378 + 412 + 210 + 38)","$1,450.00"],["− corporate-card-paid (412 + 378)","$790.00"],["− rejected or disallowed (412 + 30)","$442.00"],["− personal portion","$0.00"],["+ mileage: 120 × $0.45 (company rate)","$54.00"],["= net reimbursable","$272.00",1],["of which waits for a receipt","$38.00"]],
-    verdict:["ok","The skill proposes 6210 for the Amazon line and shows the 14 of 16 support. It flags the 2 exceptions so that the reviewer does not repeat them. Priya's net is $272.00, and $38.00 of it waits for a receipt.","CODED"] },
+    rules:[Q.q11, Q.q3, Q.q16],
+    math:[["Priya: lines other than mileage (412 + 378 + 412 + 210 + 38)","$1,450.00"],["+ mileage: 120 × $0.45 (company rate)","$54.00"],["= total submitted","$1,504.00",1],["− company-paid lines (412 + 378)","$790.00"],["− rejected or disallowed (412 + 30)","$442.00"],["− personal portion","$0.00"],["= net reimbursable out-of-pocket","$272.00",1],["Check: Sheet 2 reimbursable column (180 + 38 + 54)","$272.00",1],["− Due from Employee offset","$0.00"],["= amount to pay","$272.00",1],["of which waits for a receipt","$38.00"]],
+    verdict:["ok","The skill proposes 6210 for the Amazon line and shows the 14 of 16 support. It flags the 2 exceptions so that the reviewer does not repeat them. Priya's net is $272.00, the same as the reimbursable column in Sheet 2. $38.00 of it waits for a receipt.","CODED"] },
 
   { tier:"The whole run · ledger checks and limits" },
   { n:6, title:"The ledger checks, and what the run cannot say",
     chips:["Clearing account","Reimbursement payable","Employee list"], src:"Rules 4, 6, 12, 13 and 14", cites:[6],
-    situation:"Corporate Card Clearing has a residual of $1,264.00. Employee Reimbursement Payable holds $2,155.00, but approved claims still unpaid total $1,850.00. One claimant, J. Ortiz, has no employee record, because he left on 31 August.",
+    situation:"Corporate Card Clearing has a residual of $1,264.00. Employee Reimbursement Payable holds $2,155.00, but the approved reports not yet paid total $1,850.00. One claimant, J. Ortiz, has no employee record, because he left on 31 August.",
     facts:["Different people should hold the authority, the custody of assets and the accounting. This helps to prevent fraud, waste and abuse "+C(6)+". The skill proposes, a manager approves, and someone else pays.",
            "If a small entity cannot separate these duties, extra review of key processes takes their place "+C(6)+"."],
     visual:{type:"table",
       head:["Check","Result","Detail"],
-      rows:[["Card clearing residual",["$1,264.00","bad"],"oldest item 11 Jul, $118.00, 108 days"],["Payable against unpaid claims",["$305.00 gap","bad"],"$2,155.00 − $1,850.00"],["Claimant with no record","J. Ortiz","flagged before coding"],["Receipts","per the report","images not available"],["Fixture data","none","no mock data in the run"]]},
+      rows:[["Card clearing residual",["$1,264.00","bad"],"oldest item 11 Jul, $118.00, 108 days"],["Payable against approved reports not yet paid",["$305.00 gap","bad"],"$2,155.00 − $1,850.00, listed by employee"],["Approval","per the report","manager named on each report"],["Claimant with no record","J. Ortiz","flagged before coding"],["Receipts","per the report","images not available"],["Fixture data","none","no mock data in the run"]]},
     rules:[Q.q4, Q.q13, Q.q12, Q.q6, Q.q14],
-    math:[["Oldest clearing item: 11 Jul to 27 Oct","108 days"],["Result","a break, not timing",1],["Payable $2,155.00 − unpaid claims $1,850.00","$305.00",1],["Three employees, claimed out of pocket","$1,280.40"],["Approved now + review or held + rejected or disallowed","$560.40 + $237.20 + $482.80"],["= total","$1,280.40",1]],
+    math:[["Oldest clearing item: 11 Jul to 27 Oct","108 days"],["Result","a break, not timing",1],["Payable $2,155.00 − approved reports not yet paid $1,850.00","$305.00",1],["Card-paid lines P1 + P2, charges booked to clearing","debit expense, credit clearing: $790.00"],["Three employees, claimed out of pocket","$1,280.40"],["Approved now + review or held + rejected or disallowed","$560.40 + $237.20 + $482.80"],["= total","$1,280.40",1]],
     verdict:["flag","The skill reports a $1,264.00 clearing residual that is 108 days old, and a $305.00 payable gap. The gap means a claim was paid twice or one was never paid. The skill does not say which. It saves no employee data.","BREAKS"] },
 ];
 
@@ -487,9 +492,9 @@ function renderLevels(){
 
 /* --- calculator: the Step 4 table for one employee --- */
 const PRESETS = {
-  priya: {C:1450, K:790, D:442, P:0, M:120, R:0.45, note:"$38.00 of this waits for a receipt."},
-  marcus:{C:150.60, K:0, D:0, P:0, M:0, R:0.45, note:"$64.20 under review, $135.00 of mileage held for the log."},
-  blank: {C:"", K:"", D:"", P:"", M:"", R:"", note:""},
+  priya: {C:1450, K:790, D:442, P:0, O:0, M:120, R:0.45, note:"$38.00 of this waits for a receipt."},
+  marcus:{C:166.59, K:15.99, D:0, P:0, O:0, M:0, R:0.45, note:"$64.20 under review, $135.00 of mileage held for the log. Marcus owes $15.99 for Netflix. If your policy allows netting, enter it as the offset: $150.60 − $15.99 = $134.61."},
+  blank: {C:"", K:"", D:"", P:"", O:"", M:"", R:"", note:""},
 };
 const inputs=[...document.querySelectorAll(".calc [data-k]")];
 let note="";
@@ -506,19 +511,25 @@ function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="lab
 function run(){
   const steps=document.getElementById("steps"), box=document.getElementById("results");
   const any = inputs.some(i=>!isNaN(val(i)));
-  if(!any){ steps.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter the total claimed to start."); return; }
-  const Cl=num("C"), K=num("K"), D=num("D"), P=num("P"), M=num("M"), R=num("R");
+  if(!any){ steps.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter the report lines to start."); return; }
+  const Cl=num("C"), K=num("K"), D=num("D"), P=num("P"), O=num("O"), M=num("M"), R=num("R");
   const mile=Math.round(M*R*100)/100;
-  const net=Math.round((Cl-K-D-P+mile)*100)/100;
+  const tot=Math.round((Cl+mile)*100)/100;
+  const net=Math.round((tot-K-D-P)*100)/100;
+  const pay=Math.round((net-O)*100)/100;
   const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
-  steps.innerHTML = line("Total claimed on the report", fmt(Cl))
-    + line("− corporate-card-paid items", fmt(K))
+  steps.innerHTML = line("Report lines other than mileage", fmt(Cl))
+    + line(`+ mileage: ${M.toLocaleString("en-US")} miles × ${fmt(R)} (your policy's rate)`, fmt(mile))
+    + line("= total submitted", fmt(tot), 1)
+    + line("− company-paid lines", fmt(K))
     + line("− disallowed or rejected", fmt(D))
     + line("− personal portion", fmt(P))
-    + line(`+ mileage: ${M.toLocaleString("en-US")} miles × ${fmt(R)} (your policy's rate)`, fmt(mile))
-    + line("= net reimbursable to the employee", fmt(net), 1);
+    + line("= net reimbursable out-of-pocket", fmt(net), 1)
+    + line("− Due from Employee offset (only if your policy allows netting)", fmt(O))
+    + line("= amount to pay", fmt(pay), 1);
   let out = res(net<0?"flag":"ok", "Net reimbursable", fmt(net), note || "The skill proposes this figure. A manager approves it, and someone else pays it.");
-  if(net<0) out += res("flag", "The employee owes the company", fmt(-net), "The deductions are more than the claim. The skill would code the balance to Due from Employee.");
+  out += res(pay<0?"flag":"ok", "Amount to pay", fmt(pay), O ? "After the Due from Employee offset. Your policy must allow netting." : "No offset. The skill never assumes that your policy allows netting.");
+  if(pay<0) out += res("flag", "The employee owes the company", fmt(-pay), "The deductions are more than the claim. The skill would code the balance to Due from Employee.");
   if(M>0 && !R) out += res("note", "Rate missing", "—", "You entered miles but no rate. The skill would flag each mileage line as missing its rate.");
   box.innerHTML=out;
 }
@@ -546,7 +557,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
