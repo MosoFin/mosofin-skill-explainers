@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit Memo and Refund Handler Anatomy | MosoFin</title>
+<meta name="description" content="How the credit memo and refund handler skill is built on main: the card, seven reference files, the run stage by stage, its sources and the audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Credit memo and refund handler</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">credit-memo-and-refund-handler · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the credit memo and refund handler skill, and what it does</h1>
+  <p class="lede">The skill was one 900-line file. On main it is now a 153-line card and seven reference files. Commit 34adf3c made the split on 25 October 2026, and pull request #1 merged it on 26 October 2026. A bookkeeping-audit commit, 900f739, then changed the method on 27 October 2026. Two things set this skill apart. The reason for a credit decides the entry, and no system holds the reason. And the skill writes nothing: every entry is a draft that a person posts. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows the audit: four fixes on main, one check that main passes, and nine open findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">153</span><span class="s">lines in SKILL.md on main, down from 900. The eight files hold 1,164 lines</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">680/682</span><span class="s">non-blank lines of the pre-split file, byte for byte. The other two are the description and one link path</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">35 · 5 · 23</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 22 · 2 · 8</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">12</span><span class="s">rows of evidence tools, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">4 fixed · 9 open</span><span class="s">fixes on main in 0fc0da3, 34adf3c, 14f616a and 900f739. One check passed</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 153 lines instead of 900</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 153-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 388 lines, then mosofin-protocol.md at 262, gates.md at 138, edge-cases.md at 76, tools-and-glossary.md at 61, overview.md at 48 and output.md at 38.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 153</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · what it can't read</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to H</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read the books</text>
+          <text x="48" y="272">Stage 4 · Type, original, tax</text>
+          <text x="48" y="312">Stage 5 · Entries, register, sheets</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="209" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="110" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">138</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">388</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="61" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">76</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="30" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">38</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="38" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">48</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="49" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">61</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–7</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 7, the eight credit types, the eight entry templates and both entity scenarios. <b>edge-cases.md</b> holds 18 edge cases, 10 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3 and the 12-row Gate 3 interview. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. A sync from the repository's single copy keeps it the same in each skill. <b>tools-and-glossary.md</b> names the 7 workflow tools and 12 rows of evidence tools, and holds the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1216" role="img" aria-label="Stage 1 asks eight things in one message: Mosofin or upload, the credit type and for a chargeback which kind, the original invoice or bill, the credit amount, the reason, the tax jurisdiction, the period to review and who approves an over-credit. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, check for a payment processor, read the tool catalogue and read the company profile with the fiscal year end. Otherwise the user uploads the credit documents and the original, types the type, reason and amount, and adds the chart of accounts and the aging. Both paths read back and wait for a yes. Stage 3: step 0 reads credits, refunds, vendor credits, the originals, balances, accounts, tax codes, item costs and the company profile in one batch, and checks the mock flag. Stage 4: step 1 sets one of eight types, and the reason decides it. Step 2 runs four checks on every credit in the period: the original exists, credits to date do not exceed it, the period and the currency. Step 3 computes the expected tax from the original and compares it with the tax on the credit. Stage 5: step 4 drafts the entry for the type, step 5 tracks application with no second journal and builds the unapplied register with vendor credits first, step 6 delivers six sheets. Stage 6: step 7 offers to save the account map, reason codes, approval threshold and tax position, never names with amounts or the open credit balance, on an explicit yes.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="720" x2="460" y2="750" marker-end="url(#a2)"/>
+          <line x1="460" y1="938" x2="460" y2="968" marker-end="url(#a2)"/>
+          <line x1="460" y1="1100" x2="460" y2="1130" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+            <text x="275" y="74"><tspan font-weight="600">B</tspan> Type, chargeback kind</text>
+            <text x="470" y="74"><tspan font-weight="600">C</tspan> The original</text>
+            <text x="665" y="74"><tspan font-weight="600">D</tspan> Credit amount</text>
+            <text x="80" y="100"><tspan font-weight="600">E</tspan> Reason, never inferred</text>
+            <text x="275" y="100"><tspan font-weight="600">F</tspan> Tax jurisdiction</text>
+            <text x="470" y="100"><tspan font-weight="600">G</tspan> Period to sweep</text>
+            <text x="665" y="100"><tspan font-weight="600">H</tspan> Over-credit approver</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · payment processor?</text>
+            <text x="98" y="364">G2  tools · one search per document</text>
+            <text x="98" y="388">G3  currency, fiscal year end</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · 7 ROWS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Credit document(s), required</text>
+            <text x="558" y="340">Original invoice or bill, if any</text>
+            <text x="558" y="364">Type, reason, amount in the chat</text>
+            <text x="558" y="388">Chart of accounts · aging, recommended</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="210" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEP 0 · READ THE BOOKS IN ONE BATCH</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · 11 reads per entity, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="584">search_credit_memos · search_refund_receipts</text>
+            <text x="80" y="604">search_vendor_credits · search_bills</text>
+            <text x="80" y="624">read_invoice · tax codes and rates</text>
+            <text x="80" y="644">balances and agings · search_accounts</text>
+            <text x="80" y="664">read_item · get_company_info</text>
+          </g>
+          <text x="80" y="698" font-size="13" fill="var(--ink)"><tspan font-weight="600">Envelopes</tspan> · approval for reads only · entity by name · disabled tool becomes [manual]</text>
+          <rect x="640" y="556" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">say so, and propose</text>
+          <text x="741" y="618" text-anchor="middle" font-size="12" fill="var(--ink)">no refund on it</text>
+
+          <rect x="60" y="752" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="778" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 1–3 · TYPE, ORIGINAL, TAX · + EDGE-CASES.MD</text>
+          <text x="80" y="806" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan>  eight types · the document narrows the type, the reason decides it</text>
+          <text x="80" y="832" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 2</tspan>  exists · credits to date ≤ original · period · currency, on every credit</text>
+          <text x="80" y="858" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 2</tspan>  no original: flag it and ask for the business reason</text>
+          <text x="80" y="884" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  expected tax from the original's codes, compared, kept as its own line</text>
+          <text x="80" y="910" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Edge cases</tspan>  cross-period · FX · restocking fee · overpayment · rebate · damaged return</text>
+
+          <rect x="60" y="970" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="996" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 4–6 · ENTRIES, APPLICATION, SHEETS · + OUTPUT.MD</text>
+          <text x="80" y="1024" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 4</tspan>  11 entry shapes for 8 types · real account names · drafts only</text>
+          <text x="80" y="1050" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 5</tspan>  no journal on application · unapplied register, vendor credits first</text>
+          <text x="80" y="1076" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  six sheets · ask before Excel · CreditMemos_[YYYY-MM].xlsx</text>
+
+          <rect x="60" y="1132" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1158" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 7</tspan>: only after the user saw and approved the results, and only on an explicit yes</text>
+          <text x="80" y="1182" font-size="13.5" fill="var(--muted)">save account map, reason codes, threshold, tax position · never names with amounts or balances</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. The skill never defaults B (the type) or E (the reason). On the Mosofin path the recorded document type narrows B, and the user must say yes to it. No system holds E. H applies only when the over-credit check fails. Step 2 runs on every credit in period G, not only on the credit at hand. The highlighted box shows the mock rule from Step 0. Stage 4 also reads edge-cases.md, for example for a damaged return or a credit in a later period. Step 7 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The sources are [1] OpenStax, Principles of Accounting 6.4. [2] OpenStax, Principles of Accounting 6.3. [3] HMRC, Revenue and Customs Brief 6 (2019). [4] ATO, Making adjustments on your activity statements. [5] HMRC, VAT Notice 700/18. [6] FTC, Using Credit Cards and Disputing Charges. [7] IFRS 15. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to H. Checks the workspace, the company file, a payment processor, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · questions B and E</td><td>Asks for the type and the reason. Never defaults them, and never infers the reason from the document</td><td>None. The user supplies them</td><td>[1] A sales return puts goods back into inventory. An allowance, where the customer keeps the goods, has no inventory entry. So one credit document can need different entries. The eight types are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · questions C, D, G and H</td><td>Asks for the original, the credit amount, the period to review and the approver for an over-credit</td><td>None. The user supplies them</td><td>[3] In the UK, a valid credit note shows the number and date of the original VAT invoice. The four questions themselves are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · question F</td><td>Asks for the tax jurisdiction if the original carried tax. On the Mosofin path it reads the original's tax codes, and the user says yes to them</td><td><code>search_tax_codes</code> <code>search_tax_rates</code></td><td>[3] [4] The UK and Australia both change the tax on a credit, and both need a document for it. The worked example is US, and the pages cite no US authority for sales tax</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads credits, refunds, vendor credits, the originals, balances, accounts, tax codes, item costs and the profile in one batch per entity. Checks the <code>mock</code> flag</td><td><code>search_credit_memos</code> <code>search_refund_receipts</code> <code>search_vendor_credits</code> <code>search_invoices</code> <code>search_bills</code> <code>get_aged_receivables</code> <code>get_aged_payables</code> <code>search_accounts</code> <code>read_item</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue. The mock rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Sets one of eight types. The recorded document narrows the type, and the reason from the user decides it</td><td>None beyond the reads</td><td>[1] Sales Returns and Allowances is a contra revenue account that reduces gross sales. The type table is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Runs four checks on every credit in the period. The checks are: the original exists, credits to date do not exceed the original amount, the period and the currency. Flags a credit with no original</td><td><code>search_invoices</code> <code>read_invoice</code> <code>search_credit_memos</code></td><td>No outside authority. The four checks and the approval rule are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Computes the expected tax reversal from the original's tax codes. Compares it with the tax on the credit. Keeps the tax as its own line</td><td><code>read_invoice</code> <code>search_tax_codes</code></td><td>[3] In the UK, the supplier reduces its output tax, and the credit note uses the rate of the original supply. [4] In Australia, a decreasing adjustment generally needs an adjustment note. The 7.5% rate is the skill's own example</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4 · customer credits and returns</td><td>Drafts the entry for a credit memo, refund, sales return or goodwill credit, in the real account names</td><td><code>search_accounts</code> <code>read_item</code></td><td>[1] A return debits Sales Returns and Allowances and credits Accounts Receivable or Cash. A second entry puts resalable goods back at cost. The damaged-return write-down at NRV is the skill's own edge case</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4 · vendor credits</td><td>Credits the account that the original cost went to, read from the original bill. Never credits income</td><td><code>get-bill</code> <code>search_accounts</code></td><td>[2] A purchase return credits the account that the purchase went to. The textbook shows inventory. The skill applies the same idea to any expense or asset account</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4 · chargebacks</td><td>Asks which kind: disputed, accepted or a fraud loss. A disputed chargeback does not reverse revenue</td><td>None, unless a processor is connected</td><td>[6] A US cardholder can dispute a billing error, and the issuer must resolve it. So a disputed chargeback can still go either way. The pages cite no card-network rules for merchants</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4 · bad-debt write-offs</td><td>Drafts the write-off. Never claims the tax back automatically, and flags the tax for the user</td><td>None</td><td>[5] UK bad-debt relief has conditions, for example a debt unpaid for six months. The UK rule is one example. The [manual] verdict is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Edge case · credit in a later period</td><td>Proposes an accrual to a refund liability in the earlier period if that period is open. The user decides whether to book it</td><td>None</td><td>[7] IFRS 15 recognises a refund liability when an entity received consideration and expects to refund some of it</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Tracks application with no new journal. Builds the unapplied register from the aging detail in both directions, vendor credits first by value</td><td><code>get_aged_receivables</code> <code>get_aged_payables</code> <code>search_vendor_credits</code></td><td>No outside authority. The register and its order are the skill's own. The rule to compare an old vendor credit with the supplier's statement is the skill's own too</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Delivers six sheets with every entry marked as a proposal. Asks before it makes an Excel file</td><td>None</td><td>The six sheets and the file name are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Offers to save the account map, the reason codes, the approval threshold and the tax position. Never names with amounts, and never the open credit balance</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/6-4-analyze-and-record-transactions-for-the-sale-of-merchandise-using-the-perpetual-inventory-system" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 6.4 Analyze and Record Transactions for the Sale of Merchandise Using the Perpetual Inventory System</a></td><td>The customer credit, the sales return with inventory, and why the account is contra revenue</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/6-3-analyze-and-record-transactions-for-merchandise-purchases-using-the-perpetual-inventory-system" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 6.3 Analyze and Record Transactions for Merchandise Purchases Using the Perpetual Inventory System</a></td><td>Why a vendor credit goes back to the original cost account</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.gov.uk/government/publications/revenue-and-customs-brief-6-2019-changes-in-accounting-for-vat-after-prices-are-altered/revenue-and-customs-brief-6-2019-changes-in-accounting-for-vat-after-prices-are-altered" style="color:var(--mosofin)">HMRC: Revenue and Customs Brief 6 (2019): changes in accounting for VAT after prices are altered</a></td><td>Why tax on a credit mirrors the original, and why the original invoice reference matters (UK)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/in-detail/managing-gst-in-your-business/reporting-paying-and-activity-statements/making-adjustments-on-your-activity-statements" style="color:var(--mosofin)">Australian Taxation Office: Making adjustments on your activity statements</a></td><td>A second country where a credit changes the tax and needs its own document</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://www.gov.uk/guidance/relief-from-vat-on-bad-debts-notice-70018" style="color:var(--mosofin)">HMRC: Relief from VAT on bad debts (VAT Notice 700/18)</a></td><td>Why a write-off never claims tax back automatically (UK example)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://consumer.ftc.gov/articles/using-credit-cards-and-disputing-charges" style="color:var(--mosofin)">Federal Trade Commission: Using Credit Cards and Disputing Charges</a></td><td>Where a chargeback comes from, and why a disputed one can go either way</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>7</td><td><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2025/issued/ifrs15.html" style="color:var(--mosofin)">IFRS Foundation: IFRS 15 Revenue from Contracts with Customers</a></td><td>The refund liability in the cross-period edge case (paragraphs 51 and 55)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the seven sources on 28 Oct 2026 through search results. Nobody opened the pages. The worked example is a US business, and US states set sales tax. So the pages cite no US tax authority for the tax lines. Sources 3 to 5 show the same idea in the UK and Australia. Some items have no outside authority behind them. They are the eight credit types as a list, the four Step 2 checks and the six sheets. The vendor-first order, the 7.5% rate and every example figure have none either. The worked example uses made-up figures. Ask your accountant and your tax authority what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Four fixes on main, one check passed, and nine open findings</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>900 lines in one file, against a 500-line guide</h3>
+      <p>F1. The split on main makes a 153-line card. The card holds the six rules that never bend, questions A to H, the upload checklist and six stages. The original text moved into <code>references/</code>. 680 of the 682 non-blank lines of the pre-split file are present byte for byte. The other two are the description and the link to <code>shared/onboarding.md</code>. The new description has 1,019 characters, against the limit of 1,024.</p>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md + references/ · fixed on main in 34adf3c</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Four lines named skills that are not in the library</h3>
+      <p>F2. The text sent work to <code>intercompany-reconciliation</code>, <code>inventory-costing-fifo-lifo-wavg</code> and <code>multicurrency-fx-revaluation</code>. None of them is in the library. Each sentence now stands on its own, for example "route it to an intercompany reconciliation".</p>
+      <span class="where">method.md · Step 4 and Both entity scenarios · edge-cases.md · fixed on main in 0fc0da3</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>A pointer lost its target in the split</h3>
+      <p>F3. gates.md said "See the cross-entity step". Before the split, that step was in the same file. The pointer now names <em>Both entity scenarios</em> in method.md and links there. The same commit fixed 20 gates.md files.</p>
+      <span class="where">references/gates.md · Gate 1 · fixed on main in 14f616a</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The bookkeeping audit changed how the run works</h3>
+      <p>F4. An independent bookkeeper audit raised findings. Its commit, 900f739, reports 10 fixed, 0 partly fixed and 0 rejected. A goodwill credit is now contra revenue with mirrored tax. A bad-debt write-off is a separate entry, with tax relief [manual]. A refund of a credit on account now posts DR Accounts Receivable, CR Cash. The over-credit test now compares credits to date with the original invoice amount. A partial credit reverses tax at the line rate. Chargebacks have three forms: disputed, accepted and fraud loss. The unapplied register uses the aging detail. The skill now compares vendor credits with the supplier's statement.</p>
+      <span class="where">SKILL.md, edge-cases.md, gates.md, method.md, overview.md · fixed on main in 900f739</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter reports 43 findings on SKILL.md on main, and 27 of them are hard. Most are long sentences, semicolons and passives. The card has 1,664 words, at 2.6 findings per 100 words. Nobody applied the house rule to the card when the split made it. This site did not change the skill. The skill owner can fix the card in a later pass.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. Three skills named outside the card</h3>
+      <p>The description names <code>invoice-data-extractor</code> and <code>customer-invoicing</code>. The Step 4 heading in method.md names <code>journal-entry-builder</code>. All three skills are in the library on main. No reference is broken.</p>
+      <span class="where">SKILL.md · front matter · method.md · Step 4 · no change needed</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A3. Two places still name a "balance" check</h3>
+      <p>900f739 changed the over-credit test. The old test was "credit ≤ invoice balance". The new test is "credits to date ≤ original invoice amount". But two places still use the old word.</p>
+      <blockquote>“Existence, balance, period and currency are then all checkable”<cite>SKILL.md · Stage 1, question C</cite></blockquote>
+      <blockquote>“All four Step 2 validations were run against the live original — existence, balance, period, currency”<cite>references/output.md · Mosofin additions</cite></blockquote>
+      <span class="where">SKILL.md · question C · references/output.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. Three files still call unused vendor credits money owed</h3>
+      <p>Step 5 in method.md now says to compare an unapplied vendor credit with the supplier's statement first. It gives the reason: some are duplicate entries or credits already refunded. Three other files still present these credits as money that the business can take.</p>
+      <blockquote>“a discount already negotiated and not being taken”<cite>SKILL.md · Credit memos and refunds</cite></blockquote>
+      <blockquote>“Money the entity has already negotiated and is not taking.”<cite>references/edge-cases.md · Edge Cases</cite></blockquote>
+      <blockquote>“the closest thing to free money in the whole pack”<cite>references/overview.md · Why this skill fits a connected workspace unusually well</cite></blockquote>
+      <span class="where">SKILL.md · edge-cases.md · overview.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A5. overview.md contradicts Step 3</h3>
+      <p>overview.md says that the skill takes the tax reversal as the credit memo shows it. Step 3 in method.md computes the expected reversal from the original and tests the credit against it. The two statements do not agree.</p>
+      <blockquote>“It captures tax reversal exactly as it appears on the credit memo”<cite>references/overview.md · Credit Memo and Refund Handler (Mosofin)</cite></blockquote>
+      <span class="where">references/overview.md · opening · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A6. The intake does not cover every type, reason and question</h3>
+      <p>Question B offers four types: customer credit, customer refund, vendor credit and chargeback. Step 1 has eight. Neither B nor E names a vendor refund. The reasons in E have no "uncollectable", but the "Why" column of E sends a write-off to bad debt. Gate 3 has no row for G (the period) or for the chargeback kind. The upload checklist has no line for G or H. It asks for "AR and AP aging with credit balances", but Step 5 needs the aging detail.</p>
+      <span class="where">SKILL.md · Stage 1 · references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A7. No tax rule for a credit with no original</h3>
+      <p>The worked example has a goodwill credit, CM-0425, with no linked invoice. Step 3 needs the original's tax codes to mirror the tax. So the skill has no rule for the tax line of such a credit.</p>
+      <span class="where">references/method.md · Step 3 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A8. No entry closes a disputed chargeback</h3>
+      <p>The disputed-chargeback entry books a Chargeback Receivable. No entry says what happens when the merchant wins or loses the dispute. The accepted-chargeback template credits Cash or Merchant Clearing, not the receivable.</p>
+      <span class="where">references/method.md · Step 4, Chargeback · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. Three small gaps</h3>
+      <p>The damaged-return edge case adds a write-down line. The sales-return template in Step 4 does not show that line. Sheet 4 uses "older than one billing cycle" and does not define it. The worked example assumes one month. Step 6 says "For batches → .xlsx", but it also says to ask before it makes the file.</p>
+      <span class="where">references/edge-cases.md · references/method.md · Steps 4 and 6 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A10. The description leaves out write-offs</h3>
+      <p>The description has 1,019 of the 1,024 characters it can have. It does not mention bad-debt write-offs. Step 1 and Step 4 cover them.</p>
+      <span class="where">SKILL.md · front matter · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on a copy of main (31 skills, 0 failures), run on 28 Oct 2026.</span></li>
+    <li><span class="ok">PASS</span><span>680 of the 682 non-blank lines of the pre-split file are present byte for byte. The two differences are the description and a relative link path.</span></li>
+    <li><span class="ok">PASS</span><span>All 21 relative links in the eight files on main resolve.</span></li>
+    <li><span class="ok">PASS</span><span>The card's "Steps 0–7" match the eight Step sections in method.md, and each Step that the card names exists.</span></li>
+    <li><span class="ok">PASS</span><span>"Never writes, updates or deletes anything, in any system" is in the card. The last check in output.md says that the skill wrote nothing back.</span></li>
+    <li><span class="ok">PASS</span><span>method.md has 8 credit types, 8 entry templates with 11 entry shapes, and 6 output sheets. edge-cases.md has 18 edge cases.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 35 [auto], 5 [gated] and 23 [manual] in the eight files.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with real credits. The audit did not read the tool catalogue. So nothing here shows which of the 12 rows of evidence tools Gate 2 would find, or if the catalogue lists an aging detail capability. Nobody tested the payment-processor check at Gate 1 against a live connection. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-memo-and-refund-handler">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. Two commits for this skill on main are of 25 Oct 2026. They are 0fc0da3 (no reference to a skill outside the library) and 34adf3c (the split). Then comes 14f616a (the gates.md pointer), also of 25 Oct. Last is 900f739, the bookkeeping-audit changes of 27 Oct 2026. A live run, a catalogue read and fixes for A1 and A3 to A10 are still to do.</footer>
+
+</div>

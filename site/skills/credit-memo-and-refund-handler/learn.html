@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit Memo and Refund Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked credit memo examples, from one pricing credit to chargebacks and bad debts, with a calculator that checks one credit. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .field select{font:inherit;font-size:15px;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field{grid-template-columns:1fr 150px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Credit memos and refunds</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · credit-memo-and-refund-handler · learning guide</span>
+  <h1>From one credit memo to the credits nobody uses</h1>
+  <p class="lede">This page shows how the skill records money that goes back, <b>one level at a time</b>. It starts with one credit against one invoice. It ends with the items that the skill routes away or refuses. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are two sections of an OpenStax textbook, two HMRC pages, an ATO page, an FTC page and the IFRS 15 standard. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter one credit and its original invoice. The page checks the tax, the limit and the draft entry.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Nine rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading. Northbrook keeps its books in US dollars on the accrual basis and charges 7.5% sales tax on its sales. The skill runs on Wednesday 30 September 2026, through the owner's Mosofin connection, for the September 2026 period.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Check one credit</h2>
+  <p class="muted">Enter one credit and its original invoice, or load an example. The page runs the limit check from Step 2, the tax check from Step 3 and the draft entry from Step 4 of <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="cm0418">CM-0418 pricing error</button>
+      <button type="button" data-p="cm0421">CM-0421 damaged return</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The original invoice</legend>
+        <label class="field"><span>Invoice net amount</span><input data-k="onet" inputmode="decimal"></label>
+        <label class="field"><span>Tax rate, %</span><input data-k="rate" inputmode="decimal"></label>
+        <label class="field"><span>Open balance before this credit</span><input data-k="open" inputmode="decimal"></label>
+        <label class="field"><span>Earlier credits to date, gross</span><input data-k="earlier" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>This credit</legend>
+        <label class="field"><span>Type</span><select data-k="type"><option value="credit">Customer credit</option><option value="return">Sales return</option><option value="goodwill">Goodwill credit</option></select></label>
+        <label class="field"><span>Credit net amount</span><input data-k="cnet" inputmode="decimal"></label>
+        <label class="field"><span>Tax on the credit (optional)</span><input data-k="ctax" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>For a sales return</legend>
+        <label class="field"><span>Units back</span><input data-k="units" inputmode="decimal"></label>
+        <label class="field"><span>Unit cost</span><input data-k="cost" inputmode="decimal"></label>
+        <label class="field"><span>Units damaged</span><input data-k="dmg" inputmode="decimal"></label>
+        <label class="field"><span>NRV for each damaged unit</span><input data-k="nrv" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page calculates the expected tax as the credit net amount times the rate of the original, rounded to the cent. When a credit is more than the open balance, the rest goes on account. The page always credits Accounts Receivable, because a credit on account is a credit balance in receivables. For a goodwill credit, the page assumes that the credit has an original invoice. Without an original, the page cannot mirror the tax. NRV is net realizable value. You supply it, because the books cannot show that goods came back broken. To test the limit check, enter a net amount of 3,000, a rate of 7.5% and earlier credits of 1,075. Then enter an open balance of 2,150 and a credit net amount of 2,200. Credits to date of 3,440 are 215 more than the original 3,225.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use Mosofin for this run, or upload the data yourself? What type of credit is it, and for a chargeback, which kind? Which original invoice or bill? How much is the credit? What is the reason? Which tax jurisdiction? Which period? Who approves a credit that is more than the original?</div>
+    <div><b>Needs</b>The skill needs the credit document and the original invoice or bill. It needs the type, the reason and the amount from you. It needs the chart of accounts, and the jurisdiction when the original had tax. The aging detail lets it list unapplied credits.</div>
+    <div><b>Gives back</b>The skill gives back six sheets: the credit register, draft entries, application tracking, unapplied credits, validation exceptions and coverage. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to any system, and it never guesses the reason, the type or the tax. It never proposes a second entry on application, and never proposes a refund on mock data.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from seven outside sources. They are two sections of an OpenStax textbook, two HMRC pages, an ATO page, an FTC page and the IFRS 15 standard. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The skill itself sets the list of eight credit types, the four Step 2 checks and the six sheets. It also puts vendor credits first. The 7.5% sales tax rate comes from an example in the skill. MosoFin made up Northbrook Trading, its customers, its suppliers and every figure in the examples. Northbrook is a US company, and each US state sets its own sales tax. So the page cites no US tax authority for the tax lines. The UK and Australian sources show the same idea in two other countries.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit correction followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The tax sources are UK and Australian examples only. Ask your accountant and your tax authority which rules apply to you. This page explains <code>credit-memo-and-refund-handler</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/credit-memo-and-refund-handler">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 6.4 Analyze and Record Transactions for the Sale of Merchandise Using the Perpetual Inventory System", u:"https://openstax.org/books/principles-financial-accounting/pages/6-4-analyze-and-record-transactions-for-the-sale-of-merchandise-using-the-perpetual-inventory-system", at:"sales returns and allowances", checked:"2026-10-28", via:"from search results, page not opened", w:"Sales Returns and Allowances is a contra revenue account with a normal debit balance. It reduces gross sales. A return before payment debits this account and credits Accounts Receivable or Cash. Under a perpetual system, a second entry puts goods that the seller can sell again back into Merchandise Inventory and credits Cost of Goods Sold. An allowance has no inventory entry, because the customer keeps the goods."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 6.3 Analyze and Record Transactions for Merchandise Purchases Using the Perpetual Inventory System", u:"https://openstax.org/books/principles-financial-accounting/pages/6-3-analyze-and-record-transactions-for-merchandise-purchases-using-the-perpetual-inventory-system", at:"purchase returns and allowances", checked:"2026-10-28", via:"from search results, page not opened", w:"A buyer that returns goods before it pays debits Accounts Payable and credits Merchandise Inventory. After it pays, it debits Cash and credits Merchandise Inventory. The credit goes back to the account that holds the purchase."},
+  {t:"HMRC: Revenue and Customs Brief 6 (2019): changes in accounting for VAT after prices are altered", u:"https://www.gov.uk/government/publications/revenue-and-customs-brief-6-2019-changes-in-accounting-for-vat-after-prices-are-altered/revenue-and-customs-brief-6-2019-changes-in-accounting-for-vat-after-prices-are-altered", checked:"2026-10-28", via:"from search results, page not opened", w:"When a price falls after the original VAT period, the supplier reduces its output tax. A VAT-registered customer reduces its input tax. Since 1 September 2019, the supplier has 14 days to issue the credit note. A valid credit note shows the number and date of the original VAT invoice, with other details. The rate is the rate at the tax point of the original supply. A genuine error follows a different procedure. This is a UK rule."},
+  {t:"Australian Taxation Office: Making adjustments on your activity statements", u:"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/in-detail/managing-gst-in-your-business/reporting-paying-and-activity-statements/making-adjustments-on-your-activity-statements", at:"adjustment notes", checked:"2026-10-28", via:"from search results, page not opened", w:"A business generally cannot claim a decreasing GST adjustment, for example on a refunded sale, until it holds an adjustment note. The supplier must give the note within 28 days. Below a threshold of 75 dollars, no note is necessary. This is an Australian rule."},
+  {t:"HMRC: Relief from VAT on bad debts (VAT Notice 700/18)", u:"https://www.gov.uk/guidance/relief-from-vat-on-bad-debts-notice-70018", at:"conditions for claiming bad debt relief", checked:"2026-10-28", via:"from search results, page not opened", w:"Before it claims relief, the business must already account for the VAT and pay it. It must write the debt off in its VAT accounts, into a separate bad debt account. The debt must stay unpaid for six months after the later of the due date and the supply date. This is a UK rule."},
+  {t:"Federal Trade Commission: Using Credit Cards and Disputing Charges", u:"https://consumer.ftc.gov/articles/using-credit-cards-and-disputing-charges", checked:"2026-10-28", via:"from search results, page not opened", w:"Under the Fair Credit Billing Act, a cardholder can dispute billing errors. Examples are charges without permission, wrong amounts, and goods that the cardholder did not accept or did not get as agreed. The written dispute must reach the issuer within 60 days of the first statement that shows the error. The issuer must resolve it within two billing cycles, and in not more than 90 days. This is a US consumer rule."},
+  {t:"IFRS Foundation: IFRS 15 Revenue from Contracts with Customers", u:"https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2025/issued/ifrs15.html", at:"paragraphs 51 and 55", checked:"2026-10-28", via:"from search results, page not opened", w:"A right of return makes the consideration variable (paragraph 51). An entity records a refund liability when it receives consideration and expects to refund some of it (paragraph 55). The entity updates the liability at each reporting date."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"It can never read the reason for a credit, which drives the accounting", w:"SKILL.md · Credit memos and refunds"},
+  q2:{q:"Three types can share an identical document and need three entries.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"Never writes, updates or deletes anything, in any system.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Credits exceeding what was invoiced need management approval", w:"references/method.md · Step 2 — Validate against the original"},
+  q5:{q:"flag and ask for the business reason.", w:"references/method.md · Step 2 — Validate against the original"},
+  q6:{q:"Tax on a credit memo must mirror tax on the original.", w:"references/method.md · Step 3 — Compute the tax reversal"},
+  q7:{q:"Capture the tax reversal as a separate line. Do not bundle it into the net amount.", w:"references/method.md · Step 3 — Compute the tax reversal"},
+  q8:{q:"A mismatch is a real error — it either over-claims or under-claims tax — and it is invisible without the original to hand.", w:"references/method.md · Step 3 — Compute the tax reversal"},
+  q9:{q:"Crediting it to a generic income account instead is a common error that leaves the original expense overstated.", w:"references/method.md · Vendor credit note (applied to future bill)"},
+  q10:{q:"While disputed, do not reverse revenue", w:"references/method.md · Chargeback"},
+  q11:{q:"never claim the tax back automatically.", w:"references/method.md · Bad-debt write-off (no credit note)"},
+  q12:{q:"applying a credit moves nothing in the general ledger, because the credit was already recorded when it was issued.", w:"references/method.md · Step 5 — Application"},
+  q13:{q:"confirm with the supplier's statement before claiming", w:"references/method.md · Step 5 — Application"},
+  q14:{q:"Vendor credits appear first, sorted by value.", w:"references/method.md · Step 6 — Output"},
+  q15:{q:"bring inventory back at NRV. The difference is a write-down", w:"references/edge-cases.md · Edge Cases"},
+  q16:{q:"not a credit memo — it's a customer deposit / refund of overpayment.", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"The reason comes from you", r:Q.q1, cites:[],
+    plain:"The skill asks you for the reason for each credit. No system holds it, and the reason decides the entry." },
+  { id:"2", title:"One document, several entries", r:Q.q2, cites:[1],
+    plain:"A credit memo can be a return, a pricing correction or a goodwill credit. The skill never takes the type from the document alone.",
+    backed:"The textbook records a return with an inventory entry, and an allowance without one.{1}" },
+  { id:"3", title:"Vendor credits go back to the cost", r:Q.q9, cites:[2],
+    plain:"The skill reads the original bill and credits the account that holds the original cost.",
+    backed:"The textbook credits a purchase return back to Merchandise Inventory, the account that holds the purchase.{2} The skill uses the same idea for any expense or asset account." },
+  { id:"4", title:"Tax mirrors the original", r:Q.q6, cites:[3,4],
+    plain:"The skill calculates the tax on the credit from the tax codes of the original. It shows the tax as a line of its own.",
+    backed:"In the UK, the supplier reduces its output tax when a price falls after the sale.{3} In Australia, a decreasing GST adjustment generally needs an adjustment note.{4}" },
+  { id:"5", title:"No automatic tax claim on a write-off", r:Q.q11, cites:[5],
+    plain:"When a debt goes bad, the skill flags the tax. A person decides whether the jurisdiction lets the business claim it back.",
+    backed:"UK bad-debt relief has conditions, for example six months after the later of the due date and the supply date.{5}" },
+  { id:"6", title:"A disputed chargeback keeps the sale", r:Q.q10, cites:[6],
+    plain:"While the dispute is open, the skill moves the money to a receivable and records the fee. It does not reduce revenue.",
+    backed:"A US card issuer has up to two billing cycles, and not more than 90 days, to resolve a billing dispute.{6}" },
+  { id:"7", title:"Over the original needs approval", r:Q.q4, cites:[],
+    plain:"The skill adds this credit to the earlier credits on the same invoice. If the total is more than the original, a manager must approve it." },
+  { id:"8", title:"Application needs no second entry", r:Q.q12, cites:[],
+    plain:"When a credit settles an invoice, the skill tracks it in the customer or vendor ledger only. A second journal entry counts the credit twice." },
+  { id:"9", title:"Drafts only", r:Q.q3, cites:[],
+    plain:"Every entry is a draft for a person to post. The skill issues, applies, posts and refunds nothing." },
+];
+
+const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rules it applies are the skill's own.";
+const LEVELS = [
+  { tier:"One credit · Northbrook Trading, September 2026" },
+  { n:1, title:"One credit, one original",
+    chips:["Credit memo","Original invoice","Tax codes"], src:"Rules 1, 4 and 8", cites:[1,3],
+    situation:"Harbor Retail gets credit memo CM-0418 on Tuesday 8 September, because of a pricing error on invoice 1042. The card's read-back says \"$1,200\". This page reads that as the net amount before tax, because the card does not say.",
+    facts:["Sales Returns and Allowances is a contra revenue account with a normal debit balance. It reduces gross sales "+C(1)+".",
+           "A return before payment debits Sales Returns and Allowances and credits Accounts Receivable or Cash "+C(1)+".",
+           "In the UK, when a price falls after the original VAT period, the supplier reduces its output tax "+C(3)+". The rate for the credit note is the rate at the tax point of the original supply "+C(3)+". Northbrook is a US company, so this UK rule is an example only."],
+    visual:{type:"table",
+      head:["Document","Date","Net","Tax 7.5%","Gross","Open after"],
+      rows:[["Invoice 1042","Mon 3 Aug","$16,000.00","$1,200.00","$17,200.00","$17,200.00"],["CM-0418, pricing error","Tue 8 Sep","$1,200.00","$90.00","$1,290.00",["$15,910.00","good"]]]},
+    rules:[Q.q1, Q.q6, Q.q7, Q.q12],
+    math:[["Type and reason, from the owner","customer credit, pricing error"],["Tax on the original: 16,000 × 7.5%","$1,200.00"],["Original gross: 16,000 + 1,200","$17,200.00",1],["Tax on the credit: 1,200 × 7.5%","$90.00"],["Credit gross: 1,200 + 90","$1,290.00",1],["Credits to date, $1,290 ≤ $17,200","passes"],["Open before the credit: $17,200, so the skill applies the credit","applied"],["Invoice 1042 open after: 17,200 − 1,290","$15,910.00",1],["E1 · DR Sales Returns & Allowances","$1,200.00"],["E1 · DR Sales Tax Payable","$90.00"],["E1 · CR Accounts Receivable","$1,290.00"],["Debits 1,200 + 90 = credits 1,290","balances",1],["Second journal entry when the skill applies the credit","none"]],
+    verdict:["ok","The credit is $1,290: $1,200 net and $90 of tax on a line of its own. The skill applies it to invoice 1042, which then shows $15,910 open. The application needs no second journal entry.","APPLIED"] },
+
+  { n:2, title:"Same document, different entries",
+    chips:["Credit memos","Item cost","Original invoices"], src:"Rule 2", cites:[1],
+    situation:"Crestline Foods returns 10 of the 40 units on invoice 1038, which it paid in July. The owner says that 2 of the 10 units are broken. Pinnacle Clinics gets a goodwill credit, CM-0425, for $250 with no original invoice.",
+    facts:["Under a perpetual inventory system, a second entry puts goods that the seller can sell again back into stock. It debits Merchandise Inventory and credits Cost of Goods Sold "+C(1)+".",
+           "An allowance, where the customer keeps the goods, has no inventory entry "+C(1)+". That is why a pricing credit and a return need different entries, even on the same kind of document."],
+    visual:{type:"table",
+      head:["E2 · CM-0421, Crestline, Mon 14 Sep","Debit","Credit"],
+      rows:[["Sales Returns & Allowances","$1,500.00","—"],["Sales Tax Payable","$112.50","—"],["Inventory","$520.00","—"],["Loss on Returns / Inventory Write-Down",["$80.00","bad"],"—"],["Accounts Receivable","—","$1,612.50"],["Cost of Goods Sold","—","$600.00"]],
+      total:["Totals","$2,212.50","$2,212.50"]},
+    rules:[Q.q2, Q.q15, Q.q5],
+    math:[["Invoice 1038, Mon 27 Jul: 40 × $150","$6,000.00"],["Tax 450, so the original gross is","$6,450.00"],["Credit net: 10 × $150","$1,500.00"],["Tax on the credit: 1,500 × 7.5%","$112.50"],["Credit gross: 1,500 + 112.50","$1,612.50",1],["Original cost: 10 × $60","$600.00"],["Good units back: 8 × $60","$480.00"],["Broken units at NRV, from the owner: 2 × $20","$40.00"],["Inventory back: 480 + 40","$520.00",1],["Write-down: 600 − 520","$80.00",1],["Debits: 1,500 + 112.50 + 520 + 80","$2,212.50"],["Credits: 1,612.50 + 600","$2,212.50",1],["Invoice already paid, so on account","$1,612.50"],["Pinnacle CM-0425, no original","ask for the reason"]],
+    verdict:["note","Crestline's return needs six lines, against three for Harbor's pricing credit. The credit is $1,612.50, and it stays on account because Crestline already paid. The skill gives no entry for Pinnacle's $250 until the owner gives the business reason. The Step 4 template for a sales return has no write-down line. The edge case for damaged goods adds it.","ON ACCOUNT"] },
+
+  { tier:"The period sweep · every September credit" },
+  { n:3, title:"Four checks on every credit in the period",
+    chips:["Credit memos","Original invoices","Tax codes","Company profile"], src:"Rules 4 and 7", cites:[3,4],
+    situation:"The owner asked the skill to check every credit in September, not only CM-0418. The skill runs the four Step 2 checks and the Step 3 tax check on each credit already in the books.",
+    facts:["In the UK, a valid credit note shows the number and date of the original VAT invoice "+C(3)+". Without the original, nobody can check the tax on the credit.",
+           "In Australia, a business generally cannot claim a decreasing GST adjustment until it holds an adjustment note "+C(4)+". The supplier must give the note within 28 days "+C(4)+". Below a threshold of 75 dollars, no note is necessary "+C(4)+".",
+           "Both countries treat a credit as a change to the tax, with its own document. Northbrook is a US company, so these rules are examples only."],
+    visual:{type:"table",
+      head:["Credit","Check","Figures","Result"],
+      rows:[["CM-0418 Harbor","all four, and tax","$1,290 ≤ $17,200, tax $90",["passes","good"]],["CM-0421 Crestline","all four, and tax","$1,612.50 ≤ $6,450, tax $112.50",["passes","good"]],["CM-0409 Summit, Thu 3 Sep","credits ≤ original","$3,440 against $3,225",["$215 over","bad"]],["CM-0412 Acme, Wed 9 Sep","tax mirrors original","tax $0 against $60",["$60 short","bad"]],["CM-0425 Pinnacle, Fri 18 Sep","original exists","no linked invoice",["ask the reason","bad"]]]},
+    rules:[Q.q4, Q.q7, Q.q8],
+    math:[["Summit invoice 0975, Wed 15 Jul: 3,000 + 225","$3,225.00"],["CM-0390, Mon 17 Aug: 1,000 + 75","$1,075.00"],["CM-0409: 2,200 + 165","$2,365.00"],["Credits to date: 1,075 + 2,365","$3,440.00",1],["Over the original: 3,440 − 3,225","$215.00",1],["Open before CM-0409: 3,225 − 1,075, applied","$2,150.00"],["Left on account, waiting for approval","$215.00"],["Acme invoice 1019, Mon 20 Jul: 800 + 60","$860.00"],["Booked: DR Sales Returns & Allowances 860, CR AR 860","tax $0"],["Expected tax: 800 × 7.5%","$60.00"],["Difference","$60.00",1],["E4 · DR Sales Tax Payable 60, CR Sales Returns & Allowances 60","correcting draft"],["Period: September is open, year ends 31 December","passes"],["Currency: USD against USD","passes"]],
+    verdict:["flag","Three credits fail. Summit's credits are $215 more than its invoice, so the skill asks the approver from intake H. Acme's credit has no tax line, so Northbrook still reports $60 of sales tax on a sale that it cancelled. Draft E4 corrects it. Pinnacle's credit has no original, so the skill asks for the reason. Summit's $215 and Pinnacle's $250 get no entry until a person approves or gives a reason.","3 FAIL"] },
+
+  { tier:"The other direction · and the hard cases" },
+  { n:4, title:"Vendor credits, and the money left on account",
+    chips:["Vendor credits","Original bills","A/R and A/P aging detail"], src:"Rule 3", cites:[2],
+    situation:"Delta Packaging gave Northbrook vendor credit VC-0077 for $400 against bill B-5530. Someone booked it to Other Income. The bill went to Packaging Supplies. The skill also lists every unapplied credit on 30 September from the aging detail.",
+    facts:["A buyer that returns goods before it pays debits Accounts Payable and credits Merchandise Inventory "+C(2)+". After it pays, it debits Cash and credits Merchandise Inventory "+C(2)+".",
+           "So the credit goes back to the account that holds the purchase "+C(2)+". The textbook case is inventory. The skill applies the same idea to any expense or asset account, \"the account the cost was originally booked to\"."],
+    visual:{type:"table",
+      head:["Direction","Counterparty","Credit","Date","Amount","Age","Suggested"],
+      rows:[["vendor","Ridgeway Metals","VC-0061","Thu 11 Jun","$2,350.00",["111","bad"],"check against the vendor statement"],["vendor","Delta Packaging","VC-0077","Thu 10 Sep","$400.00","20","apply to the next Delta bill, after E3"],["customer","Crestline Foods","CM-0421","Mon 14 Sep","$1,612.50","16","next invoice or refund: owner's call"],["customer","Summit Hotels","CM-0409 rest","Thu 3 Sep","$215.00","27","hold: waiting for approval"],["customer","Pinnacle Clinics","CM-0425","Fri 18 Sep","$250.00","12","hold: waiting for the reason"],["customer","Cedar Point Cafe","payment","Fri 25 Sep","$300.00","5","refund of overpayment, routed"]]},
+    rules:[Q.q9, Q.q14, Q.q13],
+    math:[["Booked: DR AP 400, CR Other Income 400","wrong account"],["Bill B-5530, Mon 10 Aug, no tax line","Packaging Supplies"],["E3 · DR Other Income","$400.00"],["E3 · CR Packaging Supplies","$400.00",1],["Ridgeway age: 19 + 31 + 31 + 30 days","111 days"],["Vendor credits: 2,350 + 400","$2,750.00",1],["Customer credits: 1,612.50 + 215 + 250 + 300","$2,377.50",1],["One billing cycle, assumed as one month","about 30 days"]],
+    verdict:["note","Draft E3 moves Delta's $400 from Other Income back to Packaging Supplies. This is a posting finding, so it is not one of the four Step 2 checks. Vendor credits come first in the register, at $2,750. Ridgeway's $2,350 is 111 days old, so the skill asks for the supplier's statement before Northbrook claims it. The skill does not define one billing cycle. This page assumes one month.","$2,750"] },
+
+  { n:5, title:"Card chargebacks and bad debts",
+    chips:["Processor statement","Original invoices","Customer balances"], src:"Rules 5 and 6", cites:[5,6],
+    situation:"Lakeside Freight paid invoice 1050 by card, and then disputed the charge on Tuesday 22 September. Northbrook is still contesting it. Brookfield Gym stopped trading and never paid invoice 0880.",
+    facts:["Under the US Fair Credit Billing Act, a cardholder can dispute billing errors "+C(6)+". Examples are a wrong amount, or goods that did not arrive as agreed "+C(6)+".",
+           "The written dispute must reach the issuer within 60 days of the first statement that shows the error "+C(6)+". The issuer must resolve it within two billing cycles, and in not more than 90 days "+C(6)+". So a disputed chargeback can still go either way.",
+           "In the UK, VAT relief on a bad debt has conditions. The business must already account for the VAT and pay it. It must also write the debt off into a separate bad debt account "+C(5)+". The debt must stay unpaid for six months after the later of the due date and the supply date "+C(5)+"."],
+    visual:{type:"table",
+      head:["Draft","Account","Debit","Credit"],
+      rows:[["E5 Lakeside","Chargeback Receivable","$2,150.00","—"],["E5 Lakeside","Chargeback Fees Expense","$15.00","—"],["E5 Lakeside","Merchant Clearing","—","$2,165.00"],["E7 Brookfield","Bad Debt Expense","$1,075.00","—"],["E7 Brookfield","Accounts Receivable","—","$1,075.00"],["E7 Brookfield","Tax of $75 reclassified","—",["no","bad"]]]},
+    rules:[Q.q10, Q.q11],
+    math:[["Lakeside invoice 1050, Mon 24 Aug: 2,000 + 150","$2,150.00"],["Processor fee, from the processor statement","$15.00"],["E5 credit to Merchant Clearing: 2,150 + 15","$2,165.00",1],["Revenue reversed while disputed","$0.00",1],["Brookfield invoice 0880, Fri 1 May: 1,000 + 75","$1,075.00"],["Days unpaid on 30 Sep","152"],["E7 · DR Bad Debt Expense, CR AR","$1,075.00",1],["Tax portion, reclassified only if Northbrook claims relief","$75.00"],["UK test: six months from 1 May ends on 1 Nov","not yet passed"]],
+    verdict:["flag","E5 moves $2,150 to a receivable and books the $15 fee, and revenue stays. The fee and the reference are manual unless Northbrook connects a payment processor. The skill gives no entry for the day the dispute ends. E7 writes off Brookfield's $1,075, and the skill flags the $75 of tax for a person to decide. Under the UK rule, six months had not passed on 30 September. Northbrook is a US company, so that is an example only.","FLAGGED"] },
+
+  { tier:"The edges · what it routes away and refuses" },
+  { n:6, title:"What it routes away, and what it refuses",
+    chips:["Unapplied payments","Period dates","Your request"], src:"Rules 8 and 9", cites:[7],
+    situation:"Cedar Point Cafe paid part of invoice 1047 twice, so $300 sits as an unapplied payment. Then the owner asks the skill to post the drafts and send Crestline its refund.",
+    facts:["A right of return makes the consideration variable "+C(7)+". An entity records a refund liability when it receives consideration and expects to refund some of it "+C(7)+". It updates the liability at each reporting date "+C(7)+".",
+           "The skill uses a refund liability in one edge case. A credit can fall after a period end but relate to sales before it. If that period is still open, the skill proposes DR Sales Returns & Allowances and CR Refund Liability in the earlier period. The entry reverses the next day, and the owner decides whether to book it."],
+    visual:{type:"table",
+      head:["Item","What the skill does","Draft"],
+      rows:[["Cedar Point, $300 paid twice","routes it: an overpayment, not a credit memo","E6 · DR AR 300, CR Cash 300, owner's call"],["A credit after a period end, for sales before it","proposes an accrual to a refund liability","owner's call"],["\"Post these and send Crestline its refund\"",["refuses, once, in plain words","bad"],"drafts handed over"],["Save after the run, on a yes","account map, 7.5% treatment, approver","no entry"],["Save \"Summit Hotels, 215, over-credit\"",["never","bad"],"no entry"]]},
+    rules:[Q.q16, Q.q3],
+    math:[["Drafts: E1 to E7","7"],["Of which corrections: E3 and E4","2",1],["Sales tax payable that the drafts reduce: 90 + 112.50 + 60","$262.50",1],["Results with mock: true","0"],["Entries the skill posts","0",1],["Refunds the skill sends","0",1]],
+    verdict:["flag","The skill hands over seven drafts, and two of them correct entries already in the books. It never edits or deletes the original entries. It refuses to post or send money. A person posts the drafts by hand. On a yes, the skill saves the account map and the approver, but never a customer's name with an amount.","NOTHING POSTED"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    const vis = table(L.visual);
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: check one credit against its original (Steps 2, 3 and 4) --- */
+const PRESETS = {
+  cm0418:{onet:16000, rate:7.5, open:17200, earlier:0, type:"credit", cnet:1200, ctax:90, units:"", cost:"", dmg:"", nrv:""},
+  cm0421:{onet:6000, rate:7.5, open:0, earlier:0, type:"return", cnet:1500, ctax:112.5, units:10, cost:60, dmg:2, nrv:20},
+  blank:{onet:"", rate:"", open:"", earlier:"", type:"credit", cnet:"", ctax:"", units:"", cost:"", dmg:"", nrv:""},
+};
+const KEYS=["onet","rate","open","earlier","type","cnet","ctax","units","cost","dmg","nrv"];
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,%\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const r2 = n => Math.round(n*100)/100;
+const m2 = n => fmt(r2(n), 2);
+const z = n => isNaN(n)?0:n;
+
+function load(p){
+  const P=PRESETS[p];
+  KEYS.forEach(k=>fld(k).value=P[k]);
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const onet=money(fld("onet").value), rate=money(fld("rate").value), cnet=money(fld("cnet").value);
+  const open=z(money(fld("open").value)), earlier=z(money(fld("earlier").value)), ctax=money(fld("ctax").value), type=fld("type").value;
+  if(isNaN(onet) || isNaN(rate) || isNaN(cnet)){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the invoice net amount, the tax rate and the credit net amount."); return; }
+  const otax=r2(onet*rate/100), ogross=r2(onet+otax), etax=r2(cnet*rate/100), cgross=r2(cnet+etax);
+  const tdiff=isNaN(ctax)?NaN:r2(ctax-etax), todate=r2(earlier+cgross), excess=r2(Math.max(0,todate-ogross));
+  const applied=r2(Math.max(0,Math.min(cgross,open))), onacct=r2(cgross-applied), after=r2(open-applied);
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  const dr=[], cr=[];
+  dr.push(["Sales Returns & Allowances",cnet]);
+  if(etax) dr.push(["Sales Tax Payable",etax]);
+  cr.push(["Accounts Receivable",cgross]);
+  let s=line(`Tax on the original: ${m2(onet)} × ${rate}%`,m2(otax));
+  s+=line(`Original gross: ${m2(onet)} + ${m2(otax)}`,m2(ogross));
+  s+=line(`Expected tax on the credit: ${m2(cnet)} × ${rate}%`,m2(etax));
+  s+=line(`Credit gross: ${m2(cnet)} + ${m2(etax)}`,m2(cgross),1);
+  s+=line(`Credits to date: ${m2(earlier)} earlier + ${m2(cgross)}`,`${m2(todate)} against ${m2(ogross)}`,1);
+  s+=line(`Applied: the lower of ${m2(cgross)} and the open ${m2(open)}`,m2(applied));
+  s+=line(`On account: ${m2(cgross)} − ${m2(applied)}`,m2(onacct));
+  s+=line(`Invoice open after: ${m2(open)} − ${m2(applied)}`,m2(after),1);
+  let inv=NaN, wd=0, cogs=0;
+  if(type==="return"){
+    const u=z(money(fld("units").value)), c=z(money(fld("cost").value)), d=Math.min(z(money(fld("dmg").value)),u), v=z(money(fld("nrv").value));
+    cogs=r2(u*c); inv=r2((u-d)*c+d*v); wd=r2(cogs-inv);
+    s+=line(`Original cost: ${u} × ${m2(c)}`,m2(cogs));
+    s+=line(`Inventory back: ${u-d} × ${m2(c)} + ${d} × ${m2(v)} at NRV`,m2(inv),1);
+    s+=line(`Write-down: ${m2(cogs)} − ${m2(inv)}`,m2(wd),1);
+    if(inv) dr.push(["Inventory",inv]);
+    if(wd) dr.push(["Loss on Returns / Inventory Write-Down",wd]);
+    if(cogs) cr.push(["Cost of Goods Sold",cogs]);
+  }
+  const td=r2(dr.reduce((x,a)=>x+a[1],0)), tc=r2(cr.reduce((x,a)=>x+a[1],0));
+  s+=line("Draft entry, for a person to post","debit / credit",1);
+  dr.forEach(a=>{ s+=line(`DR ${a[0]}`,m2(a[1])); });
+  cr.forEach(a=>{ s+=line(`CR ${a[0]}`,m2(a[1])); });
+  s+=line(`Totals: debits ${m2(td)}, credits ${m2(tc)}`,td===tc?"balances":"does not balance",1);
+  steps.innerHTML=s;
+  let out = res("ok","Credit gross",m2(cgross),`${m2(cnet)} net + ${m2(etax)} tax, on a line of its own`,"r-gross");
+  out += res("ok","Original gross",m2(ogross),`${m2(onet)} net + ${m2(otax)} tax`,"r-orig");
+  out += isNaN(tdiff) ? res("note","Tax difference","—",`Enter the tax on the credit to compare it with ${m2(etax)}.`,"r-tax")
+    : res(tdiff?"flag":"ok","Tax difference",m2(tdiff), tdiff?`${m2(ctax)} on the credit against ${m2(etax)} expected. This is an exception.`:`${m2(ctax)} on the credit mirrors the original.`,"r-tax");
+  out += res(excess?"flag":"ok","Credits to date",m2(todate), excess?`${m2(excess)} more than the original ${m2(ogross)}. A manager must approve it.`:`Not more than the original ${m2(ogross)}.`,"r-todate");
+  out += res(onacct?"note":"ok","Applied / on account",`${m2(applied)} / ${m2(onacct)}`, `Invoice open after: ${m2(after)}. No second entry on application.`,"r-apply");
+  if(type==="return") out += res(wd?"note":"ok","Inventory back",m2(inv),`Write-down ${m2(wd)}. COGS credit ${m2(cogs)}.`,"r-inv");
+  out += res(td===tc?"ok":"flag","Draft entry",`${m2(td)} = ${m2(tc)}`,td===tc?"Debits equal credits.":"Debits and credits differ.","r-entry");
+  box.innerHTML=out;
+}
+document.querySelectorAll(".calc [data-k]").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("cm0418");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
+
