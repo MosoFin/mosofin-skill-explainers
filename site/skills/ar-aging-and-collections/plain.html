@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AR Aging and Collections in Plain English | MosoFin</title>
+<meta name="description" content="What an AR aging shows: who owes you money, how late each invoice is, who to chase first, and who gets no reminder. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← A/R aging and collections</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · A/R aging and collections, in plain words</span>
+  <h1>Who owes us money, how late are they, and who do we chase first?</h1>
+  <p class="lede">Customers who pay on an invoice often pay late. This skill sorts every unpaid customer invoice by <b>how late it is</b>. Then it ranks the late customers to show <b>who to chase first</b>, and it writes reminder drafts for a person to review.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a date and say what you need. It reads your unpaid invoices, from your books or from your files. It sorts each invoice into a band of lateness, on the amount that is still open. It compares the total with the aging summary, and with your balance sheet if it has that balance. It ranks the late customers and writes reminder drafts. It never sends a reminder and never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Six invoices and one credit at Northbrook Trading on 30 September</h2>
+  <p>Northbrook Trading sends invoices to its customers and works in US dollars. Firms that get payment after delivery, for example by invoice, are more likely to report slow-paying customers<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The as-of date is Wednesday 30 September 2026. For each invoice, the skill calculates the days past due: the as-of date minus the due date. Then it puts each invoice in a band of lateness. Accountants call these bands aging buckets.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's six open invoices and one unapplied credit on 30 September 2026, with due date, days past due, bucket and open amount">
+        <thead><tr><th scope="col" style="text-align:left">Customer</th><th scope="col" style="text-align:left">Invoice</th><th scope="col" style="text-align:left">Due</th><th scope="col">Days past due</th><th scope="col" style="text-align:left">Bucket</th><th scope="col">Open $</th><th scope="col" style="text-align:left">What the skill sees</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Harbor Retail</th><td class="t">INV-1001</td><td class="t">Tue 15 Sep</td><td>15</td><td class="t">1-30</td><td>12,000</td><td class="t">Late</td></tr>
+        <tr><th scope="row">Harbor Retail</th><td class="t">INV-0950</td><td class="t">Sat 1 Aug</td><td>60</td><td class="t">31-60</td><td>8,500</td><td class="t">Late</td></tr>
+        <tr class="breach"><th scope="row">Crestline Foods</th><td class="t">INV-0901</td><td class="t">Sat 20 Jun</td><td>102</td><td class="t">91-120</td><td>6,400</td><td class="t">The original invoice was 10,000, and 3,600 is paid. The skill ages the 6,400 that is still open</td></tr>
+        <tr><th scope="row">Pinnacle Clinics</th><td class="t">INV-1010</td><td class="t">Sat 10 Oct</td><td>−10</td><td class="t">Current</td><td>24,200</td><td class="t">Not yet due</td></tr>
+        <tr class="breach"><th scope="row">Summit Hotels</th><td class="t">INV-0870</td><td class="t">Fri 1 May</td><td>152</td><td class="t">Over 120</td><td>15,000</td><td class="t a">Insolvency notice received. No reminder. Professional review</td></tr>
+        <tr><th scope="row">Acme Corp</th><td class="t">INV-0990</td><td class="t">Mon 31 Aug</td><td>30</td><td class="t">1-30</td><td>3,300</td><td class="t a">Disputed, as you said. It goes to the person who owns the dispute</td></tr>
+        <tr><th scope="row">Lakeside Freight</th><td class="t">CM-0044</td><td class="t"></td><td></td><td class="t"></td><td>−1,200</td><td class="t">A credit memo that is not applied to an invoice. Lakeside has a credit balance: refund it or reclassify it</td></tr>
+        <tr class="tot"><th scope="row">Gross invoices</th><td></td><td></td><td></td><td></td><td class="c">69,400</td><td></td></tr>
+        <tr><th scope="row">Unapplied credit</th><td></td><td></td><td></td><td></td><td>−1,200</td><td></td></tr>
+        <tr class="tot"><th scope="row">Net A/R</th><td></td><td></td><td></td><td></td><td class="c">68,200</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. A negative number of days means the invoice is not yet due. The skill takes disputes from you, because your books do not hold them reliably.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Current</span><span class="v num">$24,200</span><span class="s">Pinnacle, not yet due</span></div>
+    <div class="stat"><span class="label">1-30 days late</span><span class="v num hold">$15,300</span><span class="s">12,000 + 3,300</span></div>
+    <div class="stat"><span class="label">31-60 days late</span><span class="v num hold">$8,500</span><span class="s">Harbor. The 61-90 bucket is $0</span></div>
+    <div class="stat"><span class="label">Over 90 days late</span><span class="v num wrong">$21,400</span><span class="s">91-120 is 6,400 and Over 120 is 15,000. All buckets: 24,200 + 15,300 + 8,500 + 0 + 6,400 + 15,000 = 69,400</span></div>
+  </div>
+  <p>Why sort by age? An older unpaid balance is less likely to be paid. Accountants use the same buckets to estimate the amount that will never come in. They apply a higher rate to the older buckets<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill builds the aging only. It does not estimate that amount, and it never writes off a balance.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The oldest invoices are missing from a quick search</h2>
+  <p>Most accounting systems have an invoice search. Most invoice searches show recent dates by default. So old unpaid invoices can be missing from the result. Those are the invoices that collections must chase.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">It reads the aging detail report as of 30 September</span>
+      <div class="rows num">
+        <div class="row"><span>Open invoices in the aging</span><span class="v">6</span></div>
+        <div class="row"><span>Over 90 days late</span><span class="v">$21,400</span></div>
+        <div class="row"><span>Crestline, aged on</span><span class="v">$6,400 open</span></div>
+      </div>
+      <div class="verdict">Every unpaid invoice is in the aging. If your workspace does not list an aging detail report, the skill asks you for an export. It uses the invoice search only to add details.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Search the recent invoices and call the result an aging</span>
+      <div class="rows num">
+        <div class="row"><span>Open invoices in the result</span><span class="v">recent only</span></div>
+        <div class="row off"><span>Over 90 days late</span><span class="v">can be missing</span></div>
+        <div class="row off"><span>Total owed</span><span class="v">too low</span></div>
+      </div>
+      <div class="verdict">The result looks complete. At Northbrook, the two oldest invoices hold $21,400, which is 31.4% of the money customers owe. A recent-date search can omit invoices of that age.</div>
+    </div>
+  </div>
+  <p>The skill also ages each invoice on its open balance. Crestline paid 3,600 of a 10,000 invoice, so 10,000 − 3,600 = 6,400 is still open. The aging totals use 6,400. The detail shows the original 10,000 beside it.</p>
+  <p>A customer balance report does not replace an aging. It gives one total for each customer and no buckets, so it cannot show what is overdue.</p>
+</section>
+
+<section>
+  <span class="label">The tie-out</span>
+  <h2>The summary agrees, and the books show $750 more</h2>
+  <p>The skill adds the invoices and the credit: 69,400 − 1,200 = 68,200. It compares that net total with the aging summary report, for each customer, for each bucket and in total. The two agree within 0.01. Accountants call this a summary-to-detail reconciliation.</p>
+  <p>Then it compares the 68,200 with the A/R balance on the balance sheet, which is $68,950. The difference is 68,950 − 68,200 = $750. A likely cause is a journal entry that someone posted directly to the A/R account. The skill puts the $750 on the Exceptions sheet, with the amount and the likely cause. It never forces the two figures to agree.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Detail to summary</span><span class="v num good">Agrees</span><span class="s">68,200 against the aging summary, within 0.01</span></div>
+    <div class="stat"><span class="label">Aging to the books</span><span class="v num wrong">$750</span><span class="s">68,950 − 68,200. It goes to Exceptions as a difference with no explanation yet</span></div>
+    <div class="stat"><span class="label">What the output says</span><span class="v num hold">Summary only</span><span class="s">The aging does not agree with the books, so the output may not say "reconciled to the general ledger"</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">The numbers it works out</span>
+  <h2>Two thirds of the money is late</h2>
+  <div class="scale">
+    <div class="stat"><span class="label">Overdue</span><span class="v num wrong">$45,200</span><span class="s">69,400 − 24,200 not yet due. That is 66.3% of 68,200</span></div>
+    <div class="stat"><span class="label">Over 90 days</span><span class="v num wrong">$21,400</span><span class="s">6,400 + 15,000. That is 31.4% of 68,200</span></div>
+    <div class="stat"><span class="label">Weighted days past due</span><span class="v num hold">53.6</span><span class="s">Each invoice counts by its open amount. An invoice that is not yet due counts as 0 days</span></div>
+    <div class="stat"><span class="label">Largest customer</span><span class="v num">35.5%</span><span class="s">Pinnacle owes 24,200 of 68,200</span></div>
+  </div>
+  <p>The weighted days past due: (12,000 × 15 + 8,500 × 60 + 6,400 × 102 + 24,200 × 0 + 15,000 × 152 + 3,300 × 30) ÷ 69,400 = 3,721,800 ÷ 69,400 = 53.6 days. The skill counts Pinnacle's invoice as 0 days, so an invoice that is not yet due does not hide the late ones.</p>
+  <p>The skill also reports how much the five largest customers owe. Five Northbrook customers owe money, so the five largest are all of them. The largest one shows more: Pinnacle owes 35.5%. One customer that owes 40% of your receivables is a different risk from fifty customers at 2% each.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>DSO on credit sales</h3>
+      <span class="who">The quarter from July to September, 92 days</span>
+      <div class="rows num">
+        <div class="row"><span>Ending A/R</span><span class="v">$68,200</span></div>
+        <div class="row"><span>Credit sales: 150,000 − 4,000</span><span class="v">$146,000</span></div>
+        <div class="row"><span>68,200 ÷ 146,000 × 92</span><span class="v">43.0 days</span></div>
+      </div>
+      <div class="verdict">Credit sales are the invoices of the quarter less the credit memos of the quarter. The skill shows that calculation.</div>
+    </div>
+    <div class="book bad">
+      <h3>DSO on total income</h3>
+      <span class="who">The same quarter, with cash sales included</span>
+      <div class="rows num">
+        <div class="row"><span>Ending A/R</span><span class="v">$68,200</span></div>
+        <div class="row off"><span>Total income, with $44,000 of cash sales</span><span class="v">$190,000</span></div>
+        <div class="row off"><span>68,200 ÷ 190,000 × 92</span><span class="v">33.0 days</span></div>
+      </div>
+      <div class="verdict">Cash sales were never owed to you, so this figure looks 10 days better. The skill shows it only with your approval, with the label "Approximate DSO (total-income proxy)".</div>
+    </div>
+  </div>
+  <p>DSO means days sales outstanding: the average number of days that you wait for payment. The skill divides the ending A/R by the credit sales of the period, then multiplies by the days in the period. An accounting textbook also uses credit sales<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. It divides net credit sales by the average A/R, and then divides 365 by that result. The skill uses the ending A/R and the days in the period. So the two formulas can give different results. With both formulas, fewer days usually means that customers pay faster<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+</section>
+
+<section>
+  <span class="label">Who it chases first</span>
+  <h2>Two reminder drafts, and four customers with a different next step</h2>
+  <p>The skill ranks the late customers by age and open balance. It sends a disputed invoice and an insolvent customer to a different path. Then it gives each customer a band of action.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's collection plan: Crestline first and Harbor second, each with a draft. Summit, Acme, Pinnacle and Lakeside get a different next step">
+        <thead><tr><th scope="col" style="text-align:left">Rank</th><th scope="col" style="text-align:left">Customer</th><th scope="col">Open $</th><th scope="col">Oldest, days</th><th scope="col" style="text-align:left">Next action</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">1</th><td class="t">Crestline Foods</td><td>6,400</td><td>102</td><td class="t">Over 90 band: escalation review under Northbrook's policy. A draft to review</td></tr>
+        <tr><th scope="row">2</th><td class="t">Harbor Retail</td><td>20,500</td><td>60</td><td class="t">8,500 + 12,000. 31-60 band: formal follow-up and a request for a payment date. A draft to review</td></tr>
+        <tr class="breach"><th scope="row">Not ranked</th><td class="t">Summit Hotels</td><td>15,000</td><td>152</td><td class="t w">Insolvency notice. No reminder. Professional review</td></tr>
+        <tr><th scope="row">Not ranked</th><td class="t">Acme Corp</td><td>3,300</td><td>30</td><td class="t a">Disputed. A dispute note to the person who owns the dispute, with no demand for payment</td></tr>
+        <tr><th scope="row">Not ranked</th><td class="t">Pinnacle Clinics</td><td>24,200</td><td>0</td><td class="t">Not yet due. No action</td></tr>
+        <tr><th scope="row">Not ranked</th><td class="t">Lakeside Freight</td><td>−1,200</td><td></td><td class="t">Credit balance. Exceptions sheet: refund it or reclassify it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The bands are the skill's defaults. 1-30 gets a friendly reminder, and 31-60 a formal follow-up. 61-90 gets a management review, and Over 90 an escalation review under your own policy. You can change them.</figcaption>
+  </figure>
+  <p>Summit Hotels sent an insolvency notice. The skill stops ordinary reminders to Summit and sends the account to professional review. In the US, a bankruptcy filing usually starts an automatic stay. The stay stops lawsuits, garnishments and most collection activity against the debtor<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. That rule is US law. Other countries have their own rules, so ask a professional about the countries where you trade.</p>
+  <p>Acme Corp disputes its invoice. The invoice stays in its bucket, and the skill routes it to the person who owns the dispute. A reminder that treats a disputed invoice as late damages the relationship and does not get the invoice paid.</p>
+  <p>The skill writes two drafts, for Crestline and for Harbor. Each draft is neutral and contains no fees or threats. Each draft carries the mark REVIEW REQUIRED - NOT SENT. The skill never contacts a customer. A person reviews each draft and decides whether to send it.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Seven items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. At item D, it makes a statement and asks no question.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. The skill asks this only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">As of which date?</div><div class="why">The skill counts every bucket from this date. It asks only if the date is not clear. It never chooses a default date without telling you.</div></li>
+    <li><div class="q">What do you need: the aging only, a collection plan, DSO or reminder drafts? All customers, or one?</div><div class="why">The answer decides which inputs matter. The core aging needs no dispute flags, payment history, DSO or policy. For one customer, the skill finds the name in your customer list and tells you the match.</div></li>
+    <li><div class="q">It tells you: an aging lists unpaid invoices, so it is always on invoices issued (accrual), even if you file on a cash basis.</div><div class="why">Only DSO and income figures depend on the basis. If you ask for a cash-basis aging, the skill explains this. Then it asks if accrual is acceptable, before it reads any data.</div></li>
+    <li><div class="q">For DSO: the period. On the upload path, also your credit sales.</div><div class="why">Only if you want DSO. Credit sales are the base that DSO needs, because total income includes cash sales. On the MosoFin path, the skill calculates credit sales from invoices less credit memos. It offers the total-income proxy only with your approval.</div></li>
+    <li><div class="q">Any disputes, credit holds, customer tiers or payment history?</div><div class="why">These change the ranking and the tone. Disputes go to resolution, away from collection pressure. The skill asks only when the plan needs them. It never guesses them from the ledger.</div></li>
+    <li><div class="q">Your collection policy: approved wording, payment contact and escalation steps.</div><div class="why">Only if you want drafts. The drafts use only the terms that you supply. They use neutral language with no fees or threats.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. The skill's own example is for Northbrook. With DSO added for this page, it reads like this:</p>
+  <blockquote><i>"Building the A/R aging for Northbrook Trading as of 30 September 2026, accrual basis, from your Mosofin connection: invoice detail tied to the aging summary, then a collection plan and reminder drafts in your approved wording, every draft marked not sent. DSO for July to September, on credit sales from your invoices and credit memos. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the aging detail</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads the aging summary, and the aging detail if your workspace lists that report</li>
+        <li>It reads the invoices, payments, credit memos and the customer list</li>
+        <li>It reads the A/R balance in your books, to test the aging against it</li>
+        <li>You still give it the <b>disputes</b>, <b>credit holds</b>, <b>customer tiers</b>, <b>payment history</b> and your <b>collection policy</b>, when the output needs them. The books do not hold them reliably</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the aging detail, and more if you have it</h3>
+      <ul>
+        <li><b>A/R Aging Detail</b> as of the date: one row for each open invoice, with the due date and the open balance. CSV or XLSX, required. Export it with the aging method "Report date"</li>
+        <li><b>A/R Aging Summary</b> for the same date, CSV, XLSX or PDF, recommended. Without it, the output says that there was no independent tie-out</li>
+        <li><b>A/R balance</b> from the balance sheet or trial balance, CSV, XLSX or PDF, recommended. The skill needs it before it can call the tie-out a reconciliation to the general ledger</li>
+        <li><b>Unapplied credits and payments</b>, CSV or XLSX, only if the detail and the summary do not agree</li>
+        <li><b>Credit sales</b> for the period, only for exact DSO, typed in the chat or as CSV or XLSX</li>
+        <li>Company name, as-of date and base currency, typed in the chat, required. Disputes, holds and policy, typed in the chat when the output needs them</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Seven sheets, from the run context to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Run context</b><span>The workspace and company by name, the as-of date, the basis, the sources and the missing fields. It ends with blank lines for the preparer and the reviewer.</span></div>
+    <div class="get"><b>Aging summary</b><span>Each customer against each bucket, with totals, the metrics and the next action.</span></div>
+    <div class="get"><b>Aging detail</b><span>One row for each invoice, with its dates, days past due, bucket, original amount and open balance.</span></div>
+    <div class="get"><b>Collection plan</b><span>The ranking, the reason, the next action, and blank fields for the owner and the status.</span></div>
+    <div class="get"><b>Drafts</b><span>Reminder text for review only. Every draft carries the mark REVIEW REQUIRED - NOT SENT.</span></div>
+    <div class="get"><b>Exceptions</b><span>Credits, credit balances, missing dates or currency, disputes and any reconciliation difference, each with an amount, a cause, an action and an owner.</span></div>
+    <div class="get"><b>Coverage</b><span>For each task, what the skill read and with which tool. It also shows what you must supply because the skill could not read it.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your customer tiers, standing holds and disputes, collection policy and DSO basis for the next run. It never saves customer contact details, balances or draft letters.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never contacts a customer.</b> Every draft carries the mark REVIEW REQUIRED - NOT SENT. A draft never invents a dispute, a credit hold, a payment promise, a late fee, a suspension or legal action.</li>
+      <li><b>Never forces a tie, and never shows part of the invoices as the full aging.</b> An invoice search is not a complete aging. A customer balance report is not an aging. The skill shows each difference that it cannot explain.</li>
+      <li><b>Never guesses disputes, holds, tiers or payment history from the ledger.</b> It never shows a proxy DSO without its label. It never adds different currencies into one total without a label.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Accounts receivable</dt><dd>The money that customers owe you for invoices that they have not paid yet. Accountants write A/R or AR.</dd>
+    <dt>Aging</dt><dd>A table that sorts every unpaid invoice by how late it is.</dd>
+    <dt>Aging bucket</dt><dd>One band of lateness, for example 1-30 days late. The skill's default bands go from Current to Over 120.</dd>
+    <dt>Open balance</dt><dd>The part of an invoice that is still unpaid, after payments and credits.</dd>
+    <dt>DSO</dt><dd>Days sales outstanding: the average number of days that you wait for payment<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Dunning</dt><dd>The routine series of payment reminders to a late customer.</dd>
+    <dt>Automatic stay</dt><dd>In the US, a bankruptcy filing usually starts it. It stops most collection activity against the debtor<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a Federal Reserve survey, two sections of an accounting textbook and a US courts glossary. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.fedsmallbusiness.org/reports/survey/2024/2024-report-on-payments" rel="noopener">Federal Reserve Banks: 2024 Report on Payments, Small Business Credit Survey</a><span class="what">About four in five small firms have a problem with payments. Firms that get payment after delivery, for example by invoice, are more likely to report slow-paying customers.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="the balance sheet aging of receivables method"><a href="https://openstax.org/books/principles-financial-accounting/pages/9-2-account-for-uncollectible-accounts-using-the-balance-sheet-and-income-statement-approaches" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 9.2 Account for Uncollectible Accounts Using the Balance Sheet and Income Statement Approaches</a><span class="what">The aging method sorts receivables into age bands. It applies a higher rate of loss to the older bands, because older balances are more likely to stay unpaid.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="number of days' sales in receivables"><a href="https://openstax.org/books/principles-financial-accounting/pages/9-3-determine-the-efficiency-of-receivables-management-using-financial-ratios" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 9.3 Determine the Efficiency of Receivables Management Using Financial Ratios</a><span class="what">Receivables turnover is net credit sales divided by average receivables. Days' sales in receivables is 365 divided by that turnover. Fewer days usually means that customers pay faster.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.uscourts.gov/glossary-legal-terms/automatic-stay" rel="noopener">Administrative Office of the U.S. Courts: Glossary, "Automatic stay"</a><span class="what">A bankruptcy filing usually starts an automatic stay. The stay stops lawsuits, garnishments and most collection activity against the debtor. This is a US rule.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the six buckets, the action bands, the 0.01 tolerance, the seven sheets or the draft mark. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>ar-aging-and-collections</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ar-aging-and-collections">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its customers and every figure in the example. They are not your data. The survey, the textbook and the courts glossary are US sources. The bankruptcy rule is US law, and other countries have their own rules. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
