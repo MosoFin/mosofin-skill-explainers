@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Entry Builder Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked journal entry examples, from one balanced accrual to a batch with 15 checks on each entry, with an entry checker. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .vcap{font-size:14px;color:var(--muted);margin-top:4px}
+  table.wrapcells td{white-space:normal;min-width:110px}
+  table.wrapcells td:first-child{min-width:120px}
+  .hdr{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.06em;background:var(--hold-soft);color:var(--hold);border-radius:8px;padding:8px 12px}
+  .bills select{min-width:130px}
+  .lines-note{display:flex;flex-direction:column;gap:4px}
+  td.p{color:var(--green);font-weight:700;text-align:center}
+  td.f{color:var(--wrong);font-weight:700;background:var(--wrong-soft);text-align:center}
+  td.na{color:var(--faint);text-align:center}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Journal entry builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · journal-entry-builder · learning guide</span>
+  <h1>From one balanced entry to a batch a reviewer can post</h1>
+  <p class="lede">This page shows how the skill builds a journal entry and checks it, <b>one level at a time</b>. It starts with one accrual that balances. It ends with five entries, 15 checks on each, and two requests that the skill refuses. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are two sections of an OpenStax textbook, the US federal internal-control standard, a US audit standard and two ACFE publications. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your entry, your check</b><span>At the end, enter up to 8 lines of your own entry. The page adds each side and applies the skill's rules for direction, red flags, period and reversal.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading. It keeps its books in US dollars, on the accrual basis, with a calendar year, in one QuickBooks Online company file. The run is on Wednesday 30 September 2026. Three entries come from the <a href="../accruals-and-deferrals/learn.html">accruals and deferrals</a> run in the same conversation. One entry comes from the <a href="../credit-memo-and-refund-handler/learn.html">credit memo and refund</a> pages. The owner types the fifth entry in the chat. The skill also works on an entry that you type in.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Check an entry before anyone posts it</h2>
+  <p class="muted">Enter up to 8 lines, or load an example. The page applies the balance check and the rules from <code>references/method.md</code> Steps 2 and 6 and Pitfall 6. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="a">Audit fees accrual (J1)</button>
+      <button type="button" data-p="b">Pinnacle deferral (J2)</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The entry</legend>
+        <label class="field"><span>Posting date</span><input data-k="post" type="date"></label>
+        <label class="field"><span>Books closed through</span><input data-k="closed" type="date"></label>
+        <label class="field"><span>Materiality threshold (blank: not run)</span><input data-k="mat" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>The reversal</legend>
+        <label class="field"><span>The entry reverses</span><input data-k="rev" type="checkbox" style="width:20px;height:20px;justify-self:end;accent-color:var(--green)"></label>
+        <label class="field"><span>Reversal date</span><input data-k="revdate" type="date"></label>
+        <p class="fine">A reversing entry must have the first day of the next period as its date.</p>
+      </fieldset>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Lines of the entry">
+      <thead><tr><th>Account</th><th>Account type</th><th>Cash, A/R or A/P control account</th><th>Debit</th><th>Credit</th></tr></thead>
+      <tbody id="jrows"></tbody>
+    </table></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page checks arithmetic and the skill's rules only. It does not see your chart, so it cannot run the hard stop for an account that is not in the chart. "Balanced" shows only at a difference of 0.00, and the page never offers a figure to force the balance. A line with a debit and a credit is an error. A debit to a Revenue line or a credit to an Expense line shows as an unusual direction, and the memo must say why. Any Revenue line or ticked control account shows a red flag. The materiality flag shows when the larger side is above your threshold. The period shows as open only when the posting date is after the closed-through date, and that status rests on your word. Try this on the Pinnacle example: change the credit to 32,999.99. The difference is then 0.01, and the entry does not balance. Load the audit fees example and set the reversal date to 2026-09-30. The page then warns that the date must be the first day of the next period.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? What event do you record, with the amounts and the document? What is the posting date? Which company? Does it have a tax effect, and where? What is the materiality threshold? Which document is behind it, and does it reverse? Through which date are the books closed, and did you report a later period?</div>
+    <div><b>Needs</b>The event and the posting date from you. Your chart of accounts with numbers, names and types, from MosoFin or as a file. The skill also uses balances, open invoices and bills, and past entries when it can read them.</div>
+    <div><b>Gives back</b>Each proposed entry with its header, lines, memo and balance check. The result of all 15 checks, with the evidence. An import file in your system's columns, only on a yes. A coverage sheet and one line of data sources.</div>
+    <div><b>Never</b>The skill never reads your data before you answer and say yes to the read-back. It never writes, posts or deletes anything. It never invents an account, and never chooses an account, a tax treatment or a threshold for you. It never adds a rounding figure.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are two sections of an OpenStax textbook, the US federal internal-control standard, a US audit standard and two ACFE publications. MosoFin found each one on 28 October 2026 in search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The 15 checks, the hard stop, the [auto], [gated] and [manual] verdicts, the proposed-entry header and the QuickBooks Online columns are the skill's own. MosoFin made up the $25,000 threshold, the 7.5% sales tax rate and every figure in the examples. The skill's files also cite ASC 250 and IAS 8 for corrections, and ASC 830 and IAS 21 for foreign currency. The page names them as the skill cites them. MosoFin did not check those standards for this page.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/overview.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a correction from the bookkeeping audit followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The textbook, the control standard and the audit standard are US sources. The control standard is for US federal entities, and AS 2401 applies to public-company audits only. Ask your accountant what applies to you. This page explains <code>journal-entry-builder</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/journal-entry-builder">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 3.5 Use Journal Entries to Record Transactions and Post to T-Accounts", u:"https://openstax.org/books/principles-financial-accounting/pages/3-5-use-journal-entries-to-record-transactions-and-post-to-t-accounts", at:"the journal entry format", checked:"2026-10-28", via:"from search results, page not opened", w:"Every recorded transaction changes at least two accounts, with at least one debit and one credit. The debit titles come first, and the credit titles follow, indented. The debits must equal the credits. Assets increase on the debit side. Liabilities, common stock and revenues increase on the credit side."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, Chapter 3 Key Terms", u:"https://openstax.org/books/principles-financial-accounting/pages/3-key-terms", at:"\"double-entry accounting\"", checked:"2026-10-28", via:"from search results, page not opened", w:"Double-entry accounting requires the sum of the debits to equal the sum of the credits for each transaction."},
+  {t:"U.S. Government Accountability Office: Standards for Internal Control in the Federal Government (the Green Book), 2025 revision, GAO-25-107721", u:"https://www.gao.gov/assets/gao-25-107721.pdf", at:"control activities: segregation of duties; documentation", checked:"2026-10-28", via:"from search results, page not opened", w:"Separate authority, custody and accounting help to prevent fraud, waste and abuse. Smaller entities that cannot separate duties can use more review levels and review a random selection of transactions with their documents. Good records show who, what, when, where and why. GAO wrote it for US federal entities."},
+  {t:"PCAOB: AS 2401, Consideration of Fraud in a Financial Statement Audit", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401", at:"examining journal entries and other adjustments for evidence of possible material misstatement due to fraud", checked:"2026-10-28", via:"from search results, page not opened", w:"The auditor must select journal entries and other adjustments for testing. Signs include unusual or seldom-used accounts, entries at period end with little explanation, entries with no account number, and round numbers. It applies to public-company audits only."},
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", at:"internal control weaknesses that contributed to fraud; organizations with fewer than 100 employees", checked:"2026-10-28", via:"from search results, page not opened", w:"A lack of internal controls contributed to 32% of the frauds in the study. Override of existing controls contributed to 19%, and a lack of management review to 18%. Organizations with fewer than 100 employees have much lower rates of anti-fraud controls."},
+  {t:"ACFE: Anti-Fraud Data Analytics Tests", u:"https://www.acfe.com/fraud-resources/fraud-risk-tools---coso/anti-fraud-data-analytics-tests", at:"financial statement fraud tests", checked:"2026-10-28", via:"from search results, page not opened", w:"The tests include a search for revenue that a company recognised at period end and later reversed in full or in part. They also review expenses that always end in round numbers or have the same amounts."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"The mistake it catches most is the double-count: booking a payment or an invoice for an item an accrual already covers.", w:"SKILL.md · Journal entry builder"},
+  q2:{q:"Every entry it produces is a proposal for a person to post.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"An account that does not exist in the chart is a hard stop, not a warning", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"never pads with a \"Rounding\" plug, and never deletes or alters a posted original", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"What date are the books closed (or locked) through, and has any period after that already been reported?", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q6:{q:"Every JE must balance: Total Debits = Total Credits.", w:"references/method.md · Step 2 — Apply the accounting equation"},
+  q7:{q:"A debit to a revenue account, or a credit to an expense account, is not wrong in itself — but it is unusual enough to warrant the memo saying why", w:"references/method.md · Step 2 — Apply the accounting equation"},
+  q8:{q:"A journal line to AR or AP does not apply against the open invoice or bill, so the aging and the control account stop agreeing.", w:"references/method.md · Step 4 — Common JE patterns"},
+  q9:{q:"If the original sits in a closed or reported period, date the correction in the current open period.", w:"references/method.md · Correcting prior error"},
+  q10:{q:"do not propose a closing entry for them; it would double-close retained earnings.", w:"references/method.md · Step 1 — Identify the JE type"},
+  q11:{q:"manual entries to revenue, cash, AR or AP control accounts are auditor red flags", w:"references/method.md · Step 6 — Validation"},
+  q12:{q:"One that says \"validated\" is not.", w:"references/method.md · Step 6 — Validation"},
+  q13:{q:"if the accrual has already reversed (e.g. auto-reversed on day 1), the bill posts to expense as normal — no double count.", w:"references/method.md · Pitfalls Specific to JE Construction (not covered above)"},
+  q14:{q:"Date: first day of next period. Flip debits and credits from the original.", w:"references/method.md · Reversing entries"},
+  q15:{q:"Posting is an authorised act with a preparer and a reviewer behind it, and an entry arriving pre-validated with its support attached is what makes that review fast.", w:"references/overview.md · Mosofin never posts — and this is the skill where that matters most"},
+  q16:{q:"Never persist amounts, balances, entry contents or transaction details.", w:"references/method.md · Step 8 — Evolve the skill (Mosofin-specific, final step)"},
+};
+
+const RULES = [
+  { id:"1", title:"Debits equal credits", r:Q.q6, cites:[1,2],
+    plain:"The skill adds each side to the cent. If an entry does not balance, the skill stops. It never adds a figure to force the balance.",
+    backed:"Every transaction changes at least two accounts, with at least one debit and one credit.{1} Double-entry accounting requires the debits to equal the credits.{2}" },
+  { id:"2", title:"The chart is the authority", r:Q.q3, cites:[],
+    plain:"If an account is not in your chart, the entry stops. With no chart at all, the skill uses descriptive names and labels each one PLACEHOLDER \u2014 REMAP REQUIRED." },
+  { id:"3", title:"An unusual direction needs a reason", r:Q.q7, cites:[1],
+    plain:"A debit to revenue or a credit to an expense can be correct. The memo must say why, and the check shows each one.",
+    backed:"Revenues increase on the credit side, so a debit to revenue goes against the normal direction.{1}" },
+  { id:"4", title:"A proposal for a person to post", r:Q.q2, cites:[3],
+    plain:"The skill writes nothing to any system. Each entry carries the header PROPOSED ENTRY \u2014 NOT POSTED.",
+    backed:"The US federal internal-control standard says that separate authority, custody and accounting help to prevent fraud, waste and abuse.{3}" },
+  { id:"5", title:"Red flags on manual entries", r:Q.q11, cites:[4],
+    plain:"The skill flags a manual entry to revenue, cash, A/R or A/P. It asks the owner for the business reason and recommends a subledger transaction where possible.",
+    backed:"Auditors of public companies must select journal entries for testing, and entries to unusual accounts are one sign.{4} AS 2401 applies to public-company audits only." },
+  { id:"6", title:"A preparer and a reviewer", r:Q.q15, cites:[3,5],
+    plain:"The skill prepares each entry and attaches its checks and its support. A second person reviews the entry and posts it.",
+    backed:"Smaller entities that cannot separate duties can add review levels.{3} A lack of management review contributed to 18% of the frauds in the ACFE's 2024 study.{5}" },
+  { id:"7", title:"No plug, no change to a posted entry", r:Q.q4, cites:[],
+    plain:"A correction reverses and books again, or books the difference. Either way, it names the original entry by its number." },
+  { id:"8", title:"The double-count comes first", r:Q.q1, cites:[],
+    plain:"Before it proposes a bill or a payment, the skill reads the accrual account. It looks for an open accrual for the same item." },
+  { id:"9", title:"Reverse on day one", r:Q.q14, cites:[],
+    plain:"A reversing entry has the first day of the next period as its date. The skill flips the original lines and names the original entry." },
+  { id:"10", title:"Correct in the open period", r:Q.q9, cites:[],
+    plain:"The owner decides if the error is material. For a material error, the skill proposes a correction against opening retained earnings and flags it for the accountant." },
+  { id:"11", title:"No second close", r:Q.q10, cites:[],
+    plain:"QuickBooks Online and Xero close the year automatically. For them, the skill proposes no closing entry." },
+  { id:"12", title:"The count goes with the entry", r:Q.q12, cites:[],
+    plain:"Each entry carries its check count: the checks that ran, passed and flagged, and the checks that did not apply." },
+];
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const HDR = "PROPOSED ENTRY \u2014 NOT POSTED";
+const LEVELS = [
+  { tier:"One entry · Northbrook Trading, Wednesday 30 September 2026" },
+  { n:1, title:"One entry that balances",
+    chips:["Engagement letter","Chart of accounts"], src:"Rules 1 and 9", cites:[1,2],
+    situation:"The accruals skill gives this skill the September audit-fee accrual, J1. The auditor's fee for interim fieldwork is $12,000, and 75% of the work is complete on Wednesday 30 September.",
+    facts:["Every recorded transaction changes at least two accounts, with at least one debit and one credit. So the accounting equation stays in balance "+C(1)+".",
+           "In a journal entry, the debit account titles come first, on the left. The credit titles come after them, indented to the right "+C(1)+".",
+           "Double-entry accounting requires the sum of the debits to equal the sum of the credits for each transaction "+C(2)+".",
+           "Assets increase on the debit side. Liabilities, common stock and revenues increase on the credit side "+C(1)+". The skill's own table in Step 2 adds that an expense increases with a debit."],
+    visuals:[{cap:"J1 · JE-202609-022 · Accrual · Wed 30 Sep 2026 · reverses Thu 1 Oct 2026",
+      head:["Account","Type","Increases with","Debit","Credit"],
+      rows:[["6410 Audit and accounting fees","Expense","Debit","9,000.00","—"],["2110 Accrued expenses","Liability","Credit","—","9,000.00"]],
+      total:["Total","","","9,000.00","9,000.00"]},
+      {cap:"Reversing entry, proposed with J1 · Thu 1 Oct 2026 · names JE-202609-022",
+      head:["Account","Debit","Credit"],
+      rows:[["2110 Accrued expenses","9,000.00","—"],["6410 Audit and accounting fees","—","9,000.00"]]}],
+    rules:[Q.q6, Q.q14],
+    math:[["Fee for interim fieldwork, from the engagement letter","12,000.00"],["Work complete on 30 September","75%"],["Accrual: 12,000 × 75%","9,000.00",1],["Debit 6410 Audit and accounting fees","9,000.00"],["Credit 2110 Accrued expenses","9,000.00"],["Difference: 9,000.00 − 9,000.00","0.00",1],["Reversal date: the first day after 30 September","Thu 1 Oct 2026"],["2110 after the reversal: 9,000 − 9,000","0.00",1]],
+    verdict:["ok","J1 balances at 9,000.00 on each side. The skill proposes the reversing entry with it, on Thursday 1 October, the first day of the next period. The reversal flips the debit and the credit, and it names JE-202609-022.","BALANCED"] },
+
+  { n:2, title:"The right accounts: the chart decides",
+    chips:["Chart of accounts","Bills","Owner's request"], src:"Rule 2", cites:[1],
+    situation:"The owner types a request in the chat. It reads: \"Move September's courier charges, $640, from Office Supplies to Freight-out.\" The skill finds three courier bills in 6520 Office Supplies.",
+    facts:["A journal entry names an account title on each line "+C(1)+". The skill takes each title from Northbrook's chart, with the number and the name as the chart shows them.",
+           "The textbook teaches the format. Only your chart can show which accounts exist in your books. No outside source can supply that fact."],
+    visuals:[{cap:"The three courier bills in 6520 Office Supplies (search_bills, [auto])",
+      head:["Bill date","Account now","Amount"],
+      rows:[["Tue 8 Sep 2026","6520 Office Supplies","210.00"],["Fri 11 Sep 2026","6520 Office Supplies","195.00"],["Tue 22 Sep 2026","6520 Office Supplies","235.00"]],
+      total:["Total","","640.00"]},
+      {cap:"J5 · JE-202609-026 · Reclass · Wed 30 Sep 2026",
+      head:["Draft","Account","In the chart?","Debit","Credit"],
+      rows:[["First draft","Freight-out",["no","bad"],["HARD STOP","bad"],"—"],["Rebuilt","6150 Shipping and Delivery",["yes","good"],"640.00","—"],["Rebuilt","6520 Office Supplies",["yes","good"],"—","640.00"]]}],
+    rules:[Q.q3],
+    math:[["Bill, Tue 8 Sep","210.00"],["Bill, Fri 11 Sep","195.00"],["Bill, Tue 22 Sep","235.00"],["Total: 210 + 195 + 235","640.00",1],["Account \"Freight-out\" in the chart","not found: hard stop",1],["Accounts that the skill makes","none"],["Account that the owner names","6150 Shipping and Delivery"],["Debit 6150 640.00, credit 6520 640.00, difference","0.00",1]],
+    verdict:["flag","The first draft stops, because Freight-out is not in Northbrook's chart. The skill does not make the account or choose the nearest name. A chart exists, so it writes no placeholder. The owner names 6150 Shipping and Delivery, and the skill builds J5 again.","HARD STOP"] },
+
+  { n:3, title:"Backed by something: header, memo, reference, date",
+    chips:["Engagement letter","Journal entries","Closed-through date"], src:"Rules 4 and 10", cites:[3],
+    situation:"Each proposal carries a header that a reviewer can follow a year later. J3 corrects an August accrual, so the closed-through date sets its posting date.",
+    facts:["Good documentation records who, what, when, where and why. With it, staff and external auditors can understand how controls work "+C(3)+".",
+           "The level of documentation changes with the size and complexity of the entity "+C(3)+".",
+           "GAO wrote the Green Book for US federal entities. This page uses it as a widely cited statement of the control idea. It is not a rule for Northbrook."],
+    hdr:true,
+    visuals:[{cap:"The header of two proposals", cls:"wrapcells",
+      head:["Field","J1","J3"],
+      rows:[["Number","JE-202609-022","JE-202609-024"],["Company","Northbrook Trading","Northbrook Trading"],["Type","Accrual","Correcting"],["Posting date","Wed 30 Sep 2026","Wed 30 Sep 2026"],["Reference","Auditor's engagement letter. Not in the books, so the owner supplies it [manual]","JE-202608-014 of Mon 31 Aug 2026, read from the ledger [auto]"],["Memo","Accrue interim audit fieldwork for September 2026, invoice expected in October","Clear the August utilities accrual JE-202608-014, which did not reverse on 1 September"],["Source","accruals-and-deferrals, item 5","accruals-and-deferrals, the missed reversal"],["Reverses","Thu 1 Oct 2026","No"]]},
+      {cap:"J3 · JE-202609-024 · Correcting · Wed 30 Sep 2026",
+      head:["Account","Debit","Credit"],
+      rows:[["2110 Accrued expenses","2,040.00","—"],["6310 Utilities","—","2,040.00"]],
+      total:["Total","2,040.00","2,040.00"]}],
+    rules:[Q.q5, Q.q9, Q.q4],
+    math:[["Books closed through, from the owner","Mon 31 Aug 2026"],["August reported to the bank","yes"],["Original JE-202608-014, dated","Mon 31 Aug 2026"],["So J3 goes into the open period, dated","Wed 30 Sep 2026",1],["Error amount","2,040.00"],["Materiality threshold","25,000.00"],["2,040 is below 25,000. The owner calls it immaterial","current-period account",1],["Debit 2110 2,040.00, credit 6310 2,040.00, difference","0.00",1],["Changes to the August entry","none"]],
+    verdict:["note","J3 has the date 30 September, in the open period, and its memo names JE-202608-014. The owner calls the error immaterial, so J3 goes through Utilities and not through opening retained earnings. The open period rests on the owner's date, because the books showed no lock date.","USER-ASSERTED"] },
+
+  { tier:"What can go wrong · the double-count and the red flags" },
+  { n:4, title:"The double-count",
+    chips:["Accrued expenses ledger","Bills"], src:"Rule 8", cites:[],
+    situation:"Before it proposes J1, the skill reads account 2110 and the bills. In August, Northbrook had no such check, and a utilities accrual did not reverse.",
+    facts:[], nofact:NOFACT,
+    visuals:[{cap:"Check 10: no open accrual already covers the item",
+      head:["Item","Accrual open in 2110","Bill in the books","Result"],
+      rows:[["Audit fees, September","none","none",["no double count","good"]],["Utilities, August","2,040.00 (JE-202608-014)","2,170.00 (Wed 9 Sep)",["counted twice","bad"]]]}],
+    rules:[Q.q1, Q.q13],
+    math:[["Audit-fee accrual open in 2110 (get_general_ledger)","none"],["Bill from the auditor in the books (search_bills)","none"],["Check 10 on J1","passed",1],["J1 reverses on","Thu 1 Oct 2026"],["The auditor's bill in October","posts to expense as normal",1],["August accrual, still open in 2110","2,040.00"],["August bill, posted to 6310 on Wed 9 Sep","2,170.00"],["August utilities in the books: 2,040 + 2,170","4,210.00"],["Counted twice","2,040.00",1],["After J3: 4,210 − 2,040","2,170.00, the real bill"]],
+    verdict:["ok","J1 passes check 10. No audit-fee accrual is open, and no bill from the auditor is in the books. J3 exists because the August accrual did not reverse on 1 September.","CHECK 10"] },
+
+  { n:5, title:"Signs and red flags",
+    chips:["Chart of accounts","Credit memo CM-0421","Sales receipt"], src:"Rules 3 and 5", cites:[4,6],
+    situation:"J2 moves 11 months of Pinnacle's prepayment out of revenue. J4 records Crestline's return CM-0421 with a journal line to A/R. Both entries go to the reviewer with flags.",
+    facts:["PCAOB AS 2401 treats management override of controls as a fraud risk. It requires the auditor to select journal entries and other adjustments for testing "+C(4)+".",
+           "Inappropriate entries often have identifying characteristics. Examples are unusual or seldom-used accounts, entries at period end with little or no explanation, entries without account numbers and round numbers "+C(4)+".",
+           "AS 2401 applies to public-company audits only. Northbrook is not a public company, so the standard does not apply to it. These signs help an auditor to select entries, and they do not prove fraud.",
+           "The ACFE's data analytics tests include a search for revenue at period end that a company later reverses. They also review expenses that always end in round numbers "+C(6)+".",
+           "The skill runs no such data test, and it does not detect fraud. It flags manual entries to revenue, cash, A/R and A/P, and entries above the owner's materiality threshold."],
+    visuals:[{cap:"J2 · JE-202609-023 · Deferral · Wed 30 Sep 2026 · does not reverse",
+      head:["Account","Type","Debit","Credit"],
+      rows:[["4000 Revenue","Income",["33,000.00","bad"],"—"],["2400 Deferred revenue","Liability","—","33,000.00"]],
+      total:["Total","","33,000.00","33,000.00"]},
+      {cap:"J4 · JE-202609-025 · Standard (sales return) · Mon 14 Sep 2026 · line memos on every line",
+      head:["Account","Type","Debit","Credit","Line memo"],
+      rows:[["4100 Sales Returns & Allowances","Contra-revenue","1,500.00","—","10 units × 150"],["2200 Sales Tax Payable","Liability","112.50","—","1,500 × 7.5%"],["1300 Inventory","Asset","520.00","—","8 × 60 + 2 × 20"],["5150 Inventory Write-Down","Expense","80.00","—","600 − 520"],["1200 Accounts Receivable","A/R control","—",["1,612.50","bad"],"Name: Crestline Foods"],["5000 Cost of Goods Sold","Expense","—","600.00","10 × 60, goods back in stock"]],
+      total:["Total","","2,212.50","2,212.50",""]},
+      {cap:"The checks that look at direction, control accounts and size",
+      head:["Entry","Check","Result"],
+      rows:[["J2","7 · Sign: a debit to revenue, and the memo says why",["passed","good"]],["J2","13 · Manual entry to Revenue",["flag","bad"]],["J2","14 · Materiality: 33,000 above 25,000",["flag","bad"]],["J4","7 · Sign: a credit to Cost of Goods Sold, and the line memo says why",["passed","good"]],["J4","13 · Manual entry to A/R",["flag","bad"]]]}],
+    rules:[Q.q7, Q.q8, Q.q11],
+    math:[["J2: Pinnacle paid on Tue 1 Sep 2026","36,000.00"],["Earned in September: 36,000 ÷ 12","3,000.00"],["Not yet earned: 36,000 − 3,000","33,000.00",1],["33,000 against the 25,000 threshold","flag",1],["J4 tax: 1,500 × 7.5%","112.50"],["J4 stock back: 8 × 60 + 2 × 20","520.00"],["J4 write-down: 600 − 520","80.00"],["J4 debits: 1,500 + 112.50 + 520 + 80","2,212.50"],["J4 credits: 1,612.50 + 600","2,212.50",1],["Flags: J2 2 + J4 1","3",1]],
+    verdict:["flag","Three review flags go with the entries. J2 is above $25,000 and is a manual entry to revenue. J4 is a manual entry to A/R. A flag does not stop an entry. For J4, the skill recommends a credit memo in QuickBooks' customer records.","3 FLAGS"] },
+
+  { tier:"The batch · what the reviewer gets" },
+  { n:6, title:"The whole batch, and two refusals",
+    chips:["Five entries","Validation Results","Coverage"], src:"Rules 4, 6, 11 and 12", cites:[3,5],
+    situation:"Five entries go to the reviewer as one batch. Then the owner asks the skill to close last year to retained earnings, and to post the entries in QuickBooks.",
+    facts:["Separate authority, custody and accounting help to prevent fraud, waste and abuse "+C(3)+". Smaller entities that cannot separate duties can add review levels. They can also review a random selection of transactions with their documents "+C(3)+".",
+           "In the ACFE's 2024 study, a lack of internal controls contributed to 32% of frauds. Override of existing controls contributed to 19%, and a lack of management review to 18% "+C(5)+".",
+           "Organizations with fewer than 100 employees have much lower rates of anti-fraud controls. A small staff usually means fewer checks and less segregation of duties "+C(5)+"."],
+    visuals:[{cap:"The 15 checks on each entry. P ran and passed · F ran and raised a review flag · – does not apply",
+      checks:true,
+      head:["#","Check","J1","J2","J3","J4","J5"],
+      rows:[["1","Debits = Credits, to the penny [auto]","P","P","P","P","P"],
+            ["2","All accounts exist in the chart [auto]","P","P","P","P","P"],
+            ["3","Date in an open period [gated]","P","P","P","P","P"],
+            ["4","Memo explains the business purpose","P","P","P","P","P"],
+            ["5","Source document referenced [gated]","P","P","P","P","P"],
+            ["6","Reversing flag set correctly","P","P","P","P","P"],
+            ["7","Sign conventions match account types [auto]","P","P","P","P","P"],
+            ["8","No P&L accounts in a pure balance sheet reclass [auto]","–","–","–","–","–"],
+            ["9","Tax lines present where warranted [gated]","P","P","P","P","P"],
+            ["10","No open accrual already covers the item [auto]","P","–","P","–","–"],
+            ["11","No open invoice for a receipt booked to revenue [auto]","–","–","–","–","–"],
+            ["12","Loan payment split [manual]","–","–","–","–","–"],
+            ["13","Target is not a control account [auto]","P","F","P","F","P"],
+            ["14","Materiality, $25,000","P","F","P","P","P"],
+            ["15","Clearing or suspense balance and age [auto]","–","–","–","–","–"]]},
+      {cap:"Count for each entry", id:"counts",
+      head:["Entry","Run","Passed","Flagged","Not applicable"],
+      rows:[["J1","11","11","0","4"],["J2","10","8","2","5"],["J3","11","11","0","4"],["J4","10","9","1","5"],["J5","10","10","0","5"]],
+      total:["All five","52","49","3","23"]},
+      {cap:"The import file in QuickBooks Online columns: J1, and the A/R line of J4",
+      head:["JournalNo","JournalDate","Line Description","Account","Debit","Credit","Name","Class","Location"],
+      rows:[["JE-202609-022","2026-09-30","Interim audit fieldwork, September","6410 Audit and accounting fees","9,000.00","","","",""],["JE-202609-022","2026-09-30","Interim audit fieldwork, September","2110 Accrued expenses","","9,000.00","","",""],["JE-202609-025","2026-09-14","Credit memo CM-0421","1200 Accounts Receivable","","1,612.50","Crestline Foods","",""]]}],
+    line:"validated: 11 of 15 run, 11 passed; 4 not applicable (BS reclass, receipt, loan split, clearing); account 6410 and 2110 confirmed in chart; period open (closed through 31 Aug, user-asserted); no matching accrual or bill found; 9,000 below the $25,000 threshold.",
+    rules:[Q.q12, Q.q2, Q.q10, Q.q15, Q.q16],
+    math:[["Lines: 2 + 2 + 2 + 6 + 2","14 lines in 5 entries"],["Debits: 9,000 + 33,000 + 2,040 + 2,212.50 + 640","46,892.50"],["Credits, the same five entries","46,892.50",1],["J1's reversing entry, not in the totals","2 lines, 9,000.00"],["Check results: 5 × 15","75"],["Run: 11 + 10 + 11 + 10 + 10","52"],["Passed: 11 + 8 + 11 + 9 + 10","49"],["Flagged: 0 + 2 + 0 + 1 + 0","3"],["Not applicable: 4 + 5 + 4 + 5 + 5","23"],["Run + not applicable: 52 + 23","75",1],["Hard stops","1, resolved by the owner"],["Closing entry for last year","none: QuickBooks Online closes the year"],["Entries that the skill posts","0",1],["Saved after the results, on a yes","account map, import format, numbering, threshold, reversal policy"],["Never saved","the 9,000, the 33,000 or any entry"]],
+    verdict:["note","The skill offers the file \"Northbrook Trading_JE_September adjustments_2026-09-30.xlsx\" and makes it only on a yes. The file has a Validation Results sheet and a Coverage sheet. The skill refuses to post, once and in plain words, and a person posts the entries.","NOT POSTED"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+const MARK = {P:"p", F:"f", "–":"na"};
+function cell(c, num, chk){
+  if(chk && MARK[c]) return `<td class="${MARK[c]}">${esc(c)}</td>`;
+  if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`;
+  return `<td class="${num?"n":""}">${esc(c)}</td>`;
+}
+function table(v){
+  let h=(v.cap?`<p class="vcap">${esc(v.cap)}</p>`:"")+`<div class="tbl"><table${v.cls?` class="${v.cls}"`:""}${v.id?` id="${v.id}"`:""}><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0 && !(v.checks&&i===1) && !v.cls,v.checks&&i>1)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = (L.hdr?`<div class="hdr">${esc(HDR)}</div>`:"") + L.visuals.map(table).join("");
+    if(L.line) vis += `<p class="vcap">The line that goes with J1, in the style of the sample in Step 6:</p><pre class="formula">${esc(L.line)}</pre>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: check one entry of up to 8 lines against the balance check and the skill's rules --- */
+const ROWS = 8;
+const TYPES = ["Asset","Liability","Equity","Revenue","Expense","Contra-asset","Contra-revenue"];
+const PRESETS = {
+  a:{post:"2026-09-30", closed:"2026-08-31", mat:25000, rev:true, revdate:"2026-10-01",
+     rows:[["6410 Audit and accounting fees","Expense",false,9000,""],["2110 Accrued expenses","Liability",false,"",9000]]},
+  b:{post:"2026-09-30", closed:"2026-08-31", mat:25000, rev:false, revdate:"",
+     rows:[["4000 Revenue","Revenue",false,33000,""],["2400 Deferred revenue","Liability",false,"",33000]]},
+  blank:{post:"", closed:"", mat:"", rev:false, revdate:"", rows:[]},
+};
+const tb=document.getElementById("jrows");
+for(let i=1;i<=ROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="name" aria-label="Line ${i} account" style="min-width:210px"></td>
+    <td><select data-c="type" aria-label="Line ${i} account type">${TYPES.map(t=>`<option>${t}</option>`).join("")}</select></td>
+    <td style="text-align:center"><input data-c="ctl" type="checkbox" aria-label="Line ${i} is a cash, A/R or A/P control account"></td>
+    <td><input data-c="dr" class="n" inputmode="decimal" aria-label="Line ${i} debit" style="width:120px"></td>
+    <td><input data-c="cr" class="n" inputmode="decimal" aria-label="Line ${i} credit" style="width:120px"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const t=String(s).replace(/[$£€,\s]/g,""); if(t==="") return NaN; const v=parseFloat(t); return isFinite(v)?v:NaN; };
+const cents = v => Math.round(v*100);
+const m2 = c => (c<0?"−":"")+(Math.abs(c)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const dnum = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?Date.UTC(+m[1],+m[2]-1,+m[3]):NaN; };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const nextFirst = n => { const d=new Date(n); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+1, 1); };
+
+function load(p){
+  const P=PRESETS[p];
+  fld("post").value=P.post; fld("closed").value=P.closed; fld("mat").value=P.mat; fld("rev").checked=P.rev; fld("revdate").value=P.revdate;
+  [...tb.rows].forEach((tr,i)=>{ const b=P.rows[i]||["","Asset",false,"",""];
+    tr.querySelector('[data-c="name"]').value=b[0]; tr.querySelector('[data-c="type"]').value=b[1];
+    tr.querySelector('[data-c="ctl"]').checked=!!b[2]; tr.querySelector('[data-c="dr"]').value=b[3]; tr.querySelector('[data-c="cr"]').value=b[4]; });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const lines=[...tb.rows].map(tr=>{ const g=k=>tr.querySelector(`[data-c="${k}"]`);
+    const dr=money(g("dr").value), cr=money(g("cr").value);
+    return {r:tr.dataset.r, name:g("name").value.trim()||"Line "+tr.dataset.r, type:g("type").value, ctl:g("ctl").checked,
+            dr:isNaN(dr)?0:cents(dr), cr:isNaN(cr)?0:cents(cr)}; })
+    .filter(l=>l.dr!==0 || l.cr!==0);
+  if(!lines.length){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter at least one line with a debit or a credit."); return; }
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  const D=lines.reduce((x,l)=>x+l.dr,0), K=lines.reduce((x,l)=>x+l.cr,0), diff=D-K;
+  const both=lines.filter(l=>l.dr!==0 && l.cr!==0);
+  let s="", flags=0, warns=0;
+  lines.forEach(l=>{
+    const notes=[];
+    if(l.dr!==0 && l.cr!==0){ notes.push("error: a debit and a credit on one line, never both"); }
+    if(l.type==="Revenue" && l.dr>0){ notes.push("unusual direction: a debit to revenue, the memo must say why"); flags++; }
+    if(l.type==="Expense" && l.cr>0){ notes.push("unusual direction: a credit to an expense, the memo must say why"); flags++; }
+    if(l.type==="Revenue" || l.ctl){ notes.push(`red flag: a manual entry to ${l.type==="Revenue"?"revenue":"a control account"}`); flags++; }
+    const amt = l.dr? "debit "+m2(l.dr) : "credit "+m2(l.cr);
+    s+=line(`${esc(l.name)} · ${l.type} · ${amt}`, notes.length?notes.join(" · "):"no flag");
+  });
+  s+=line(`Total debits: ${lines.filter(l=>l.dr).map(l=>m2(l.dr)).join(" + ")||"0.00"}`, m2(D), 1);
+  s+=line(`Total credits: ${lines.filter(l=>l.cr).map(l=>m2(l.cr)).join(" + ")||"0.00"}`, m2(K), 1);
+  // materiality
+  const matv=money(fld("mat").value), big=Math.max(D,K);
+  let mat;
+  if(isNaN(matv)) mat=res("note","Materiality","not run","No threshold given. The skill never chooses one.","r-mat");
+  else if(big>cents(matv)){ flags++; mat=res("flag","Materiality","flag",`${m2(big)} is above ${m2(cents(matv))}. A second person reviews it.`,"r-mat"); }
+  else mat=res("ok","Materiality","no flag",`${m2(big)} is not above ${m2(cents(matv))}.`,"r-mat");
+  // period
+  const P=dnum(fld("post").value), Cl=dnum(fld("closed").value);
+  let per;
+  if(isNaN(P) || isNaN(Cl)) per=res("note","Period","not run","Enter the posting date and the closed-through date.","r-period");
+  else if(P>Cl) per=res("ok","Period","open (user-asserted)",`Posting ${dshow(P)} is after the closed-through date, ${dshow(Cl)}.`,"r-period");
+  else { warns++; per=res("flag","Period","warn: closed or reported period",`Posting ${dshow(P)} is not after ${dshow(Cl)}. Date it in the open period, or ask the owner.`,"r-period"); }
+  // reversal
+  let rev;
+  if(!fld("rev").checked) rev=res("ok","Reversal","does not reverse","No reversal date to check.","r-rev");
+  else { const R=dnum(fld("revdate").value);
+    if(isNaN(P)) rev=res("note","Reversal","not run","Enter the posting date.","r-rev");
+    else if(R===nextFirst(P)) rev=res("ok","Reversal","reversal date OK",`${dshow(R)} is the first day of the next period.`,"r-rev");
+    else { warns++; rev=res("flag","Reversal","warn: must be the first day of the next period",`Want ${dshow(nextFirst(P))}${isNaN(R)?"":`, not ${dshow(R)}`}.`,"r-rev"); } }
+  steps.innerHTML=s;
+  let bal;
+  if(both.length) { warns++; bal=res("flag","Balance","error",`Line ${both.map(l=>l.r).join(", ")} has a debit and a credit. A line has one or the other, never both.`,"r-bal"); }
+  else if(diff===0) bal=res("ok","Balance","Balanced",`Difference ${m2(0)}.`,"r-bal");
+  else bal=res("flag","Balance","not balanced",`Difference ${m2(Math.abs(diff))}. Find the error. The skill never adds a figure to force the balance.`,"r-bal");
+  let out = res("ok","Total debits",m2(D),`${lines.filter(l=>l.dr).length} debit line(s)`,"r-dr");
+  out += res("ok","Total credits",m2(K),`${lines.filter(l=>l.cr).length} credit line(s)`,"r-cr");
+  out += res(diff===0?"ok":"flag","Difference",m2(Math.abs(diff)),"Debits minus credits, to the cent.","r-diff");
+  out += bal + mat + per + rev;
+  out += res(flags?"flag":"ok","Review flags",String(flags),flags?"A flag goes with the entry to the person who posts it. It does not stop the entry.":"No unusual direction, red flag or materiality flag.","r-flags");
+  box.innerHTML=out;
+}
+document.querySelectorAll(".calc [data-k], #jrows [data-c]").forEach(i=>{ const f=()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}; i.addEventListener("input",f); i.addEventListener("change",f); });
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("a");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

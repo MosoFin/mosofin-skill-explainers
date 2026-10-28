@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Entry Builder in Plain English | MosoFin</title>
+<meta name="description" content="How a journal entry gets checked before anyone posts it: it balances, uses real accounts, has a memo and a source, and carries review flags. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Journal entry builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Journal entries, in plain words</span>
+  <h1>Is this entry right before anyone posts it?</h1>
+  <p class="lede">A journal entry records one accounting event in your books. This skill builds the entry and checks it. Does it <b>balance</b>? Does it use <b>accounts that exist</b> in your chart? Is there <b>a document behind it</b>? Then a person posts it, or does not.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You tell it the event, or another skill gives it a draft entry. It reads your chart of accounts, from your books or from your files. It builds the entry with real accounts, a memo and a reference. It runs up to 15 checks and shows each result beside the entry. It never posts an entry and never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">The idea</span>
+  <h2>Two sides, and they must be equal</h2>
+  <p>Every transaction changes at least two accounts. At least one line is a debit and at least one line is a credit. The debits must equal the credits, so the accounting equation stays in balance<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Accountants call this double-entry accounting<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 300" role="img" aria-label="One proposed entry at Northbrook Trading, dated Wednesday 30 September 2026. On the debit side, account 6410 Audit and accounting fees, 9,000 dollars. On the credit side, account 2110 Accrued expenses, 9,000 dollars. Debits of 9,000 equal credits of 9,000, so the entry balances. A reversing entry on Thursday 1 October 2026 flips the two lines. The header says the entry is a proposal and is not posted.">
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <rect x="16" y="14" width="848" height="36" rx="8" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="440" y="37" text-anchor="middle" font-size="13" fill="var(--hold)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">PROPOSED · NOT POSTED · JE-202609-022 · ACCRUAL · WED 30 SEP 2026</text>
+
+          <text x="16" y="84" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">DEBIT (LEFT)</text>
+          <text x="460" y="84" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">CREDIT (RIGHT, INDENTED)</text>
+          <rect x="16" y="96" width="404" height="60" rx="8" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="32" y="121" font-weight="700" fill="var(--ink)">6410 Audit and accounting fees</text>
+          <text x="32" y="143" font-size="13" fill="var(--muted)">Expense: a debit increases it</text>
+          <text x="404" y="132" text-anchor="end" font-weight="700" fill="var(--green)">9,000.00</text>
+          <rect x="460" y="96" width="404" height="60" rx="8" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="476" y="121" font-weight="700" fill="var(--ink)">2110 Accrued expenses</text>
+          <text x="476" y="143" font-size="13" fill="var(--muted)">Liability: a credit increases it</text>
+          <text x="848" y="132" text-anchor="end" font-weight="700" fill="var(--ink)">9,000.00</text>
+
+          <rect x="16" y="172" width="848" height="40" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="440" y="197" text-anchor="middle" font-weight="700" fill="var(--green)">Debits 9,000.00 = credits 9,000.00 · balanced</text>
+
+          <text x="16" y="244" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">THU 1 OCT 2026</text>
+          <rect x="160" y="226" width="704" height="40" rx="8" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 4"/>
+          <text x="176" y="251" font-size="13" fill="var(--ink)">Reversing entry: debit 2110 9,000.00, credit 6410 9,000.00. It names JE-202609-022.</text>
+          <text x="16" y="290" font-size="13" fill="var(--muted)">Memo: Accrue interim audit fieldwork for September 2026, invoice expected in October</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, Northbrook Trading. The fee is 12,000, and the auditor says that 75% of the work was complete at 30 September: 12,000 × 75% = 9,000. The debit accounts come first, on the left. The credit accounts come after them, indented to the right<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</figcaption>
+  </figure>
+  <p>An expense and an asset increase with a debit. A liability and revenue increase with a credit<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. So the audit fee is a debit to an expense account and a credit to a liability account. The skill reads the type of each account from your chart. So it can check the direction of each line, and it does not have to guess.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Five entries at Northbrook Trading on 30 September</h2>
+  <p>Northbrook Trading works in US dollars, on the accrual basis, with a calendar year. It keeps one company file in QuickBooks Online. The run is on Wednesday 30 September 2026. Other skills end with draft entries, and they give those drafts to this skill. Four of the five entries come from two other skills. The owner types the fifth entry in the chat.</p>
+  <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:64ch">
+    <li>Three of the entries come from the September run of <a href="../accruals-and-deferrals/plain.html" style="color:var(--green)">accruals and deferrals</a>: the audit fees, the Pinnacle deferral and the utilities correction.</li>
+    <li>One entry comes from <a href="../credit-memo-and-refund-handler/plain.html" style="color:var(--green)">credit memos and refunds</a>: the Crestline Foods return, draft E2 on that page.</li>
+    <li>The owner asks for one entry in the chat: move September's courier charges to the correct account.</li>
+  </ul>
+  <p>The accruals run was in the same conversation, so the skill does not ask all its setup questions again. It asks one short question about the company: "Northbrook Trading, the same QuickBooks company file?" The owner says yes. The skill never builds an entry before the owner says yes to the company.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's five proposed entries: number, type, date, debit lines, credit lines, total and the origin of each entry">
+        <thead><tr><th scope="col" style="text-align:left">Entry</th><th scope="col" style="text-align:left">Type, date</th><th scope="col" style="text-align:left">Debit</th><th scope="col" style="text-align:left">Credit</th><th scope="col">Each side $</th><th scope="col" style="text-align:left">From</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">J1 · JE-202609-022</th><td class="t">Accrual, Wed 30 Sep. Reverses Thu 1 Oct</td><td class="t">6410 Audit and accounting fees 9,000.00</td><td class="t">2110 Accrued expenses 9,000.00</td><td>9,000.00</td><td class="t">Accruals: the auditor's engagement letter</td></tr>
+        <tr><th scope="row">J2 · JE-202609-023</th><td class="t">Deferral, Wed 30 Sep</td><td class="t">4000 Revenue 33,000.00</td><td class="t">2400 Deferred revenue 33,000.00</td><td>33,000.00</td><td class="t">Accruals: Pinnacle Clinics paid 36,000 for a year. September earns 36,000 ÷ 12 = 3,000, so 33,000 moves out of revenue</td></tr>
+        <tr><th scope="row">J3 · JE-202609-024</th><td class="t">Correcting, Wed 30 Sep</td><td class="t">2110 Accrued expenses 2,040.00</td><td class="t">6310 Utilities 2,040.00</td><td>2,040.00</td><td class="t">Accruals: the August utilities accrual JE-202608-014 did not reverse</td></tr>
+        <tr><th scope="row">J4 · JE-202609-025</th><td class="t">Standard (sales return), Mon 14 Sep</td><td class="t">4100 Sales Returns &amp; Allowances 1,500.00 · 2200 Sales Tax Payable 112.50 · 1300 Inventory 520.00 · 5150 Inventory Write-Down 80.00</td><td class="t">1200 Accounts Receivable 1,612.50 (Crestline Foods) · 5000 Cost of Goods Sold 600.00</td><td>2,212.50</td><td class="t">Credit memos: CM-0421, Crestline Foods, against paid invoice 1038</td></tr>
+        <tr><th scope="row">J5 · JE-202609-026</th><td class="t">Reclass, Wed 30 Sep</td><td class="t">6150 Shipping and Delivery 640.00</td><td class="t">6520 Office Supplies 640.00</td><td>640.00</td><td class="t">The owner, in the chat: three courier bills, 210 + 195 + 235 = 640</td></tr>
+        <tr class="tot"><th scope="row">Five entries, 14 lines</th><td></td><td></td><td></td><td class="c">46,892.50</td><td class="t">Debits equal credits</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The account numbers and names come from Northbrook's chart. 9,000 + 33,000 + 2,040 + 2,212.50 + 640 = 46,892.50 on each side. J4: 1,500 + 112.50 + 520 + 80 = 2,212.50 of debits, and 1,612.50 + 600 = 2,212.50 of credits. J1's reversing entry has two more lines of 9,000.00, and the totals do not include it.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Entries checked</span><span class="v num good">5</span><span class="s">46,892.50 on each side. Every entry balances</span></div>
+    <div class="stat"><span class="label">Hard stop</span><span class="v num wrong">1</span><span class="s">An account that does not exist. The owner named the correct account</span></div>
+    <div class="stat"><span class="label">Review flags</span><span class="v num hold">3</span><span class="s">One entry above $25,000. Two manual entries, to revenue and to A/R</span></div>
+    <div class="stat"><span class="label">Posted</span><span class="v num">0</span><span class="s">One request refused: a closing entry that QuickBooks already makes</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>A cost in the books twice</h2>
+  <p>The skill's own file names this mistake first. A person books a bill or a payment for an item that an accrual already covers. The cost then goes into the books twice. So before the skill proposes the audit-fee accrual, it reads account 2110 Accrued expenses and the supplier bills.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>J1: the check passes</h3>
+      <span class="who">Audit fees, accrued on 30 September</span>
+      <div class="rows num">
+        <div class="row"><span>Audit-fee accrual still open in 2110</span><span class="v">none</span></div>
+        <div class="row"><span>Bill from the auditor in the books</span><span class="v">none</span></div>
+        <div class="row"><span>The accrual reverses on</span><span class="v">Thu 1 Oct</span></div>
+      </div>
+      <div class="verdict">No double count. The accrual reverses on 1 October. So when the auditor's bill comes in October, it goes to the expense account in the usual way.</div>
+    </div>
+    <div class="book bad">
+      <h3>August: the reversal never happened</h3>
+      <span class="who">Utilities, accrued on 31 August as JE-202608-014</span>
+      <div class="rows num">
+        <div class="row"><span>August accrual, still open in 2110</span><span class="v">$2,040</span></div>
+        <div class="row off"><span>August bill, to Utilities on Wed 9 Sep</span><span class="v">$2,170</span></div>
+        <div class="row off"><span>August's utilities in the books twice</span><span class="v">$2,040 extra</span></div>
+      </div>
+      <div class="verdict">The accrual had to reverse on 1 September. It did not, and the real bill went to the expense account too. J3 clears the 2,040.</div>
+    </div>
+  </div>
+  <p>J3 is a correcting entry, and its date is 30 September. The owner closed August and reported it to the bank. When the original entry is in a closed or reported period, the skill dates the correction in the open period. The skill asks if the error is material. The owner says no, because 2,040 is below the $25,000 limit. So J3 goes through the Utilities account for September. The skill does not change or delete the August entry. J3's memo names it by its number from the ledger.</p>
+</section>
+
+<section>
+  <span class="label">The hard stop</span>
+  <h2>"Freight-out" is not in the chart</h2>
+  <p>The owner writes: "Move September's courier charges, $640, from Office Supplies to Freight-out." The skill finds three courier bills in 6520 Office Supplies. They are 210 on Tue 8 Sep, 195 on Fri 11 Sep and 235 on Tue 22 Sep. Their total is 640.</p>
+  <p>Northbrook's chart has no account with the name Freight-out. That is a hard stop. The skill does not make a new account. It does not choose the account with the nearest name, and it does not write a placeholder, because a chart exists. It asks the owner. The owner names 6150 Shipping and Delivery, and the skill builds J5 again with that account.</p>
+  <p>Why stop? An import with an unknown account fails, or it can make a new account in your books. Only two things stop an entry. One is an account that is not in the chart. The other is an entry that does not balance, and the skill never adds a figure to force the balance.</p>
+</section>
+
+<section>
+  <span class="label">Backed by something</span>
+  <h2>A memo, a reference and a date on every entry</h2>
+  <p>Each proposal starts with a header. It gives the company by name, the entry type, the posting date, a reference and a one-line memo. It names the skill or the person that the entry came from. It gives the validation result, and it says that nobody posted the entry. The skill shows that header word for word as:</p>
+  <blockquote><code>PROPOSED ENTRY — NOT POSTED</code></blockquote>
+  <p>Good records show who did what, when, where and why. With them, staff and outside auditors can understand how a control works<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. That source is the US government's internal-control standard for federal agencies. It is not a rule for Northbrook. We use it here because many people cite it for the control idea.</p>
+  <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:64ch">
+    <li><b>J1</b> refers to the auditor's engagement letter. That letter is not in the books, so the coverage sheet marks it as a document from the owner.</li>
+    <li><b>J3</b> refers to JE-202608-014 of Mon 31 Aug 2026. The skill reads the number and the date from the ledger, and not from memory.</li>
+    <li><b>The period check</b> uses the owner's date: the owner closed the books through 31 August. The coverage sheet says "user-asserted", because no setting in the books showed a lock date.</li>
+  </ul>
+  <p>Auditors of public companies must select journal entries for tests. They look for some signs. Examples are an unusual account, or a person who does not usually make entries. Others are an entry at period end with little explanation, no account number or a round amount<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. That standard applies to public-company audits only. Northbrook is not a public company. The signs help an auditor to select entries, and they do not prove fraud. The skill does not look for fraud. Its part is the memo, the real account, the reference and the flags.</p>
+</section>
+
+<section>
+  <span class="label">The checks</span>
+  <h2>Fifteen checks on each entry, and three flags</h2>
+  <p>The skill's method has nine original checks and six more checks that read your books. A check that does not apply to an entry counts as not applicable. For example, no entry here is a loan payment, so the loan-split check does not apply. Five entries × 15 checks give 75 results.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Run</span><span class="v num">52</span><span class="s">11 + 10 + 11 + 10 + 10, for J1 to J5</span></div>
+    <div class="stat"><span class="label">Passed</span><span class="v num good">49</span><span class="s">11 + 8 + 11 + 9 + 10</span></div>
+    <div class="stat"><span class="label">Flagged for review</span><span class="v num hold">3</span><span class="s">Two on J2 and one on J4. A flag does not stop the entry</span></div>
+    <div class="stat"><span class="label">Not applicable</span><span class="v num">23</span><span class="s">4 + 5 + 4 + 5 + 5. 52 + 23 = 75</span></div>
+  </div>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The three review flags: J2 is above the 25,000 dollar limit and is a manual entry to revenue. J4 is a manual entry to accounts receivable. Each flag goes with its entry to the person who posts it">
+        <thead><tr><th scope="col" style="text-align:left">Entry</th><th scope="col" style="text-align:left">Flag</th><th scope="col" style="text-align:left">What the skill does</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">J2, 33,000</th><td class="t a">Above the limit: 33,000 is more than 25,000</td><td class="t">It flags the entry for review by a second person</td></tr>
+        <tr><th scope="row">J2, 33,000</th><td class="t a">A manual entry to revenue</td><td class="t">It asks the owner for the business reason. The memo gives it: 11 months of Pinnacle's prepayment move to deferred revenue</td></tr>
+        <tr><th scope="row">J4, 1,612.50 to A/R</th><td class="t a">A manual entry to accounts receivable</td><td class="t">A journal line to A/R does not apply against Crestline's account. So the customer list and the A/R total stop agreeing. The skill recommends a credit memo in QuickBooks' customer records</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>The limit of $25,000 is Northbrook's own figure. The skill never chooses a limit. If you give none, the skill names that check as not run. If the owner still wants J4 as a journal entry, the A/R line carries the name Crestline Foods.</figcaption>
+  </figure>
+  <p>Some lines go in an unusual direction. J2 debits revenue. J3 and J5 credit an expense account. J4 credits Cost of Goods Sold, because the returned goods go back into stock. These lines are correct, but each memo must say why. Each memo does, so that check passes.</p>
+  <p>The skill reports a count for each entry, and never a bare pass. For J1 it writes: 11 of 15 run, 11 passed, 4 not applicable. It names the accounts that it found in the chart and the period status. It says that it found no matching accrual or bill, and that 9,000 is below the limit.</p>
+</section>
+
+<section>
+  <span class="label">What it refuses</span>
+  <h2>Two requests it declines</h2>
+  <p>The owner asks: "While you're at it, close last year's profit and loss to retained earnings." QuickBooks Online closes the year automatically. A closing entry would close retained earnings a second time. So the skill proposes no entry, and it names the closing-entries-and-trial-balance skill.</p>
+  <p>Then the owner says: "Looks good, post them in QuickBooks." The skill declines once, in plain words. It cannot post. It gives the five proposals to a person, who posts them.</p>
+  <p>The skill's own file gives the reason. A preparer makes an entry, and a reviewer checks it before anybody posts it. Separate duties help to prevent fraud, waste and abuse. A small company that cannot separate duties can add review steps instead<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. In a study of fraud cases, a lack of internal controls contributed to 32% of frauds. Override of existing controls contributed to 19%, and a lack of management review to 18%<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. Organizations with fewer than 100 employees have much lower rates of anti-fraud controls<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Eight questions, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. You must answer B, C and H. You must answer E only when the entry has a tax effect.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. The skill asks only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">What event do you want to record? Give the amounts and any document.</div><div class="why">Required. The event is yours, and no connection can supply it. The skill builds nothing without it.</div></li>
+    <li><div class="q">What is the posting date?</div><div class="why">Required. The date sets the period, the reversal date and the open-period check.</div></li>
+    <li><div class="q">Which company does the entry belong to? For an entry between two companies of a group, both.</div><div class="why">Account numbers differ between companies. On the MosoFin path, the skill reads back the company by its name in your books and waits for your yes. In a manual run, it records the name that you give.</div></li>
+    <li><div class="q">Does the entry have a tax effect, and in which place?</div><div class="why">Required if there is a tax effect. The skill adds no tax lines without a place. If the rules are not clear, it asks you and does not guess.</div></li>
+    <li><div class="q">Above which amount does an entry need a review flag?</div><div class="why">This is the materiality threshold. The skill never chooses one for you. If you give none, it names the large-entry check as not run.</div></li>
+    <li><div class="q">Which document is behind the entry, and does the entry reverse?</div><div class="why">Recommended. The reference goes in the header. An accrual usually reverses on the first day of the next period. If the document is in your books, the skill can find it.</div></li>
+    <li><div class="q">Through which date are the books closed or locked? Did you already report any later period?</div><div class="why">Required. A search of past entries cannot show a lock date. The skill records your answer as user-asserted, unless it can read the setting in your books.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. For this run, the read-back can look like this:</p>
+  <blockquote><i>"Building five proposed entries at Northbrook Trading: three from the September accruals (audit fees, the Pinnacle deferral, the utilities correction), the Crestline return CM-0421, and your courier reclass, against the chart read from your Mosofin connection, in QuickBooks Online import format. Books closed through 31 August; materiality threshold $25,000; sales tax 7.5% on CM-0421 only. Shall I go ahead?"</i></blockquote>
+  <p class="muted" style="font-size:15px">We wrote this read-back for the example, in the shape of the skill's own read-back. The skill's own example is a single accrual of $8,400 for September consulting fees.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the chart and the event</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads the chart with account numbers, names and types. It also reads the company's currency and year-end</li>
+        <li>It reads the balances of the accounts in the entry, and the detail of the accrual, prepaid, deferred and clearing accounts</li>
+        <li>It reads open invoices and bills, and past journal entries for the numbering and for any original entry</li>
+        <li>You still give it the <b>event</b>, the <b>materiality threshold</b>, the <b>tax rules</b>, the <b>closed-through date</b> and any <b>document</b> that is not in your books. For a loan payment, give the lender statement</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>One checklist, in one message</h3>
+      <ul>
+        <li><b>The event</b>: what happened, the amounts and the date. Required. Type it in the chat, or give the document as PDF or image</li>
+        <li><b>Chart of accounts</b> with numbers, names and types. Required. CSV or XLSX, or typed in</li>
+        <li><b>Company name, currency, year-end and basis</b> (cash or accrual), typed in the chat. Required</li>
+        <li><b>Accounting system</b> or its import template. Recommended. Without it, you get general columns to match to your system</li>
+        <li><b>Tax place and rules</b>, typed in the chat. Required if the event has a tax effect</li>
+        <li><b>Trial balance or ledger detail</b> for the accounts in the entry, with the accrual, prepaid, deferred and clearing accounts. Recommended. CSV or XLSX</li>
+        <li><b>Materiality threshold</b>, and the original entry for a reversal, reclass or correction. Recommended</li>
+        <li><b>Open invoices or open bills</b> for a receipt or a payment, and the <b>loan statement</b> for a loan payment. Recommended</li>
+      </ul>
+    </div>
+  </div>
+  <p>Without a chart, the skill cannot check that an account exists. Then it uses descriptive names only, and it labels each one:</p>
+  <blockquote><code>PLACEHOLDER — REMAP REQUIRED</code></blockquote>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Proposals that a reviewer can post quickly</h2>
+  <div class="gets">
+    <div class="get"><b>The proposed entries</b><span>Each with its header, its lines, a memo on each line where an entry has more than one debit or credit, and a balance check.</span></div>
+    <div class="get"><b>The check results</b><span>All 15 checks for each entry, with the evidence behind each result. A check that could not run has the label "not run".</span></div>
+    <div class="get"><b>An import file</b><span>In the columns of your system. For QuickBooks Online: JournalNo, JournalDate, Line Description, Account, Debit, Credit, Name, Class, Location.</span></div>
+    <div class="get"><b>Coverage</b><span>For each task, what the skill read and with which tool, and what you supplied. It ends with one line of data sources.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">For one entry, you get a table in the chat. For several entries, it asks whether you want an Excel file before it makes one. Here the file is "Northbrook Trading_JE_September adjustments_2026-09-30.xlsx", with a Validation Results sheet and a Coverage sheet. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your account map, import format, numbering, materiality threshold and reversal policy. It never saves amounts, balances or entries.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never says that an entry is in your books.</b> Every output carries the proposed-entry header.</li>
+      <li><b>Never invents an account number.</b> An account that is not in the chart is a hard stop. With no chart, it uses placeholder names and says so.</li>
+      <li><b>Never chooses an account, a tax treatment or a materiality threshold for you.</b> It never adds a "Rounding" line to force a balance. It never deletes or changes a posted entry. A correction reverses and books again, or books the difference, and it names the original entry.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Journal entry</dt><dd>The record of one accounting event as debits and credits that balance. Accountants write JE.</dd>
+    <dt>Debit and credit</dt><dd>The two sides of an entry. The account type decides what each side does<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. They do not mean good and bad.</dd>
+    <dt>Chart of accounts</dt><dd>The list of every account in your books, with its number, name and type.</dd>
+    <dt>Reversing entry</dt><dd>An entry on the first day of the next period that cancels an accrual. The real bill can then go to the expense account.</dd>
+    <dt>Reclass</dt><dd>An entry that moves an amount from one account to another, with no new event behind it.</dd>
+    <dt>Control account</dt><dd>A summary account that a detailed list feeds, for example A/R from your customer records. A manual entry to one is a red flag for auditors.</dd>
+    <dt>Materiality threshold</dt><dd>The amount above which an entry needs an extra review. You choose it.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are two sections of an accounting textbook, a US government control standard, a US audit standard and a fraud study. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="the journal entry format"><a href="https://openstax.org/books/principles-financial-accounting/pages/3-5-use-journal-entries-to-record-transactions-and-post-to-t-accounts" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 3.5 Use Journal Entries to Record Transactions and Post to T-Accounts</a><span class="what">Every transaction changes at least two accounts, with at least one debit and one credit. The debits come first and the credits follow, indented. Debits must equal credits. Assets increase with a debit. Liabilities, stock and revenue increase with a credit.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="&quot;double-entry accounting&quot;"><a href="https://openstax.org/books/principles-financial-accounting/pages/3-key-terms" rel="noopener">OpenStax: Principles of Accounting, Volume 1, Chapter 3 Key Terms</a><span class="what">Double-entry accounting requires the sum of the debits to equal the sum of the credits for each transaction.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="control activities: segregation of duties; documentation"><a href="https://www.gao.gov/assets/gao-25-107721.pdf" rel="noopener">U.S. Government Accountability Office: Standards for Internal Control in the Federal Government (the Green Book), 2025 revision, GAO-25-107721</a><span class="what">Separate duties help to prevent fraud, waste and abuse. Smaller entities that cannot separate duties can add review levels and review a random selection of transactions with their documents. Good records show who, what, when, where and why. It applies to US federal entities.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="examining journal entries and other adjustments for evidence of possible material misstatement due to fraud"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401" rel="noopener">PCAOB: AS 2401, Consideration of Fraud in a Financial Statement Audit</a><span class="what">The auditor must select journal entries and other adjustments for tests. Signs include unusual or seldom-used accounts, entries at period end with little explanation, entries with no account number, and round numbers. It applies to public-company audits only.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="internal control weaknesses that contributed to fraud; organizations with fewer than 100 employees"><a href="https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf" rel="noopener">ACFE: Occupational Fraud 2024: A Report to the Nations</a><span class="what">A lack of internal controls contributed to 32% of the frauds in the study. Override of controls contributed to 19%, and a lack of management review to 18%. Organizations with fewer than 100 employees have much lower rates of anti-fraud controls.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the 15 checks, the hard stop, the proposed-entry header, the QuickBooks columns, the $25,000 threshold or the 7.5% tax rate. They are the skill's own rules, or figures from this example. The skill's files also cite accounting standards for corrections and for foreign currency. We did not check those standards for this page. We made up Northbrook Trading and every figure in the example.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>journal-entry-builder</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/journal-entry-builder">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a correction from the bookkeeping audit followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its customers, its suppliers and every figure in the example. They are not your data. The textbook, the control standard and the audit standard are US sources. The control standard is for US federal agencies, and the audit standard is for audits of public companies. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
