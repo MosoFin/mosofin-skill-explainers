@@ -165,7 +165,7 @@
 <section>
   <span class="label">What a run finds</span>
   <h2>Northbrook Trading, September, against the FY26 Board Budget</h2>
-  <p>Northbrook compares its September results with its budget, the "FY26 Board Budget". It set two thresholds: $5,000 and 10%. A line needs an explanation when its gap passes <b>either</b> threshold. The two thresholds and the "either" rule are Northbrook's own choice. The skill lets the owner choose "either" or "both", and it never supplies a threshold.</p>
+  <p>Northbrook compares its September results with its budget, the "FY26 Board Budget". It set two thresholds: $5,000 and 10%. A line needs an explanation when its gap passes <b>either</b> threshold. The two thresholds and the "either" rule are Northbrook's own choice. The skill asks whether a gap must pass both thresholds or either one, and the report header records the answer. It never supplies a threshold.</p>
   <figure>
     <div class="canvas">
       <table class="grid" aria-label="Northbrook's seven September lines: budget, actual, the gap in dollars and percent, good or bad for profit, and whether the line needs an explanation">
@@ -195,7 +195,7 @@
 <section>
   <span class="label">The mistake it catches</span>
   <h2>Revenue up $32,000 hides a price cut</h2>
-  <p>A report that gives only the gap says revenue beat the plan. The skill splits the gap into its drivers: volume and price. Northbrook budgeted 2,800 units at $150. It sold 3,200 units at $141.25. Both figures come from the driver data that Northbrook supplies.</p>
+  <p>A report that gives only the gap says revenue beat the plan. The skill splits the gap into its drivers: volume and price. Northbrook budgeted 2,800 units at $150. It sold 3,200 units at $141.25. Both figures come from the driver data that Northbrook supplies. Northbrook sells one product in US dollars, so the mix and exchange-rate parts are zero. The parts must add to the gap. The skill shows any difference that remains as "unexplained".</p>
   <div class="compare">
     <div class="book bad">
       <h3>The gap alone</h3>
@@ -219,23 +219,25 @@
     </div>
   </div>
   <p>Cost of goods sold works the same way. The budget cost per unit was 168,000 ÷ 2,800 = $60. The actual cost was 185,600 ÷ 3,200 = $58. Volume adds (3,200 − 2,800) × 60 = $24,000 U. The lower cost per unit saves (58 − 60) × 3,200 = $6,400 F. Together: $17,600 U. Most of that overrun comes from the extra units that also raised revenue.</p>
-  <p>An explanation must give the cause, and not only restate the numbers<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Managers compare actual results with budgets and look into unexpected results, so that they can correct them<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill applies that discipline to a private management report. It is not a tool for public-company filings.</p>
+  <p>An explanation must give the cause, and not only restate the numbers<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Managers compare actual results with budgets and look into unexpected results, so that they can fix them<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill applies that discipline to a private management report. It is not a tool for public-company filings.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>Six questions, in one message</h2>
+  <h2>Eight questions, in one message</h2>
   <p>The skill asks these questions first, in one short batch. It asks only for what it cannot already see.</p>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files, and the skill does the same work. The skill asks this only if your account has a MosoFin connection.</div></li>
-    <li><div class="q">Which budget, by name: the original, a revised one, or the latest forecast?</div><div class="why">Required. Each version tells a different story. The skill never chooses one for you. If the name is not in your list of budgets, it asks again.</div></li>
-    <li><div class="q">Which period: the month, the quarter to date, or the year to date?</div><div class="why">Required. The year to date depends on the end of your financial year. The skill compares the period with that date.</div></li>
-    <li><div class="q">Your thresholds: an amount and a percentage.</div><div class="why">Required for the explanations. A $5,000 gap on a $10,000 line is 50%. On a $5 million line, it is noise. If you decline to give thresholds, the skill explains every gap above zero and tells you so.</div></li>
-    <li><div class="q">Which one-time items happened in the period, and who owns the explanation of each line?</div><div class="why">Recommended. A one-time item, such as a legal settlement, must not look like a regular cost. Without an owner, nobody writes the explanation. Without this answer, the skill marks each unexplained cause "to be confirmed", with no owner.</div></li>
-    <li><div class="q">What data does the budget rest on that your books do not hold: units and prices, planned headcount and average pay?</div><div class="why">Recommended. The split into drivers needs the budget's own figures, which are often not in your books. Without them, the skill shows the gap and says that it did not split it.</div></li>
+    <li><div class="q">Which entity, or which set of entities?</div><div class="why">Required. The skill compares each entity with its own budget. A missing entity looks like a cost saving.</div></li>
+    <li><div class="q">Which period: the month, the quarter to date, or the year to date? Is that period closed?</div><div class="why">Required. The year to date depends on the end of your financial year. In an open month, bills that nobody entered look like savings. If the period is not closed, or you do not know, the report says "PRELIMINARY".</div></li>
+    <li><div class="q">Which budget, by name: the original, a revised one, or the latest forecast?</div><div class="why">Required. Each version tells a different story. The skill never chooses one for you. If your books hold several budgets, it lists them and asks which one.</div></li>
+    <li><div class="q">Your thresholds: an amount and a percentage. Must a gap pass both, or either one?</div><div class="why">A $5,000 gap on a $10,000 line is 50%. On a $5 million line, it is noise. If you decline to give thresholds, the skill says that it applied no rule. It ranks every gap by its dollar size and explains from the largest down.</div></li>
+    <li><div class="q">Which one-time items happened in the period?</div><div class="why">Recommended. A one-time item, such as a legal settlement, must not look like a regular cost.</div></li>
+    <li><div class="q">What driver data do you have: units, headcount, prices, and the budget's own figures for them?</div><div class="why">Recommended. The split into drivers needs the actual and the budget figures. Your books often hold the actual units and prices. The planned figures usually come from you.</div></li>
+    <li><div class="q">Which grouping of lines does your management read?</div><div class="why">Recommended. It decides how the lines add up in the report.</div></li>
   </ol>
   <p>Then it reads your answers back, and waits for your yes:</p>
-  <blockquote><i>"Comparing September actuals and year to date for Northbrook Trading against the FY26 Board Budget, read from your Mosofin connection, with prior year alongside. Thresholds $5,000 and 10%. Known one-off: the insurance renewal in September. G&amp;A owned by the financial controller. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Comparing Northbrook Trading's actuals for September, QTD and YTD on a December year-end, to the FY26 Board Budget, with both read from your Mosofin connection. September is closed. Thresholds $5,000 and 10%, and a line needs commentary when it passes either one. Prior year shown as a separate column. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
@@ -250,7 +252,7 @@
         <li>It reads the budget, where your accounting platform holds it. It reads the list of budgets first and asks which one</li>
         <li>It reads the prior year, the chart of accounts and its groups, and the transactions behind large lines</li>
         <li>It reads your financial year-end, so the year to date means what your company means</li>
-        <li>You still give it the <b>thresholds</b>, the <b>one-time items</b> and the <b>owners</b>. They are never in the books</li>
+        <li>You still give it the <b>thresholds</b>, the <b>one-time items</b> and the planned <b>driver figures</b>. They are usually not in the books</li>
       </ul>
     </div>
     <div class="card">
@@ -258,11 +260,11 @@
       <h3>Bring the actual results and the named budget</h3>
       <ul>
         <li><b>Actual results</b> by line and by month for the period: a profit and loss export, CSV or XLSX, required</li>
-        <li><b>Budget or forecast</b> by line and by month, with its version name, CSV or XLSX, required</li>
+        <li><b>Budget or forecast</b> by line and by month, with its version name, CSV or XLSX, required. Give its basis (cash or accrual) and any split by class, location or customer</li>
         <li><b>Prior-year actual results</b> at the same level of detail, CSV or XLSX, recommended</li>
-        <li><b>Chart of accounts</b> with its report groups, CSV or XLSX, recommended. Without it, the skill asks the type of each line</li>
-        <li><b>Transactions</b> behind any large line, and your driver data: a general ledger export or sales by item, recommended</li>
-        <li>Thresholds, one-time items and owners, typed in the chat</li>
+        <li><b>Chart of accounts</b> with its report groups, CSV or XLSX, recommended. The skill takes F or U from the type of each line</li>
+        <li><b>Driver data</b>: units, prices and headcount, CSV, XLSX or typed in the chat, recommended</li>
+        <li>Period, year-end and currency, thresholds and one-time items, typed in the chat</li>
       </ul>
     </div>
   </div>
@@ -273,9 +275,9 @@
   <span class="label">What you get back</span>
   <h2>Six sheets, from the summary to the coverage</h2>
   <div class="gets">
-    <div class="get"><b>Variance summary</b><span>Every line, with the gap in dollars and percent, F or U, and the budget version named on the face of the report.</span></div>
+    <div class="get"><b>Variance summary</b><span>Every line, with the gap in dollars and percent, F or U, and the budget version named on the face of the report. An open period has the mark "PRELIMINARY".</span></div>
     <div class="get"><b>Commentary</b><span>For each large gap: the drivers, timing or permanent, the effect on the full year, the action and the owner.</span></div>
-    <div class="get"><b>Driver detail</b><span>The split of each gap into volume, price, mix, headcount, rate or one-time items, with the arithmetic.</span></div>
+    <div class="get"><b>Driver detail</b><span>The split of each gap into volume, price, mix, FX, headcount, rate or one-time items, with the arithmetic.</span></div>
     <div class="get"><b>Full-year outlook</b><span>What the permanent gaps can mean for the year. It is arithmetic for you to discuss, and no forecast.</span></div>
     <div class="get"><b>Waterfall data</b><span>The steps from budgeted profit to actual profit, ready for a chart.</span></div>
     <div class="get"><b>Coverage</b><span>Which tool read each figure, and where each cause came from: the ledger, a person, or still to be confirmed.</span></div>
@@ -289,11 +291,11 @@
     <h2>Six rules that never bend</h2>
     <ul>
       <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
-      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
-      <li><b>Never revises a budget, posts a reclassification or updates a forecast.</b> Every recommendation is a proposal for a person.</li>
-      <li><b>Never chooses the period, the budget version or the thresholds for you.</b> If you decline to give thresholds, it tells you so and explains every gap above zero.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never revises a budget, posts a reclassification or updates a forecast.</b> Every recommendation is a proposal for a person. It never saves the gap figures, the commentary or the outlook.</li>
+      <li><b>Never chooses the period, the budget version, the thresholds or the entity for you.</b> It never shows last year's results as a budget. Without a budget, there is no variance report.</li>
       <li><b>Never invents a cause.</b> Where the driver is unknown, it writes the gap, names the transactions behind it, and marks the cause "to be confirmed", with an owner.</li>
-      <li><b>Labels every gap F or U</b>, from the account's type in the chart of accounts, never from its name. It never saves the gap figures, the commentary or the outlook.</li>
+      <li><b>Reports each entity first, then the group.</b> It never compares one entity's actual results with the budget of a different entity.</li>
     </ul>
   </div>
 </section>
@@ -305,7 +307,7 @@
     <dt>Variance</dt><dd>The gap between the actual result and the budget. Accountants call the comparison variance analysis<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
     <dt>Favourable, unfavourable</dt><dd>F means the gap helps profit. U means it hurts profit. More revenue is F. More cost is U.</dd>
     <dt>Materiality threshold</dt><dd>The size of gap that needs an explanation. You set it, as an amount and a percentage.</dd>
-    <dt>Driver</dt><dd>The cause of a gap: volume, price, mix, headcount, rate or a one-time item.</dd>
+    <dt>Driver</dt><dd>The cause of a gap: volume, price, mix, exchange rates (FX), headcount, rate or a one-time item.</dd>
     <dt>Timing variance</dt><dd>The money moved between months. It reverses later. A later month proves it.</dd>
     <dt>Permanent variance</dt><dd>The business really spent or earned more or less. It does not reverse.</dd>
   </dl>
@@ -318,7 +320,7 @@
   <ol class="srcs">
     <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://legacy.sba.gov/blog/why-bother-financial-forecasts" rel="noopener">US SBA: Why Bother with Financial Forecasts</a><span class="what">Plan-versus-actual analysis, which accountants call variance analysis, compares the forecast with the actual results. You see the difference and can make changes. Keep the budget's categories the same as the ones in your accounting reports.</span></li>
     <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Section III.B, analysis"><a href="https://www.sec.gov/rules-regulations/2003/12/commission-guidance-regarding-managements-discussion-analysis-financial-condition-results-operations" rel="noopener">US SEC: Commission guidance regarding MD&amp;A (Release 33-8350, 2003)</a><span class="what">The analysis should show the causes, for example a manufacturing difficulty, a fall in product quality or a loss of market share. It should not only restate the numbers.</span></li>
-    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Control Activities, top-level and functional reviews"><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" rel="noopener">GAO: Internal Control Standards: Management and Evaluation Tool (GAO-01-1008G)</a><span class="what">Top management regularly compares actual performance with budgets, forecasts and prior periods. It looks into unexpected results so that it can correct them.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Control Activities, top-level and functional reviews"><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" rel="noopener">GAO: Internal Control Standards: Management and Evaluation Tool (GAO-01-1008G)</a><span class="what">Top management regularly compares actual performance with budgets, forecasts and prior periods. It looks into unexpected results so that it can fix them.</span></li>
   </ol>
   <p class="muted" style="font-size:14.5px">No outside authority backs the six stages, the F and U table, the six sheets or the volume and price split. They are the skill's own rules. The $5,000 and 10% thresholds and the "either" rule in the example are Northbrook's own choice, made up for this page. All three sources are US sources.</p>
 </section>
@@ -326,7 +328,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>budget-vs-actual-analysis</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/budget-vs-actual-analysis">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and has not shipped. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>budget-vs-actual-analysis</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/budget-vs-actual-analysis">Read the skill on GitHub →</a> The card format of the skill is on main of MosoFin/mosofin-finance-skills. PR #1 merged it on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -354,7 +356,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

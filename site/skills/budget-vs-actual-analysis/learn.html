@@ -245,7 +245,7 @@
       <label>Threshold, % <input class="n" id="tP" inputmode="decimal"></label>
       <label>A line needs commentary when it passes <select id="rule"><option value="either">either threshold</option><option value="both">both thresholds</option></select></label>
     </div>
-    <p class="fine">The zero-budget rule for "both": a line with a budget of $0 has no percent. Under "both", this page counts that line as passing when its dollar variance passes the dollar threshold. This rule is the page's own choice. The skill does not state one. If you leave both thresholds empty, the page marks every variance above zero, as the skill does when you decline to set thresholds.</p>
+    <p class="fine">The zero-budget rule for "both": a line with a budget of $0 has no percent. Under "both", this page counts that line as passing when its dollar variance passes the dollar threshold. This rule is the page's own choice. The skill does not state one. If you leave both thresholds empty, the page applies no rule. It ranks every variance by its dollar size, as the skill does when you decline to set thresholds.</p>
     <div class="tbl" id="out" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
     <p class="fine">The page computes variance = actual − budget, and percent = variance ÷ |budget|. A revenue line is F when the actual is higher. An expense line is U when the actual is higher. The "Northbrook, September" preset gives a net effect on profit of −$23,900 U. It needs commentary on 6 of 7 lines under "either" and on 4 of 7 lines under "both".</p>
@@ -269,7 +269,7 @@
     </div>
     <div class="math num" id="vsteps" aria-live="polite"></div>
     <div class="results" id="vres" aria-live="polite"></div>
-    <p class="fine">Volume = (actual units − budget units) × budget price. Price = (actual price − budget price) × actual units. The two parts add to the total variance when mix and exchange rates do not apply. The "Northbrook revenue" preset gives volume +$60,000 F and price −$28,000 U, a total of +$32,000. A split from this calculator shows the arithmetic only. A person still gives the cause.</p>
+    <p class="fine">Volume = (actual units − budget units) × budget price. With one product, the budget average price is the budget price. Price = (actual price − budget price) × actual units. With one product and one currency, mix and FX are zero, so the two parts add to the total variance. The page shows the unexplained difference, which is $0 here. The "Northbrook revenue" preset gives volume +$60,000 F and price −$28,000 U, a total of +$32,000. A split from this calculator shows the arithmetic only. A person still gives the cause.</p>
   </div>
 </section>
 
@@ -277,10 +277,10 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use Mosofin for this run, or upload the data yourself? Which budget, by name? Which period, and at what grain? What are your materiality thresholds, as an amount and a percentage? Which one-time items fall in the period, and who owns each line? Which driver data do the books not hold?</div>
-    <div><b>Needs</b>The skill needs the actuals and the named budget, by line and by month. The prior-year actuals, the chart of accounts and the transactions behind large lines make the result better. You type in the thresholds, the one-offs and the owners, because no ledger holds them.</div>
-    <div><b>Gives back</b>The skill gives back six sheets: the variance summary, the commentary, the driver detail, the full-year outlook, the waterfall data and a coverage sheet. It asks before it makes an Excel file.</div>
-    <div><b>Never</b>The skill never revises a budget, posts a reclassification or updates a forecast. It never chooses the period, the budget version or a threshold for you. It never invents a cause. It never saves the figures, the commentary or the outlook.</div>
+    <div><b>Asks first</b>Do you want to use Mosofin for this run, or upload the data yourself? Which entity? Which period, at what grain, and is that period closed? Which budget, by name? What are your materiality thresholds, as an amount and a percentage, and must a variance pass both or either? Which one-time items fall in the period? Which driver data do you have? Which grouping does management read?</div>
+    <div><b>Needs</b>The skill needs the actuals and the named budget, by line and by month. An uploaded budget also states its basis, cash or accrual, and any split by class, location or customer. The prior-year actuals, the chart of accounts and the driver data make the result better. You type in the thresholds and the one-time items, because no ledger holds them.</div>
+    <div><b>Gives back</b>The skill gives back six sheets: the variance summary, the commentary, the driver detail, the full-year outlook, the waterfall data and a coverage sheet. If the period is not closed, the summary header says "PRELIMINARY". The skill asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never revises a budget, posts a reclassification or updates a forecast. It never chooses the period, the budget version, a threshold or the entity for you. It never invents a cause. It never saves the figures, the commentary or the outlook.</div>
   </div>
 </section>
 
@@ -293,7 +293,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code> and <code>references/method.md</code>. These files come from the card-format rewrite of the skill. The rewrite is on a branch and has not shipped. The skill on main holds the same text in one longer file. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. All five sources are US sources. Ask your accountant what applies to you. This page explains <code>budget-vs-actual-analysis</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/budget-vs-actual-analysis">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code> and <code>references/method.md</code>. The card format of the skill is on main of MosoFin/mosofin-finance-skills. PR #1 merged it on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. The quotes match the files on main. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. All five sources are US sources. Ask your accountant what applies to you. This page explains <code>budget-vs-actual-analysis</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/budget-vs-actual-analysis">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -310,7 +310,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The fifteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
+/* The quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
 const Q = {
   q1:{q:"The hard part is never the subtraction; it is saying what caused it.", w:"references/overview.md · Budget vs. Actual Analysis (Mosofin)"},
   q2:{q:"This one has both sides inside it.", w:"references/overview.md · Budget vs. Actual Analysis (Mosofin)"},
@@ -327,6 +327,9 @@ const Q = {
   q13:{q:"Never invent a cause.", w:"references/method.md · Step 8 — Draft commentary"},
   q14:{q:"An honest open item beats a plausible fiction", w:"references/method.md · Step 8 — Draft commentary"},
   q15:{q:"Persist the thresholds, the structure and the owners.", w:"references/method.md · Step 10 — Evolve the skill (Mosofin-specific, final step)"},
+  q16:{q:"If it is not, or the user does not know, put \"PRELIMINARY — period not closed\" in the Sheet 1 header, and classify a favourable expense variance with no ledger evidence as \"possible missing accrual — to be confirmed\", not as a saving.", w:"references/method.md · Step 1 — Align actuals and budget"},
+  q17:{q:"Variances above both the $ threshold and the % threshold → require explanation — or above either one, if the user chooses that rule.", w:"references/method.md · Step 4 — Apply materiality filter"},
+  q18:{q:"Check: Volume + Mix + Price + FX = the line variance, to the cent. Show any residual as \"unexplained\" — never plug it.", w:"references/method.md · Step 5 — Decompose variances into drivers"},
 };
 
 const RULES = [
@@ -339,18 +342,18 @@ const RULES = [
     plain:"The skill asks which budget you compare with, by name. It never picks the version for you.",
     backed:"The SBA describes plan-versus-actual analysis as a comparison of the forecast with the actual results." },
   { id:"4", title:"Compare like with like", r:Q.q4, cites:[1],
-    plain:"Before it subtracts, the skill lists every account that is in one file and not in the other. It shows any mapping between budget lines and actual accounts.",
+    plain:"Before it subtracts, the skill lists every account that is in one file and not in the other. It shows any mapping between budget lines and actual accounts. It also puts both sides on the same basis, cash or accrual.",
     backed:"The SBA advises that the budget use the same categories as your accounting reports." },
   { id:"5", title:"Divide by the absolute budget", r:Q.q5, cites:[],
     plain:"The percent is the variance divided by the budget without its sign. A line with a zero budget gets the dollar variance and the flag \"no budget\"." },
   { id:"6", title:"F or U on every line", r:Q.q6, cites:[],
-    plain:"The skill takes each line's type from the chart of accounts, never from its name. More spend on an expense line is unfavourable. More income on a revenue line is favourable." },
+    plain:"The skill takes each line's type from the chart of accounts, never from its name. More spend on an expense line is unfavourable. More income on a revenue line is favourable. The skill flags each contra line, such as discounts, so that the label does not come out reversed." },
   { id:"7", title:"Explain only what is material", r:Q.q7, cites:[],
-    plain:"A line that passes the thresholds gets commentary. The report notes a line below them but does not explain it." },
+    plain:"The skill asks whether a line must pass both thresholds or only one, and records that rule in the report header. A line that passes gets commentary. The report notes a line below the thresholds but does not explain it." },
   { id:"8", title:"Your thresholds, never a default", r:Q.q8, cites:[],
-    plain:"You set an amount and a percentage. If you decline, the skill says so and explains every variance above zero." },
+    plain:"You set an amount and a percentage. If you decline, the header says that no rule applies. The skill ranks every variance by its dollar size and explains from the top down. It stops at the number of lines that you name." },
   { id:"9", title:"Split the gap into drivers", r:Q.q9, cites:[4],
-    plain:"For each material line, the skill splits the gap into volume, price, mix, headcount, rate or a one-off, where the data supports it.",
+    plain:"For each material line, the skill splits the gap into volume, price, mix, FX, headcount, rate or a one-off, where the data supports it. The parts must add to the line variance. The skill shows any difference that remains as \"unexplained\".",
     backed:"A textbook price variance is (actual price − standard price) × actual quantity. A quantity variance is (actual quantity − standard quantity) × standard price." },
   { id:"10", title:"Timing or permanent", r:Q.q10, cites:[],
     plain:"A timing variance moves spend or income to another period. A permanent variance changes the full year. The skill flags which is which, and you make the decision." },
@@ -386,19 +389,19 @@ const LEVELS = [
     verdict:["flag","Marketing is $18,000 (60.0%) unfavourable. The same plus sign on revenue is favourable. The F/U label tells the reader which one is good.","U"] },
 
   { n:2, title:"Which budget, and which accounts?",
-    chips:["Budget list","Chart of accounts"], src:"Rules 2, 3 and 4", cites:[1],
-    situation:"The budget list holds more than one version. Northbrook names the FY26 Board Budget. The actuals show $7,200 in an Insurance account in September. The budget has $0 on that line for September.",
+    chips:["Budget list","Chart of accounts","Close status"], src:"Rules 2, 3 and 4", cites:[1],
+    situation:"The budget list holds more than one version. Northbrook names the FY26 Board Budget. Both sides use the accrual basis, and Northbrook closed September before the run. The actuals show $7,200 in an Insurance account in September. The budget has $0 on that line for September.",
     facts:["The SBA advises that the budget use the same categories as your accounting reports "+C(1)+". Then each budget line has an actual line to compare with."],
     visual:{type:"table",
       head:["Line","Budget (Sep)","Actual (Sep)","Variance","Percent"],
       rows:[["Revenue","$420,000","$452,000","+$32,000","+7.6%"],["Insurance","$0","$7,200","+$7,200",["no budget","bad"]]]},
-    rules:[Q.q3, Q.q4, Q.q2],
-    math:[["Budget version","FY26 Board Budget, by name"],["Fiscal year","calendar year"],["Insurance: $7,200 − $0","+$7,200",1],["Percent: $7,200 ÷ |$0|","not computed"],["Flag on the line","no budget",1]],
+    rules:[Q.q3, Q.q4, Q.q16, Q.q2],
+    math:[["Budget version","FY26 Board Budget, by name"],["Fiscal year","calendar year"],["Basis of both sides","accrual"],["September closed?","yes, so no PRELIMINARY mark"],["Insurance: $7,200 − $0","+$7,200",1],["Percent: $7,200 ÷ |$0|","not computed"],["Flag on the line","no budget",1]],
     verdict:["note","The skill shows the $7,200 and flags \"no budget\". It does not divide by zero. A revised budget or the latest forecast can tell a different story, so the report header names the version.","NO BUDGET"] },
 
   { n:3, title:"Which gaps deserve words",
     chips:["Thresholds $5,000 and 10%","Rule: either"], src:"Rules 7 and 8", cites:[],
-    situation:"Northbrook set two thresholds: $5,000 and 10%. The skill says \"AND/OR\" and lets the user choose. Northbrook chose \"either\", so a line needs commentary when it passes one threshold or both.",
+    situation:"Northbrook set two thresholds: $5,000 and 10%. The skill asks whether a line must pass both thresholds or either one. Northbrook chose \"either\", so a line needs commentary when it passes one threshold or both. The report header records that rule.",
     facts:[], nofact:NOFACT,
     visual:{type:"table",
       head:["Line","Budget","Actual","Variance","%","F/U","Commentary"],
@@ -410,14 +413,14 @@ const LEVELS = [
             ["G&A","$40,000","$49,500","+$9,500","+23.8%",["U","bad"],"yes"],
             ["Insurance","$0","$7,200","+$7,200","no budget",["U","bad"],"yes ($)"]],
       total:["Net income","$88,000","$64,100","−$23,900","−27.2%",["U","bad"],""]},
-    rules:[Q.q7, Q.q8],
-    math:[["Budget net income: 420,000 + 2,000 − 168,000 − 96,000 − 30,000 − 40,000 − 0","$88,000"],["Actual net income: 452,000 + 1,400 − 185,600 − 99,000 − 48,000 − 49,500 − 7,200","$64,100"],["Effect on profit: +32,000 − 600 − 17,600 − 3,000 − 18,000 − 9,500 − 7,200","−$23,900",1],["Other income: 30.0% is above 10%","yes, on % alone"],["Payroll: $3,000 and 3.1%, below both","noted, not explained"],["Lines that need commentary","6 of 7",1]],
-    verdict:["note","Six of seven lines get commentary. The report notes payroll but does not explain it. The thresholds are Northbrook's own. The skill never supplies a default.","6 OF 7"] },
+    rules:[Q.q7, Q.q17, Q.q8],
+    math:[["Budget net income: 420,000 + 2,000 − 168,000 − 96,000 − 30,000 − 40,000 − 0","$88,000"],["Actual net income: 452,000 + 1,400 − 185,600 − 99,000 − 48,000 − 49,500 − 7,200","$64,100"],["Effect on profit: +32,000 − 600 − 17,600 − 3,000 − 18,000 − 9,500 − 7,200","−$23,900",1],["Other income: 30.0% is above 10%","yes, on % alone"],["Payroll: $3,000 and 3.1%, below both","noted, not explained"],["Lines that need commentary, rule \"either\"","6 of 7",1],["Under \"both\": COGS, marketing, G&A, insurance","4 of 7"]],
+    verdict:["note","Six of seven lines get commentary under the \"either\" rule. Under \"both\", four lines would. The report notes payroll but does not explain it. The thresholds and the rule are Northbrook's own. The skill never supplies a default.","6 OF 7"] },
 
   { tier:"Why the gap happened · drivers and timing" },
   { n:4, title:"Why: volume, price and rate",
     chips:["Sales by item","Budget drivers","Headcount"], src:"Rule 9", cites:[4,3],
-    situation:"Revenue is $32,000 favourable. Northbrook sold 3,200 units at $141.25 against a budget of 2,800 units at $150. Payroll is below both thresholds, so the page splits it only as an illustration.",
+    situation:"Revenue is $32,000 favourable. Northbrook sold 3,200 units at $141.25 against a budget of 2,800 units at $150. It sells one product in US dollars, so mix and FX are zero. Payroll averaged 11 heads at $9,000 against a budget of 12 heads at $8,000. Payroll is below both thresholds, so the page splits it only as an illustration.",
     facts:["A textbook price variance is (actual price − standard price) × actual quantity. A quantity variance is (actual quantity − standard quantity) × standard price "+C(4)+". The skill's split has the same shape.",
            "SEC guidance asks that an analysis show the underlying causes, for example a loss of market share "+C(3)+"."],
     visual:{type:"table",
@@ -428,8 +431,8 @@ const LEVELS = [
             ["COGS","rate","($58 − $60) × 3,200","−$6,400",["F","good"]],
             ["Payroll","headcount","(11 − 12) × $8,000","−$8,000",["F","good"]],
             ["Payroll","rate","($9,000 − $8,000) × 11","+$11,000",["U","bad"]]]},
-    rules:[Q.q9, Q.q1],
-    math:[["Revenue: $60,000 − $28,000","+$32,000 F",1],["COGS unit cost: $168,000 ÷ 2,800 and $185,600 ÷ 3,200","$60 and $58"],["COGS: $24,000 − $6,400","$17,600 U",1],["Payroll: −$8,000 + $11,000","$3,000 U",1],["Mix and FX","none: one product, USD"]],
+    rules:[Q.q9, Q.q18, Q.q1],
+    math:[["Revenue: $60,000 − $28,000","+$32,000 F",1],["COGS unit cost: $168,000 ÷ 2,800 and $185,600 ÷ 3,200","$60 and $58"],["COGS: $24,000 − $6,400","$17,600 U",1],["Payroll: −$8,000 + $11,000","$3,000 U",1],["Mix and FX","none: one product, USD"],["Unexplained, on each line","$0"]],
     verdict:["note","Volume drove most of the gap on revenue and on COGS. The lower price is $28,000 unfavourable and permanent. The ledger shows lower invoice prices but not the reason. The sales director must give the cause.","DRIVERS"] },
 
   { n:5, title:"Timing or permanent",
@@ -553,19 +556,24 @@ function runLines(){
     const passA = !isNaN(tA) && Math.abs(v) > tA;
     const passP = !isNaN(tP) && pct!==null && Math.abs(pct) > tP;
     let yes;
-    if(noT) yes = v!==0;
+    if(noT) yes = false;
     else if(rule==="either") yes = passA || passP;
     else yes = pct===null ? passA : (passA && passP);
     if(yes) need++;
-    const why = noT ? (yes?"yes: no thresholds set":"no") : yes ? "yes"+(rule==="either"?(passA&&passP?"":passA?" ($)":" (%)"):(pct===null?" ($, no budget)":"")) : "no: noted, not explained";
-    rows.push([fld(i,"name").value||("Line "+(i+1)), type, fmt(B), fmt(A), sg(v), pct===null?["no budget","bad"]:(pct>0?"+":pct<0?"−":"")+Math.abs(pct).toFixed(1)+"%", [fu, eff>0?"good":eff<0?"bad":""], why]);
+    const why = noT ? "" : yes ? "yes"+(rule==="either"?(passA&&passP?"":passA?" ($)":" (%)"):(pct===null?" ($, no budget)":"")) : "no: noted, not explained";
+    rows.push([fld(i,"name").value||("Line "+(i+1)), type, fmt(B), fmt(A), sg(v), pct===null?["no budget","bad"]:(pct>0?"+":pct<0?"−":"")+Math.abs(pct).toFixed(1)+"%", [fu, eff>0?"good":eff<0?"bad":""], why, Math.abs(v)]);
   }
+  if(noT){ /* no rule: rank every variance by its absolute dollar size, as Step 4 does when the user declines */
+    const order=rows.map((r,k)=>k).filter(k=>rows[k][8]>0).sort((x,y)=>rows[y][8]-rows[x][8]);
+    rows.forEach(r=>r[7]="no variance"); order.forEach((k,j)=>rows[k][7]="rank "+(j+1)); need=order.length;
+  }
+  rows.forEach(r=>r.length=8);
   if(!rows.length){ out.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter a budget and an actual on one line to start."); return; }
-  out.innerHTML = table({head:["Line","Type","Budget","Actual","Variance","%","F/U","Commentary"], rows});
+  out.innerHTML = table({head:["Line","Type","Budget","Actual","Variance","%","F/U",noT?"Rank by $":"Commentary"], rows});
   effect=Math.round(effect*100)/100;
   const fuT = effect>0?"F":effect<0?"U":"";
   box.innerHTML = res(effect<0?"flag":"ok","Net effect on profit", `${sg(effect)} ${fuT}`, "The sum of each line's effect: revenue lines add their variance and expense lines take it away.")
-    + res(need?"note":"ok","Lines that need commentary", `${need} of ${rows.length}`, noT ? "No thresholds set, so every variance above zero needs commentary. The skill says so in the report." : `Under the "${rule}" rule, with ${isNaN(tA)?"no $ threshold":fmt(tA)} and ${isNaN(tP)?"no % threshold":tP+"%"}.`);
+    + res(need?"note":"ok", noT?"Lines ranked, no rule":"Lines that need commentary", `${need} of ${rows.length}`, noT ? "No thresholds, so no rule applies. The skill explains from rank 1 down and stops at the number of lines that you name." : `Under the "${rule}" rule, with ${isNaN(tA)?"no $ threshold":fmt(tA)} and ${isNaN(tP)?"no % threshold":tP+"%"}.`);
 }
 linesBox.addEventListener("input",()=>{document.querySelectorAll("[data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));runLines();});
 ["tA","tP","rule"].forEach(id=>document.getElementById(id).addEventListener("input",runLines));
@@ -589,7 +597,8 @@ function runV(){
     + line(`Actual: ${n(au)} × ${fmt(ap,2)}`, fmt(r2(au*ap),2))
     + line(`Volume: (${n(au)} − ${n(bu)}) × ${fmt(bp,2)}`, sg(vol,2)+" "+fu(vol), 1)
     + line(`${ty==="revenue"?"Price":"Rate"}: (${fmt(ap,2)} − ${fmt(bp,2)}) × ${n(au)}`, sg(pr,2)+" "+fu(pr), 1)
-    + line("Total: volume + price", sg(r2(vol+pr),2)+" "+fu(r2(vol+pr)), 1);
+    + line("Total: volume + price", sg(r2(vol+pr),2)+" "+fu(r2(vol+pr)), 1)
+    + line("Unexplained: actual − budget − (volume + price)", fmt(r2(tot-vol-pr),2));
   box.innerHTML = res(fu(vol)==="U"?"flag":"ok","Volume", `${sg(vol)} ${fu(vol)}`, "The change in units, at the budget price.")
     + res(fu(pr)==="U"?"flag":"ok", ty==="revenue"?"Price":"Rate", `${sg(pr)} ${fu(pr)}`, "The change in price, on the actual units.")
     + res("", "Total variance", `${sg(tot)} ${fu(tot)}`, "Actual minus budget. A person still gives the cause.");
@@ -618,7 +627,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
