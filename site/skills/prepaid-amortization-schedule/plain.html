@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prepaid Expense Amortization in Plain English | MosoFin</title>
+<meta name="description" content="How a prepaid cost such as a year of insurance goes into each month, and the missed run and stray items the skill finds. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Prepaid amortization schedule</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Prepaid amortization, in plain words</span>
+  <h1>We paid a year of insurance up front. How much of it is this month's cost?</h1>
+  <p class="lede">When you pay for months of cover or service in advance, the cost belongs to those months. This skill spreads each advance payment across <b>the months that it pays for</b>. It tests your books against that <b>schedule</b>, and it writes draft entries for a person to post.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a company and a month. It reads your prepaid account, from your books or from your files. It asks you for the start and end date of each item, because your books do not hold them. It calculates this month's cost for each item and builds the schedule. It compares the schedule with your books and names each difference. It never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">The idea</span>
+  <h2>$7,200 of insurance, and $600 of it is September's cost</h2>
+  <p>A prepaid expense is a cost that you pay before you use it. It stays an asset on the balance sheet until you use it. Then it moves to the income statement as an expense. An accounting textbook uses insurance as its example. It spreads a $4,500 six-month policy at $4,500 ÷ 6 = $750 a month<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 270" role="img" aria-label="A timeline of 12 months from September 2026 to August 2027. Northbrook Trading paid 7,200 dollars on Tuesday 1 September 2026 for 12 months of insurance cover. Each month gets 600 dollars of cost. September's 600 dollars goes to expense. The other 11 months, 6,600 dollars, stay on the balance sheet as a prepaid asset at 30 September.">
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <rect x="40" y="16" width="800" height="44" rx="8" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="440" y="43" text-anchor="middle" fill="var(--ink)">Paid <tspan font-weight="700">$7,200</tspan> on Tue 1 Sep 2026 for 12 months of cover, 1 Sep 2026 to 31 Aug 2027</text>
+          <g font-size="11.5" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1" text-anchor="middle">
+            <text x="73" y="92">SEP</text><text x="140" y="92">OCT</text><text x="207" y="92">NOV</text><text x="273" y="92">DEC</text>
+            <text x="340" y="92">JAN</text><text x="407" y="92">FEB</text><text x="473" y="92">MAR</text><text x="540" y="92">APR</text>
+            <text x="607" y="92">MAY</text><text x="673" y="92">JUN</text><text x="740" y="92">JUL</text><text x="807" y="92">AUG</text>
+          </g>
+          <rect x="43" y="102" width="60" height="44" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <g fill="var(--panel)" stroke="var(--rule-strong)">
+            <rect x="110" y="102" width="60" height="44" rx="6"/><rect x="177" y="102" width="60" height="44" rx="6"/><rect x="243" y="102" width="60" height="44" rx="6"/>
+            <rect x="310" y="102" width="60" height="44" rx="6"/><rect x="377" y="102" width="60" height="44" rx="6"/><rect x="443" y="102" width="60" height="44" rx="6"/>
+            <rect x="510" y="102" width="60" height="44" rx="6"/><rect x="577" y="102" width="60" height="44" rx="6"/><rect x="643" y="102" width="60" height="44" rx="6"/>
+            <rect x="710" y="102" width="60" height="44" rx="6"/><rect x="777" y="102" width="60" height="44" rx="6"/>
+          </g>
+          <text x="73" y="129" text-anchor="middle" font-weight="700" fill="var(--green)">$600</text>
+          <g text-anchor="middle" font-size="13" fill="var(--muted)">
+            <text x="140" y="129">$600</text><text x="207" y="129">$600</text><text x="273" y="129">$600</text><text x="340" y="129">$600</text>
+            <text x="407" y="129">$600</text><text x="473" y="129">$600</text><text x="540" y="129">$600</text><text x="607" y="129">$600</text>
+            <text x="673" y="129">$600</text><text x="740" y="129">$600</text><text x="807" y="129">$600</text>
+          </g>
+          <rect x="40" y="164" width="66" height="54" rx="8" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="73" y="186" text-anchor="middle" font-size="12.5" fill="var(--ink)">Expense</text>
+          <text x="73" y="205" text-anchor="middle" font-weight="700" fill="var(--green)">$600</text>
+          <rect x="110" y="164" width="730" height="54" rx="8" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="475" y="186" text-anchor="middle" fill="var(--ink)">Still an asset at 30 September: 11 months × $600</text>
+          <text x="475" y="205" text-anchor="middle" font-weight="700" fill="var(--hold)">$6,600 prepaid</text>
+          <text x="40" y="250" font-size="13" fill="var(--muted)">The dates come from the policy schedule that the owner gives the skill. The payment date does not set them.</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, Northbrook Trading. 7,200 ÷ 12 = 600 a month, and 7,200 − 600 = 6,600 at 30 September. Accountants call this spread amortization, and the table of months a prepaid schedule.</figcaption>
+  </figure>
+  <p>Why are the 11 unused months an asset? Northbrook has a right to cover that it paid for and did not use yet. The international framework for financial reports defines an asset as a present economic resource that the business controls because of past events<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Northbrook reports under US rules, so this is the IFRS wording of the same idea.</p>
+  <p>The skill uses one of two ways to divide the cost, and you choose the way. Whole-month gives each month an equal share: $600. Daily gives each day an equal share: 7,200 ÷ 365 days × 30 days = $591.78 for September, and $6,608.22 stays. Both ways are correct. The skill uses one way for each item and records which. Northbrook uses whole-month.</p>
+  <blockquote>The ledger holds the prepaid balance. It does not hold the schedule.<br><span class="muted" style="font-size:14.5px">SKILL.md</span></blockquote>
+  <p>Your books show the total in the prepaid account. They do not show what each part of it pays for, or when that cover ends. Those dates are on the policy and the contracts. So the skill always asks you for them.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Seven payments at Northbrook Trading for September 2026</h2>
+  <p>Northbrook Trading keeps its books in US dollars, with a calendar year. The month is Tuesday 1 September to Wednesday 30 September 2026. The skill reads the account "Prepaid Expenses" through MosoFin, back to its oldest open item. It also reads the expense accounts, where it finds one more prepaid. The owner gives the cover dates from the policy schedule and the contracts.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's prepaid items for September 2026, with vendor, payment date, amount, cover dates from the owner, monthly cost and what the skill sees">
+        <thead><tr><th scope="col" style="text-align:left">Item</th><th scope="col" style="text-align:left">Vendor and what</th><th scope="col" style="text-align:left">Paid</th><th scope="col">Amount $</th><th scope="col" style="text-align:left">Cover, from the owner</th><th scope="col">A month $</th><th scope="col" style="text-align:left">What the skill sees</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">P0</th><td class="t">Ridgeway Mutual, liability insurance 2025-26</td><td class="t">Mon 1 Sep 2025</td><td>6,600</td><td class="t">1 Sep 2025 to 31 Aug 2026</td><td>550</td><td class="t a">The cover ended on 31 August. 550 of it stays in the account</td></tr>
+        <tr><th scope="row">P1</th><td class="t">Ridgeway Mutual, liability insurance 2026-27</td><td class="t">Tue 1 Sep 2026</td><td>7,200</td><td class="t">1 Sep 2026 to 31 Aug 2027</td><td>600</td><td class="t">This year's policy. September's cost is 600</td></tr>
+        <tr><th scope="row">P2</th><td class="t">Cobalt Analytics, reporting software for a year</td><td class="t">Mon 15 Jun 2026</td><td>4,800</td><td class="t">1 Jul 2026 to 30 Jun 2027</td><td>400</td><td class="t">Paid in June, and the cover starts in July. So the cost starts in July</td></tr>
+        <tr><th scope="row">P3</th><td class="t">Delta Packaging Machines, two-year maintenance contract</td><td class="t">Mon 15 Dec 2025</td><td>3,600</td><td class="t">1 Jan 2026 to 31 Dec 2027</td><td>150</td><td class="t">24 months. Part of it is for more than 12 months ahead</td></tr>
+        <tr class="breach"><th scope="row">P5</th><td class="t">Midwest Trade Expo, booth, memo "spring expo"</td><td class="t">Thu 20 Aug 2026</td><td>2,400</td><td class="t">Unknown</td><td>—</td><td class="t a">No dates. It stays on the schedule with blank dates and the flag "unknown"</td></tr>
+        <tr class="breach"><th scope="row">P6</th><td class="t">Pixelform Studio, design software for a year</td><td class="t">Wed 1 Apr 2026</td><td>3,000</td><td class="t">1 Apr 2026 to 31 Mar 2027</td><td>250</td><td class="t w">All 3,000 went to expense in April. Nobody recorded it as a prepaid</td></tr>
+        <tr class="breach"><th scope="row">D1</th><td class="t">Riverside Properties, a round sum to the landlord</td><td class="t">Fri 1 May 2026</td><td>5,000</td><td class="t">—</td><td>—</td><td class="t w">A refundable deposit. The lease says that the landlord returns the money, so it is not a prepaid</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. 7,200 ÷ 12 = 600, 6,600 ÷ 12 = 550, 4,800 ÷ 12 = 400, 3,600 ÷ 24 = 150 and 3,000 ÷ 12 = 250. P1's cover starts on its payment date, but the skill takes the date from the owner, and not from the payment.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">September's insurance cost</span><span class="v num good">$600</span><span class="s">7,200 ÷ 12 months, for the 2026-27 policy</span></div>
+    <div class="stat"><span class="label">Policy left at 30 Sep</span><span class="v num hold">$6,600</span><span class="s">11 months × 600, still an asset</span></div>
+    <div class="stat"><span class="label">Account as booked</span><span class="v num wrong">$22,100</span><span class="s">Against a schedule of $14,850, at 30 September</span></div>
+    <div class="stat"><span class="label">Dates unknown</span><span class="v num hold">$2,400</span><span class="s">The expo booth. It stays with blank dates</span></div>
+  </div>
+  <p>Cobalt shows why the dates matter. Northbrook paid on 15 June, and the cover started on 1 July. If the cost started in the payment month, June would get 400. By 30 September the expense would be 1,600 instead of 1,200, which is 400 too much. The skill's rule:</p>
+  <blockquote>Never derives coverage dates from the payment date or the invoice memo.<br><span class="muted" style="font-size:14.5px">SKILL.md, Rules that never bend</span></blockquote>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The account agrees with itself, and it is still $7,250 too high</h2>
+  <p>A quick test compares the account balance with a roll-forward. A roll-forward is the opening balance, plus new payments, minus the monthly cost. At Northbrook both give 22,100. That agreement proves only that the books add up. Both numbers come from the same books.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">It compares the account with the schedule that it built from your dates</span>
+      <div class="rows num">
+        <div class="row"><span>Prepaid Expenses, as booked</span><span class="v">$22,100</span></div>
+        <div class="row"><span>The schedule: 6,600 + 3,600 + 2,250 + 2,400</span><span class="v">$14,850</span></div>
+        <div class="row off"><span>Difference</span><span class="v">$7,250</span></div>
+      </div>
+      <div class="verdict">It names each part by its shape. 1,150 is September's cost, not yet booked. 1,100 is one whole month, August, that nobody booked. 5,000 is the deposit. 1,150 + 1,100 + 5,000 = 7,250, with 0 unexplained.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Compare the account with its own roll-forward</span>
+      <div class="rows num">
+        <div class="row"><span>Prepaid Expenses, as booked</span><span class="v">$22,100</span></div>
+        <div class="row"><span>Roll-forward: 14,900 + 7,200 − 0</span><span class="v">$22,100</span></div>
+        <div class="row off"><span>Difference</span><span class="v">$0, and it proves nothing</span></div>
+      </div>
+      <div class="verdict">The result looks like a clean reconciliation. It shows nothing about the expired cover, the missed month or the deposit.</div>
+    </div>
+  </div>
+  <p>The skill uses the schedule that it built from your dates as the third test. Only the schedule knows what each part of the balance pays for. The skill's rule:</p>
+  <blockquote>Never reports a roll-forward as a reconciliation.<br><span class="muted" style="font-size:14.5px">SKILL.md, Rules that never bend</span></blockquote>
+  <p>The books also show three problems before the skill sees any contract:</p>
+  <div class="three">
+    <div class="card">
+      <span class="tag bad">A missed month</span>
+      <h3>No monthly entry in August</h3>
+      <p>The monthly entry came every month from January to July, and then it stopped. The recurring entry in QuickBooks probably stopped without a warning. August's cost is 550 + 400 + 150 = 1,100.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">A cost in one month</span>
+      <h3>A year of software in April</h3>
+      <p>Software subscriptions show one charge of 3,000 against a monthly average of 6,400 ÷ 12 = 533.33. That is 5.6 times the average. Pixelform's order form shows 12 months of cover.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">Not a prepaid</span>
+      <h3>A round sum to the landlord</h3>
+      <p>A payment of 5,000 to a landlord looks like a refundable deposit. The lease says that the landlord returns the money. It belongs in a Deposits account.</p>
+    </div>
+  </div>
+  <p>The skill also tests if the balance is more than 12 months of new payments. Here it is not: 22,100 against 23,000. But P0's cover ended on 31 August, and 550 of it stays in the account. The schedule finds that amount.</p>
+</section>
+
+<section>
+  <span class="label">What it proposes</span>
+  <h2>Three draft entries, and one deposit to move</h2>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The skill's three draft entries and one recommended action for Northbrook at 30 September 2026">
+        <thead><tr><th scope="col" style="text-align:left">Draft</th><th scope="col" style="text-align:left">What it does</th><th scope="col">Amount $</th><th scope="col" style="text-align:left">Effect on Prepaid Expenses</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">E1</th><td class="t">September's cost: insurance 600, software 400, machine maintenance 150</td><td>1,150</td><td class="t">Down 1,150</td></tr>
+        <tr><th scope="row">E2</th><td class="t">The missed August month: insurance 550, software 400, machine maintenance 150. The 550 also clears the cover of P0 that ended</td><td>1,100</td><td class="t">Down 1,100</td></tr>
+        <tr><th scope="row">E3</th><td class="t">Pixelform: moves the unused months, October 2026 to March 2027, from expense to the asset. 6 × 250</td><td>1,500</td><td class="t">Up 1,500</td></tr>
+        <tr><th scope="row">Action</th><td class="t">Move the Riverside deposit to Deposits, after you read the lease. A recommendation, and not a draft entry</td><td>5,000</td><td class="t">Down 5,000, when you post it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company. After E1 to E3: 22,100 − 1,150 − 1,100 + 1,500 = 21,350. The schedule with Pixelform is 14,850 + 1,500 = 16,350. The 5,000 difference is the deposit. After you move it, 16,350 = 16,350.</figcaption>
+  </figure>
+  <p>Pixelform covers April 2026 to March 2027. Northbrook used six months, April to September. So the correction returns only the six unused months to the asset: 1,500, and not 3,000. The year 2026 is still open, so the correction goes through this year's expense.</p>
+  <p>Every draft carries this mark:</p>
+  <blockquote><code>PROPOSED — NOT POSTED</code></blockquote>
+  <p>The owner's answer: the 2026-27 policy costs 600 in September, and 600 in each month to August 2027. At 30 September, 6,600 stays. If you post E2 in September, September's report also shows August's 550 from last year's policy. That 550 belongs to August, and you decide the posting date. You also create the recurring entry again in QuickBooks. Next month, the skill tests that it ran.</p>
+</section>
+
+<section>
+  <span class="label">Small items, and items for other skills</span>
+  <h2>Two small payments go straight to expense, and their total stays in view</h2>
+  <p>Northbrook's limit is $1,000. Accountants call this a materiality threshold. A trade association membership of 600 and domain and hosting of 480 are each below 1,000. Each covers 12 months, and each goes to expense when Northbrook pays it. The skill lists them, with a count of 2 and a total of 1,080.</p>
+  <p>It also shows what the limit does. Spread over 12 months, the two items cost 50 + 40 = 90 a month. As expense on payment, September carries 1,080, which is 990 more. The next 11 months carry none of them. The owner keeps $1,000. The skill applies your limit and never sets one. The accruals page for Northbrook uses a $500 limit for accruals. That is a different policy, and both limits are the owner's.</p>
+  <div class="two">
+    <div class="card">
+      <span class="tag up">Goes to accruals-and-deferrals</span>
+      <h3>Pinnacle Clinics paid Northbrook $36,000 for a year</h3>
+      <p>That is money that a customer paid in advance. Accountants call it deferred revenue. This skill does nothing with it. Another skill moves it into income month by month.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">Not a prepaid</span>
+      <h3>Huddle Notes, billed every month</h3>
+      <p>Huddle Notes sends an invoice for 250 every month. That is an ordinary monthly cost. The skill's rule: a vendor with twelve invoices a year is not a prepaid.</p>
+    </div>
+  </div>
+  <p>Then the owner says: "Just post these in QuickBooks." The skill declines once, in plain words, and gives the owner the three drafts. It cannot change data in a connected system. Nothing in the books changes.</p>
+</section>
+
+<section>
+  <span class="label">The balance sheet</span>
+  <h2>What stays, and when you use it</h2>
+  <p>After the drafts and the deposit move, Northbrook's prepaid total is $16,350. The skill splits it by time. The part for the next 12 months is current. The part for later is non-current.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Current, Oct 2026 to Sep 2027</span><span class="v num">$13,500</span><span class="s">6,600 + 3,600 + 1,800 + 1,500</span></div>
+    <div class="stat"><span class="label">Non-current</span><span class="v num">$450</span><span class="s">Delta, October to December 2027: 3 × 150</span></div>
+    <div class="stat"><span class="label">Not split</span><span class="v num hold">$2,400</span><span class="s">The expo booth, until you give its dates. Total 13,500 + 450 + 2,400 = 16,350</span></div>
+  </div>
+  <p>Northbrook's chart of accounts has no account for non-current prepaids. The skill says so, because the $450 then shows as current on the balance sheet. The $16,350 is not money in the bank. Prepaid expenses never become cash, so they cannot pay a bill. Accountants still report them as current assets<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+  <div class="never" style="border-left-color:var(--hold)">
+    <h3 style="margin:0;font-size:19px">Tax is a separate question</h3>
+    <p>The skill calculates the cost for your books only. It says nothing about your income tax deduction. US federal tax has a 12-month rule. Under that rule, a business can sometimes deduct a payment in the year that it pays, if the benefit ends within the rule's limits. A business that starts to use the rule may need IRS approval first<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Your books still show 600 a month for the policy. Whether Northbrook can deduct the full premium in 2026 is a question for its accountant. The skill does not apply the rule and gives no tax amount.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Eight questions, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the tests are the same. The skill asks this only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">Which company, or which companies in a group?</div><div class="why">Each company gets its own schedule, with its name on it. The skill never puts two companies into one schedule. On the MosoFin path it asks you by name and never chooses for you.</div></li>
+    <li><div class="q">Which account or accounts hold your prepaids?</div><div class="why">Many books have more than one. Sometimes an "Other Current Assets" account holds many different items. On the MosoFin path the skill reads your chart of accounts first, then asks you to confirm.</div></li>
+    <li><div class="q">The start and end date of the cover for each open item, and your current prepaid schedule if you have one.</div><div class="why">This is the one question that you must answer. Your books cannot supply these dates. The skill asks item by item. If you do not know a date, the item goes on the schedule with blank dates and the flag "unknown". The skill never guesses a date.</div></li>
+    <li><div class="q">Your materiality threshold: the amount below which a payment goes straight to expense.</div><div class="why">This decides what goes on the schedule. You set it, and the skill never sets it. The skill can show what a proposed limit does in total. If you set none, the coverage sheet says so.</div></li>
+    <li><div class="q">Whole-month or daily?</div><div class="why">Both ways are correct, but one schedule must not mix them. The skill looks at how your past entries divide the cost, then asks you to confirm.</div></li>
+    <li><div class="q">Do you recover sales tax such as VAT or GST when you pay, and in which country?</div><div class="why">Where you can recover the tax, it comes out at payment, and the skill does not spread it. You state the policy. The skill still tests the books for recoverable tax inside the asset.</div></li>
+    <li><div class="q">Your main currency, and your policy for prepaids in a foreign currency.</div><div class="why">A prepaid is not a right to an amount of money, so it usually keeps its first exchange rate. You must give the currency. On the MosoFin path the skill reads it from your company record. It asks you to confirm the policy.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. The skill's own example also uses Northbrook. This page adapts it to the example above: no recoverable tax, because Northbrook is a US company, and dates for 5 of 6 items.</p>
+  <blockquote><i>"Building the September prepaid schedule for Northbrook Trading, account Prepaid Expenses, from your Mosofin connection. Materiality $1,000, whole-month amortization, no recoverable tax (US). You gave coverage dates for 5 of 6 items; the other one goes on the schedule blank and flagged. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the prepaid account</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads a saved profile first, if you have one, and tells you that it uses it</li>
+        <li>It reads every entry in the prepaid account, the expense accounts, the bills and payments behind each item, and the chart of accounts</li>
+        <li>You still give it the <b>cover dates</b>. Your books do not hold them, and a memo such as "annual renewal" is not a date</li>
+        <li>You also give it your <b>threshold</b>, and your decision on deposits and on advances to related companies</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the account, the dates and the chart</h3>
+      <ul>
+        <li><b>Prepaid account detail</b>, back to the oldest open item and for at least 24 months, with vendor, description, reference, amount and payment date. CSV or XLSX, required</li>
+        <li><b>Cover start and end dates</b> for each item, from the contracts, policy schedules or invoices. PDF, CSV, XLSX or typed in the chat, required. Unknown dates stay blank and flagged</li>
+        <li><b>Chart of accounts</b>, with the prepaid and expense accounts. CSV or XLSX, required</li>
+        <li><b>Main currency</b>, and the currency of each item if there is more than one. Typed in the chat, required</li>
+        <li><b>Your current prepaid schedule</b>, if you have one. XLSX or PDF. Without it, the upload list calls the tie-out a roll-forward only</li>
+        <li><b>Expense ledger detail</b> for the last 12 to 24 months. CSV or XLSX, recommended. Without it, the skill cannot find a prepaid that went to expense in one month</li>
+        <li><b>Bills behind each prepaid</b>, with tax lines, and <b>credits and receipts</b> from prepaid vendors. CSV, XLSX or PDF, recommended. The coverage sheet names each test that the skill could not do</li>
+        <li><b>Threshold, tax country and how often you book the cost</b>. Typed in the chat, recommended</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Seven sheets, from the schedule to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Prepaid schedule</b><span>One row for each item, with its dates, amount, monthly cost, current and non-current parts, and a Source column: ledger, user or unknown.</span></div>
+    <div class="get"><b>Period detail</b><span>Each item's cost, month by month, across its cover.</span></div>
+    <div class="get"><b>Tie-out</b><span>The account against the roll-forward and against the schedule. Only the schedule column comes from you.</span></div>
+    <div class="get"><b>Draft entries</b><span>The month's entry, the catch-up entries and any correction, each with its months. All are proposals.</span></div>
+    <div class="get"><b>Cancellations and changes</b><span>A log of each cancelled or changed item, with its effect.</span></div>
+    <div class="get"><b>Ledger findings</b><span>What the books showed without a contract: missed months, prepaids that nobody recorded, items that are not prepaids.</span></div>
+    <div class="get"><b>Coverage</b><span>What the skill read, what it could not do and why, the unknowns for next month, and the threshold and method that it used.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your prepaid accounts, method, threshold, renewal months, cover dates and the errors that it found. It saves them only if you say yes.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never takes cover dates from the payment date or the invoice memo.</b> An unknown date stays blank, with the flag "unknown".</li>
+      <li><b>Never calls a roll-forward a reconciliation.</b> The account balance and the roll-forward come from the same books. Only the schedule tests the balance. No schedule means no reconciliation.</li>
+      <li><b>Never sets the materiality threshold.</b> It applies yours. It never shows a tie-out on test data as a clean result.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Prepaid expense</dt><dd>A cost that you pay before you use it. It stays an asset until you use it<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Amortization</dt><dd>Moving a prepaid into expense, a share at a time, over the months that it pays for.</dd>
+    <dt>Coverage period</dt><dd>The dates that a payment pays for. They come from the policy or the contract, and not from your books.</dd>
+    <dt>Prepaid schedule</dt><dd>A table of each prepaid item, its dates, its monthly cost and the amount that stays.</dd>
+    <dt>Roll-forward</dt><dd>The opening balance, plus new payments, minus the monthly cost. It shows how the account moved.</dd>
+    <dt>Materiality threshold</dt><dd>Your limit. Below it, a payment goes straight to expense and stays off the schedule.</dd>
+    <dt>Current and non-current</dt><dd>The part that you use in the next 12 months, and the part for later. Accountants report prepaids as current assets<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are two sections of open accounting and finance textbooks, the IFRS conceptual framework and an IRS publication. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="deferrals; prepaid insurance example"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-2-discuss-the-adjustment-process-and-illustrate-common-types-of-adjusting-entries" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.2 Discuss the Adjustment Process and Illustrate Common Types of Adjusting Entries</a><span class="what">A prepaid expense is a cost that a business pays before it uses it. It stays an asset until the business uses it, and then it moves to expense. The example spreads a $4,500 six-month policy at $750 a month.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="chapter 4, definition of an asset"><a href="https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2021/issued/part-a/conceptual-framework-for-financial-reporting.pdf" rel="noopener">IFRS Foundation: Conceptual Framework for Financial Reporting</a><span class="what">An asset is a present economic resource that the entity controls because of past events. An economic resource is a right that can produce economic benefits. This is the international framework. Northbrook reports under US rules.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://openstax.org/books/principles-finance-2e/pages/19-1-what-is-working-capital" rel="noopener">OpenStax: Principles of Finance 2e, 19.1 What Is Working Capital?</a><span class="what">Supplies and prepaid expenses never become cash, so they cannot pay bills. Businesses still report them as current assets.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="prepaid expenses; the 12-month rule"><a href="https://www.irs.gov/publications/p538" rel="noopener">IRS: Publication 538 (01/2022), Accounting Periods and Methods</a><span class="what">For US federal tax only. A prepaid expense is usually deductible only in the year that it applies, unless it qualifies for the 12-month rule. A business that starts to use these rules needs IRS approval first.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the four ledger tests, the 5.6 ratio, the three-way tie-out and its variance shapes, the seven sheets or the draft mark. They are the skill's own rules. We made up Northbrook Trading, its vendors and every figure in the example for this page. Source 2 is international. Sources 1, 3 and 4 are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>prepaid-amortization-schedule</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/prepaid-amortization-schedule">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a change from a bookkeeping audit followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its vendors and every figure in the example. They are not your data. The IRS publication is about US federal tax, and other countries have their own rules. This page is not tax advice. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
