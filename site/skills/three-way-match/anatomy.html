@@ -96,17 +96,17 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Three-way match</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">three-way-match · shipped on main · audited 21 Oct 2026 · all 3 findings fixed · card format</div>
+  <div class="eyebrow">three-way-match · card format on main since 22 Oct 2026 · PR #1 merged 26 Oct · bookkeeping-audit fix 27 Oct</div>
   <h1>The structure of the three-way match, and what it does</h1>
-  <p class="lede">The skill was one 729-line file and is now a 137-line card and six reference files, which keep every line of the original. Its distinctive move is that it names no evidence tools at all. Gate 2 asks three capability questions of the live catalogue: are purchase orders exposed, are item receipts exposed, is approval status exposed. The answers decide which of fifteen exception tests can run. This page shows where the weight sits, the run step by step, and what the audit found. It also shows the answers to those three questions against a real workspace.</p>
+  <p class="lede">The skill was one 729-line file. Since 526d8bf it is a card and six reference files, which keep every line of the original. On main the card is 139 lines. Its distinctive move is that it names no evidence tools at all. Gate 2 asks three capability questions of the live catalogue: are purchase orders exposed, are item receipts exposed, is approval status exposed. The answers decide which of fifteen exception tests can run. This page shows where the weight sits, the run step by step, and what the two audits found. It also shows the answers to those three questions against a real workspace. Every count on this page is from main at d9bdc22, checked on 28 Oct 2026.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">Card</span><span class="v">137</span><span class="s">lines in SKILL.md, down from 729</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">495/495</span><span class="s">original lines, moved into 6 reference files</span></div>
-    <div class="stat"><span class="k">Exception tests</span><span class="v">15</span><span class="s">5 need the receipt leg, 2 need approval data</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">3/3</span><span class="s">fixed on main: 4d5637c, 9882a07, 526d8bf</span></div>
+    <div class="stat"><span class="k">Card</span><span class="v">139</span><span class="s">lines in SKILL.md on main, down from 729</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">495/495</span><span class="s">original lines, moved into 6 reference files at the split (526d8bf)</span></div>
+    <div class="stat"><span class="k">Exception tests</span><span class="v">15</span><span class="s">4 need the receipt leg, and so does half of test 3. 2 need approval data</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">5/5</span><span class="s">fixed on main: 4d5637c, 9882a07, 526d8bf, 313d7c0, d9bdc22. 3 new observations open</span></div>
   </div>
 </section>
 
@@ -115,10 +115,10 @@
   <p class="sec-title">One card, six files behind it</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 137-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md is read on demand. method.md is the largest file at 283 lines.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 139-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md is read on demand. method.md is the largest file at 309 lines.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
-        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 137</text>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 139</text>
         <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
           <text x="48" y="78" font-weight="600">What it does · which legs it has</text>
           <text x="48" y="112" font-weight="600">Rules that never bend</text>
@@ -131,7 +131,7 @@
         </g>
         <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
-          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="287" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g><g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="127" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">116</text></g><g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">283</text></g><g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="32" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">29</text></g><g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="41" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">37</text></g><g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">62</text></g>
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="263" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g><g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="116" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">116</text></g><g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">309</text></g><g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="29" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">29</text></g><g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="38" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">38</text></g><g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">62</text></g>
         </g>
         <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
           <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
@@ -160,7 +160,7 @@
   <p class="sec-title">What the skill does, step by step</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 1010" role="img" aria-label="Gate 3 interviews for tolerance, approval matrix, services scope, FX policy and exception owner. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company file and answer three capability questions about purchase orders, receipts and approval data; otherwise the user uploads PO, receipt and invoice. Both paths read back and wait for a yes. Step 1 extracts fields. Step 2 matches headers then lines. Step 3 applies tolerances. Step 4 runs the fifteen exception tests that the available legs allow. Step 5 proposes pay, hold, reject, credit or partial payment. Step 6 builds six sheets including which match was performed and which tests did not run.">
+      <svg viewBox="0 0 920 1010" role="img" aria-label="Gate 3 interviews for tolerance, approval matrix, services scope, FX policy and exception owner. If Mosofin is present and chosen, gates 0 to 2 confirm the workspace and company file and answer three capability questions about purchase orders, receipts and approval data; otherwise the user uploads PO, receipt and invoice. Both paths read back and wait for a yes. Step 1 extracts fields. Step 2 matches headers then lines. Step 3 applies tolerances. Step 4 runs the fifteen exception tests that the available legs allow. Step 5 picks Reject for a vendor mismatch or a duplicate, Hold for an open Critical or High exception, no approval on record or no receipt leg, and Pay otherwise, with matched and disputed amounts. Step 6 builds six sheets including which match was performed and which tests did not run.">
         <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
           <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
@@ -202,7 +202,7 @@
             <text x="558" y="316">Purchase order(s) — PDF, XLSX, CSV, pasted</text>
             <text x="558" y="340">Goods receipt / proof of delivery / sign-off</text>
             <text x="558" y="364">Vendor invoice(s)</text>
-            <text x="558" y="388">Tolerance and approval matrix, typed</text>
+            <text x="558" y="388">Prior bills on the POs · tolerance, matrix</text>
           </g>
           <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
           <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
@@ -212,7 +212,7 @@
           <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Whole open population, one batch</text>
           <g font-size="13" fill="var(--muted)">
             <text x="80" y="584">bills · purchase orders · item receipts (if any) · vendor master</text>
-            <text x="80" y="604">header: PO ref, vendor, currency, entity · then line: no. → SKU → description</text>
+            <text x="80" y="604">header: PO ref, vendor, currency, entity, payment terms · then line: no. → SKU → description</text>
             <text x="80" y="624">match basis recorded per line · unmatched is a status, never forced</text>
           </g>
           <rect x="640" y="552" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
@@ -222,17 +222,19 @@
 
           <rect x="60" y="672" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="698" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 3–4 · TOLERANCES, THEN THE FIFTEEN TESTS</text>
-          <text x="80" y="726" font-size="13.5" fill="var(--ink)">No tolerance → exact match · 1–2 price, 3–4 quantity, 5–8 missing lines, 9 duplicate, 10 currency, 11–12 authority, 13 vendor, 14 tax, 15 damage · tests that can't run are listed</text>
+          <text x="80" y="722" font-size="13" fill="var(--ink)">No tolerance → exact match · 1–2 price, 3–4 quantity (one per line), 5–8 missing lines, 9 duplicate,</text>
+          <text x="80" y="740" font-size="13" fill="var(--ink)">10 currency, 11–12 authority, 13 vendor, 14 tax, 15 damage · tests that can't run are listed · GRNI valued, draft accrual</text>
 
           <rect x="60" y="782" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="808" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 5–6 · RESOLUTION, THEN SIX SHEETS</text>
-          <text x="80" y="836" font-size="13.5" fill="var(--ink)">Hold · Reject · Request credit · Override with reason and authority · Partial payment — pay the matched portion, dispute the rest · overrides counted</text>
+          <text x="80" y="832" font-size="13" fill="var(--ink)">Reject: 13 vendor or 9 duplicate · Hold: Critical/High open, no approval on record, or no receipt · else Pay</text>
+          <text x="80" y="850" font-size="13" fill="var(--ink)">matched = lines in tolerance, min(PO, GRN, invoice qty) × PO price · disputed = the rest · credit, override, partial pay</text>
 
           <rect x="60" y="892" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="921" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6 · Six sheets</tspan> — summary with Pay/Hold/Reject, line-by-line with match basis, exceptions with owners, references, population findings, coverage</text>
+          <text x="80" y="921" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6 · Six sheets</tspan> — summary, matched/disputed · lines, match basis · exceptions, owners · population · coverage</text>
 
           <rect x="60" y="960" width="800" height="40" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
-          <text x="80" y="986" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Seed to evolved</tspan> — persist legs held, tolerance, approval matrix, known price clauses, resolved exceptions, override log, GRNI baseline · explicit yes</text>
+          <text x="80" y="986" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Seed to evolved</tspan> — after the results, on an explicit yes: legs, tolerance, matrix, clauses, overrides, GRNI</text>
 
           <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
             <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
@@ -241,30 +243,55 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths converge on the read-back, and the skill reads nothing before it. The skill's design centres on the clause in the highlighted box. The clause names which match the skill actually performed, in the summary and the file name. The clause also lists the tests that could not run, so no one reads their absence as a pass. The receipt leg decides five of the fifteen tests. Approval data decides two more.</figcaption>
+    <figcaption>Both paths converge on the read-back, and the skill reads nothing before it. The skill's design centres on the clause in the highlighted box. The clause names which match the skill actually performed, in the summary and the file name. The clause also lists the tests that could not run, so no one reads their absence as a pass. The receipt leg decides four of the fifteen tests and the receipt half of test 3. Approval data decides two more. Without a receipt or an approval on record, the recommendation is Hold.</figcaption>
   </figure>
 </section>
 
 <section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Three findings, all fixed the same week, with the published guidance behind each</p>
+  <p class="sec-title">Five findings fixed on main, with the published guidance where it applies, and three observations still open</p>
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Nine of fourteen cross-references pointed at skills that are not in the repository</h3>
       <p>The text and the Related skills table send the reader to <code>sox-controls-design-and-testing</code>, <code>fraud-detection-and-forensics</code>, <code>petty-cash-management</code>, <code>multicurrency-fx-revaluation</code>, <code>sales-tax-us-multistate</code>, <code>vat-gst-international</code>, <code>vendor-onboarding-and-w9-tin</code>, <code>standard-costing-and-variance-analysis</code> and <code>accruals-and-prepayments</code>. All but the last are in the queue and not yet shipped. The last is not in the queue at all: the repository's skill is <code>accruals-and-deferrals</code>. A user installing this skill alone follows nine names to nothing. Each sentence now stands without the name, and the fix replaces the wrong name with <code>accruals-and-deferrals</code>. The Related skills table now lists only the five that exist, with a note that the others will be linked when they ship.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">overview.md · method.md Steps 3–4 · edge-cases.md · main 9882a07</span>
+      <span class="where">overview.md · method.md Steps 3–4 · edge-cases.md · fixed on main in 9882a07. On main all six named skills exist.</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>729 lines in one file, against a 500-line guide</h3>
-      <p>The fix works the same way as it did for the two skills before it. The skill now has a 137-line card with the six intake questions, the three capability questions and the which-legs rule. The fix moved the original text unchanged into <code>references/</code>. A script accounted for 495 of 495 content lines. The validator and shared-block sync pass on the new layout.</p>
+      <p>The fix works the same way as it did for the two skills before it. The skill now has a card with the six intake questions, the three capability questions and the which-legs rule. It was 137 lines at the split and is 139 on main. The fix moved the original text unchanged into <code>references/</code>. A script accounted for 495 of 495 content lines. The validator and shared-block sync pass on the new layout.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">SKILL.md + references/ · main 526d8bf</span>
+      <span class="where">SKILL.md + references/ · fixed on main in 526d8bf</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>A sandbox-only path for the spreadsheet helper</h3>
       <p>Step 6 says "If creating xlsx, read first: <code>/mnt/skills/public/xlsx/SKILL.md</code>". That path exists in one hosted environment and nowhere else. It is now an ask-first sentence: the skill asks the user whether they want an Excel file. The skill creates the file only on a yes, using the file name from the skill (<code>3WayMatch_…</code> or <code>Match_Population_…</code>). The fallback is tables in the chat. All 31 skills received the same fix.</p>
-      <span class="where">SKILL.md · Step 6 · main 4d5637c</span>
+      <span class="where">method.md · Step 6 — Output · fixed on main in 4d5637c</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>The description was 1,039 characters, against a 1,024 limit</h3>
+      <p>The fix removed two example phrases, "duplicate invoices" and "received-not-invoiced". It kept "goods received not invoiced (GRNI)" and every limit. On main the description is 996 characters. The same commit fixed bank-reconciliation.</p>
+      <span class="where">SKILL.md · front matter · fixed on main in 313d7c0</span>
+    </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>Bookkeeping audit: a two-way match had no quantity test, and the money had no definition</h3>
+      <p>The commit records 8 findings fixed and 1 partly fixed. Exception 3 now compares cumulative billed quantity with the PO, so it runs on a two-way match. One line raises one quantity exception: where 3 and 4 both apply, the skill reports 4. Step 5 now has a Reject / Hold / Pay rule and defines the matched and disputed amounts. GRNI counts all bills on the PO, excludes receipts that already post to AP, uses the PO price and comes with a draft accrual. The upload path asks for prior bills on the POs. Step 2 compares payment terms. The word "unattended" is gone: an [auto] step runs only after the user says yes to the run. The SOX wording now applies only where SOX applies.</p>
+      <span class="where">SKILL.md · method.md Steps 2–6 · gates.md Gate 3 · output.md · overview.md · fixed on main in d9bdc22. baf43ef added the ask-before-saving rule behind Stage 6.</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The matched amount drops a whole line for any exception, Low ones too</h3>
+      <p>The formula sums only lines within tolerance. A one-line invoice with any exception has a matched amount of $0, so "pay the matched portion" pays nothing. A line with only exception 2 (price underbilling, Low) gets Pay, but the full invoice shows as disputed. A finding for the skill owner. The pages follow the formula as written.</p>
+      <span class="where">method.md · Step 5 — Resolution suggestions</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>Without an approval matrix, every invoice is Hold</h3>
+      <p>The Hold rule also covers an approval that is not on record ("11 or 12 not run"). Exception 12 needs the matrix. The intake calls the matrix only Recommended, and the upload path asks for it only as typed text. So an upload run without a matrix can never recommend Pay. The card does not tell the user this at intake.</p>
+      <span class="where">SKILL.md · Stage 1, question C · method.md · Step 5</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Question C says exceptions 11 and 12 both need the matrix</h3>
+      <p>Exception 11 (PO not approved) needs only the approval status. Exception 12 (wrong authority) needs the matrix and the approver. Without a matrix, 11 can still run where the status is exposed. The card says to list both as not run.</p>
+      <span class="where">SKILL.md · Stage 1, question C · method.md · Step 4 — Identify exception types</span>
     </div></div>
   </div>
 </section>
@@ -273,19 +300,19 @@
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>The audit answered Gate 2's three capability questions against a live catalogue on 21 Oct 2026. The workspace was Online Shop, the QuickBooks company file was Northwood, and the catalogue had 73 read tools. The catalogue answered <b>yes</b> for purchase orders (<code>search_purchase_orders</code>, <code>get_purchase_order</code>), <b>no tool</b> for item receipts, and <b>not exposed</b> for approval status. The skill would run a two-way match by omission there, and it would say so. It would also list tests 3, 4, 7, 8, 11, 12 and 15 as not run. That is the designed behaviour.</span></li>
-    <li><span class="ok">PASS</span><span>The skill hard-codes no evidence tool. It reads the names from <code>get_datasource_tools</code> each run. In that workspace <code>search_vendors</code> is <code>permission</code>-gated and <code>search_vendor_credits</code> is <code>disabled</code>. So the vendor-master read goes [gated], and vendor-credit history goes [manual]. The verdict table handles both.</span></li>
+    <li><span class="ok">PASS</span><span>The audit answered Gate 2's three capability questions against a live catalogue on 21 Oct 2026. The workspace was Online Shop, the QuickBooks company file was Northwood, and the catalogue had 73 read tools. The catalogue answered <b>yes</b> for purchase orders (<code>search_purchase_orders</code>, <code>get_purchase_order</code>), <b>no tool</b> for item receipts, and <b>not exposed</b> for approval status. On main the skill would run a two-way match by omission there, and it would say so. It would list tests 4, 7, 8, 11, 12 and 15, and the receipt half of 3, as not run. It would still check billed quantity against the PO, and it would recommend Hold. That is the designed behaviour.</span></li>
+    <li><span class="ok">PASS</span><span>The skill hard-codes no evidence tool. On main it names only the six protocol tools (list_workspaces, get_agent_datasources, get_datasource_tools, get_my_skill, get_skills, create_skill), all with underscores. It reads the names from <code>get_datasource_tools</code> each run. In that workspace <code>search_vendors</code> is <code>permission</code>-gated and <code>search_vendor_credits</code> is <code>disabled</code>. So the vendor-master read goes [gated], and vendor-credit history goes [manual]. The verdict table handles both.</span></li>
     <li><span class="ok">PASS</span><span>No tool in the catalogue pays a bill or releases a payment. The skill's scope note says that such a tool is out of scope regardless of policy. That note has nothing to exclude.</span></li>
     <li><span class="ok">PASS</span><span>The skill preserves the exact-match default from the source, and it never invents a tolerance.</span></li>
     <li><span class="ok">PASS</span><span>The output names which match the skill performed and which tests did not run, in the summary header, the coverage sheet and the file name.</span></li>
     <li><span class="ok">PASS</span><span>The output flags exception 7 both as AP information and as a period-end accrual, with the population total.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures). The shared blocks are in sync.</span></li>
-    <li><span class="ok">PASS</span><span>The learn page quotes 11 rules, and every one matches the skill text word for word. A script checked this after the split too.</span></li>
-    <li><span class="ok">PASS</span><span>The bundle has no broken links anywhere. Each stage on the card points at a file and step that exists. The one-line install pulls all 7 files.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main at d9bdc22 (31 skills, 0 failures), run again on 28 Oct 2026. The shared blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>The learn page quotes 11 rules, and every one matches the text on main word for word. A script checked this on 28 Oct 2026, after the bookkeeping-audit fix.</span></li>
+    <li><span class="ok">PASS</span><span>On main the files carry 60 [auto], 3 [gated] and 24 [manual] tags, and edge-cases.md keeps all eleven edge cases. The bundle has no broken links anywhere. Each stage on the card points at a file and step that exists. The one-line install pulls all 7 files.</span></li>
   </ul>
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with real purchase orders and bills. The audit did not test whether <code>search_purchase_orders</code> returns line detail. Gate 2 asks this as "with line detail, or header only?" The audit checked only that the tool exists.</p>
 </section>
 
-<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a>. The approved=true limit is d86fa27. The audit ran on 21 Oct 2026. The fixes for the findings are in 4d5637c, 9882a07 and 526d8bf. Still to do: a live run with real purchase orders.</footer>
+<footer>The card format is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/three-way-match">MosoFin/mosofin-finance-skills</a> since 526d8bf (22 Oct 2026). PR #1, merged on 26 Oct 2026, added 313d7c0, baf43ef and the bookkeeping-audit fix d9bdc22 (27 Oct 2026). The approved=true limit is d86fa27. The first audit ran on 21 Oct 2026. Its fixes are in 4d5637c, 9882a07 and 526d8bf. Still to do: a live run with real purchase orders, and the three open observations.</footer>
 
 </div>
