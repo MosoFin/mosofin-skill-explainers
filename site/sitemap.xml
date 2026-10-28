@@ -1,55 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/</loc>
+    <loc>https://skills.mosofin.com/</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/</loc>
+    <loc>https://skills.mosofin.com/skills/bank-reconciliation/</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/plain.html</loc>
+    <loc>https://skills.mosofin.com/skills/bank-reconciliation/plain.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/bank-reconciliation/learn.html</loc>
+    <loc>https://skills.mosofin.com/skills/bank-reconciliation/learn.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/</loc>
+    <loc>https://skills.mosofin.com/skills/cash-flow-forecast-13-week/</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/plain.html</loc>
+    <loc>https://skills.mosofin.com/skills/cash-flow-forecast-13-week/plain.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/credit-card-reconciliation/learn.html</loc>
+    <loc>https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/</loc>
+    <loc>https://skills.mosofin.com/skills/credit-card-reconciliation/</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/plain.html</loc>
+    <loc>https://skills.mosofin.com/skills/credit-card-reconciliation/plain.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/learn.html</loc>
+    <loc>https://skills.mosofin.com/skills/credit-card-reconciliation/learn.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/three-way-match/</loc>
+    <loc>https://skills.mosofin.com/skills/duplicate-invoice-detection/</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/three-way-match/plain.html</loc>
+    <loc>https://skills.mosofin.com/skills/duplicate-invoice-detection/plain.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
   <url>
-    <loc>https://mosofin.github.io/mosofin-skill-explainers/skills/three-way-match/learn.html</loc>
+    <loc>https://skills.mosofin.com/skills/duplicate-invoice-detection/learn.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/plain.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/learn.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/three-way-match/</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/three-way-match/plain.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/three-way-match/learn.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/vendor-statement-reconciliation/</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/vendor-statement-reconciliation/plain.html</loc>
+    <lastmod>2026-10-28</lastmod>
+  </url>
+  <url>
+    <loc>https://skills.mosofin.com/skills/vendor-statement-reconciliation/learn.html</loc>
     <lastmod>2026-10-28</lastmod>
   </url>
 </urlset>
