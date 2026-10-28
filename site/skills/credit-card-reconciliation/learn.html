@@ -286,7 +286,7 @@
 <section>
   <span class="label">How it thinks</span>
   <h2>Five rules the whole skill runs on</h2>
-  <p class="muted">Everything on this page is one of these rules applied to a bigger situation. The examples use one company, Northbrook Trading, one corporate card held by Dana Reyes, and the September statement.</p>
+  <p class="muted">Everything on this page is one of these rules applied to a bigger situation. The examples use one company, Northbrook Trading, one corporate card held by the operations manager, and the September statement.</p>
   <div class="rules" id="rules"></div>
 </section>
 
@@ -314,7 +314,7 @@
         <label class="field"><span>Charges on the statement not yet in the books</span><input data-k="notgl" inputmode="decimal"></label>
       </fieldset>
       <fieldset><legend>From your books</legend>
-        <label class="field"><span>Card liability balance at period end</span><input data-k="gl" inputmode="decimal"></label>
+        <label class="field"><span>Card liability balance at the statement closing date</span><input data-k="gl" inputmode="decimal"></label>
         <label class="field"><span>Charges in the books not yet on the statement</span><input data-k="notstmt" inputmode="decimal"></label>
         <label class="field"><span>Payments in transit</span><input data-k="transit" inputmode="decimal"></label>
       </fieldset>
@@ -327,7 +327,7 @@
       </fieldset>
     </div>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">The tie-out is the skill's Step 2 bridge. The receipt categories (matched, below threshold, missing) are the skill's Step 3. Your threshold is your own. The IRS's own line is $75 for most expenses<sup class="c"><a href="#src1">1</a></sup>. The capital test compares one purchase with your threshold. The IRS safe harbor is $2,500 per item without audited statements<sup class="c"><a href="#src3">3</a></sup>.</p>
+    <p class="fine">The tie-out is the skill's Step 2 bridge, read at the statement closing date. The receipt categories (matched, below threshold, missing) are the skill's Step 3. Your threshold is your own. The IRS's own line is $75 for most expenses<sup class="c"><a href="#src1">1</a></sup>. The capital test compares one purchase with your threshold. The IRS safe harbor is $2,500 per item without audited statements<sup class="c"><a href="#src3">3</a></sup>.</p>
   </div>
 </section>
 
@@ -343,8 +343,8 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Is MosoFin the data source, or do you upload the data? Which card is it, and whose is it? Which statement period is it, and does it match your month? The skill also asks for the statement, the receipts and your policies. The policies are the receipt and capitalisation thresholds, and whether you can reclaim tax.</div>
-    <div><b>Needs</b>The skill needs your books' card charges and liability balance, connected or exported. It also needs the statement and the receipts, which only you can supply.</div>
+    <div><b>Asks first</b>Is MosoFin the data source, or do you upload the data? Which card is it, and who holds it (by role)? Which statement period is it, and does it match your month? The skill also asks for the statement, the receipts and your policies. The policies are the receipt and capitalisation thresholds, and whether you can reclaim tax.</div>
+    <div><b>Needs</b>The skill needs your books' card charges, and the liability balance at the statement closing date and at month end, connected or exported. It also needs the statement and the receipts, which only you can supply. Last month's reconciliation is useful, because the skill checks that its open items cleared.</div>
     <div><b>Gives back</b>The skill returns the tie-out and every charge with its receipt status. It lists exceptions by severity with the three monthly tests. It proposes entries in your account names. It also returns a coverage sheet that names what it could not check.</div>
     <div><b>Never</b>The skill never posts and never pays the card. It never calls a review a reconciliation. It never treats an attached file as a matched receipt. It never names an employee on test data. It reads nothing before you say yes.</div>
   </div>
@@ -372,12 +372,12 @@ const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").
 
 const RULES = [
   { id:"1", kind:"", title:"Tie the statement to the card liability",
-    formula:"Card liability in the books\n+ charges in books, not yet on statement\n− charges on statement, not yet in books\n+ payments in transit ± FX timing\n= statement closing balance",
-    plain:"Every step on that ladder has a name. A remaining difference is an unexplained charge or payment, never rounding.",
+    formula:"Card liability in the books, at statement close\n− charges in books, not yet on statement\n+ charges on statement, not yet in books\n+ payments in transit ± one-sided credits, fees, FX\n= statement closing balance",
+    plain:"First the skill proves that the statement adds up, and it matches each statement line to a posted charge. Every step on the ladder has a name. A remaining difference is an unexplained charge or payment, never rounding.",
     where:"references/method.md · Step 2", cites:[2],
     backed:"QuickBooks' own reconcile screen does the same for a credit card account. It finishes only when the difference is $0.00." },
   { id:"2", kind:"", title:"A file is not a receipt",
-    formula:"matched: receipt confirms date, amount, merchant\nbelow threshold: no receipt required by policy\nmissing: above threshold, no receipt → exception",
+    formula:"matched: receipt shows the same date, amount, merchant\nbelow threshold: no receipt required by policy\nmissing: above threshold, no receipt → exception",
     plain:"An attachment proves a file exists. A match proves it is the right receipt for the right amount. The skill reports those as two separate facts.",
     where:"references/method.md · Step 3", cites:[1],
     backed:"The IRS calls evidence adequate when it shows the amount, date, place and essential character of the expense. The IRS generally does not need evidence under $75 except for lodging." },
@@ -387,7 +387,7 @@ const RULES = [
     where:"references/overview.md · What a connected workspace gives you here", cites:[2],
     backed:"A reconciliation in the accounting software starts from the statement's closing balance. With nothing to enter there, there is no reconciliation to finish." },
   { id:"W", kind:"w", title:"Three tests every month, statement or not",
-    formula:"same merchant, same amount, same day → duplicate\nsame merchant, same amount, every month → subscription, × 12\nexpense-coded charge > capitalisation line → asset",
+    formula:"same merchant, same amount, within a few days → duplicate\nsame merchant, same amount, every month → subscription, × 12\nexpense-coded charge > capitalisation line → asset",
     plain:"Each needs only the posted charges. Each finds something on a card that people only ever check in total.",
     where:"references/method.md · Step 6", cites:[3,6],
     backed:"The IRS safe harbor draws the asset line at $2,500 per item for most small businesses.{3} Asset misappropriation is the most common occupational fraud, found in 89% of cases.{6}" },
@@ -401,15 +401,16 @@ const RULES = [
 const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 
 const LEVELS = [
-  { tier:"Single card · Northbrook Trading, Dana Reyes's corporate card, September statement" },
+  { tier:"Single card · Northbrook Trading, the operations manager's corporate card, September statement" },
   { n:1, title:"One statement that ties on the first pass",
     chips:["Statement","Books"], src:"Rule 1", cites:[2,5],
-    situation:"The September statement closes at $8,432.10 with 42 charges and one payment. The card liability in Northbrook's books is $8,092.10. Northbrook posted one $340 charge in the books on 30 September. The issuer recorded it on 1 October.",
+    situation:"The September statement closes at $8,432.10 with 42 charges and one payment. The statement closes on 30 September. On that date the card liability in Northbrook's books is $8,772.10. Northbrook posted one $340 charge in the books on 30 September. The issuer recorded it on 1 October.",
     facts:["In QuickBooks Online, you reconcile a credit card account like a bank account. Enter the statement's closing balance and date. Tick what appears. Finish when the difference is $0.00 "+C(2)+".","If a charge on the statement is wrong, the cardholder has 60 days from the statement to dispute it in writing "+C(5)+". The issuer has 30 days to acknowledge the dispute "+C(5)+". The skill tracks a disputed amount. It does not book the credit until the issuer decides."],
-    visual:{type:"wf", start:["Card liability in the books",8092.10], steps:[["Charge posted 30 Sep, on October's statement",340]], end:["Adjusted books",8432.10], dec:2},
-    rule:{q:"The credit card liability on the GL should reconcile to the statement closing balance", w:"references/method.md · Step 2"},
-    math:[["Card liability in the books","$8,092.10"],["+ charge in books, not yet on statement","$340.00"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
-    verdict:["ok","The statement ties. The $340 is timing, nothing else. The skill records it as a reconciling item with its posting date, so next month's run expects it on October's statement."] },
+    visual:{type:"wf", start:["Card liability in the books",8772.10], steps:[["Charge posted 30 Sep, on October's statement",-340]], end:["Adjusted books",8432.10], dec:2},
+    rule:{q:"The credit card liability on the GL should reconcile to the statement closing balance", w:"references/method.md · Step 2 — Tie statement balance to GL"},
+    rule2:{q:"Read the GL liability balance as of the statement closing date, not the accounting period end — otherwise every charge and payment between the two dates becomes a bridge item.", w:"references/method.md · Step 2 — Tie statement balance to GL"},
+    math:[["Card liability in the books","$8,772.10"],["− charge in books, not yet on statement","$340.00"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
+    verdict:["ok","The statement ties. The $340 is timing, nothing else. The skill records it as a reconciling item with its posting date. Next month's run checks that it cleared on October's statement."] },
 
   { n:2, title:"Receipts: matched, below threshold, missing",
     chips:["Receipts","$75 policy"], src:"Rule 2", cites:[1],
@@ -417,21 +418,21 @@ const LEVELS = [
     facts:["The IRS treats evidence as adequate when it shows the amount, date, place and essential character of the expense. The IRS generally does not require evidence below $75, except for lodging "+C(1)+". A hotel charge always needs its receipt."],
     visual:{type:"table",
       head:["Status","Charges","What the skill saw","Exception?"],
-      rows:[["Matched","31","receipt confirms date, amount and merchant","no"],["Below threshold","6","under $75, no receipt required by policy","no"],["File attached, not a match",["4","bad"],"a file exists, but the amount or merchant differs",["yes, 4"]],["Missing, above threshold",["1","bad"],"$412 hotel, nothing attached",["yes, high"]]]},
-    rule:{q:"it is not a match: a file being present says nothing about whether it is the right receipt for the right amount.", w:"references/method.md · Step 3"},
-    rule2:{q:"Missing receipt above threshold — exception, needs follow-up", w:"references/method.md · Step 3"},
+      rows:[["Matched","31","receipt shows the same date, amount and merchant","no"],["Below threshold","6","under $75, no receipt required by policy","no"],["File attached, not a match",["4","bad"],"a file exists, but the amount or merchant differs",["yes, 4"]],["Missing, above threshold",["1","bad"],"$412 hotel, nothing attached",["yes, high"]]]},
+    rule:{q:"it is not a match: a file being present says nothing about whether it is the right receipt for the right amount.", w:"references/method.md · Step 3 — Match receipts to transactions"},
+    rule2:{q:"Missing receipt above threshold — exception, needs follow-up", w:"references/method.md · Step 3 — Match receipts to transactions"},
     math:[["Charges on the statement","42"],["Matched","31"],["Below $75, no receipt needed","6"],["Attached but not matched","4"],["Missing above threshold","1"],["Exceptions: 4 + 1","5",1]],
     verdict:["flag","There are five exceptions, not one. The four attached-but-unmatched files would read as fine in a system that only checks whether something is attached. The hotel charge is the one the IRS would ask about first."] },
 
   { n:3, title:"The $148.50 nobody entered",
     chips:["Statement","Books"], src:"Rules 1 and 3", cites:[6],
-    situation:"The statement is the same, but the books show $8,240.60. The bridge is $148.50 short. The missing charge is a Saturday grocery-store purchase that nobody ever submitted. It has no receipt and no business purpose.",
+    situation:"The statement is the same, but the books show $8,623.60. The bridge is $148.50 short. The missing charge is a Saturday grocery-store purchase that nobody ever submitted. It has no receipt and no business purpose.",
     facts:["Asset misappropriation is the most common occupational fraud, in 89% of cases, with a median loss of $120,000 "+C(6)+". A third of frauds happen where controls are lacking "+C(6)+". Most unsubmitted charges are forgetfulness. That is exactly why the skill reports the facts and lets a person decide."],
-    visual:{type:"wf", start:["Card liability in the books",8240.60], steps:[["Charge posted 30 Sep, on October's statement",340],["Charge on statement, never entered",-148.50]], end:["Adjusted books",8432.10], dec:2, warn:true},
-    rule:{q:"Charges on the statement but not yet posted to GL → reconciling item (timing)", w:"references/method.md · Step 2"},
-    rule2:{q:"Possible personal-use charges (groceries, personal services, weekend non-business locations)", w:"references/method.md · Step 6"},
-    math:[["Card liability in the books","$8,240.60"],["+ timing item","$340.00"],["− charge on statement not in books","$148.50"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
-    verdict:["flag","The bridge ties once the skill names the $148.50. The finding is a weekend grocery charge with no receipt and no purpose. The skill lists it as a possible personal charge with the cardholder as owner. It never calls it anything more than that."] },
+    visual:{type:"wf", start:["Card liability in the books",8623.60], steps:[["Charge posted 30 Sep, on October's statement",-340],["Charge on statement, never entered",148.50]], end:["Adjusted books",8432.10], dec:2, warn:true},
+    rule:{q:"Charges on the statement but not yet posted to GL → reconciling item (timing)", w:"references/method.md · Step 2 — Tie statement balance to GL"},
+    rule2:{q:"Possible personal-use charges (groceries, personal services, weekend non-business locations)", w:"references/method.md · Step 6 — Flag exceptions"},
+    math:[["Card liability in the books","$8,623.60"],["− timing item","$340.00"],["+ charge on statement not in books","$148.50"],["= adjusted books","$8,432.10",1],["Statement closing balance","$8,432.10"],["Difference","$0.00",1]],
+    verdict:["flag","The bridge ties once the skill names the $148.50. The finding is a weekend grocery charge with no receipt and no purpose. The skill lists it as a possible personal charge with the cardholder as owner. It never calls it anything more than that. If a person decides that the charge is personal, the skill proposes an entry to Due from Employee."] },
 
   { n:4, title:"The laptop in office supplies",
     chips:["Books","$2,500 line"], src:"Three tests", cites:[3],
@@ -440,7 +441,7 @@ const LEVELS = [
     visual:{type:"table",
       head:["Charge","Coded to","Amount","Threshold","Test"],
       rows:[["Electronics retailer, 9 Sep","Office Supplies",["$2,900.00","bad"],"$2,500.00",["over the line: asset","bad"]],["Office chair, 14 Sep","Office Supplies","$640.00","$2,500.00","expense"],["Monitor, 22 Sep","Office Supplies","$389.00","$2,500.00","expense"]]},
-    rule:{q:"Capitalization-threshold breaches — charges above the entity's capitalisation limit coded to an expense account", w:"references/method.md · Step 6"},
+    rule:{q:"Capitalization-threshold breaches — charges above the entity's capitalisation limit coded to an expense account", w:"references/method.md · Step 6 — Flag exceptions"},
     rule2:{q:"Card used for capital purchases (equipment over the entity's capitalisation threshold): flag for Fixed Asset coding, not expense.", w:"references/edge-cases.md · Edge Cases"},
     math:[["Charge","$2,900.00"],["Capitalisation threshold","$2,500.00"],["Over by","$400.00",1],["Proposed entry: DR Computer Equipment, CR Office Supplies","$2,900.00",1]],
     verdict:["flag","The result is one line and one proposed entry. September's expenses were $2,900 too high and the asset register was missing a laptop. The skill runs this test only after you give it the threshold. It never assumes a threshold."] },
@@ -453,7 +454,7 @@ const LEVELS = [
       head:["Merchant","Monthly","Months seen","Annualised","Note"],
       rows:[["Cloud hosting","$240.00","3","$2,880.00","in use"],["Accounting software","$85.00","3","$1,020.00","in use"],["Design tool",["$99.00","bad"],"3",["$1,188.00","bad"],["last login March","bad"]],["Four others","$380.00","3","$4,560.00","in use"]],
       total:["7 subscriptions","$804.00","","$9,648.00",""]},
-    rule:{q:"Recurring subscriptions — same merchant, same amount, repeating monthly across several periods. Present the list with the annualised cost; this reliably surfaces software nobody uses", w:"references/method.md · Step 6"},
+    rule:{q:"Recurring subscriptions — same merchant, same amount, repeating monthly across several periods. Present the list with the annualised cost; this reliably surfaces software nobody uses", w:"references/method.md · Step 6 — Flag exceptions"},
     math:[["Design tool: $99 × 12","$1,188.00",1],["All seven: $804 × 12","$9,648.00"],["Share that is the unused tool: 1,188 ÷ 9,648","12.3%"]],
     verdict:["flag","The design tool costs $1,188 a year, and nobody opens it. The skill lists it with the six that are in use, so the owner can decide. The skill presents the list and the annual cost. Whether a subscription is unused is a question for the team."] },
 
@@ -466,14 +467,14 @@ const LEVELS = [
       head:["Charge","Gross","VAT coded","Receipt","Status"],
       rows:[["Stationery, 3 Sep","£180.00","£30.00",["none","bad"],["reclaim with no evidence","bad"]],["Software, 11 Sep","£600.00","£100.00",["none","bad"],["reclaim with no evidence","bad"]],["Travel agent, 19 Sep","£660.00","£110.00",["none","bad"],["reclaim with no evidence","bad"]]],
       total:["Exposure","£1,440.00","£240.00","",""]},
-    rule:{q:"Tax must be visible on the receipt — some jurisdictions require a valid tax invoice, not just a credit-card slip. This is the point most often missed: the card slip proves payment, not tax", w:"references/method.md · Step 5"},
+    rule:{q:"Tax must be visible on the receipt — some jurisdictions require a valid tax invoice, not just a credit-card slip. This is the point most often missed: the card slip proves payment, not tax", w:"references/method.md · Step 5 — Tax handling"},
     rule2:{q:"A recoverable tax code with no receipt — Mosofin-specific and directly detectable. A tax recovery claim with no supporting invoice is an exposure; list them.", w:"references/edge-cases.md · Edge Cases"},
     math:[["Charges with a recoverable tax code and no receipt","3"],["VAT claimed on them: 30 + 100 + 110","£240.00",1],["Evidence held","card transactions only"],["Action","obtain VAT invoices or reverse the claim"]],
     verdict:["flag","This level shows £240 of VAT reclaimed with nothing behind it. The skill can see the tax code and the absence of a file from the books alone. For this reason, this test runs even on the upload path once the skill knows the receipts."] },
 
   { n:7, title:"One card, two companies",
     chips:["Northbrook","Southbrook"], src:"Not your expense", cites:[7],
-    situation:"Dana's Northbrook card paid $1,240 of September costs that belong to Southbrook, a subsidiary: a venue deposit and some printing. In Northbrook's books they sit in Marketing.",
+    situation:"The operations manager's Northbrook card paid $1,240 of September costs that belong to Southbrook, a subsidiary: a venue deposit and some printing. In Northbrook's books they sit in Marketing.",
     facts:["Group accounts present the parent and its subsidiaries as a single economic entity "+C(7)+". As a result, the $1,240 vanishes in the consolidated total. In each company's own books, it is a balance between them. You have to record it on both sides."],
     visual:{type:"table",
       head:["Charge","Paid by","Belongs to","Booked as","Should be"],
@@ -481,7 +482,7 @@ const LEVELS = [
       total:["Intercompany","","","","$1,240.00 owed by Southbrook"]},
     rule:{q:"A card issued to one entity but used for another's expenses is the common cross-entity case. Those charges are not that entity's expense — they create an intercompany balance: entity A paid for entity B's cost.", w:"references/method.md · Both entity scenarios"},
     math:[["Southbrook costs on the Northbrook card: 900 + 340","$1,240.00",1],["Northbrook marketing expense, overstated by","$1,240.00"],["Proposed: DR Due from Southbrook, CR Marketing (Northbrook)","$1,240.00"],["Proposed: DR Marketing (Southbrook), CR Due to Northbrook","$1,240.00",1]],
-    verdict:["note","The $1,240 is an intercompany balance, with one proposed entry in each company. It is not an error to delete, and it is not Northbrook's expense. Northbrook's September marketing drops by $1,240. Southbrook's rises by the same amount. The two cancel only in the group accounts."] },
+    verdict:["note","The $1,240 is an intercompany balance, with one proposed entry in each company. It is not an error to remove, and it is not Northbrook's expense. Northbrook's September marketing drops by $1,240. Southbrook's rises by the same amount. The two cancel only in the group accounts."] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -551,9 +552,9 @@ function renderLevels(){
 
 /* --- calculator: the Step 2 bridge, the Step 3 receipt count, and one capital test --- */
 const PRESETS = {
-  clean:   {stmt:8432.10,notgl:0,     gl:8092.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:640},
-  missing: {stmt:8432.10,notgl:148.50,gl:8240.60,notstmt:340,transit:0,n:42,matched:31,below:6,cap:2500,big:640},
-  laptop:  {stmt:8432.10,notgl:0,     gl:8092.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:2900},
+  clean:   {stmt:8432.10,notgl:0,     gl:8772.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:640},
+  missing: {stmt:8432.10,notgl:148.50,gl:8623.60,notstmt:340,transit:0,n:42,matched:31,below:6,cap:2500,big:640},
+  laptop:  {stmt:8432.10,notgl:0,     gl:8772.10,notstmt:340,transit:0,n:42,matched:36,below:6,cap:2500,big:2900},
   blank:   {stmt:"",notgl:"",gl:"",notstmt:"",transit:"",n:"",matched:"",below:"",cap:"",big:""},
 };
 const inputs=[...document.querySelectorAll("[data-k]")];
@@ -564,8 +565,8 @@ function run(){
   const stmt=num("stmt"), notgl=num("notgl"), gl=num("gl"), notstmt=num("notstmt"), transit=num("transit");
   const box=document.getElementById("results");
   if(!stmt && !gl){ box.innerHTML=res("", "Waiting", "—", "Enter the statement closing balance and the card liability in the books to start."); return; }
-  const adj = gl + notstmt - notgl + transit, diff = Math.round((adj-stmt)*100)/100;
-  let h = res("", "Rule 1 · adjusted books", fmt(adj), `${fmt(gl)} + ${fmt(notstmt)} not yet on statement − ${fmt(notgl)} not yet in books + ${fmt(transit)} in transit`);
+  const adj = gl - notstmt + notgl + transit, diff = Math.round((adj-stmt)*100)/100;
+  let h = res("", "Rule 1 · adjusted books", fmt(adj), `${fmt(gl)} − ${fmt(notstmt)} not yet on statement + ${fmt(notgl)} not yet in books + ${fmt(transit)} in transit`);
   h += Math.abs(diff)<0.005
     ? res("ok","Rule 1 · does it tie?", "Yes", "To the cent. Every reconciling item has a name.")
     : res("flag","Rule 1 · does it tie?", fmt(Math.abs(diff))+" apart", `Adjusted books are ${fmt(Math.abs(diff))} ${diff>0?"above":"below"} the statement after every named item. Start with charges that appear on one side only. Then check the timing of the last payment.`);
