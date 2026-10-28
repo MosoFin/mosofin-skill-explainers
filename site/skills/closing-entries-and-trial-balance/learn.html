@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Closing Entries and Trial Balance Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked year-end close levels for a two-member LLC, from one account type to the double-close test, with a closing calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .vcap{font-size:14px;color:var(--muted);margin-top:4px}
+  table.wrapcells td{white-space:normal;min-width:110px}
+  table.wrapcells td:first-child{min-width:120px}
+  .hdr{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.06em;background:var(--hold-soft);color:var(--hold);border-radius:8px;padding:8px 12px}
+  .bills select{min-width:130px}
+  .lines-note{display:flex;flex-direction:column;gap:4px}
+  td.p{color:var(--green);font-weight:700;text-align:center}
+  td.f{color:var(--wrong);font-weight:700;background:var(--wrong-soft);text-align:center}
+  td.na{color:var(--faint);text-align:center}
+  .field select{font:inherit;font-size:14.5px;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field{grid-template-columns:1fr minmax(130px,190px)}
+  .bills{min-width:600px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Closing entries and trial balance</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · closing-entries-and-trial-balance · learning guide</span>
+  <h1>From one account type to a year that closes once</h1>
+  <p class="lede">This page shows how the skill closes a year, <b>one level at a time</b>. It starts with the type of one account. It ends with a proof that the books balance after the close, and a lock that a person does. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are three sections of an OpenStax textbook, two IRS pages and one FASB standard. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your year, your check</b><span>At the end, enter your own totals and members. The page shows the entries that the skill proposes and the equity after the close.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Eight rules the whole close runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. Northbrook Trading on this page is the skill's own example: a two-member LLC that closes FY2025. It keeps its books in US dollars, on the accrual basis, under US GAAP, in one QuickBooks Online company file. The skill's read-back names FY2026, but that year has not ended yet. So this example moves the year back by one and keeps every other word. Other pages on this site use the name Northbrook with different facts. Do not compare the figures across pages.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Close your own year on paper</h2>
+  <p class="muted">Enter the totals from your final trial balance, or load an example. The page applies Step 0b, Step 4 and Step 5 from <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="a">Northbrook FY2025, auto-closed</button>
+      <button type="button" data-p="b">Same books, not closed</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The business</legend>
+        <label class="field"><span>Entity type</span><select data-k="ent"><option value="llc">LLC or partnership</option><option value="corp">Corporation</option><option value="sole">Sole proprietor</option></select></label>
+        <label class="field"><span>Closed-state finding (Step 0b)</span><select data-k="state"><option value="auto">Auto-closed by the platform</option><option value="open">Not closed</option><option value="explicit">Closed by an explicit entry</option></select></label>
+        <p class="fine">For a corporation or a sole proprietor, the page uses only the first row below.</p>
+      </fieldset>
+      <fieldset><legend>The year's totals</legend>
+        <label class="field"><span>Revenue (A, before contra)</span><input data-k="rev" inputmode="decimal"></label>
+        <label class="field"><span>Contra revenue, debit balance</span><input data-k="contra" inputmode="decimal"></label>
+        <label class="field"><span>Other income and gains (B)</span><input data-k="oth" inputmode="decimal"></label>
+        <label class="field"><span>Cost of sales (C)</span><input data-k="cos" inputmode="decimal"></label>
+        <label class="field"><span>Operating expenses (D)</span><input data-k="opex" inputmode="decimal"></label>
+        <label class="field"><span>Other expenses and losses (E)</span><input data-k="oexp" inputmode="decimal"></label>
+        <label class="field"><span>Income tax expense (F)</span><input data-k="tax" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Members or owners">
+      <thead><tr><th>Member or owner</th><th>Share %</th><th>Opening capital or RE</th><th>Distributions, draws or dividends</th></tr></thead>
+      <tbody id="mrows"></tbody>
+    </table></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page checks arithmetic and the skill's entry shapes only. It cannot see your books, so it cannot run the closed-state test. You choose the finding. For an LLC, the shares must add up to 100. The page never assumes equal shares. Amounts round to the cent, and the last member takes any cent left over.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin, or upload the data yourself? Which company? What is the fiscal year end? What is the entity type, and for an LLC, how do members share profit? Which framework? Is the trial balance final? Does your system close the year automatically? Is the audit complete? Two-step or four-step? Cash or accrual?</div>
+    <div><b>Needs</b>The final trial balance at the year end and the chart of accounts with types. For the closed-state test, it needs the trial balance on the first day of the new year and the equity ledger. Last year's statements or return let it agree the opening equity.</div>
+    <div><b>Gives back</b>The closed-state finding, the proposed entries with every account named, both trial balances and the tie-outs. It makes an eight-sheet workpaper only on a yes. The last sheet shows the coverage and names the person who locks the year.</div>
+    <div><b>Never</b>The skill never reads your data before you answer and say yes to the read-back. It never posts or locks anything. It never proposes an entry before the closed-state test. It never chooses the year end, the entity type or the framework for you.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources: three sections of an OpenStax textbook, two IRS pages and one FASB standard. MosoFin found each one on 28 October 2026 in search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The closed-state test in Step 0b and its three states are the skill's own. So are the decision on account type, the eight output sheets and the [auto], [gated] and [manual] verdicts. The rule that the skill never locks a year is also its own. MosoFin made up the members, their shares and every figure in the examples.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/gates.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a correction from the bookkeeping audit followed on 27 October 2026. This page describes that version. All figures come from made-up worked examples, not from your data. The sources are US sources, and the tax rule is US law. This page is not tax advice. Ask your accountant what applies to you. This page explains <code>closing-entries-and-trial-balance</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/closing-entries-and-trial-balance">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 5.1 Describe and Prepare Closing Entries for a Business", u:"https://openstax.org/books/principles-financial-accounting/pages/5-1-describe-and-prepare-closing-entries-for-a-business", at:"the four closing entries", checked:"2026-10-28", via:"from search results, page not opened", w:"Closing entries set the temporary accounts back to zero, so each period starts fresh. Permanent accounts carry their balances forward. The four entries start from the adjusted trial balance."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 5.2 Prepare a Post-Closing Trial Balance", u:"https://openstax.org/books/principles-financial-accounting/pages/5-2-prepare-a-post-closing-trial-balance", checked:"2026-10-28", via:"from search results, page not opened", w:"The post-closing trial balance shows that debits equal credits and that only permanent accounts have balances. A temporary account with a balance points to an error in the close."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 15.3 Compute and Allocate Partners' Share of Income and Loss", u:"https://openstax.org/books/principles-financial-accounting/pages/15-3-compute-and-allocate-partners-share-of-income-and-loss", at:"closing entries for a partnership", checked:"2026-10-28", via:"from search results, page not opened", w:"Net income goes to each partner's capital account by share. Each partner's drawing account closes to that partner's capital. If the agreement says nothing, partners share equally."},
+  {t:"IRS: LLC filing as a corporation or partnership", u:"https://www.irs.gov/businesses/small-businesses-self-employed/llc-filing-as-a-corporation-or-partnership", checked:"2026-10-28", via:"from search results, page not opened", w:"For US federal tax, an LLC with two or more members is a partnership, unless it elects corporation treatment on Form 8832. A partnership LLC generally files Form 1065 and gives each member a Schedule K-1."},
+  {t:"IRS: Instructions for Form 1065 (2025), Item L, partner's capital account analysis", u:"https://www.irs.gov/instructions/i1065", at:"Item L", checked:"2026-10-28", via:"from search results, page not opened", w:"Each partner's capital analysis runs from beginning capital through contributions, net income or loss, other changes and withdrawals to ending capital. The lines must add up to the ending capital."},
+  {t:"FASB: Comprehensive Income (Topic 220), ASU No. 2011-05", u:"https://storage.fasb.org/ASU2011-05.pdf", checked:"2026-10-28", via:"from search results, page not opened", w:"Other comprehensive income goes in one continuous statement of comprehensive income or in two consecutive statements. The option to show it in the statement of changes in equity ended."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"The mistake it exists to stop is the double close", w:"SKILL.md · Closing entries and trial balance"},
+  q2:{q:"Never proposes a closing entry before the closed-state test.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"Classifies temporary versus permanent on account type, never on name", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Never reports the period as locked.", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"Each entity closes its own books; there is no group closing entry", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q6:{q:"If the revenue and expense accounts are already at zero, the platform has closed the year automatically.", w:"references/method.md · Step 0b — Test whether the year is already closed (Mosofin addition)"},
+  q7:{q:"the platform's roll touches only income and expense", w:"references/method.md · Step 0b — Test whether the year is already closed (Mosofin addition)"},
+  q8:{q:"A difference means the prior year changed after it was reported. Stop and ask before closing on top of it.", w:"references/method.md · Step 1 — Verify the pre-closing trial balance"},
+  q9:{q:"A revenue-typed account called \"Deferred Revenue\" is a real misconfiguration and closing it would move a liability into retained earnings.", w:"references/method.md · Step 2 — Identify accounts to close"},
+  q10:{q:"If they differ, an account is classified in a way the report and the trial balance disagree about — resolve it before closing, not after.", w:"references/method.md · Step 4 — Compute the closing entries"},
+  q11:{q:"Close each account by the opposite of its own balance.", w:"references/method.md · Step 5 — Construct the closing JEs (hand off to journal-entry-builder)"},
+  q12:{q:"a closing entry that says \"Revenue\" when there are eleven revenue accounts is not postable.", w:"references/method.md · Step 5 — Construct the closing JEs (hand off to journal-entry-builder)"},
+  q13:{q:"The post-closing TB equals the opening trial balance for the new fiscal year.", w:"references/method.md · Step 7 — Post-closing trial balance"},
+  q14:{q:"Mosofin cannot lock a period.", w:"references/method.md · Step 9 — Lock and roll"},
+  q15:{q:"A balance sheet plus a P&L is not a trial balance", w:"references/gates.md · Gate 2 — Discover enabled tools → build the capability map"},
+  q16:{q:"Do not persist balances, net income, retained earnings or the trial balances.", w:"references/method.md · Step 11 — Evolve the skill (Mosofin-specific, final step)"},
+};
+
+const RULES = [
+  { id:"1", title:"The type decides, the name does not", r:Q.q3, cites:[1],
+    plain:"Revenue, expense, gain and loss types close to zero. Asset, liability and equity types carry forward. If a name and a type disagree, the skill lists the account for your decision.",
+    backed:"Closing entries set the temporary accounts back to zero, and permanent accounts carry their balances forward.{1}" },
+  { id:"2", title:"The proof comes after the close", r:Q.q13, cites:[2],
+    plain:"The skill builds the post-closing trial balance from the trial balance and the entries. After a person posts them, it compares that list with the books on the first day of the new year.",
+    backed:"A post-closing trial balance shows that debits equal credits and that only permanent accounts have balances.{2}" },
+  { id:"3", title:"The automatic close leaves the members' part", r:Q.q7, cites:[3,4],
+    plain:"When the platform closed the year, the skill still proposes two entries for an LLC. One moves the year's income to each member's capital. The other closes each member's distributions.",
+    backed:"In a partnership, net income goes to each partner's capital account by share, and drawings close to capital.{3} For US federal tax, an LLC with two or more members is a partnership by default.{4}" },
+  { id:"4", title:"One close, never two", r:Q.q1, cites:[],
+    plain:"Some systems close the year automatically. If a person also posts closing entries, equity counts the year's result two times." },
+  { id:"5", title:"Test first, then propose", r:Q.q2, cites:[],
+    plain:"The test has three parts. It reads the trial balance on the first day of the new year. It searches for a closing entry, and it compares retained earnings." },
+  { id:"6", title:"Each account by its own balance", r:Q.q11, cites:[1],
+    plain:"A contra revenue account, such as sales returns, has a debit balance. So the closing entry credits it. Every account appears by its own name.",
+    backed:"The four closing entries close revenues and expenses account by account, from the adjusted trial balance.{1}" },
+  { id:"7", title:"A person locks the year", r:Q.q4, cites:[],
+    plain:"The skill cannot lock a period. The workpaper names the person who locks the year, and the coverage sheet shows that step as manual." },
+  { id:"8", title:"Save the method, not the money", r:Q.q16, cites:[],
+    plain:"On a yes after the results, the skill saves the entity type, the closing method and who locks the year. The closed state of a year can change, so the skill tests it again next year." },
+];
+
+const NOFACT = "This level needs no outside fact. The test it runs is the skill's own.";
+const LEVELS = [
+  { tier:"Before the close · Northbrook Trading, FY2025" },
+  { n:1, title:"One account, one rule: the type decides",
+    chips:["Chart of accounts","Trial balance at 31 Dec 2025"], src:"Rule 1", cites:[1],
+    situation:"On the first run, on Tuesday 13 January 2026, the skill reads 24 accounts with their types. One account has the name Customer Deposits, the type Other Income and a credit of $4,000.",
+    facts:["Temporary accounts, such as revenue and expense accounts, go back to zero at the end of each period "+C(1)+".",
+           "Permanent accounts, such as assets, liabilities and equity, carry their balances into the next period "+C(1)+".",
+           "By its name, Customer Deposits holds money that customers paid in advance. That is a liability. Only the owner can say which word is right, the name or the type."],
+    visuals:[{cap:"Three accounts from the first run, classified on type (search_accounts, [auto])",
+      head:["Account","Type","By type","By name","Result"],
+      rows:[["Sales","Income","Temporary","Temporary",["closes","good"]],["Customer Deposits","Other Income","Temporary","Liability",["exception","bad"]],["Member Distributions (Hart)","Equity","Permanent","Draws",["closes: draws exception","good"]]]}],
+    rules:[Q.q3, Q.q9, Q.q10],
+    math:[["Net income from the trial balance, as typed","212,900"],["Net income on the QuickBooks P&L","212,900"],["Difference: 212,900 − 212,900","0",1],["Customer Deposits inside both figures","4,000"],["Correction, dated Wed 31 Dec 2025","DR Customer Deposits (income) 4,000"],["","CR Customer Deposits (liability) 4,000"],["Posted by the owner in QuickBooks","Wed 14 Jan 2026"],["Net income after the correction: 212,900 − 4,000","208,900",1]],
+    verdict:["note","The P&L check passes, because QuickBooks' P&L follows the same account type. Only the review of names against types finds the account. The skill lists it and moves nothing. A type correction is an adjusting entry, so the trial balance was not final. The owner takes the correction to journal-entry-builder.","EXCEPTION"] },
+
+  { n:2, title:"The trial balance must balance first",
+    chips:["Trial balance at 31 Dec 2025","2024 Form 1065, Schedule K-1"], src:"Rules 1 and 2", cites:[2,5],
+    situation:"The second run is on Thursday 15 January 2026. The skill reads everything again, because the books changed. Then it adds each side of the final trial balance.",
+    facts:["OpenStax shows the same test at the end of the close: on the post-closing trial balance, debits equal credits "+C(2)+". The skill runs it before the close too.",
+           "Each partner's capital analysis on Form 1065 runs from beginning capital to ending capital. The lines above the ending capital must add up to it "+C(5)+".",
+           "So the ending capital on last year's return is a check on this year's opening capital. The owner uploads the return, because the books do not hold it."],
+    visuals:[{cap:"Final pre-closing trial balance, Wed 31 Dec 2025, USD (get_trial_balance, [auto])",
+      head:["Account","Type","Debit","Credit","Kind"],
+      rows:[["Cash","Bank","182,400","—","Permanent"],["Accounts Receivable","A/R","96,500","—","Permanent"],["Prepaid Expenses","Other current asset","12,500","—","Permanent"],["Equipment","Fixed asset","300,000","—","Permanent"],["Accumulated Depreciation","Fixed asset (contra)","—","46,000","Permanent"],["Accounts Payable","A/P","—","64,000","Permanent"],["Accrued Liabilities","Other current liability","—","18,500","Permanent"],["Customer Deposits","Other current liability","—","4,000","Permanent"],["Member Capital (Hart)","Equity","—","210,000","Permanent"],["Member Capital (Vance)","Equity","—","140,000","Permanent"],["Retained Earnings","Equity","—","0","Permanent"],["Member Distributions (Hart)","Equity","60,000","—","Temporary (draws)"],["Member Distributions (Vance)","Equity","40,000","—","Temporary (draws)"],["Sales","Income","—","1,240,000","Temporary"],["Sales Returns and Allowances","Income (contra)","18,000","—","Temporary"],["Interest Income","Other income","—","1,500","Temporary"],["Cost of Sales","Cost of goods sold","742,000","—","Temporary"],["Wages","Expense","186,000","—","Temporary"],["Rent","Expense","48,000","—","Temporary"],["Utilities","Expense","9,600","—","Temporary"],["Depreciation Expense","Expense","14,000","—","Temporary"],["Insurance","Expense","7,200","—","Temporary"],["Office Supplies","Expense","5,400","—","Temporary"],["Loss on Disposal of Equipment","Other expense","2,400","—","Temporary"]],
+      total:["Total","","1,724,000","1,724,000",""]},
+      {cap:"Opening capital against last year's return (Step 1 item 6, [manual])",
+      head:["Item","Amount"],
+      rows:[["Member Capital (Hart), opening","210,000"],["Member Capital (Vance), opening","140,000"],["Total opening capital in the books","350,000"],["Ending capital on the 2024 Schedule K-1s, Item L, from the owner","350,000"]],
+      total:["Difference","0"]}],
+    rules:[Q.q15, Q.q8],
+    math:[["Debits: 182,400 + 96,500 + 12,500 + 300,000","591,400"],["+ 60,000 + 40,000 + 18,000","118,000"],["+ 742,000 + 186,000 + 48,000 + 9,600","985,600"],["+ 14,000 + 7,200 + 5,400 + 2,400","29,000"],["Total debits: 591,400 + 118,000 + 985,600 + 29,000","1,724,000",1],["Credits: 46,000 + 64,000 + 18,500 + 4,000","132,500"],["+ 210,000 + 140,000 + 0","350,000"],["+ 1,240,000 + 1,500","1,241,500"],["Total credits: 132,500 + 350,000 + 1,241,500","1,724,000",1],["Difference","0",1],["Opening capital: 210,000 + 140,000","350,000"],["Against the 2024 return","agrees",1]],
+    verdict:["ok","The trial balance balances at 1,724,000 on each side. Opening capital agrees with last year's return. The run 1 list also totalled 1,724,000, because the correction moved 4,000 between two credit balances. Reconciliations, variance review and approval stay [manual], with named owners.","BALANCED"] },
+
+  { n:3, title:"If the year were open: the two-step entries",
+    chips:["Trial balance","Profit shares from the owner"], src:"Rule 6", cites:[1,3],
+    situation:"This level is a contrast. Suppose QuickBooks had not closed the year, so the test finds state 1, not closed. Northbrook has no Income Summary account, so the skill proposes the two-step method.",
+    facts:["The textbook method has four entries. It closes revenues to Income Summary, then expenses, then Income Summary to retained earnings, then dividends "+C(1)+".",
+           "The two-step method skips Income Summary. The skill's Step 3 says that both methods reach the same end state.",
+           "In a partnership, net income goes to each partner's capital account by share, and each partner's drawings close to that partner's capital "+C(3)+"."],
+    visuals:[{cap:"E1 · Close revenue and income to members' capital · Wed 31 Dec 2025 · PROPOSAL",
+      head:["Account","Debit","Credit"],
+      rows:[["Sales","1,240,000","—"],["Interest Income","1,500","—"],["Sales Returns and Allowances","—","18,000"],["Member Capital (Hart), 60%","—","734,100"],["Member Capital (Vance), 40%","—","489,400"]],
+      total:["Total","1,241,500","1,241,500"]},
+      {cap:"E2 · Close expenses and losses to members' capital · Wed 31 Dec 2025 · PROPOSAL",
+      head:["Account","Debit","Credit"],
+      rows:[["Member Capital (Hart), 60%","608,760","—"],["Member Capital (Vance), 40%","405,840","—"],["Cost of Sales","—","742,000"],["Wages","—","186,000"],["Rent","—","48,000"],["Utilities","—","9,600"],["Depreciation Expense","—","14,000"],["Insurance","—","7,200"],["Office Supplies","—","5,400"],["Loss on Disposal of Equipment","—","2,400"]],
+      total:["Total","1,014,600","1,014,600"]},
+      {cap:"E3 · Close member distributions to capital · PROPOSAL",
+      head:["Account","Debit","Credit"],
+      rows:[["Member Capital (Hart)","60,000","—"],["Member Distributions (Hart)","—","60,000"],["Member Capital (Vance)","40,000","—"],["Member Distributions (Vance)","—","40,000"]],
+      total:["Total","100,000","100,000"]}],
+    rules:[Q.q11, Q.q12],
+    math:[["A revenue: 1,240,000 − 18,000","1,222,000"],["B other income","1,500"],["Credits to close: A + B","1,223,500",1],["Hart: 1,223,500 × 60%","734,100"],["Vance: 1,223,500 × 40%","489,400"],["C cost of sales","742,000"],["D operating: 186,000 + 48,000 + 9,600 + 14,000 + 7,200 + 5,400","270,200"],["E other: 2,400 · F income tax: 0","2,400"],["Debits to close: C + D + E + F","1,014,600",1],["Hart: 1,014,600 × 60%","608,760"],["Vance: 1,014,600 × 40%","405,840"],["Net for Hart: 734,100 − 608,760","125,340",1],["Net for Vance: 489,400 − 405,840","83,560",1]],
+    verdict:["note","These entries apply only to state 1. E1 credits the contra account by the opposite of its debit balance. Every account appears by its own name. Northbrook's real test finds a different state, at Level 4.","STATE 1 ONLY"] },
+
+  { tier:"The mistake it catches · the double close" },
+  { n:4, title:"The double-close test",
+    chips:["Trial balance at 1 Jan 2026","Journal entries","Balance sheet at 1 Jan 2026"], src:"Rules 4 and 5", cites:[],
+    situation:"Before it proposes any entry, the skill runs three reads, all [auto]. The owner said, \"I think QuickBooks does it\". The skill tests that answer and then asks the owner to agree.",
+    facts:[], nofact:NOFACT,
+    visuals:[{cap:"The three checks of Step 0b",
+      head:["Check","What the skill reads","Result"],
+      rows:[["1 · Trial balance, Thu 1 Jan 2026","Every income and expense account",["all at 0","good"]],["2 · Journal entries near Wed 31 Dec 2025","A closing entry to retained earnings",["none found","good"]],["3 · Retained earnings","1 Jan 2026: 208,900. 31 Dec 2025: 0 + Net Income line 208,900",["agree","good"]]]},
+      {cap:"Members' equity after the close",
+      head:["Case","Equity","Profit counted"],
+      rows:[["The skill's way: test, then propose only what QuickBooks left","458,900","1 time"],["The mistake: post E1 and E2 on top of QuickBooks' close",["667,800","bad"],["2 times","bad"]]]}],
+    rules:[Q.q2, Q.q6, Q.q1],
+    math:[["Income and expense accounts at Thu 1 Jan 2026","all 0"],["Explicit closing entry found","none"],["RE at Thu 1 Jan 2026","208,900"],["RE 0 + Net Income line 208,900 at Wed 31 Dec 2025","208,900"],["Difference","0",1],["Finding","State 2: auto-closed by the platform",1],["Correct equity: 350,000 + 208,900 − 100,000","458,900"],["With a second close: 458,900 + 208,900","667,800"],["Overstatement","208,900",1]],
+    verdict:["ok","The finding is state 2, auto-closed by the platform. So the skill proposes no entry that closes revenue or expense. A second close would overstate equity by the full year's result, 208,900.","AUTO-CLOSED"] },
+
+  { tier:"After the test · what the roll leaves, and the proof" },
+  { n:5, title:"What the roll leaves: the members' shares",
+    chips:["Equity ledger","Operating agreement shares"], src:"Rule 3", cites:[3,4],
+    situation:"QuickBooks moved the year's result into Retained Earnings. It did not split that result between Lena Hart (60%) and Omar Vance (40%). It did not close their distributions.",
+    facts:["A partnership credits net income to each partner's capital account by share, and closes each partner's drawings to that partner's capital "+C(3)+".",
+           "A partnership can share by a set ratio, by capital balances, by salaries plus a ratio, or by a mix. If the agreement says nothing, partners share equally "+C(3)+".",
+           "The skill never assumes equal shares (intake D2). It asks, because it cannot read the operating agreement. The two rules do not conflict.",
+           "For US federal tax, an LLC with two or more members is a partnership, unless it elects to be a corporation on Form 8832. It generally files Form 1065 and gives each member a Schedule K-1 "+C(4)+".",
+           "So Northbrook has no income tax expense, and F is 0. This is a US rule, and this page is not tax advice."],
+    visuals:[{cap:"P1 · Allocate FY2025 income to members · Wed 31 Dec 2025 · PROPOSAL, NOT POSTED",
+      head:["Account","Debit","Credit"],
+      rows:[["Retained Earnings","208,900","—"],["Member Capital (Hart)","—","125,340"],["Member Capital (Vance)","—","83,560"]],
+      total:["Total","208,900","208,900"]},
+      {cap:"P2 · Close member distributions to capital · PROPOSAL, NOT POSTED",
+      head:["Account","Debit","Credit"],
+      rows:[["Member Capital (Hart)","60,000","—"],["Member Distributions (Hart)","—","60,000"],["Member Capital (Vance)","40,000","—"],["Member Distributions (Vance)","—","40,000"]],
+      total:["Total","100,000","100,000"]}],
+    rules:[Q.q7, Q.q5],
+    math:[["Net income","208,900"],["Hart: 208,900 × 60%","125,340"],["Vance: 208,900 × 40%","83,560"],["Check: 125,340 + 83,560","208,900",1],["Distributions: 60,000 + 40,000","100,000",1],["All debits, P1 + P2: 208,900 + 100,000","308,900"],["All credits, P1 + P2","308,900",1]],
+    verdict:["note","The skill proposes P1 and P2 only, with every account in the chart's own name. The example dates P1 on 31 December 2025. The skill does not say which date to use. A person posts both entries.","PROPOSAL"] },
+
+  { n:6, title:"Prove it, and hand it over",
+    chips:["Post-closing trial balance","Tie-outs","Coverage sheet"], src:"Rules 2, 7 and 8", cites:[2,5,6],
+    situation:"The skill builds the post-closing trial balance from the trial balance, QuickBooks' roll, P1 and P2. Then the owner asks, \"Post P1 and P2, and lock 2025 for me.\"",
+    facts:["After the close, only permanent accounts have balances. A temporary account with a balance points to an error in the close "+C(2)+".",
+           "Form 1065's capital analysis for each partner starts at beginning capital, adds net income, subtracts withdrawals and ends at ending capital "+C(5)+". The table below has the same shape.",
+           "Under ASU 2011-05, other comprehensive income goes in a statement of comprehensive income, apart from net income "+C(6)+". That is the background to Step 6, which closes OCI to AOCI. Northbrook has no OCI, so the AOCI roll-forward does not apply."],
+    visuals:[{cap:"Post-closing trial balance at Wed 31 Dec 2025, after a person posts P1 and P2",
+      head:["Account","Debit","Credit"],
+      rows:[["Cash","182,400","—"],["Accounts Receivable","96,500","—"],["Prepaid Expenses","12,500","—"],["Equipment","300,000","—"],["Accumulated Depreciation","—","46,000"],["Accounts Payable","—","64,000"],["Accrued Liabilities","—","18,500"],["Customer Deposits","—","4,000"],["Member Capital (Hart)","—","275,340"],["Member Capital (Vance)","—","183,560"],["Retained Earnings","—","0"]],
+      total:["Total","591,400","591,400"]},
+      {cap:"Capital for each member, in the shape of Form 1065 Item L",
+      head:["Member","Opening","+ Net income","− Distributions","Ending"],
+      rows:[["Lena Hart","210,000","125,340","60,000","275,340"],["Omar Vance","140,000","83,560","40,000","183,560"]],
+      total:["Total","350,000","208,900","100,000","458,900"]},
+      {cap:"What the skill does with the owner's request",
+      head:["Request","Answer"], cls:"wrapcells",
+      rows:[["Post P1 and P2",["refused: the skill never writes","bad"]],["Lock 2025",["refused: [manual], owner Lena Hart, in QuickBooks, after the audit","bad"]],["Workpaper",["Closing_Entries_TB_FY2025_Northbrook Trading.xlsx, eight sheets, only on a yes","good"]],["Save for next year",["the method, the exception and the lock owner, only on a yes","good"]]]}],
+    rules:[Q.q13, Q.q4, Q.q14, Q.q16],
+    math:[["Debits: 182,400 + 96,500 + 12,500 + 300,000","591,400",1],["Credits: 46,000 + 64,000 + 18,500 + 4,000","132,500"],["+ 275,340 + 183,560 + 0","458,900"],["Total credits: 132,500 + 458,900","591,400",1],["Assets and liabilities before and after","no change"],["Increase in capital from P1","208,900 = net income",1],["Decrease in capital from P2","100,000 = distributions",1],["Hart: 210,000 + 125,340 − 60,000","275,340"],["Vance: 140,000 + 83,560 − 40,000","183,560"],["Total: 350,000 + 208,900 − 100,000","458,900",1]],
+    verdict:["note","The post-closing trial balance balances at 591,400 and holds only permanent accounts. It equals the opening trial balance for 2026 once a person posts P1 and P2. This is a preliminary close, so audit adjustments mean a new run of the tie-outs. The skill saves no balances.","NOT LOCKED"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+function cell(c, num){
+  if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`;
+  return `<td class="${num?"n":""}">${esc(c)}</td>`;
+}
+function table(v){
+  let h=(v.cap?`<p class="vcap">${esc(v.cap)}</p>`:"")+`<div class="tbl"><table${v.cls?` class="${v.cls}"`:""}><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0 && !v.cls)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    const vis = L.visuals.map(table).join("");
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: the entries the skill would propose for one entity, from the year's totals --- */
+const MROWS = 4;
+const PRESETS = {
+  a:{ent:"llc", state:"auto", rev:1240000, contra:18000, oth:1500, cos:742000, opex:270200, oexp:2400, tax:0,
+     m:[["Hart",60,210000,60000],["Vance",40,140000,40000]]},
+  b:{ent:"llc", state:"open", rev:1240000, contra:18000, oth:1500, cos:742000, opex:270200, oexp:2400, tax:0,
+     m:[["Hart",60,210000,60000],["Vance",40,140000,40000]]},
+  blank:{ent:"llc", state:"auto", rev:"", contra:"", oth:"", cos:"", opex:"", oexp:"", tax:"", m:[]},
+};
+const mb=document.getElementById("mrows");
+for(let i=1;i<=MROWS;i++){
+  mb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="name" aria-label="Row ${i} member or owner" style="min-width:160px"></td>
+    <td><input data-c="pct" class="n" inputmode="decimal" aria-label="Row ${i} share %" style="width:90px"></td>
+    <td><input data-c="open" class="n" inputmode="decimal" aria-label="Row ${i} opening capital or retained earnings" style="width:140px"></td>
+    <td><input data-c="dist" class="n" inputmode="decimal" aria-label="Row ${i} distributions, draws or dividends" style="width:140px"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const t=String(s).replace(/[$£€,\s%]/g,""); if(t==="") return NaN; const v=parseFloat(t); return isFinite(v)?v:NaN; };
+const cents = v => Math.round(v*100);
+const m2 = c => (c<0?"−":"")+(Math.abs(c)/100).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:2});
+const val = k => { const v=money(fld(k).value); return isNaN(v)?0:cents(v); };
+
+function load(p){
+  const P=PRESETS[p];
+  ["ent","state","rev","contra","oth","cos","opex","oexp","tax"].forEach(k=>fld(k).value=P[k]);
+  [...mb.rows].forEach((tr,i)=>{ const b=P.m[i]||["","","",""];
+    ["name","pct","open","dist"].forEach((c,j)=>tr.querySelector(`[data-c="${c}"]`).value=b[j]); });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function split(total, ms){ let left=total; return ms.map((m,i)=>{ const x = i===ms.length-1 ? left : Math.round(total*m.pct/100); left-=x; return x; }); }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const ent=fld("ent").value, state=fld("state").value;
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  let ms=[...mb.rows].map(tr=>{ const g=c=>tr.querySelector(`[data-c="${c}"]`).value;
+      const p=money(g("pct")), o=money(g("open")), d=money(g("dist"));
+      return {name:g("name").trim(), pct:isNaN(p)?0:p, open:isNaN(o)?0:cents(o), dist:isNaN(d)?0:cents(d), any:g("name").trim()!==""||!isNaN(p)||!isNaN(o)||!isNaN(d)}; })
+    .filter(m=>m.any);
+  if(ent!=="llc"){ ms=ms.slice(0,1); if(!ms.length) ms=[{name:"",pct:100,open:0,dist:0}]; ms[0].pct=100; }
+  const cap = ent==="corp" ? "Retained Earnings" : ent==="sole" ? "Owner Capital" : null;
+  const dname = ent==="corp" ? "Dividends Declared" : ent==="sole" ? "Owner Draws" : null;
+  const nm = m => cap || `Member Capital (${m.name||"member"})`;
+  const dn = m => dname || `Member Distributions (${m.name||"member"})`;
+  const A=val("rev")-val("contra"), B=val("oth"), CR=A+B;
+  const DR=val("cos")+val("opex")+val("oexp")+val("tax"), NI=CR-DR;
+  let s=line(`A revenue: ${m2(val("rev"))} − ${m2(val("contra"))}`, m2(A));
+  s+=line("B other income and gains", m2(B));
+  s+=line("Credits to close: A + B", m2(CR), 1);
+  s+=line(`Debits to close: ${m2(val("cos"))} + ${m2(val("opex"))} + ${m2(val("oexp"))} + ${m2(val("tax"))}`, m2(DR), 1);
+  s+=line(`Net income: ${m2(CR)} − ${m2(DR)}`, m2(NI), 1);
+  const sum=ms.reduce((x,m)=>x+m.pct,0);
+  if(ent==="llc" && (!ms.length || Math.abs(sum-100)>1e-9)){
+    steps.innerHTML=s;
+    box.innerHTML=res("flag","Shares","error",`The shares add up to ${sum.toLocaleString("en-US")}%. They must add up to 100. The skill never assumes equal shares, so it asks you.`,"r-err");
+    return;
+  }
+  const niS=split(NI, ms), crS=split(CR, ms), drS=split(DR, ms);
+  const dist=ms.reduce((x,m)=>x+m.dist,0);
+  let ent1="", ent2="", ent3="", p1="";
+  if(state==="open"){
+    if(ent==="llc"){
+      ms.forEach((m,i)=>{ s+=line(`E1 credit ${nm(m)}: ${m2(CR)} × ${m.pct}%`, m2(crS[i])); });
+      ms.forEach((m,i)=>{ s+=line(`E2 debit ${nm(m)}: ${m2(DR)} × ${m.pct}%`, m2(drS[i])); });
+      ent1=ms.map((m,i)=>`${nm(m)} ${m2(crS[i])}`).join(" · "); ent2=ms.map((m,i)=>`${nm(m)} ${m2(drS[i])}`).join(" · ");
+    } else { ent1=`${cap} ${m2(CR)}`; ent2=`${cap} ${m2(DR)}`; }
+  } else if(state==="auto" && ent==="llc"){
+    ms.forEach((m,i)=>{ s+=line(`P1 credit ${nm(m)}: ${m2(NI)} × ${m.pct}%`, m2(niS[i])); });
+    p1=ms.map((m,i)=>`${nm(m)} ${m2(niS[i])}`).join(" · ");
+  }
+  if(state!=="explicit") ms.forEach(m=>{ if(m.dist) s+=line(`${state==="open"?"E3":"P2"} debit ${nm(m)}, credit ${dn(m)}`, m2(m.dist)); });
+  // closing equity: for the corporation and the sole proprietor in state 2, the roll sits in Retained Earnings
+  const close=ms.map((m,i)=>m.open+niS[i]-m.dist);
+  ms.forEach((m,i)=>{ s+=line(`Closing ${nm(m)}: ${m2(m.open)} + ${m2(niS[i])} − ${m2(m.dist)}`, m2(close[i])); });
+  const tot=close.reduce((x,c)=>x+c,0);
+  s+=line("Total closing equity", m2(tot), 1);
+  steps.innerHTML=s;
+  let out=res(NI>=0?"ok":"flag","Net income",m2(NI),`(A + B) − (C + D + E + F) = ${m2(CR)} − ${m2(DR)}`,"r-ni");
+  if(state==="open"){
+    out+=res("note","E1 closes income",ent1,`Total ${m2(CR)}. Every revenue account by its own name.`,"r-e1");
+    out+=res("note","E2 closes expenses",ent2,`Total ${m2(DR)}. Every expense account by its own name.`,"r-e2");
+    out+=res("note","E3 closes distributions",m2(dist),dist?ms.map(m=>`${nm(m)} ${m2(m.dist)}`).join(" · "):"Nothing to close.","r-e3");
+  } else if(state==="auto"){
+    out+=res("ok","Revenue and expense entries","none","The platform closed them. The skill proposes no second close.","r-none");
+    if(ent==="llc") out+=res("note","P1 allocates income",p1,`Debit Retained Earnings ${m2(NI)}. The roll does not split income between members.`,"r-p1");
+    else if(ent==="sole") out+=res("note","Income in Retained Earnings",m2(NI),"The roll moved it there. Ask your accountant if it belongs in Owner Capital.","r-p1");
+    out+=res("note","P2 closes distributions",m2(dist),dist?ms.map(m=>`${dn(m)} ${m2(m.dist)}`).join(" · "):"Nothing to close.","r-p2");
+  } else {
+    out+=res("ok","Entries proposed","none","An explicit entry already closed the year. The skill verifies it with the Step 8 tie-outs.","r-none");
+  }
+  out+=res("ok","Closing equity",m2(tot),ms.map((m,i)=>`${nm(m)} ${m2(close[i])}`).join(" · ")+". This assumes a person posts every proposal.","r-close");
+  out+=res("flag","Double-close error",m2(NI),state==="open"?"The error if the platform also closed the year and a person posts E1 and E2.":"The error if a person also posts closing entries for revenue and expense.","r-dbl");
+  box.innerHTML=out;
+}
+document.querySelectorAll(".calc [data-k], #mrows [data-c]").forEach(i=>{ const f=()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}; i.addEventListener("input",f); i.addEventListener("change",f); });
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("a");
+</script>
+
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

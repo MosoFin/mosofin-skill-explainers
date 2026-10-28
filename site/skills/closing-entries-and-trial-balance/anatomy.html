@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Closing Entries and Trial Balance Anatomy | MosoFin</title>
+<meta name="description" content="How the closing entries skill is built on main: a 166-line card, seven reference files, a double-close test, its sources and ten audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Closing entries and trial balance</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">closing-entries-and-trial-balance · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the closing entries skill, and what it does</h1>
+  <p class="lede">On main the skill is a 166-line card and seven reference files, 1,278 lines in all. The split commits made the card on 25 October 2026. Pull request #1 merged it on 26 October 2026. The bookkeeping-audit commit af87caf changed the card, gates.md and method.md on 27 October 2026. The skill tests if the year is already closed before it proposes an entry. It posts nothing and locks no period. This page shows how the files connect, the run stage by stage, the tools and sources behind each step, and the audit findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">166</span><span class="s">lines in SKILL.md on main. 1,278 lines in the eight files</span></div>
+    <div class="stat"><span class="k">Closed states</span><span class="v">3</span><span class="s">not closed, auto-closed by the platform, closed by an explicit entry. Method Step 0b</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">40 · 9 · 27</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 28 · 4 · 10</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">9</span><span class="s">evidence tools in 7 purposes, plus 7 Mosofin workflow tools. No tool can lock a period</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">0 fixed · 9 open</span><span class="s">A1 to A10, for the skill owner. A2 is a check that passed, so it is not open</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 1,278 lines in all</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 166-line card with rules and six stages. The rules point to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stages 3 and 4 also to edge-cases.md, and stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 477 lines, then mosofin-protocol.md at 262, gates.md at 149, edge-cases.md at 83, tools-and-glossary.md at 60, output.md at 42 and overview.md at 39.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 166</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · the double close</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend · 6</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, A to J and D2</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Steps 0, 0b, 1</text>
+          <text x="48" y="272">Stage 4 · Steps 2–6, build</text>
+          <text x="48" y="312">Stage 5 · Steps 7–10, prove</text>
+          <text x="48" y="352">Stage 6 · Step 11, offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="170" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="97" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">149</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">477</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="54" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">83</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="27" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">42</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="25" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">39</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="39" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">60</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 150, 574 150" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 154, 574 154" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 158, 574 158" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 162, 574 162" marker-end="url(#a1)"/>
+          <path d="M300 232 C 450 232, 450 204, 574 204" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 272 C 450 272, 450 210, 574 210" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 312 C 450 312, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="182">Gates 0–3</text>
+          <text x="458" y="340">Steps 0–11</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. <b>method.md</b> carries Steps 0, 0b and 1 to 11, 13 sections, and a part for both entity scenarios. <b>edge-cases.md</b> holds 20 edge cases. <b>gates.md</b> holds Gates 0 to 3 and the Gate 3 table. <b>output.md</b> holds the output quality standards. <b>tools-and-glossary.md</b> names 7 workflow tools, 7 evidence purposes and the glossary. Each bar uses the file's line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1100" role="img" aria-label="Stage 1 asks eleven questions, A to J and D2, in one message. On the Mosofin path, gates 0 to 3 confirm the workspace, the company file, the tools and the profile. Otherwise the user uploads nine checklist items. Both paths read back and wait for a yes. Stage 3 runs steps 0, 0b and 1. Step 0b tests if the year is already closed and reports one of three states. Stage 4, steps 2 to 6, classifies accounts on type and builds the entries. Stage 5, steps 7 to 10, builds the post-closing trial balance, runs the tie-outs, names who locks the period and gives eight sheets on a yes. Stage 6, step 11, saves decisions only, never balances.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+          <polyline points="330,226 230,226 230,288" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,226 690,226 690,288" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,428 230,474 400,474" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,428 690,474 520,474" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="498" x2="460" y2="530" marker-end="url(#a2)"/>
+          <line x1="460" y1="712" x2="460" y2="740" marker-end="url(#a2)"/>
+          <line x1="460" y1="864" x2="460" y2="892" marker-end="url(#a2)"/>
+          <line x1="460" y1="1000" x2="460" y2="1018" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, A TO J AND D2</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+            <text x="280" y="74"><tspan font-weight="600">B</tspan> Company, by name</text>
+            <text x="480" y="74"><tspan font-weight="600">C</tspan> Year end, no default</text>
+            <text x="680" y="74"><tspan font-weight="600">D</tspan> Entity type</text>
+            <text x="80" y="100"><tspan font-weight="600">D2</tspan> Member shares</text>
+            <text x="280" y="100"><tspan font-weight="600">E</tspan> Framework</text>
+            <text x="480" y="100"><tspan font-weight="600">F</tspan> Final TB?</text>
+            <text x="680" y="100"><tspan font-weight="600">G</tspan> Auto-closes?</text>
+            <text x="80" y="126"><tspan font-weight="600">H</tspan> Audit complete?</text>
+            <text x="280" y="126"><tspan font-weight="600">I</tspan> Two-step or four-step</text>
+            <text x="480" y="126"><tspan font-weight="600">J</tspan> Cash or accrual</text>
+          </g>
+          <polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="290" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="314" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="340">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="364">G1  company files, one close each</text>
+            <text x="98" y="388">G2  tools · TB tool is not optional</text>
+            <text x="98" y="412">G3  profile · year end read back</text>
+          </g>
+          <rect x="540" y="290" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="314" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · 9 ROWS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="340">Final pre-closing TB, typed chart</text>
+            <text x="558" y="364">Prior-year RE, new-year TB</text>
+            <text x="558" y="388">No new-year files: state is</text>
+            <text x="558" y="412">user-asserted, not tested</text>
+          </g>
+          <rect x="400" y="450" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="479" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="532" width="800" height="180" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="558" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0, 0B, 1 · READ, TEST, VERIFY · + EDGE-CASES.MD</text>
+          <text x="80" y="584" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 0</tspan>  one batch of reads · basis on every read · mock flag</text>
+          <text x="80" y="608" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 0b</tspan>  new-year TB · closing journal · RE roll, then one of three states:</text>
+          <rect x="80" y="622" width="236" height="44" rx="8" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="198" y="649" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">1 Not closed: propose all</text>
+          <rect x="332" y="622" width="256" height="44" rx="8" fill="var(--med-soft)" stroke="var(--med)"/>
+          <text x="460" y="649" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">2 Auto-closed: draws, members</text>
+          <rect x="604" y="622" width="236" height="44" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="722" y="649" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">3 Explicit entry: verify it</text>
+          <text x="80" y="694" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan>  debits = credits · adjustments · opening capital agreed to last year</text>
+
+          <rect x="60" y="742" width="800" height="122" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="768" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–6 · BUILD · + EDGE-CASES.MD</text>
+          <text x="80" y="796" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 2</tspan>  temporary or permanent on type · name / type mismatches listed</text>
+          <text x="80" y="822" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 3–4</tspan>  two-step or four-step · totals A to G · net income vs the P&amp;L</text>
+          <text x="80" y="848" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 5–6</tspan>  entries per entity type, every account named · OCI to AOCI</text>
+
+          <rect x="60" y="894" width="800" height="106" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="920" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 7–10 · PROVE, PRESENT · + OUTPUT.MD</text>
+          <text x="80" y="948" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 7–8</tspan>  post-closing TB · four tie-outs · equity agreed to the balance sheet</text>
+          <text x="80" y="974" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 9–10</tspan>  lock is [manual], owner named · 8 sheets on a yes, one file per entity</text>
+
+          <rect x="60" y="1020" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1046" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 11</tspan>: only after the results, and only on an explicit yes</text>
+          <text x="80" y="1070" font-size="13.5" fill="var(--muted)">save method, classifications and owners · never balances, net income or trial balances</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="216" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. Step 0b runs before any entry. In state 2 the skill proposes no entry for revenue or expense. It still proposes the distributions entry and, for a partnership or LLC, the allocation to each member, unless the equity GL shows them as posted. In state 3 it runs the Step 8 tie-outs against the entry that exists.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, its evidence tools, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The tools in each row are the tools that the step names in method.md or gates.md on main. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule. <b>Practice</b> means no outside authority stands behind it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Evidence tools</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks A to J and D2. Checks the workspace, the company files, the tools and the profile. Never defaults the year end, the entity type or the framework</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code> (Gate 3)</td><td>The skill's shared protocol</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the evidence in one batch, with the basis from intake J on every read. Checks the mock flag</td><td><code>get_trial_balance</code> <code>search_accounts</code> <code>get_account</code> <code>get_profit_and_loss</code> <code>get_balance_sheet</code> <code>get_general_ledger</code> <code>search_journal_entries</code> <code>get_company_info</code></td><td>[1] The adjusted trial balance is the source data for closing entries</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0b</td><td>Tests if the year is already closed. Reports one of three states before any entry</td><td><code>get_trial_balance</code> <code>search_journal_entries</code> <code>get_balance_sheet</code></td><td>No outside authority. The test and its three states are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Checks that debits equal credits and that adjustments posted. Agrees opening capital to last year's return. Items 3 to 6 are [manual]</td><td><code>get_trial_balance</code> <code>search_journal_entries</code> <code>get_general_ledger</code></td><td>[5] Item L: each partner's capital runs from beginning capital to ending capital</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Classifies each account as temporary or permanent on its type. Lists name / type mismatches. Draws are the one exception</td><td><code>search_accounts</code></td><td>[1] Temporary accounts reset each period. Permanent accounts carry their balances forward. Classify-on-type is the skill's own rule</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Finds the method used before: two-step, or four-step through Income Summary</td><td><code>search_accounts</code> <code>search_journal_entries</code></td><td>[1] The four entries through Income Summary</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 4</td><td>Sums totals A to G. Cross-checks net income against the P&amp;L</td><td><code>get_profit_and_loss</code></td><td>No outside authority. See finding A6</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Builds the entries for the entity type, with each account named and each closed by the opposite of its balance</td><td><code>search_accounts</code></td><td>[1] The closing entries. [3] A partnership credits each partner's capital by share and closes each drawing account to that capital. [4] A two-member LLC is a partnership for federal tax by default. US only, no tax advice</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Closes OCI to AOCI, not to retained earnings. The accounts are readable. The classification is [manual]</td><td>None named</td><td>[6] Statements show OCI apart from net income. Routing OCI to AOCI is the skill's rule</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Builds the post-closing TB from the pre-closing TB and the proposals. Verifies it after a person posts</td><td>None beyond the reads</td><td>[2] The post-closing TB balances and holds only permanent accounts</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 8</td><td>Runs four tie-outs. Agrees closing equity to the balance sheet</td><td><code>get_balance_sheet</code></td><td>[5] The per-member roll from beginning to ending capital. See finding A5</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 9</td><td>Records the lock as [manual], with a named owner. Never reports it as done</td><td>None. "There is no tool to lock a period"</td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 10</td><td>Gives eight sheets on a yes, one file per entity. Sheet 8 is Coverage</td><td>None</td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 11</td><td>Offers to save decisions, keyed by datasource and entity. Never balances</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px"><b>Tools with no step.</b> <code>get_journal_entry</code> is in the evidence table of tools-and-glossary.md, but no step names it. The workflow tools <code>get_skills</code> and <code>get_my_skill</code> are in the tool list of gates.md and tools-and-glossary.md, but no gate or step calls them. <code>invoke_datasource_api_tool</code> carries every read, so the table does not give it a row.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/5-1-describe-and-prepare-closing-entries-for-a-business" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 5.1 Describe and Prepare Closing Entries for a Business</a></td><td>What closing is, temporary and permanent accounts, the four entries</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/5-2-prepare-a-post-closing-trial-balance" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 5.2 Prepare a Post-Closing Trial Balance</a></td><td>The post-closing TB, Step 7</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/15-3-compute-and-allocate-partners-share-of-income-and-loss" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 15.3 Compute and Allocate Partners' Share of Income and Loss</a></td><td>Intake D2 and the member allocation</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.irs.gov/businesses/small-businesses-self-employed/llc-filing-as-a-corporation-or-partnership" style="color:var(--mosofin)">IRS: LLC filing as a corporation or partnership</a></td><td>Why the example LLC has no income tax line and keeps member capital</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://www.irs.gov/instructions/i1065" style="color:var(--mosofin)">IRS: Instructions for Form 1065 (2025), Item L, partner's capital account analysis</a></td><td>Step 1 item 6 and the per-member roll</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://storage.fasb.org/ASU2011-05.pdf" style="color:var(--mosofin)">FASB: Comprehensive Income (Topic 220), ASU No. 2011-05</a></td><td>OCI apart from net income, the background to Step 6</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the six sources on 28 Oct 2026 through search results. Nobody opened the pages. Some items have no outside authority behind them. They are the double-close test and its three states, classify-on-type, the eight sheets, the verdict tags and the never-lock rule. The pages made up every example figure. The textbook default is equal shares when the agreement says nothing. The skill asks instead, because it cannot read the agreement. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Nine findings open for the skill owner, and one check passed</p>
+  <p style="color:var(--muted);font-size:14.5px">This site did not change the skill. The skill owner can fix these findings in a later pass. The audit checked each finding again against main on 28 Oct 2026.</p>
+  <div class="findings">
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter gives 53 findings on SKILL.md on main, and 36 of them are hard. The linter counts 2,078 words, so the rate is 2.6 per 100 words. Most findings are long sentences and passives.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. Each skill that the files name is in the library</h3>
+      <p>The files name month-end-close-checklist, journal-entry-builder and balance-sheet-reconciliations. All three are in <code>skills/</code> on main.</p>
+      <span class="where">SKILL.md · references/method.md · no change needed</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A3. Gate 3 and the upload checklist miss intake rows</h3>
+      <p>The Gate 3 table has no row for the closing method (intake I). It calls the framework "Recommended", but intake E and the last line of Gate 3 say never default it. The upload checklist has no row for the basis (J, required) or the member shares (D2, required for an LLC). It also has no row for the closing method (I) or the final-TB confirmation (F).</p>
+      <span class="where">references/gates.md · Gate 3 · SKILL.md · upload checklist · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. overview.md says accrual basis only</h3>
+      <p>overview.md says that the skill "applies the standard closing procedure for accrual-basis entities". Intake J accepts the cash basis and passes it on every read. The bookkeeping audit added J and did not change this line.</p>
+      <span class="where">references/overview.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A5. The tie-outs speak only of retained earnings</h3>
+      <p>Step 8 checks the "increase in RE from closing entries". Sheet 5 shows "Opening RE + Net Income − Dividends". For an LLC or a sole proprietor, the increase goes to member or owner capital, as Step 5 and the edge cases say. The worked example states the tie-outs on member capital.</p>
+      <span class="where">references/method.md · Step 8 and Step 10 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A6. The P&amp;L cross-check cannot find a wrong type</h3>
+      <p>On QuickBooks the P&amp;L follows the account type. So the Step 4 cross-check passes when an account has the wrong type. In the example, "Customer Deposits" has the type Other Income and passes the check. Only the Step 2 type and name review finds it. One sentence in Step 4 can say this.</p>
+      <span class="where">references/method.md · Step 4 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A7. Step 5 names a hand-off and does not describe it</h3>
+      <p>The heading of Step 5 says "hand off to journal-entry-builder". The body of the step does not say when or how the hand-off occurs.</p>
+      <span class="where">references/method.md · Step 5 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A8. The sample read-back names a year that has not ended</h3>
+      <p>The card's read-back names FY2026, the year that ends on 31 December 2026. On 28 October 2026 that year is still open. This is harmless in the skill. The pages use FY2025.</p>
+      <span class="where">SKILL.md · Stage 1 read-back · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. The glossary lists fewer temporary accounts than Step 2</h3>
+      <p>The glossary says temporary accounts are "revenue, expense and drawings accounts". Step 2 also lists gains and losses, income tax expense, dividends and distributions.</p>
+      <span class="where">references/tools-and-glossary.md · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Cosmetic · open</span><div class="body">
+      <h3>A10. State 1 says "proceed with Steps 1–9"</h3>
+      <p>Step 0b state 1 says "proceed with Steps 1–9". But Step 1 runs at Stage 3, together with Step 0b. The order in this sentence does not agree with the card.</p>
+      <span class="where">references/method.md · Step 0b · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Site owner</h2>
+  <p class="sec-title">An open conflict between the explainer pages</p>
+  <div class="findings">
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>Two different Northbrook Trading companies</h3>
+      <p>The pages of this skill make Northbrook Trading a two-member LLC with a calendar year, as the skill's read-back and journal-entry-builder do. financial-statement-builder makes Northbrook a company limited by shares under IFRS, with a 30 June year end. The pages of this skill do not use or cite the financial-statement-builder figures. The site owner must choose one story.</p>
+      <span class="where">site/skills/financial-statement-builder · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>Line counts on main: SKILL.md 166, edge-cases 83, gates 149, method 477, mosofin-protocol 262, output 42, overview 39, tools-and-glossary 60. Total 1,278.</span></li>
+    <li><span class="ok">PASS</span><span>The description has 1,023 of 1,024 characters after a YAML parse. One character is free.</span></li>
+    <li><span class="ok">PASS</span><span>Verdict tags on main: method 28 · 4 · 10, gates 7 · 2 · 9, mosofin-protocol 3 · 1 · 6. Also edge-cases 0 · 1 · 1, output 1 · 1 · 1, overview 1 · 0 · 0. SKILL.md has none.</span></li>
+    <li><span class="ok">PASS</span><span>The card has 11 intake rows (A to J and D2), 9 upload rows and 6 rules that never bend. edge-cases.md has 20 edge cases. Step 10 has 8 sheets.</span></li>
+    <li><span class="ok">PASS</span><span>"Never proposes a closing entry before the closed-state test" is in the card's rules that never bend.</span></li>
+    <li><span class="ok">PASS</span><span>The card's stage map agrees with method.md. Stage 3 has Steps 0, 0b and 1, Stage 4 Steps 2 to 6. Stage 5 has Steps 7 to 10, Stage 6 Step 11.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file. Nobody ran the Step 0b test against a real QuickBooks file that closed its year. The audit did not read the tool catalogue, so nothing here shows which of the 9 evidence tool names Gate 2 would find. The audit checked the outside sources through search results only.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/closing-entries-and-trial-balance">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The full path history on main has 9 commits. daa6d6a (30 Sep 2026) added the skill. d86fa27 (20 Oct) and 4d5637c (21 Oct) changed it. 6886a8f, 9ccc961 (a split), 03c0189, 5f8a964 (a split) and 7975b74 are from 25 Oct 2026. af87caf (the bookkeeping-audit fixes) is from 27 Oct 2026. A live run, a catalogue read and fixes for A1 and A3 to A10 are still to do.</footer>
+
+</div>
