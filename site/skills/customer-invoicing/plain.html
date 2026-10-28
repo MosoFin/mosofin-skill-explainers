@@ -180,9 +180,9 @@
   </figure>
   <p>The total is more than £250. So in the UK this must be a full VAT invoice<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. A full VAT invoice shows a unique number in one series, the names and addresses of both companies, and the seller's VAT number. It also shows the date of supply, the date of issue, a description, the quantity, the VAT rate and the VAT amount<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
   <p>From the books, the skill fills Harbor's name, address and VAT number. It also fills Northbrook's legal name and address, the items and prices, the VAT code, the Net 30 terms and the next number, NT-2026-0418. The VAT number on file is what a person typed. So the skill asks you to check that it is current.</p>
-  <p>Northbrook delivered the goods on 28 October. The invoice date is 31 October. The date of supply, which accountants call the tax point, can decide the tax period. The skill shows both dates and asks you which one is the tax point.</p>
+  <p>Northbrook delivered the racking and did the installation on 28 October. The invoice date is 31 October. The date of supply, which accountants call the tax point, can decide the tax period. The skill shows both dates and asks you which one is the tax point. The skill also asks for the delivery date of each line. Both lines were complete before the invoice date, so the skill books them as sales. Work that ends after the invoice date goes to deferred revenue (money for work not yet done) instead.</p>
   <p>The installation price is different from the standard price and from Harbor's last price. That can be a discount that you agreed, or a typing error. The skill asks before the invoice goes out, when a correction costs less.</p>
-  <p>It also shows the accounting entry that the invoice will make. Debit accounts receivable (money that customers owe you) £2,628.00. Credit product sales £1,800.00, service sales £390.00 and VAT payable £438.00. £1,800.00 + £390.00 + £438.00 = £2,628.00. Most accounting systems make this entry automatically when you enter the invoice. So the skill's entry is a record of what will happen.</p>
+  <p>It also shows the accounting entry that the invoice will make. Debit accounts receivable (money that customers owe you) £2,628.00. Credit product sales £1,800.00, service sales £390.00 and VAT payable £438.00. £1,800.00 + £390.00 + £438.00 = £2,628.00. The skill checks that the receivable is equal to the amount due. That is the £2,190.00 subtotal, minus a £0.00 discount, plus £0.00 shipping, plus £438.00 VAT. Most accounting systems make this entry automatically when you enter the invoice. So the skill's entry is a record of what will happen.</p>
 </section>
 
 <section>
@@ -192,7 +192,7 @@
   <div class="compare">
     <div class="book bad">
       <h3>The invoice list as it looks</h3>
-      <div class="who">September and October, NT-2026-0390 to NT-2026-0417</div>
+      <div class="who">The fixed range NT-2026-0390 to NT-2026-0417, voided invoices included</div>
       <div class="rows">
         <div class="row"><span>Invoice numbers in the range</span><span class="v num">28</span></div>
         <div class="row"><span>Documents found</span><span class="v num">28</span></div>
@@ -211,29 +211,32 @@
       <div class="verdict">One gap and one duplicate hide behind a count that agrees. The skill gives each number.</div>
     </div>
   </div>
-  <p>A missing number usually means that a person deleted or cancelled an invoice. In several jurisdictions, a gap in the sequence is a compliance problem. The skill found three more problems in the same two months:</p>
+  <p>The list includes the voided invoices, so a voided number is not a gap. A missing number usually means that a person deleted an invoice. Only the audit log of your accounting system can prove a deletion, and the skill cannot read it. In several jurisdictions, a gap in the sequence is a compliance problem. The skill found three more problems in the same two months:</p>
   <div class="scale">
-    <div class="stat"><span class="label">Rounding, NT-2026-0396</span><span class="v num hold">£0.01</span><span class="s">3 lines of £33.33 at 20%. VAT per line £6.67, so 3 × £6.67 = £20.01. VAT on the £99.99 total is £20.00</span></div>
+    <div class="stat"><span class="label">Rounding, NT-2026-0396</span><span class="v num hold">£0.02</span><span class="s">6 lines of £33.33 at 20%. Northbrook rounds VAT on each line: 6 × £6.67 = £40.02. The invoice shows £40.00, the VAT on the £199.98 total</span></div>
     <div class="stat"><span class="label">Missing phrase, NT-2026-0411</span><span class="v wrong">Reverse charge</span><span class="s">An Irish business customer at 0% VAT, with no reverse charge words. Its tax office can refuse the customer's claim</span></div>
     <div class="stat"><span class="label">Missing field, NT-2026-0414</span><span class="v wrong">Address</span><span class="s">No customer address. A UK invoice must show it<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
   </div>
-  <p>That is five findings: 1 gap, 1 duplicate, 1 rounding difference, 1 missing phrase and 1 missing field. The skill calculates each rounding difference and does not ignore it.</p>
+  <p>That is five findings: 1 gap, 1 duplicate, 1 rounding difference, 1 missing phrase and 1 missing field. The skill calculates the totals again with your own rounding method. It reports each difference of more than £0.01 that stays.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>Six questions, in one message</h2>
+  <h2>Nine questions, in one message</h2>
   <p>The skill asks these questions first, in one short batch. It asks only for what it cannot already see.</p>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the data, and the checks are the same. The skill asks this only if your account has a MosoFin connection.</div></li>
     <li><div class="q">Prepare new invoices, or check invoices that you already sent?</div><div class="why">Required. They are different jobs.</div></li>
-    <li><div class="q">Which jurisdiction controls this sale, and what is its list of required invoice fields?</div><div class="why">Required. This decides the fields and the tax. Your place of tax registration and the place of the sale can be different. The skill never guesses this from your company's country.</div></li>
-    <li><div class="q">For new invoices: the customer, what to bill, the quantities, the prices and the invoice date.</div><div class="why">Required to prepare. The books hold your standard prices. What to bill this time is your decision. The skill never chooses the invoice date for you.</div></li>
-    <li><div class="q">The tax on each line: which rate applies, and any exemption certificate or reverse charge.</div><div class="why">Required if tax applies. The skill can read the tax codes that you use. It cannot know if a rate is correct for this sale. It marks each line where you did not give a rate.</div></li>
-    <li><div class="q">Your numbering scheme: prefixes, resets, and a separate series for each company.</div><div class="why">Required. The skill can read the next number. The scheme behind that number is your rule. The skill never chooses it, and it compares your answer with the numbers in your books.</div></li>
+    <li><div class="q">Which company is selling?</div><div class="why">Required. Its legal name, tax registration and number series go on the invoice. An invoice from the wrong company is legally wrong.</div></li>
+    <li><div class="q">Which customer, and what to bill: the description, quantity, unit price and tax code of each line?</div><div class="why">Required. The books hold your standard prices. What to bill this time is your decision. The skill asks you to check that the customer's tax number is current.</div></li>
+    <li><div class="q">The invoice date, the tax point if it is different, and the delivery date or service period of each line.</div><div class="why">The tax point decides the tax period. The delivery date decides if the line goes to sales or to deferred revenue. The skill never chooses the invoice date for you.</div></li>
+    <li><div class="q">Which jurisdiction controls this sale, its required fields and phrases, and any electronic invoicing rule?</div><div class="why">Required. This decides the fields and the tax. Your place of tax registration and the place of the sale can be different. The skill never guesses this from your company's country.</div></li>
+    <li><div class="q">The tax rate of each line, any exemption certificate or reverse charge, and do your prices include tax? Do you round tax on each line or on each rate total?</div><div class="why">Required if tax applies. The skill can read the tax codes that you use. It cannot know if a rate is right for this sale. It never chooses a rate for you.</div></li>
+    <li><div class="q">Your numbering scheme: prefixes, resets, and a separate series for each company.</div><div class="why">Required. The skill measures gaps and duplicates against it, and never chooses it for you. With MosoFin, it reads the next number from the live series.</div></li>
+    <li><div class="q">Payment terms, currency, the customer's purchase order number and the payment instructions.</div><div class="why">Terms and currency are required. Some customers do not pay without their purchase order number. You check the payment instructions against a trusted source.</div></li>
   </ol>
   <p>Then it reads your answers back, and waits for your yes:</p>
-  <blockquote><i>"Preparing one invoice, two lines, from Northbrook Trading to Harbor Retail, read from your Mosofin connection. Jurisdiction UK VAT, standard rate on both lines. Invoice date 31 October. Next number NT-2026-0418, from the existing NT-YYYY- sequence. Terms Net 30. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Preparing one invoice, two lines, from Northbrook Trading to Harbor Retail, read from your Mosofin connection. Jurisdiction UK VAT, standard rate on both lines. Invoice date 31 October. Next number NT-2026-0418, from the existing NT-YYYY- sequence, proposed, not reserved. Terms Net 30. Payment instructions as you confirmed them. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
@@ -248,18 +251,18 @@
         <li>It reads your legal name and address, your items and standard prices, and your tax codes</li>
         <li>It reads your recent invoices, for the next number, the gap check and what this customer paid last time</li>
         <li>In a group of companies, it asks which company sells. Each company has its own number series</li>
-        <li>You still give it the <b>jurisdiction</b>, <b>what to bill</b>, the <b>tax for each line</b> and the <b>numbering scheme</b></li>
+        <li>You still give it the <b>jurisdiction</b>, <b>what to bill</b>, the <b>invoice date</b>, any <b>exemption certificate</b> and the <b>payment instructions</b>. You confirm the tax for each line and the numbering scheme</li>
       </ul>
     </div>
     <div class="card">
       <span class="tag up">Uploading instead</span>
       <h3>Bring the details for the job</h3>
       <ul>
-        <li><b>To prepare:</b> the customer's details, the lines to bill, your legal name and tax registration. Type them in the chat, or a CSV. Required</li>
-        <li><b>To check:</b> the invoices that you sent, with numbers, dates, lines, tax and totals. An invoice list export, CSV or XLSX. Required</li>
-        <li><b>Item and price list</b> and <b>tax codes</b>, CSV or XLSX, recommended</li>
-        <li><b>Chart of accounts</b>, CSV or XLSX, recommended. Without it, the entry shows placeholder account names</li>
-        <li>The jurisdiction, the required fields, the scheme and any exemptions, typed in the chat</li>
+        <li><b>To prepare:</b> the customer's details, the lines to bill, your legal name and tax registration. Type them in the chat, or a CSV or XLSX. Required</li>
+        <li><b>Numbering scheme</b> and a list of recent invoices, for the next number. CSV or XLSX. Required</li>
+        <li><b>Chart of accounts</b> with the sales, output tax and deferred revenue accounts. CSV or XLSX. Required</li>
+        <li><b>To check:</b> the invoices that you sent, and an invoice list for the full range, voided invoices included. A sample cannot show gaps or duplicates. PDF, image, CSV or XLSX. Required</li>
+        <li>The invoice date, terms, currency, jurisdiction and tax rates, typed in the chat. The customer's purchase order number is recommended. Add an exemption certificate if it applies</li>
       </ul>
     </div>
   </div>
@@ -271,7 +274,7 @@
   <div class="gets">
     <div class="get"><b>The invoice draft</b><span>Every required field, with a mark that says "draft for review". As a PDF, a web page or data for your system, as you prefer.</span></div>
     <div class="get"><b>The check results</b><span>For each invoice: missing fields, line errors, totals that do not agree, duplicate numbers and gaps, each by number.</span></div>
-    <div class="get"><b>The proposed entry</b><span>Accounts receivable, sales and tax, with the account names from your chart of accounts.</span></div>
+    <div class="get"><b>The proposed entry</b><span>Accounts receivable, sales and tax, with the account names from your chart of accounts. It must agree with the amount due. Work not yet delivered goes to deferred revenue.</span></div>
     <div class="get"><b>Where each field came from</b><span>Each field says if it came from your books or from you.</span></div>
   </div>
   <p>The number on the draft is a proposal. Until a person enters the invoice, someone else can use that number. The skill reads the next number again on every run. The bank details on the invoice need care too. The skill asks you to check them against a trusted source. Payment fraud on invoices works by a change to exactly those details.</p>
@@ -284,11 +287,11 @@
     <h2>Six rules that never bend</h2>
     <ul>
       <li><b>Asks before it uses MosoFin.</b> A connected account is not permission to read it.</li>
-      <li><b>Reads nothing until you answer the six questions</b> and say yes to the read-back.</li>
-      <li><b>Never creates an invoice, gives out a number, sends anything or posts an entry.</b> The document and the data are what you get. Every draft has a mark for review.</li>
-      <li><b>Never chooses the jurisdiction, a tax rate, the invoice date or the numbering scheme for you.</b> It never guesses the jurisdiction from your company's country.</li>
-      <li><b>Reads the next invoice number again on every run.</b> The next number changes, so the skill never remembers it.</li>
-      <li><b>Never saves customer tax numbers, bank details or invoice contents.</b> It can save the field list, the scheme and the account map, if you say yes.</li>
+      <li><b>Reads nothing until you answer the first questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, changes or deletes anything, in any system.</b> Every entry is a proposal for a person to post.</li>
+      <li><b>Never says that an invoice exists.</b> Every document is a draft for review. The number on it is a proposal until a person enters the invoice.</li>
+      <li><b>Never chooses the jurisdiction, a tax rate, the invoice date or the numbering scheme for you.</b> It never guesses the jurisdiction from your company's country. It uses only the selling company's own records, and never drafts an invoice to a real customer from test data.</li>
+      <li><b>Never copies payment instructions from memory or an old document.</b> You confirm them from a trusted source. It never saves customer tax numbers, bank details or invoice contents.</li>
     </ul>
   </div>
 </section>
@@ -321,7 +324,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>customer-invoicing</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and has not shipped. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>customer-invoicing</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">Read the skill on GitHub →</a> This page describes the skill in its card format. That format is on main of MosoFin/mosofin-finance-skills. It was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -349,7 +352,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

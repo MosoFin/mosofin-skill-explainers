@@ -246,7 +246,7 @@
     </table></div>
     <div class="math num" id="steps" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">The page rounds the VAT on each line to the penny. It also calculates the VAT on the subtotal of each rate and rounds it once. The rounding difference is the sum of the line VAT minus the VAT on the subtotals. The page flags a price that differs from the standard price and from the last price to this customer. If you leave one of those two prices blank, the page compares with the other one only. The £250 limit is a UK rule <sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Other jurisdictions differ.</p>
+    <p class="fine">The page rounds the VAT on each line to the penny. It also calculates the VAT on the subtotal of each rate and rounds it once. The rounding difference is the sum of the line VAT minus the VAT on the subtotals. The skill uses the rounding method that you state, and reports a difference of more than £0.01 between that method and the invoice. The page flags a price that differs from the standard price and from the last price to this customer. If you leave one of those two prices blank, the page compares with the other one only. The £250 limit is a UK rule <sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Other jurisdictions differ.</p>
   </div>
   <div class="calc seq" id="calc2">
     <h3>Part 2: the number sequence</h3>
@@ -256,7 +256,7 @@
     </div>
     <label class="field" style="grid-template-columns:1fr"><span>Invoice numbers, one for each line or with commas between them</span><textarea id="seqin" spellcheck="false" aria-label="Invoice numbers"></textarea></label>
     <div class="results" id="seqres" aria-live="polite"></div>
-    <p class="fine">The page splits each number into a prefix and a final run of digits. It checks each prefix as one series, from its lowest number to its highest. A voided invoice keeps its number in the sequence. So a gap can be a voided invoice or a deleted one. Ask which before you report it.</p>
+    <p class="fine">The page splits each number into a prefix and a final run of digits. It checks each prefix as one series, from its lowest number to its highest. Paste every number in the range, voided invoices included. A voided invoice still appears in the list, at zero. So a number that is missing points to a deleted invoice. Only the audit log of your accounting system can prove a deletion.</p>
   </div>
 </section>
 
@@ -264,9 +264,9 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use Mosofin for this run, or upload the data yourself? Do you want to prepare new invoices or check issued ones? Which jurisdiction governs the supply, and which fields must an invoice show there? For a new invoice: who is the customer, what do you bill, at which quantities and prices, and on which invoice date? Which tax rate applies to each line, and is there an exemption certificate or a reverse charge? What is your numbering scheme?</div>
-    <div><b>Needs</b>To prepare, the skill needs the customer's details, the lines to bill, your legal name and your tax registration. To check, it needs the issued invoices with their numbers, dates, lines, tax and totals. An item and price list, the tax codes and the chart of accounts make the result better.</div>
-    <div><b>Gives back</b>The skill gives back an invoice draft, marked for review, and the matching journal entry as a proposal. In check mode, it gives back each missing field, each arithmetic error, each duplicate number and each gap.</div>
+    <div><b>Asks first</b>Do you want to use Mosofin for this run, or upload the data yourself? Do you want to prepare new invoices or check issued ones? Which company sells? Who is the customer, and what do you bill on each line? What are the invoice date, the tax point and the delivery date of each line? Which jurisdiction governs the supply, and which fields and phrases must an invoice show there? Which tax rate applies to each line? Is there an exemption or a reverse charge? Do your prices include tax, and how do you round the tax? What is your numbering scheme? What are the terms, the currency, the purchase order number and the payment instructions?</div>
+    <div><b>Needs</b>To prepare, the skill needs the customer's details, the lines to bill, your legal name and your tax registration. It also needs your numbering scheme with a list of recent invoices, and the chart of accounts. To check, it needs the issued invoices and an invoice list for the full range, voided invoices included.</div>
+    <div><b>Gives back</b>The skill gives back an invoice draft, marked for review, and the matching journal entry as a proposal. The entry must agree with the amount due. In check mode, it gives back each missing field, each arithmetic error, each duplicate number and each gap.</div>
     <div><b>Never</b>The skill never uses Mosofin before you agree. It reads nothing before you answer its questions and say yes to its summary. It never creates an invoice, gives out a number, sends anything or posts an entry. It never assumes the jurisdiction, a tax rate, the invoice date or the numbering scheme. It reads the next number again on every run. It never saves tax IDs, bank details or invoice contents.</div>
   </div>
 </section>
@@ -280,7 +280,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files come from the card-format rewrite of the skill. The rewrite is on a branch and has not shipped. The skill on main holds the same text in one longer file. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The UK is one example jurisdiction, and the £250 limit is a UK rule only. Check with your accountant what applies to you. This page explains <code>customer-invoicing</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format of the skill, on main of MosoFin/mosofin-finance-skills. The card format was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The UK is one example jurisdiction, and the £250 limit is a UK rule only. Check with your accountant what applies to you. This page explains <code>customer-invoicing</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -297,7 +297,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The fifteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
+/* The seventeen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
 const Q = {
   q1:{q:"an invoice is a legal document, not just a request for money.", w:"references/overview.md · Customer Invoicing (Mosofin)"},
   q2:{q:"Mosofin cannot create an invoice.", w:"references/overview.md · What this skill is, in a read-only workspace"},
@@ -309,11 +309,13 @@ const Q = {
   q8:{q:"their absence is a common reason a customer's tax authority disallows their claim and they come back asking for a reissue", w:"references/method.md · Step 1 — Apply jurisdiction-mandated invoice fields"},
   q9:{q:"the skill can produce the data but submission requires the relevant platform.", w:"references/method.md · Step 1 — Apply jurisdiction-mandated invoice fields"},
   q10:{q:"A price that departs from both is either a deliberate concession or a keying error, and it is much cheaper to ask now.", w:"references/method.md · Step 2 — Validate line items"},
-  q11:{q:"are worth quantifying rather than ignoring.", w:"references/method.md · Step 3 — Compute totals"},
+  q11:{q:"recompute using the entity's stated rounding method and report any difference over 0.01 that remains.", w:"references/method.md · Step 3 — Compute totals"},
   q12:{q:"entering the invoice generates this entry automatically.", w:"references/method.md · Step 4 — Construct the AR / Revenue / Tax JE"},
   q13:{q:"invoice payment-detail fraud works by altering exactly this block.", w:"references/method.md · Step 5 — Generate the invoice document"},
   q14:{q:"Until the invoice is actually entered, someone else may take that number.", w:"references/method.md · Step 5 — Generate the invoice document"},
   q15:{q:"report gaps with their numbers rather than only a count.", w:"references/edge-cases.md · Edge Cases"},
+q16:{q:"A voided invoice still appears (at zero); a deleted one does not, and only the audit log can confirm a deletion.", w:"references/edge-cases.md · Edge Cases"},
+q17:{q:"The entry must foot to Step 3's Amount due before it is presented", w:"references/method.md · Step 4 — Construct the AR / Revenue / Tax JE"},
 };
 
 const RULES = [
@@ -328,7 +330,7 @@ const RULES = [
   { id:"4", title:"Ask about an unusual price now", r:Q.q10, cites:[],
     plain:"The skill compares each price with the item's standard price and with the last price to this customer. If the price differs from both, it asks you." },
   { id:"5", title:"Count the rounding", r:Q.q11, cites:[2],
-    plain:"The skill recalculates every total from the lines. When the totals do not agree, rounding on each line against rounding on the total is the usual cause. The skill counts that difference in pounds and pence.",
+    plain:"The skill recalculates every total from the lines, with the rounding method that you gave at intake. Rounding on each line against rounding on the total is the usual cause of a difference. The skill reports each difference of more than 0.01 that stays.",
     backed:"In the EU, a full invoice shows the VAT amount and a breakdown by rate.{2}" },
   { id:"6", title:"Read the next number every time", r:Q.q6, cites:[2],
     plain:"The skill can save your numbering scheme. It never saves the next number, because the next number changes with each invoice.",
@@ -346,7 +348,7 @@ const LEVELS = [
   { tier:"Prepare mode · invoice NT-2026-0418 to Harbor Retail Ltd" },
   { n:1, title:"What makes an invoice valid",
     chips:["Customer record","Company profile","Item list"], src:"Rule 1", cites:[1,5],
-    situation:"Northbrook prepares invoice NT-2026-0418 to Harbor Retail Ltd, a UK customer. The invoice date is 31 October 2026, and Northbrook delivered the goods on 28 October.",
+    situation:"Northbrook prepares invoice NT-2026-0418 to Harbor Retail Ltd, a UK customer. The invoice date is 31 October 2026. Northbrook delivered the racking and did the installation on 28 October.",
     facts:["A UK full VAT invoice shows a unique sequential number, the seller's name, address and VAT number, and the customer's name and address "+C(1)+".",
            "It also shows the tax point, the date of issue, a description, the quantity, the VAT rate and amount, and the total VAT "+C(1)+".",
            "In the UK, a business must give a full VAT invoice above £250, or below it if the customer asks "+C(1)+". This limit is a UK rule only.",
@@ -368,7 +370,7 @@ const LEVELS = [
 
   { n:2, title:"The arithmetic",
     chips:["Item list","Tax codes"], src:"Rule 5", cites:[1,2],
-    situation:"NT-2026-0418 has two lines at 20% VAT. In check mode, the skill also recalculates issued invoices. NT-2026-0396 has three lines of £33.33 each at 20%.",
+    situation:"NT-2026-0418 has two lines at 20% VAT. Northbrook's prices exclude VAT, and at intake it said that it rounds VAT on each line. In check mode, the skill also recalculates issued invoices. NT-2026-0396 has six lines of £33.33 each at 20%, and it shows VAT of £40.00.",
     facts:["A UK full VAT invoice shows the VAT rate, the VAT amount and the total VAT "+C(1)+".",
            "In the EU, a full invoice shows the VAT rate and amount, and a breakdown by rate "+C(2)+"."],
     visual:{type:"table",
@@ -376,8 +378,8 @@ const LEVELS = [
       rows:[["1 · Storage racking","10","£180.00","£1,800.00","£360.00"],["2 · Installation","6 hours","£65.00","£390.00","£78.00"]],
       total:["NT-2026-0418","","","£2,190.00","£438.00"]},
     rules:[Q.q11],
-    math:[["Line 1: 10 × £180.00","£1,800.00"],["Line 2: 6 × £65.00","£390.00"],["Subtotal: £1,800.00 + £390.00","£2,190.00",1],["VAT by line: £360.00 + £78.00","£438.00"],["VAT on the subtotal: £2,190.00 × 20%","£438.00",1],["Total: £2,190.00 + £438.00","£2,628.00",1],["NT-2026-0396: 3 × £33.33","£99.99"],["VAT on one line: £33.33 × 20% = £6.666","£6.67"],["VAT by line: 3 × £6.67","£20.01"],["VAT on the total: £99.99 × 20% = £19.998","£20.00"],["Rounding difference: £20.01 − £20.00","£0.01",1]],
-    verdict:["note","NT-2026-0418 totals £2,628.00, with no rounding difference. On NT-2026-0396, rounding on each line gives £20.01 and rounding on the total gives £20.00. The skill reports the £0.01.","£0.01"] },
+    math:[["Line 1: 10 × £180.00","£1,800.00"],["Line 2: 6 × £65.00","£390.00"],["Subtotal: £1,800.00 + £390.00","£2,190.00",1],["VAT by line: £360.00 + £78.00","£438.00"],["VAT on the subtotal: £2,190.00 × 20%","£438.00",1],["Total: £2,190.00 + £438.00","£2,628.00",1],["NT-2026-0396: 6 × £33.33","£199.98"],["VAT on one line: £33.33 × 20% = £6.666","£6.67"],["VAT by line, Northbrook's method: 6 × £6.67","£40.02"],["VAT on the invoice: £199.98 × 20% = £39.996","£40.00"],["Difference: £40.02 − £40.00","£0.02",1],["£0.02 is more than £0.01","report it",1]],
+    verdict:["note","NT-2026-0418 totals £2,628.00, with no rounding difference. On NT-2026-0396, Northbrook's method gives £40.02, but the invoice shows £40.00. The difference is more than £0.01, so the skill reports the £0.02.","£0.02"] },
 
   { tier:"What the skill asks about · prices, dates and phrases" },
   { n:3, title:"The price nobody meant",
@@ -410,21 +412,21 @@ const LEVELS = [
   { tier:"Check mode · September and October invoices" },
   { n:5, title:"The sequence",
     chips:["Issued invoices"], src:"Rule 6", cites:[1,2],
-    situation:"The owner asks the skill to check the September and October invoices. Their numbers run from NT-2026-0390 to NT-2026-0417, and the skill finds 28 documents.",
+    situation:"The owner asks the skill to check the September and October invoices. The skill first fixes the range: NT-2026-0390 to NT-2026-0417. The owner uploads the invoice list for that range, with voided invoices included. The skill finds 28 documents.",
     facts:["A UK full VAT invoice carries a unique sequential number. It can use letters, as part of one series "+C(1)+".",
            "In the EU, the invoice number is sequential, from one or more series, and identifies the invoice uniquely "+C(2)+"."],
     visual:{type:"table",
       head:["Finding","Invoice","Detail"],
-      rows:[["Gap","NT-2026-0402",["missing","bad"]],["Duplicate","NT-2026-0409",["on two documents","bad"]],["Rounding difference","NT-2026-0396","£0.01, level 2"],["Missing phrase","NT-2026-0411","reverse charge wording, level 4"],["Missing field","NT-2026-0414","no customer address"]],
+      rows:[["Gap","NT-2026-0402",["missing","bad"]],["Duplicate","NT-2026-0409",["on two documents","bad"]],["Rounding difference","NT-2026-0396","£0.02, level 2"],["Missing phrase","NT-2026-0411","reverse charge wording, level 4"],["Missing field","NT-2026-0414","no customer address"]],
       total:["Findings","","5"]},
-    rules:[Q.q3, Q.q15, Q.q6, Q.q14],
+    rules:[Q.q3, Q.q16, Q.q15, Q.q6, Q.q14],
     math:[["Numbers in the range: 0417 − 0390 + 1","28"],["− the missing number 0402","27"],["+ the second document with 0409","28"],["= documents found","28",1],["Findings: 1 gap + 1 duplicate + 1 rounding + 1 phrase + 1 field","5",1]],
-    verdict:["flag","The document count agrees with the range, but only because one gap and one duplicate cancel each other. The skill reports NT-2026-0402 and NT-2026-0409 by number.","GAP"] },
+    verdict:["flag","The document count agrees with the range, but only because one gap and one duplicate cancel each other. The skill reports NT-2026-0402 and NT-2026-0409 by number. The list includes voided invoices, so NT-2026-0402 is not a void. Only the audit log can prove a deletion, and the skill cannot read it.","GAP"] },
 
   { tier:"The limits · what the skill never does" },
   { n:6, title:"What the skill cannot do",
     chips:["Chart of accounts","Customer record"], src:"Rules 7 and 8", cites:[4],
-    situation:"The draft of NT-2026-0418 is ready for review. Northbrook still has to enter it, send it and collect the money.",
+    situation:"The draft of NT-2026-0418 is ready for review. Both lines were complete on 28 October, before the invoice date, so the entry credits sales and not deferred revenue. Northbrook still has to enter the invoice, send it and collect the money.",
     facts:["About four in five small firms have a problem with payments "+C(4)+". Firms that let customers pay after delivery, for example by invoice, report slow payers more often "+C(4)+".",
            "A complete invoice gives a customer one less reason to wait. That is the skill's aim, and the survey does not measure it."],
     visual:{type:"table",
@@ -432,8 +434,8 @@ const LEVELS = [
       rows:[["Accounts receivable","£2,628.00",""],["Sales: products","","£1,800.00"],["Sales: services","","£390.00"],["VAT payable","","£438.00"]],
       total:["Total","£2,628.00","£2,628.00"]},
     pair:[["note","Entry","proposal","the system makes it when a person enters the invoice"],["note","Number","NT-2026-0418","a proposal until a person enters the invoice"],["bad","Sent by the skill","nothing","no invoice, no number, no entry, no email"]],
-    rules:[Q.q2, Q.q12, Q.q13, Q.q9, Q.q5],
-    math:[["Credits: £1,800.00 + £390.00 + £438.00","£2,628.00"],["Debit: Accounts receivable","£2,628.00"],["Debits − credits","£0.00",1],["Bank details on the draft","the owner checks them against a trusted source"],["Harbor's VAT number","check that it is current",1],["E-invoicing submission","the platform, not the skill",1]],
+    rules:[Q.q2, Q.q17, Q.q12, Q.q13, Q.q9, Q.q5],
+    math:[["Credits: £1,800.00 + £390.00 + £438.00","£2,628.00"],["Debit: Accounts receivable","£2,628.00"],["Debits − credits","£0.00",1],["Check: subtotal − discount + shipping + tax = £2,190.00 − £0.00 + £0.00 + £438.00","£2,628.00"],["Amount due on the invoice","£2,628.00"],["Receivable − amount due","£0.00",1],["Bank details on the draft","the owner checks them against a trusted source"],["Harbor's VAT number","check that it is current",1],["E-invoicing submission","the platform, not the skill",1]],
     verdict:["note","The skill builds the draft and the entry as a proposal. The owner checks the bank details and Harbor's VAT number, then enters the invoice. The system then makes the entry and gives the number.","DRAFT"] },
 ];
 
@@ -495,7 +497,7 @@ function renderLevels(){
 const ROWS = 8;
 const PRESETS = {
   northbrook:[["Storage racking",10,180,20,180,""],["Installation",6,65,20,55,55]],
-  nt0396:[["Line 1",1,33.33,20,"",""],["Line 2",1,33.33,20,"",""],["Line 3",1,33.33,20,"",""]],
+  nt0396:[["Line 1",1,33.33,20,"",""],["Line 2",1,33.33,20,"",""],["Line 3",1,33.33,20,"",""],["Line 4",1,33.33,20,"",""],["Line 5",1,33.33,20,"",""],["Line 6",1,33.33,20,"",""]],
   blank:[],
 };
 const KEYS=["d","q","p","r","s","l"];
@@ -545,7 +547,7 @@ function run(){
   let out = res("ok","Subtotal",fmt(subP/100),Object.keys(byRate).sort((a,b)=>b-a).map(r=>`${r}%: ${fmt(byRate[r]/100)}`).join(" · "),"subtotal");
   out += res("ok","VAT, rounded on each line",fmt(lineVatP/100),"The sum of the VAT on each line.","linevat");
   out += res("ok","VAT on the subtotals, rounded once",fmt(totVatP/100),"One rounding for each rate.","totvat");
-  out += res(diffP?"flag":"ok","Rounding difference",fmt(diffP/100),diffP?"Report this amount. Do not ignore it.":"The two VAT figures agree.","diff");
+  out += res(Math.abs(diffP)>1?"flag":"ok","Rounding difference",fmt(diffP/100),Math.abs(diffP)>1?"More than £0.01. If your invoice uses one method and you stated the other, report this amount.":(diffP?"£0.01 or less. The skill reports only a difference of more than 0.01.":"The two VAT figures agree."),"diff");
   out += res("ok","Total",fmt(totalP/100),`${fmt(subP/100)} + ${fmt(lineVatP/100)} of VAT`,"total");
   out += res(flags.length?"flag":"ok","Price check",flags.length?`${flags.length} flagged`:"none",flags.length?flags.map(x=>`${esc(x.d)}: ${fmt(x.p)} differs from each price you gave. Ask: concession or keying error?`).join(" "):"No price differs from both the standard price and the last price.","flags");
   out += res(totalP>25000?"note":"ok","Full VAT invoice",totalP>25000?"needed":"not needed",`UK rule, fact 1. Other jurisdictions differ. ${totalP>25000?"The total is more than £250.":"The total is £250 or less. The customer can still ask for one."}`,"full");
@@ -573,8 +575,8 @@ function runSeq(){
     for(let n=lo;n<=hi;n++){ if(!cnt[n]) gaps.push(id(n)); else if(cnt[n]>1) dups.push(`${id(n)} ×${cnt[n]}`); } });
   const docs=toks.length-odd.length;
   let out = res("ok","Documents",String(docs),`${range} numbers in the range, ${keys.length} series.`,"docs");
-  out += res(gaps.length?"flag":"ok","Gaps",gaps.length?gaps.join(", "):"none",gaps.length?"The page shows each missing number. Find out if someone voided or deleted it.":"No number is missing in the range.","gaps");
-  out += res(dups.length?"flag":"ok","Duplicates",dups.length?dups.join(", "):"none",dups.length?"Two documents with one number is a problem to correct.":"No number occurs twice.","dups");
+  out += res(gaps.length?"flag":"ok","Gaps",gaps.length?gaps.join(", "):"none",gaps.length?"The page shows each missing number. If your list includes the voided invoices, check the audit log for a deletion.":"No number is missing in the range.","gaps");
+  out += res(dups.length?"flag":"ok","Duplicates",dups.length?dups.join(", "):"none",dups.length?"Two documents with one number is a problem to fix.":"No number occurs twice.","dups");
   if(odd.length) out += res("note","Not read",String(odd.length),`These entries do not end in digits: ${odd.slice(0,5).map(esc).join(", ")}`,"odd");
   box.innerHTML=out;
 }
@@ -602,7 +604,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
