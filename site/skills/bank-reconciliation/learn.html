@@ -419,7 +419,7 @@ const LEVELS = [
     facts:["The IRS lists bank charges not yet recorded as a normal source of difference between the statement and the books "+C(1)+".","A returned deposited item is a cheque you deposited that a bank returned because it could not be processed against the writer's account "+C(5)+". The bank removes the $300 from the account again."],
     visual:{type:"wf", start:["Book balance",12180.50], steps:[["Bank fee not recorded",-15],["Interest not recorded",4.50],["Customer cheque returned",-300]], end:["Adjusted book balance",11870], dec:2},
     rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"references/method.md · Step 2"},
-    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"references/method.md · Step 5"},
+    rule2:{q:"Every proposed entry names its evidence: the statement line for bank-originated items, and the GL rows and source document for book errors — an entry proposed without that evidence is a guess.", w:"references/method.md · Step 5"},
     math:[["Book balance","$12,180.50"],["− bank fee (statement line 14 Sep)","$15.00"],["+ interest (statement line 30 Sep)","$4.50"],["− returned deposit (statement line 19 Sep)","$300.00"],["= adjusted book balance","$11,870.00",1],["Adjusted bank balance (Level 1)","$11,870.00"],["Difference","$0.00",1]],
     verdict:["ok","It ties after three entries that the skill proposes. Each entry points at its statement line. The entries record the fee, record the interest, and reverse the bounced receipt. You also chase the customer. A person posts the entries."] },
 
