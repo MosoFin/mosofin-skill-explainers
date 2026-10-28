@@ -174,7 +174,7 @@
         <tr><th scope="row">Power Co</th><td>3,400</td><td class="t">Fri 30 Oct</td><td>7</td><td class="t">1–30</td><td class="t">Critical, as you said</td></tr>
         <tr><th scope="row">PayrollCo</th><td>1,200</td><td class="t">Tue 10 Nov</td><td>−4</td><td class="t">Not yet due</td><td class="t">Critical, as you said</td></tr>
         <tr class="breach"><th scope="row">Crestline Logistics</th><td>12,500</td><td class="t">Tue 22 Sep</td><td>45</td><td class="t">31–60</td><td class="t">Late fee of 1.5% a month in the terms: $187.50 a month</td></tr>
-        <tr class="breach"><th scope="row">Lakeside Freight</th><td>7,200</td><td class="t">Mon 12 Oct</td><td>25</td><td class="t">1–30</td><td class="t">Final notice, with a collection threat. An email on 3 Nov sent new bank details</td></tr>
+        <tr class="breach"><th scope="row">Lakeside Freight</th><td>7,200</td><td class="t">Mon 12 Oct</td><td>25</td><td class="t">1–30</td><td class="t">Final notice, with a collection threat. You said an email on 3 Nov asked to change its bank details</td></tr>
         <tr><th scope="row">Harbor Office Supply</th><td>8,000</td><td class="t">Sun 29 Nov</td><td>−23</td><td class="t">Not yet due</td><td class="t h">2/10 Net 30, billed 30 Oct. Pay by Mon 9 Nov to save $160</td></tr>
         <tr><th scope="row">Summit Cleaning</th><td>950</td><td class="t">Sun 8 Nov</td><td>−2</td><td class="t">Not yet due</td><td class="t">Due this week</td></tr>
         <tr><th scope="row">Pinnacle Design</th><td>14,000</td><td class="t">Thu 12 Nov</td><td>−6</td><td class="t">Not yet due</td><td class="t">Due next week</td></tr>
@@ -207,12 +207,12 @@
         <tr><th scope="row">1</th><td class="t">Power Co</td><td class="t">Critical: the service stops without payment</td><td>3,400</td><td>3,400</td></tr>
         <tr><th scope="row">1</th><td class="t">PayrollCo</td><td class="t">Critical</td><td>1,200</td><td>4,600</td></tr>
         <tr><th scope="row">2</th><td class="t">Crestline Logistics</td><td class="t">Late, with a late fee that grows</td><td>12,500</td><td>17,100</td></tr>
-        <tr><th scope="row">2</th><td class="t">Lakeside Freight</td><td class="t">Late, with a collection threat. To the bank account on file</td><td>7,200</td><td>24,300</td></tr>
-        <tr><th scope="row">3</th><td class="t">Harbor Office Supply</td><td class="t">Discount ends Mon 9 Nov, before the next run on Fri 13 Nov. 8,000 − 160</td><td>7,840</td><td>32,140</td></tr>
+        <tr><th scope="row">2</th><td class="t">Lakeside Freight</td><td class="t">Late, with a collection threat. Flagged: bank-detail change, hold until confirmed</td><td>7,200</td><td>24,300</td></tr>
+        <tr><th scope="row">3</th><td class="t">Harbor Office Supply</td><td class="t">Discount ends Mon 9 Nov, before the next run on Fri 13 Nov. Cash paid: 8,000 − 160</td><td>7,840</td><td>32,140</td></tr>
         <tr><th scope="row">4</th><td class="t">Summit Cleaning</td><td class="t">Due this week</td><td>950</td><td class="c">33,090</td></tr>
         <tr class="breach"><th scope="row">5</th><td class="t">Pinnacle Design</td><td class="t w">Due next week. 33,090 + 14,000 = 47,090, more than 40,000. The run stops here</td><td>0</td><td>33,090</td></tr>
         <tr><th scope="row">6</th><td class="t">Brightline Software</td><td class="t">Discretionary and not due: wait</td><td>0</td><td>33,090</td></tr>
-        <tr><th scope="row">Held</th><td class="t">Acme Corp</td><td class="t a">On hold. The run never pays a held bill</td><td>0</td><td>33,090</td></tr>
+        <tr><th scope="row">Held</th><td class="t">Acme Corp</td><td class="t a">On hold. It goes on the Held and disputed sheet, not in the run</td><td>0</td><td>33,090</td></tr>
         </tbody>
       </table>
     </div>
@@ -225,24 +225,25 @@
     <div class="stat"><span class="label">Discount saved</span><span class="v num good">$160</span><span class="s">2% of 8,000. The parts re-add: 33,090 + 160 + 29,600 = 62,850</span></div>
   </div>
   <p>The skill shows the unpaid bills on the face of the result, not in a note. Those are the bills you must make a decision about.</p>
-  <p>Why does a small discount rank above a bill that is due? Harbor gives 2% for payment within 10 days, instead of 30. The skill calculates the return a year as 2% × 365 / (30 − 10) = 36.5%. A finance textbook calculates the cost of a missed 2/10, net 30 discount as 36.73% a year, with a slightly fuller formula<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Both give about 36% a year.</p>
+  <p>The cash test uses the cash paid. For Harbor, that is $7,840, not $8,000. The skill records the $160 discount with the payment, so the bill closes in full. Northbrook has no open vendor credits. If a vendor has one, the skill takes it off that vendor's payment.</p>
+  <p>Why does a small discount rank above a bill that is due? Harbor gives 2% for payment within 10 days, instead of 30. The skill divides the discount by the price after the discount, then scales it to a year: 2% / 98% × 365 / (30 − 10) = 37.2%. A finance textbook uses the same formula with a 360-day year and gets 36.73% a year<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Both give more than 36% a year.</p>
   <p>Crestline's terms add 1.5% a month to a late bill: 12,500 × 1.5% = $187.50 a month. So Crestline ranks above the larger Pinnacle bill, which costs nothing to wait on. The skill takes a late fee from the terms in your books. If the fee is only in a contract, it asks you.</p>
 </section>
 
 <section>
   <span class="label">The mistake it catches</span>
   <h2>The email that asks you to pay a new bank account</h2>
-  <p>Lakeside Freight is late and sent a final notice. On Tuesday 3 November, an email came "from Lakeside" with new bank details. A request to change bank details is a common way for businesses to lose money. The skill flags the change and does not use the new details.</p>
+  <p>Lakeside Freight is late and sent a final notice. On Tuesday 3 November, an email came "from Lakeside" with new bank details. A request to change bank details is a common way for businesses to lose money. The skill does not read your email. It asks you at the start of each run if a vendor asked to change bank details. You name Lakeside, and the skill flags that payment.</p>
   <div class="compare">
     <div class="book">
       <h3>What the skill does</h3>
-      <span class="who">The run uses the bank account already on file</span>
+      <span class="who">The payment line carries a flag on the proposed run</span>
       <div class="rows num">
-        <div class="row"><span>Lakeside, in the run</span><span class="v">$7,200</span></div>
-        <div class="row"><span>Pay to</span><span class="v">account on file</span></div>
-        <div class="row off"><span>New details from the 3 Nov email</span><span class="v">held</span></div>
+        <div class="row"><span>Lakeside, in the proposed run</span><span class="v">$7,200</span></div>
+        <div class="row"><span>Bank-detail change?</span><span class="v">yes</span></div>
+        <div class="row off"><span>Payment to the new details</span><span class="v">hold</span></div>
       </div>
-      <div class="verdict">You confirm the change through a channel the vendor did not supply, for example the phone number already on file. Only then can a payment go to the new account. The skill never saves bank details.</div>
+      <div class="verdict">The flag says: "Hold until confirmed by phone on a number from your records, not from the request." The skill never puts bank details in an output and never saves them.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -261,22 +262,23 @@
     <div class="stat"><span class="label">Complaints, 2024</span><span class="v num">21,442</span><span class="s">Business email compromise complaints in the same report<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
     <div class="stat"><span class="label">Who decides</span><span class="v num good">A person</span><span class="s">The skill proposes the run. A person approves it. The bank or the accounting system pays it. Splitting those roles between people helps prevent fraud, waste and abuse<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup></span></div>
   </div>
-  <p class="muted" style="font-size:15px">Most changes of bank details are real. The skill does not know which kind it found. It flags the change, and you decide after you confirm it through a second channel.</p>
+  <p class="muted" style="font-size:15px">Most changes of bank details are real. The skill does not know which kind it found. It flags the change, and you decide after you confirm it through a second channel. If you do not answer the question, the proposed run says "bank-detail changes not screened".</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks six questions before it reads anything</h2>
+  <h2>It asks seven questions before it reads anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files and the skill does the same work. The skill asks this only if your account has a MosoFin connection. If not, it says once that the run is manual.</div></li>
-    <li><div class="q">The as-of date for the aging.</div><div class="why">Required. The aging changes from day to day. The skill never picks a date for you.</div></li>
-    <li><div class="q">How much cash is available for this payment run?</div><div class="why">Required for the payment run. The run stops when the cash ends. Give the amount after payments you already promised, your float and any reserve. Without it, the skill builds the aging only. It never reads a bank balance and calls it available.</div></li>
-    <li><div class="q">Which vendors are critical, standard or discretionary?</div><div class="why">Optional. Your books do not know which supplier stops service first. Without the tiers, the skill ranks on dates, discounts and late fees only, and says so.</div></li>
-    <li><div class="q">How you pay each vendor, and any terms or holds you keep outside the books.</div><div class="why">Recommended. The books hold the names of the payment methods. They often do not show which vendor gets which method. Without your answer, that column reads "to confirm".</div></li>
-    <li><div class="q">If your bills are in more than one currency: the exchange rate and its source.</div><div class="why">Required if several currencies appear. No accounting connection supplies a live rate for a bank transfer. The skill never assumes a rate.</div></li>
+    <li><div class="q">The as-of date for the aging, and any buckets of your own.</div><div class="why">Required. The aging changes from day to day. The skill never picks a date for you. Without your own buckets, it uses the six default buckets.</div></li>
+    <li><div class="q">Aging only, or a payment run too? For a run, how much cash is available?</div><div class="why">Required for the payment run. The run stops when the cash ends. Give the amount after payments you already promised, your float and any reserve. Without it, the skill says that it cannot propose a payment run. It never reads a bank balance and calls it available.</div></li>
+    <li><div class="q">Which vendors are critical, standard or discretionary?</div><div class="why">Optional. Your books do not know which supplier stops service first. Critical vendors rank first in the run. Once you give the tiers, the skill need not ask again each week.</div></li>
+    <li><div class="q">Vendors on hold, disputed bills, payments sent outside the books, and requests to change bank details.</div><div class="why">The run leaves out held vendors and pays only the undisputed part of a bill. It takes off payments that are on their way but not in the books. It flags a vendor that asked to change bank details. Hold and dispute status come only from you.</div></li>
+    <li><div class="q">How do you pay each vendor: ACH, wire, cheque or card?</div><div class="why">Recommended. The books hold the names of the payment methods. They often do not show which vendor gets which method.</div></li>
+    <li><div class="q">If your bills are in more than one currency: the exchange rate and its source.</div><div class="why">The skill asks this only if your bills show more than one currency. No accounting connection supplies a live rate for a bank transfer. The output shows the source and the date of the rate.</div></li>
   </ol>
   <p>Then it reads your answers back and waits for your yes. For Northbrook, the read-back is like this:</p>
-  <blockquote><i>"Aging as at Friday 6 November for Northbrook Trading, read from your Mosofin connection. Payment run for $40,000 of available cash, after the $10,000 you keep back. Power Co and PayrollCo are critical. Default buckets. All bills in USD. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Aging as at Friday 6 November for Northbrook Trading, read from your Mosofin connection. Payment run for $40,000 of available cash, after the $10,000 you keep back. Power Co and PayrollCo are critical. Acme Corp is on hold. Lakeside Freight asked to change bank details. Default buckets. All bills in USD. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
@@ -291,7 +293,7 @@
         <li>It reads the payments already made and the open vendor credits</li>
         <li>It reads the payment terms, including discount terms, and the vendor records</li>
         <li>It reads the balance of your accounts payable account, to compare the aging with it</li>
-        <li>You still give it the <b>as-of date</b> and the <b>cash available</b>, every run. You also give it the <b>vendor tiers</b> and any late fee that is only in a contract</li>
+        <li>You still give it the <b>as-of date</b> and the <b>cash available</b>, every run. You also give it the <b>vendor tiers</b>, the <b>holds and disputes</b>, and any late fee that is only in a contract</li>
       </ul>
     </div>
     <div class="card">
@@ -299,10 +301,10 @@
       <h3>Bring the open bills, and more if you have them</h3>
       <ul>
         <li><b>Open bills</b>: vendor, bill number, bill date, due date or terms, open amount, currency. An aged payables or open bills export, CSV or XLSX, required</li>
-        <li><b>Payments already made or in progress</b>, and <b>open vendor credits</b>, CSV or XLSX, recommended</li>
+        <li><b>Payments already made</b> and <b>open vendor credits</b>, CSV or XLSX, recommended</li>
         <li><b>Vendor list</b> with terms and payment method, CSV or XLSX, recommended</li>
-        <li><b>The accounts payable balance</b> from the balance sheet or trial balance, recommended</li>
-        <li>The as-of date, cash available, tiers and exchange rate, typed in the chat</li>
+        <li><b>The accounts payable balance</b> from the balance sheet or trial balance, required to agree the aging to it. Without it, the aging summary says that it is not agreed to that balance</li>
+        <li>The as-of date, cash available, tiers, holds and exchange rate, typed in the chat</li>
       </ul>
     </div>
   </div>
@@ -310,13 +312,14 @@
 
 <section>
   <span class="label">What you get back</span>
-  <h2>Six sheets: the aging, the run, and what it could not read</h2>
+  <h2>Seven sheets: the aging, the run, the held bills, and what it could not read</h2>
   <div class="gets">
     <div class="get"><b>Aging summary</b><span>Each vendor against each bucket, with totals. It says if the aging came from your report or if the skill built it from the bills.</span></div>
     <div class="get"><b>Aging detail</b><span>Every bill with its dates, days past due, bucket, terms, discount, late fee, tier and status.</span></div>
-    <div class="get"><b>Proposed payment run</b><span>Each payment with its reason, the total, the cash available, the cash left and the bills that wait. Headed as a proposal: no payment has been made or scheduled.</span></div>
+    <div class="get"><b>Proposed payment run</b><span>Each payment with its reason, its discount, the cash paid and any bank-detail flag. Then the total, the cash available, the cash left and the bills that wait. Headed as a proposal: no payment has been made or scheduled. It ends with blank lines for the preparer and the approver.</span></div>
+    <div class="get"><b>Held and disputed</b><span>Each held or disputed amount, with the reason, the date it started and who owns it.</span></div>
     <div class="get"><b>Discounts</b><span>Every discount with its last day, its amount and its return a year, highest return first.</span></div>
-    <div class="get"><b>Exceptions</b><span>Bills with data problems to correct before payment, and any due date the skill calculated from the terms.</span></div>
+    <div class="get"><b>Exceptions</b><span>Bills with data problems to fix before payment, and any due date the skill calculated from the terms.</span></div>
     <div class="get"><b>Coverage</b><span>For each task, what the skill read, with which tool, and what you must supply because it could not read it.</span></div>
   </div>
   <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your vendor tiers, payment methods, holds and ranking order for the next run. It never saves bank details or the cash available.</p>
@@ -327,11 +330,11 @@
     <span class="label">What it never does</span>
     <ul>
       <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
-      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never reads anything before you answer the first questions</b> and say yes to the read-back.</li>
       <li><b>Never sends, releases or schedules a payment, changes bank details or puts a vendor on hold.</b> The run is a proposal, headed as one. A person approves it and pays it.</li>
       <li><b>Never picks the as-of date, the cash available or the company for you.</b> A bank balance is not available cash. It asks every run.</li>
       <li><b>Never proposes a real payment run from test data.</b> If any figure is test data, the run is an illustration only, and says so at the top.</li>
-      <li><b>Never saves vendor bank details.</b> You confirm a change through a channel the vendor did not supply. Only then can a payment go to the new account.</li>
+      <li><b>Never puts vendor bank details in an output, and never saves them.</b> You confirm a change through a channel the vendor did not supply.</li>
     </ul>
   </div>
 </section>
@@ -360,13 +363,13 @@
     <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="loss table, Business Email Compromise"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" rel="noopener">FBI IC3: 2024 Internet Crime Report</a><span class="what">Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints.</span></li>
     <li id="src4" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Principle 10, Segregation of Duties, ¶10.21–10.23"><a href="https://www.gao.gov/assets/gao-25-107721.pdf" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721</a><span class="what">Separating authority, custody and accounting among different people helps prevent fraud, waste and abuse.</span></li>
   </ol>
-  <p class="muted" style="font-size:14.5px">No outside authority backs the default buckets, the ranking order, the vendor tiers or the six sheets. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources.</p>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the default buckets, the ranking order, the vendor tiers or the output sheets. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources.</p>
 </section>
 
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>ap-aging-and-payment-runs</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and has not shipped. It is not yet on the main branch. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>ap-aging-and-payment-runs</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -394,7 +397,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

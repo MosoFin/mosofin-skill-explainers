@@ -256,9 +256,9 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? What is the as-of date for the aging? How much cash is available for this run? Which vendors are critical, standard or discretionary? What payment method does each vendor use, and do you keep terms or holds outside the books? If the bills are in more than one currency, what is the exchange rate and its source?</div>
-    <div><b>Needs</b>The skill needs the open bills, with the vendor, bill number, bill date, due date or terms, open amount and currency. The payments in flight, the open vendor credits, the vendor list and the A/P control balance make the result better. You type in the as-of date and the cash available.</div>
-    <div><b>Gives back</b>The skill gives back six sheets: aging summary, aging detail, proposed payment run, discount opportunities, exceptions and coverage. It asks before it makes an Excel file.</div>
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? What is the as-of date, and do you use your own buckets? Aging only, or a payment run too, and how much cash is available? Which vendors are critical, standard or discretionary? Which vendors are on hold or in dispute, which payments are on their way outside the books, and which vendor asked to change bank details? How do you pay each vendor? If the bills are in more than one currency, what is the exchange rate and its source?</div>
+    <div><b>Needs</b>The skill needs the open bills, with the vendor, bill number, bill date, due date or terms, open amount and currency. It needs the A/P control balance to agree the aging to it. The payments made, the open vendor credits and the vendor list make the result better. You type in the as-of date and the cash available.</div>
+    <div><b>Gives back</b>The skill gives back six numbered sheets: aging summary, aging detail, proposed payment run, discount opportunities, exceptions and coverage. A Held and disputed sheet, 3b, follows the payment run. It asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its summary. It never sends, releases or schedules a payment, changes bank details or puts a vendor on hold. It never assumes the as-of date or the cash. It never runs a real payment run from test data, and never saves bank details.</div>
   </div>
 </section>
@@ -268,11 +268,11 @@
   <h2>Where every fact on this page comes from</h2>
   <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are an OpenStax textbook, two FBI IC3 publications, a GOV.UK page, a US Treasury page and the GAO Green Book. MosoFin checked each one on 27 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
   <ol class="srcs" id="srclist"></ol>
-  <p class="fine"><b>Not backed by an outside authority.</b> The default buckets, the ranking order, the six output sheets and the three vendor tiers are the skill's own. Northbrook Trading, its bills, its tiers and every figure in the examples are made up. The page marks them where they appear.</p>
+  <p class="fine"><b>Not backed by an outside authority.</b> The default buckets, the ranking order, the output sheets and the three vendor tiers are the skill's own. Northbrook Trading, its bills, its tiers and every figure in the examples are made up. The page marks them where they appear.</p>
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files come from the card-format rewrite of the skill. The rewrite is on a branch and has not shipped. The skill on main holds the same text in one longer file. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 3, 5 and 6 are US sources. Source 4 is a UK source. Check with your accountant which rules apply to you. This page explains <code>ap-aging-and-payment-runs</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. The card format is on the main branch of MosoFin/mosofin-finance-skills. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 3, 5 and 6 are US sources. Source 4 is a UK source. Check with your accountant which rules apply to you. This page explains <code>ap-aging-and-payment-runs</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -290,7 +290,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The sixteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
+/* The eighteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
 const Q = {
   q1:{q:"who do we owe, and how late are we?", w:"references/overview.md · AP Aging and Payment Runs (Mosofin)"},
   q2:{q:"Ask; do not read a bank balance and call it available.", w:"references/gates.md · Gate 3 — Profile the entity, then interview the user"},
@@ -308,6 +308,8 @@ const Q = {
   q14:{q:"require user confirmation through a channel the vendor did not supply.", w:"references/edge-cases.md · Edge Cases"},
   q15:{q:"a converted figure without its rate and date cannot be checked later", w:"references/method.md · Step 6 — Multi-currency handling"},
   q16:{q:"Cash available is also state, not a decision", w:"references/method.md · Step 8 — Evolve the skill (Mosofin-specific, final step)"},
+  q17:{q:"the simpler 2% × 365 / 20 = 36.5% is an approximation", w:"references/method.md · Step 3 — Identify early-pay discounts"},
+  q18:{q:"Hold until confirmed by phone on a number from your records, not from the request.", w:"references/edge-cases.md · Edge Cases"},
 };
 
 const RULES = [
@@ -326,14 +328,14 @@ const RULES = [
   { id:"6", title:"Ask for the cash", r:Q.q2, cites:[],
     plain:"Cash available is the cash you choose to spend this week. It is not your bank balance. The skill asks you for it." },
   { id:"7", title:"Tiers come from you", r:Q.q3, cites:[],
-    plain:"You tell the skill which vendors are critical, standard or discretionary. Without tiers, the run ranks on dates, discounts and penalties only." },
+    plain:"You tell the skill which vendors are critical, standard or discretionary. Critical vendors rank first in the run." },
   { id:"8", title:"Show what is left unpaid", r:Q.q11, cites:[],
     plain:"The skill stops adding payments when the cash is used. It shows the deferred and held bills on the face of the output." },
   { id:"9", title:"A proposal, never a payment", r:Q.q12, cites:[6],
     plain:"The run is headed as a proposal. A person approves it, and the bank or the accounting system pays it.",
     backed:"Different people should hold the authority, the custody of assets and the accounting.{6}" },
   { id:"10", title:"New bank details wait", r:Q.q14, cites:[2,3],
-    plain:"If a vendor sends new bank details, the run pays the account on file. You check the change through a channel that the vendor did not supply.",
+    plain:"At the start, the skill asks if a vendor asked to change bank details. It flags each vendor you name on the proposed run. You check the change through a channel that the vendor did not supply.",
     backed:"The FBI says to check a change of payment details through a second channel.{2} In 2024, reported losses to business email compromise were $2,770,151,146.{3}" },
   { id:"11", title:"A rate with its date", r:Q.q15, cites:[],
     plain:"For bills in other currencies, the skill converts at the rate you give. It shows the rate, its source and its date." },
@@ -374,13 +376,13 @@ const LEVELS = [
     chips:["Open bills","Terms record"], src:"Rule 4", cites:[1],
     situation:"Harbor Office Supply billed $8,000 on Friday 30 October, on terms of 2/10 Net 30. The discount ends on Monday 9 November. The next run is on Friday 13 November, after the deadline.",
     facts:["For terms of 2/10, net 30, the OpenStax textbook puts the annual cost of not taking the discount at 36.73 percent "+C(1)+". If you pay late instead of early, you give up the discount.",
-           "The skill's formula gives about 36.5%. The textbook's fuller formula also divides by the discounted price and uses a 360-day year. So it gives 36.73% "+C(1)+". Both show a return of about 36% a year."],
+           "The skill divides the discount by the price after the discount and uses a 365-day year. So it gives about 37.2%. The textbook uses a 360-day year, so it gives 36.73% "+C(1)+". Both show a return of more than 36% a year."],
     visual:{type:"table",
-      head:["Bill","Terms","Billed","Discount deadline","Discount","Net to pay"],
+      head:["Bill","Terms","Billed","Discount deadline","Discount","Cash paid"],
       rows:[["Harbor, $8,000","2/10 Net 30","Fri 30 Oct","Mon 9 Nov",["$160","good"],"$7,840"]]},
-    rules:[Q.q7, Q.q8],
-    math:[["Discount deadline: 30 Oct + 10 days","Mon 9 Nov"],["Discount: $8,000 × 2%","$160",1],["Net to pay: $8,000 − $160","$7,840"],["Annual return, skill's formula: 2% × 365 ÷ (30 − 10)","36.5%",1],["Annual cost, textbook's fuller formula","36.73%"],["Next run, Fri 13 Nov, is after Mon 9 Nov","take it in this run",1]],
-    verdict:["ok","The skill flags the Harbor discount, because its deadline falls before the next run. Paying $7,840 now saves $160. By the skill's formula, that is a return of 36.5% a year.","DISCOUNT"] },
+    rules:[Q.q7, Q.q8, Q.q17],
+    math:[["Discount deadline: 30 Oct + 10 days","Mon 9 Nov"],["Discount: $8,000 × 2%","$160",1],["Cash paid: $8,000 − $160","$7,840"],["Annual return, skill's formula: 2% ÷ 98% × 365 ÷ (30 − 10)","37.2%",1],["Simpler form: 2% × 365 ÷ 20","36.5%"],["Textbook: 2% ÷ 98% × 360 ÷ 20","36.73%"],["Next run, Fri 13 Nov, is after Mon 9 Nov","take it in this run",1]],
+    verdict:["ok","The skill flags the Harbor discount, because its deadline falls before the next run. Paying $7,840 now saves $160. By the skill's formula, that is a return of about 37.2% a year. The skill records the discount with the payment, so the bill closes in full.","DISCOUNT"] },
 
   { n:4, title:"The bill that costs money to wait on",
     chips:["Open bills","Terms record"], src:"Rule 5", cites:[4,5],
@@ -397,29 +399,29 @@ const LEVELS = [
   { tier:"The run · $40,000 of cash available" },
   { n:5, title:"Not enough cash for everything",
     chips:["Aging","Tiers","Cash available"], src:"Rules 6, 7, 8 and 12", cites:[],
-    situation:"The bills come to $62,850, and the owner gives $40,000 as the cash available. The skill ranks the bills in its default order and adds them until the next bill does not fit.",
+    situation:"The bills come to $62,850, and the owner gives $40,000 as the cash available. Northbrook has no open vendor credits. The skill ranks the bills in its default order and adds them until the next bill does not fit.",
     facts:[], nofact:NOFACT,
     visual:{type:"table",
       head:["Group","Vendor","Reason","Pay","Running total"],
       rows:[["1","Power Co","critical","$3,400","$3,400"],["1","PayrollCo","critical","$1,200","$4,600"],["2","Crestline Logistics","past due, penalty","$12,500","$17,100"],["2","Lakeside Freight","past due, final notice","$7,200","$24,300"],["3","Harbor Office Supply","discount ends Mon 9 Nov","$7,840","$32,140"],["4","Summit Cleaning","due this week","$950","$33,090"],["5","Pinnacle Design","due next week",["$14,000 deferred","bad"],["$47,090 > $40,000","bad"]],["6","Brightline Software","discretionary","$6,000 deferred","—"],["held","Acme Corp","credit hold","$9,600 held","—"]]},
     pair:[["ok","Proposed run","$33,090","six bills, groups 1 to 4"],["note","Cash left","$6,910","$40,000 − $33,090"],["bad","Left unpaid, on the face","$29,600","Pinnacle $14,000, Brightline $6,000, Acme $9,600 held"]],
     rules:[Q.q10, Q.q11, Q.q2, Q.q3, Q.q16],
-    math:[["3,400 + 1,200 + 12,500 + 7,200 + 7,840 + 950","$33,090",1],["Next bill: $33,090 + $14,000 (Pinnacle)","$47,090"],["$47,090 is more than $40,000","stop",1],["Cash left: $40,000 − $33,090","$6,910",1],["Left unpaid: 14,000 + 6,000 + 9,600","$29,600"],["Check: open $62,850 − bills in the run $33,250","$29,600",1]],
+    math:[["3,400 + 1,200 + 12,500 + 7,200 + 7,840 + 950","$33,090",1],["Next bill: $33,090 + $14,000 (Pinnacle)","$47,090"],["$47,090 is more than $40,000","stop",1],["Cash left: $40,000 − $33,090","$6,910",1],["Left unpaid: 14,000 + 6,000 + 9,600","$29,600"],["Check: open $62,850 − bills in the run $33,250","$29,600",1],["The cash test counts Harbor at cash paid","$7,840, not $8,000"]],
     verdict:["note","The skill proposes $33,090 and leaves $6,910 of cash. Pinnacle waits for the next run, Brightline is deferred and Acme is held. The skill asks for the cash available again next week.","PROPOSAL"] },
 
   { tier:"The limits · what the run must never do" },
   { n:6, title:"What the run must never do",
     chips:["Vendor records","Email","Holds"], src:"Rules 9 and 10", cites:[2,3,6],
-    situation:"On 3 November, an email from Lakeside Freight gave new bank details. Acme Corp's $9,600 bill is in dispute, and the owner has put Acme on credit hold.",
+    situation:"On 3 November, an email from Lakeside Freight gave new bank details. The owner names Lakeside when the skill asks about bank-detail changes. Acme Corp's $9,600 bill is in dispute, and the owner has put Acme on credit hold.",
     facts:["The FBI says to check a request to change payment details through a second channel. For example, use a phone number that is already on file "+C(2)+".",
            "In 2024, people reported losses of $2,770,151,146 to business email compromise, from 21,442 complaints "+C(3)+".",
            "Different people should hold the authority, the custody of assets and the accounting. This helps to prevent fraud, waste and abuse "+C(6)+". The skill proposes the run, a person approves it, and the bank or the accounting system pays it."],
     visual:{type:"table",
       head:["Check","Result","Detail"],
-      rows:[["Lakeside's new bank details",["held","bad"],"run pays $7,200 to the account on file"],["Acme Corp, credit hold",["$9,600 held","bad"],"never paid by the run"],["Header of the run","proposal","Proposal: no payment has been made or scheduled."],["Fixture data","none","no mock data in the run"],["Who pays","a person","approves, then the bank or accounting system pays"]]},
-    rules:[Q.q12, Q.q13, Q.q14, Q.q4],
-    math:[["Lakeside, paid to the account on file","$7,200"],["New details from the 3 Nov email","held until confirmed",1],["Check by","the phone number on file"],["Acme Corp, held out of the run","$9,600",1],["Payments the skill sends","$0",1]],
-    verdict:["flag","The skill holds Lakeside's new bank details until the owner checks them by the phone number on file. It keeps Acme out of the run. It sends nothing, and it heads the run as a proposal.","HELD"] },
+      rows:[["Lakeside, bank-detail change",["flagged","bad"],"$7,200 line on the run, held for a phone check"],["Acme Corp, credit hold",["$9,600 held","bad"],"on the Held and disputed sheet, not in the run"],["Header of the run","proposal","Proposal: no payment has been made or scheduled."],["End of the run","blank","Prepared by / date. Approved by / date."],["Fixture data","none","no mock data in the run"],["Who pays","a person","approves, then the bank or accounting system pays"]]},
+    rules:[Q.q12, Q.q13, Q.q14, Q.q18, Q.q4],
+    math:[["Lakeside, in the proposed run","$7,200"],["Bank-detail change, from the owner's answer","flagged, held for a phone check",1],["Check by","a phone number from your own records"],["Acme Corp, held out of the run","$9,600",1],["Payments the skill sends","$0",1]],
+    verdict:["flag","The skill flags the Lakeside payment until the owner checks the change by phone, on a number from the owner's records. It keeps Acme out of the run. It sends nothing, and it heads the run as a proposal.","HELD"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -536,7 +538,7 @@ function run(){
   const tot=[0,0,0,0,0,0];
   bills.forEach(b=>{ b.dpd=A-b.d; b.bk=bucketOf(b.dpd); tot[b.bk]+=b.a;
     b.disc = (!isNaN(b.dp) && b.dp>0 && !isNaN(b.dd)) ? Math.round(b.a*b.dp)/100 : 0;
-    b.ret = b.disc && b.d>b.dd ? b.dp*365/(b.d-b.dd) : NaN;
+    b.ret = b.disc && b.d>b.dd && b.dp<100 ? b.dp/(100-b.dp)*100*365/(b.d-b.dd) : NaN;
     b.live = b.disc>0 && b.dd>=A;
     b.pay = b.live ? b.a-b.disc : b.a;
     b.g = b.t==="critical"?1 : (b.dpd>0 && b.p)?2 : (b.live && !isNaN(N) && b.dd<N)?3 : b.t==="discretionary"?6 : b.d<=endThis?4 : b.d<=endNext?5 : 6; });
@@ -591,7 +593,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
