@@ -151,13 +151,13 @@
   <p>The two figures rarely agree on the first look. Some differences are timing. Others are real mistakes. The skill names each line that takes one figure to the other.</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 880 340" role="img" aria-label="Two columns. Left: Northbrook Trading's books show 21,115 dollars owed to Harbor Office Supply at 30 September. Minus a 3,100 dollar invoice dated 27 September, after the statement date. Plus a 625 dollar payment of 29 September that Harbor has not received. Plus a 2,480 dollar invoice on Harbor's statement that the books never recorded. Minus a 410 dollar credit note that nobody claimed. The result is 20,710 dollars. Right: Harbor's statement at 25 September shows a closing balance of 20,710 dollars. They meet.">
+      <svg viewBox="0 0 880 340" role="img" aria-label="Two columns. Left: Northbrook Trading's books show 21,115 dollars owed to Harbor Office Supply at 30 September. Minus a 3,100 dollar invoice dated 27 September, after the statement date. Plus a 625 dollar payment of 29 September, also after the statement date. Plus a 2,480 dollar invoice on Harbor's statement that the books never recorded. Minus a 410 dollar credit note that nobody claimed. The result is 20,710 dollars. Right: Harbor's statement at 25 September shows a closing balance of 20,710 dollars. They meet.">
         <g font-family="Archivo,sans-serif" font-size="14">
           <rect x="16" y="20" width="540" height="304" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="36" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">YOUR BOOKS · NORTHBROOK TRADING</text>
           <text x="36" y="80" fill="var(--ink)">Owed to Harbor at 30 September</text><text x="536" y="80" text-anchor="end" font-weight="700" fill="var(--ink)">$21,115.00</text>
           <text x="36" y="112" fill="var(--hold)">− Invoice 0057, 27 Sep, after the statement date</text><text x="536" y="112" text-anchor="end" fill="var(--hold)">− 3,100.00</text>
-          <text x="36" y="144" fill="var(--hold)">+ Payment of 29 Sep, Harbor has not received it</text><text x="536" y="144" text-anchor="end" fill="var(--hold)">+ 625.00</text>
+          <text x="36" y="144" fill="var(--hold)">+ Payment of 29 Sep, after the statement date</text><text x="536" y="144" text-anchor="end" fill="var(--hold)">+ 625.00</text>
           <text x="36" y="176" fill="var(--wrong)">+ INV-0049 on the statement, never in your books</text><text x="536" y="176" text-anchor="end" fill="var(--wrong)">+ 2,480.00</text>
           <text x="36" y="208" fill="var(--green)">− Credit note CN-0011, nobody claimed it</text><text x="536" y="208" text-anchor="end" fill="var(--green)">− 410.00</text>
           <line x1="36" y1="228" x2="536" y2="228" stroke="var(--rule-strong)"/>
@@ -177,7 +177,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures for a made-up company and supplier. Harbor dated the statement 25 September, and your books close on 30 September. The skill treats the five days between those dates as a known window, so the two amber lines are timing. The arithmetic: 21,115.00 − 3,100.00 + 625.00 + 2,480.00 − 410.00 = 20,710.00.</figcaption>
+    <figcaption>Example figures for a made-up company and supplier. Harbor dated the statement 25 September, and your books close on 30 September. The skill reconciles at the statement date. It lists each item in your books dated 26 to 30 September on its own, so the two amber lines are timing. The arithmetic: 21,115.00 − 3,100.00 + 625.00 + 2,480.00 − 410.00 = 20,710.00.</figcaption>
   </figure>
 </section>
 
@@ -192,7 +192,7 @@
       <div class="rows num">
         <div class="row off"><span>INV-0049, 18 Sep, on the statement and not in your books</span><span class="v">$2,480.00</span></div>
         <div class="row off"><span>CN-0011, 12 Sep, a credit for returned chairs, never recorded</span><span class="v">$410.00</span></div>
-        <div class="row same"><span>Timing lines in the five-day window</span><span class="v">2</span></div>
+        <div class="row same"><span>Timing lines dated 26 to 30 Sep, each listed</span><span class="v">2</span></div>
       </div>
       <div class="verdict">The skill reports the credit note on its own, apart from the problems. It asks for a copy of the missing invoice and proposes an accrual for it.</div>
     </div>
@@ -242,27 +242,28 @@
   <span class="label">One honest limit</span>
   <h2>It can read your books. It cannot read the supplier's statement</h2>
   <p>With MosoFin connected, the skill reads your side in full: every invoice, credit and payment, the payment list and your supplier records. No accounting system holds the supplier's statement, because the supplier sends it to you. So the skill always asks you for it.</p>
-  <p>Without a statement it can still help. It can rank your suppliers to show which ones to check first, from your books alone. The ranking puts large balances and large spending first. It also lists suppliers with old unpaid items, and suppliers whose regular invoices stopped. A supplier account in credit means you paid more than you owe. That money is usually yours to recover. The skill learns which suppliers were never checked from its saved history, or it asks you on a first run.</p>
+  <p>Without a statement it can still help. It can rank your suppliers to show which ones to check first, from your books alone. The ranking puts large balances and large spending first. It also lists suppliers with old unpaid items, and suppliers whose regular invoices stopped. In your books a supplier account normally shows what you owe. If it shows the supplier owes you, a debit balance, you paid more than you owe. That money is usually yours to recover. No accounting system records when you last checked a supplier. So the skill takes that date from its saved runs, or it asks you on a first run. If nobody knows, it says "not known".</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks six questions before it looks at anything</h2>
+  <h2>It asks seven questions before it looks at anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your side from there. Without it, you upload the files and the checks stay the same. The skill asks only if your account has a MosoFin connection.</div></li>
-    <li><div class="q">Which supplier, or which suppliers?</div><div class="why">A check of every supplier is not possible and not necessary. On the MosoFin path the skill offers its ranking. You choose.</div></li>
-    <li><div class="q">The supplier's statement, as a PDF or CSV.</div><div class="why">The statement is the one side your books never hold. Without it there is nothing to compare. The skill says so and offers the ranking, which needs only your books.</div></li>
+    <li><div class="q">The statement for each supplier to reconcile, as a PDF or CSV.</div><div class="why">The statement is the one side your books never hold, so the skill always asks for it. On the MosoFin path, the skill can still rank which suppliers to ask for a statement.</div></li>
     <li><div class="q">Which of your companies is the statement for, and under which account number?</div><div class="why">A statement for another company or another account makes every invoice look missing. The skill reads both from the statement and checks them with you.</div></li>
-    <li><div class="q">Your period end, the statement's date, and what the statement lists?</div><div class="why">The two dates often differ. A statement can list every open item, only overdue items, or a running balance. An overdue-only statement makes every current invoice look unmatched. The skill never assumes the two dates are the same.</div></li>
-    <li><div class="q">Do you keep a record of disputes, and who handles the exceptions?</div><div class="why">Disputes live in emails and notes, not in your books. Every exception needs a person and a target date, and you set both.</div></li>
+    <li><div class="q">Your cutoff date, and the statement's date if it is different?</div><div class="why">The two dates often differ. The skill reconciles at the statement date. It lists each item in your books between the two dates on its own, never as one total.</div></li>
+    <li><div class="q">Does the statement list every open item, only overdue items, or a balance brought forward?</div><div class="why">An overdue-only statement makes every current invoice look unmatched. For a balance brought forward, the skill starts from the opening balance and adds the period's activity.</div></li>
+    <li><div class="q">Do you keep a record of disputes?</div><div class="why">Disputes live in emails and notes, not in your books. Without the record, the coverage sheet says that this check did not run.</div></li>
+    <li><div class="q">Which suppliers do you reconcile, how often, and who owns the exceptions?</div><div class="why">Every exception needs a person and a target date. The skill proposes the next action, and you set the person and the date.</div></li>
   </ol>
   <p>Then it reads your answers back and waits for your yes:</p>
-  <blockquote><i>"Reconciling Harbor Office Supply's statement dated 25 September, addressed to Northbrook Trading (account NB-2210), against your AP ledger at 30 September read from your Mosofin connection. The statement lists every open item. The five days between the two dates are a known window. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Reconciling Harbor Office Supply's statement dated 25 September, addressed to Northbrook Trading (account NB-2210), against your AP ledger at 30 September read from your Mosofin connection. The statement lists every open item. I'll reconcile at 25 September and list each item in your books dated 26 to 30 September separately. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
   <span class="label">What you need</span>
-  <h2>Connect once, or upload two files and a date</h2>
+  <h2>Connect once, or upload the files on a checklist</h2>
   <div class="two">
     <div class="card">
       <span class="tag">Connected with MosoFin</span>
@@ -279,8 +280,10 @@
       <h3>Bring the statement and an export</h3>
       <ul>
         <li><b>Supplier's statement</b> (PDF or CSV), required</li>
-        <li><b>What you owe that supplier</b>, as an AP ageing or supplier ledger export, required</li>
-        <li><b>Your period end date</b>, typed in the chat, required</li>
+        <li><b>Every invoice, credit and payment for that supplier</b>, from the prior statement date to today, required. An ageing alone is not sufficient</li>
+        <li><b>Your supplier list</b>, or a bill search by the statement's invoice numbers, required before it calls an item missing</li>
+        <li><b>Your cutoff date</b>, the company on the statement and its account number, typed in the chat, required</li>
+        <li>Your AP ageing total and trial balance at the cutoff, recommended</li>
         <li>Your payment list with bank details, recommended</li>
         <li>Your notes on disputed invoices, recommended</li>
       </ul>
@@ -292,11 +295,11 @@
   <span class="label">What you get back</span>
   <h2>Six sheets: the balance, the matches, and what to do next</h2>
   <div class="gets">
-    <div class="get"><b>The summary</b><span>The two balances, the difference, how much it explains and how much it does not. It shows both dates.</span></div>
+    <div class="get"><b>The summary</b><span>The two balances, the difference, how much it explains and how much it does not. It shows both dates. It goes from the statement balance to your balance, one reconciling item at a time. Below it, a separate line compares your supplier ledger with your general ledger.</span></div>
     <div class="get"><b>Every match, with its strength</b><span>Each matched item shows which of four tests matched it. A match on the document number is the strongest. A loose match on the description is the weakest.</span></div>
     <div class="get"><b>Exceptions, with a person and a date</b><span>Each one has a cause, a person, a next step, a target date and an age. For a recurring check, open exceptions carry forward to the next month.</span></div>
-    <div class="get"><b>Proposed entries</b><span>It drafts corrections for a person to post. It keeps accruals apart from invoice entries.</span></div>
-    <div class="get"><b>Which suppliers to check</b><span>The ranking: large balances, suppliers never checked, accounts in credit, and broken invoice patterns.</span></div>
+    <div class="get"><b>Proposed entries</b><span>It drafts corrections for a person to post, with the document each one rests on. It keeps accruals apart from invoice entries.</span></div>
+    <div class="get"><b>Which suppliers to check</b><span>The ranking: large balances, suppliers never checked, accounts that show you paid too much, and broken invoice patterns.</span></div>
     <div class="get"><b>Where every number came from</b><span>Which side it read and which side you supplied, and what it did not do, such as contact the supplier.</span></div>
   </div>
   <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat.</p>
@@ -307,7 +310,7 @@
     <span class="label">What it never does</span>
     <ul>
       <li><b>Never reads your books without asking.</b> A connected account is not permission.</li>
-      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never reads anything before you answer the first questions</b> and say yes to the read-back.</li>
       <li><b>Never posts an entry or changes your data.</b> Every entry is a proposal for a person to post.</li>
       <li><b>Never contacts a supplier.</b> It sends nothing to anyone.</li>
       <li><b>Never books a bill from a statement line.</b> Until the invoice arrives, it proposes an accrual.</li>
@@ -328,7 +331,7 @@
     <dt>Unrecorded liability</dt><dd>A bill you owe that is not in your books. An invoice on the statement and not in your books is a possible one.</dd>
     <dt>Accrual</dt><dd>An entry for goods or services you received but the supplier has not yet invoiced. It often appears with trade payables<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
     <dt>Credit note</dt><dd>A document from the supplier that reduces what you owe, for example after a return. QuickBooks calls it a vendor credit<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
-    <dt>Cutoff date</dt><dd>The date a list stops. The supplier's cutoff and yours often differ. The skill treats the days between them as a known window, not as errors.</dd>
+    <dt>Cutoff date</dt><dd>The date a list stops. The supplier's cutoff and yours often differ. The skill reconciles at the statement date and lists each item between the two dates on its own, as timing.</dd>
     <dt>Match tier</dt><dd>The skill's four match tests, from strongest to weakest: document number, amount and date, order number and amount, then a loose match on the description.</dd>
   </dl>
 </section>
@@ -345,13 +348,13 @@
     <li id="src5" data-checked="2026-10-24" data-via="from search results, page not opened"><a href="https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf" rel="noopener">ACFE: Occupational Fraud 2024: A Report to the Nations</a><span class="what">Of the 1,921 cases in the study, 22% involved billing schemes, with a median loss of $100,000. Theft of company assets occurred in 89% of cases.</span></li>
     <li id="src6" data-checked="2026-10-24" data-via="from search results, page not opened" data-at="loss table, Business Email Compromise"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" rel="noopener">FBI IC3: 2024 Internet Crime Report</a><span class="what">Victims reported $2,770,151,146 lost to business email compromise in 2024, across 21,442 complaints. The FBI tells businesses to check any change to payment details through a second channel.</span></li>
   </ol>
-  <p class="muted" style="font-size:14.5px">No outside authority backs the four match tests, the six types of difference, or the signals that rank which suppliers to check first. The same is true of the three near-substitutes in the skill's background file and the six output sheets. They are the skill's own rules.</p>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the four match tests, the seven types of difference, or the signals that rank which suppliers to check first. The same is true of the three near-substitutes in the skill's background file and the six output sheets. They are the skill's own rules.</p>
 </section>
 
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>vendor-statement-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>vendor-statement-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. The card format is on main of MosoFin/mosofin-finance-skills, merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -379,7 +382,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-24", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

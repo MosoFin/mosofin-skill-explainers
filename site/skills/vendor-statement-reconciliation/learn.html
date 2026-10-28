@@ -233,13 +233,13 @@
       <fieldset><legend>From your books</legend>
         <label class="field"><span>Your ledger balance for this supplier (B)</span><input data-k="B" inputmode="decimal"></label>
         <label class="field"><span>Invoices in your books dated after the statement date (L)</span><input data-k="L" inputmode="decimal"></label>
-        <label class="field"><span>Your payments the supplier has not received (T)</span><input data-k="T" inputmode="decimal"></label>
+        <label class="field"><span>Your payments the statement does not show yet (T)</span><input data-k="T" inputmode="decimal"></label>
       </fieldset>
     </div>
     <div class="math num" id="bridge" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
     <div class="results" id="owed" aria-live="polite"></div>
-    <p class="fine">The page uses expected statement = B − L + T + M − C, and unexplained = S − expected. The page calls it a tie when the unexplained amount is under half a cent. The skill itself matches item by item, in its four tiers. This bridge only adds up the totals of what that matching finds. The "Harbor, September" preset puts Levels 2, 3 and 4 on one statement: $18,640.00 + $2,480.00 − $410.00 = $20,710.00.</p>
+    <p class="fine">The page uses expected statement = B − L + T + M − C, and unexplained = S − expected. The page calls it a tie when the unexplained amount is under half a cent. The skill reconciles at the statement date. So L and T hold the ledger items dated between the two dates, plus any payment in transit. The skill itself matches item by item, in its four tiers. This bridge only adds up the totals of what that matching finds. The "Harbor, September" preset puts Levels 2, 3 and 4 on one statement: $18,640.00 + $2,480.00 − $410.00 = $20,710.00.</p>
   </div>
 </section>
 
@@ -247,9 +247,9 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin, or upload the data yourself? Which supplier, or which suppliers? The skill asks for the statement, as a PDF or CSV. It asks which company the statement is for, and the account reference. It asks for your period end, the statement's date and what the statement covers. It also asks about a dispute log and who owns the exceptions.</div>
-    <div><b>Needs</b>The skill needs the supplier's statement, which only you can supply. It needs your AP ageing or vendor ledger for that supplier, connected or exported. It needs your cutoff date. A payment register and a dispute log make the result better.</div>
-    <div><b>Gives back</b>The skill gives back six sheets. They are a summary, the matched items with their tier, the exceptions with owner and age, and the proposed entries. The last two are the vendor ranking and a coverage sheet. Every entry carries the label PROPOSED &mdash; NOT POSTED. The skill asks before it makes an Excel file.</div>
+    <div><b>Asks first</b>The skill asks seven questions in one message. Do you want to use MosoFin, or upload the data yourself? It asks for the statement of each supplier, as a PDF or CSV. It asks which company the statement is for, and the account reference. It asks for your cutoff date and the statement's date. It asks if the statement lists every open item, only overdue items, or a balance brought forward. It asks for a dispute log. Last, it asks which suppliers you reconcile, how often, and who owns the exceptions.</div>
+    <div><b>Needs</b>The skill needs the supplier's statement, which only you can supply. It needs every invoice, credit and payment for that supplier, from the prior statement date to today. An ageing alone is not sufficient. Before it calls an item missing, it needs your supplier list or a bill search across all suppliers. It needs your cutoff date. Your AP ageing total and trial balance let it agree the supplier ledger to the general ledger. A payment register and a dispute log make the result better.</div>
+    <div><b>Gives back</b>The skill gives back six sheets. They are a summary, the matched items with their tier, the exceptions with owner and age, and the proposed entries. The last two are the vendor ranking and a coverage sheet. The summary goes from the statement balance to the ledger balance, one reconciling item at a time. Below it, the summary shows any difference between the supplier ledger and the general ledger. Every entry carries the label PROPOSED &mdash; NOT POSTED. The skill asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never posts an entry and never contacts a supplier. It never books a liability from a statement line. It never forces an uncertain match. It reads nothing before you answer its questions and say yes.</div>
   </div>
 </section>
@@ -259,11 +259,11 @@
   <h2>Where every fact on this page comes from</h2>
   <p class="muted">The rules are the skill's own. The facts below come from seven outside sources. They include a US audit standard-setter, an international accounting standard-setter and the UK tax authority. The others are QuickBooks help, a fraud examiners' association and the FBI. MosoFin checked each one on 24 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
   <ol class="srcs" id="srclist"></ol>
-  <p class="fine"><b>Not backed by an outside authority.</b> The four match tiers, the six difference types and the Step 0 ranking signals are the skill's own rules. So are the "three near-substitutes" and the six output sheets. The page marks them as the skill's where they appear.</p>
+  <p class="fine"><b>Not backed by an outside authority.</b> The four match tiers, the seven difference types and the Step 0 ranking signals are the skill's own rules. So are the "three near-substitutes" and the six output sheets. The page marks them as the skill's where they appear.</p>
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 6 and 7 are US sources. Source 4 is a UK rule. Source 3 is an international standard. Source 5 is QuickBooks Online help. Check with your accountant which rules apply to you. This page explains <code>vendor-statement-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 6 and 7 are US sources. Source 4 is a UK rule. Source 3 is an international standard. Source 5 is QuickBooks Online help. Check with your accountant which rules apply to you. This page explains <code>vendor-statement-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">read it on GitHub</a>). The card format is on main of MosoFin/mosofin-finance-skills, merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -282,13 +282,13 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The thirteen quotes, word for word from the skill's files. Section names are written as the files write them. */
+/* The fourteen quotes, word for word from the skill's files. Section names are written as the files write them. */
 const Q = {
   q1:{q:"A vendor statement is independent evidence, prepared by a third party from their own records.", w:"references/overview.md · This is a genuine external reconciliation"},
   q2:{q:"Anything on their list and not on yours is a candidate unrecorded liability", w:"references/overview.md · Which makes it the primary control over completeness of AP"},
   q3:{q:"You cannot book a liability from a statement line alone", w:"references/overview.md · Three near-substitutes"},
   q4:{q:"if the supplier exists twice in one vendor master, half the invoices are under the other record", w:"references/gates.md · Gate 1 \u2014 Establish the datasource and entity scenario"},
-  q5:{q:"a supplier account in credit means the business has paid more than it owes", w:"references/method.md · Step 0 \u2014 Decide which vendors to reconcile *(Mosofin addition)*"},
+  q5:{q:"a supplier account with a debit balance in your AP means the business has paid more than it owes", w:"references/method.md · Step 0 \u2014 Decide which vendors to reconcile *(Mosofin addition)*"},
   q6:{q:"INV-0042, 42 and 0042 are one document", w:"references/method.md · Step 1 \u2014 Normalise both datasets"},
   q7:{q:"The supplier's statement cutoff is very often not your period end.", w:"references/method.md · Step 1 \u2014 Normalise both datasets"},
   q8:{q:"An unmatched item is a question; a wrongly matched item is two wrong answers", w:"references/method.md · Step 2 \u2014 Match statement items to the AP ledger"},
@@ -297,6 +297,7 @@ const Q = {
   q11:{q:"Where the liability is confirmed and the document has not yet arrived, the answer is an accrual, not an invoice posting.", w:"references/method.md · Step 5 \u2014 Accounting actions"},
   q12:{q:"The statement is for a different entity in the group. Every invoice presents as missing.", w:"references/edge-cases.md · Edge Cases"},
   q13:{q:"Payments made to an old bank account. A payment you made and they did not receive.", w:"references/edge-cases.md · Edge Cases"},
+  q14:{q:"The window is a set of listed items, never a lump", w:"references/method.md · Step 1 \u2014 Normalise both datasets"},
 };
 
 const RULES = [
@@ -311,12 +312,12 @@ const RULES = [
     backed:"Under UK rules, the input tax you reclaim is the VAT shown on the supplier's VAT invoice.{4} A statement line is not that invoice." },
   { id:"4", title:"Look for a second vendor record first", r:Q.q4, cites:[],
     plain:"Before the skill calls an invoice missing, it checks the vendor master for a second record of the same supplier." },
-  { id:"5", title:"A supplier account in credit is money", r:Q.q5, cites:[],
-    plain:"The skill ranks suppliers before it reconciles one. An account in credit ranks high, because the causes are all money you can get back." },
+  { id:"5", title:"A debit balance in your AP is money", r:Q.q5, cites:[],
+    plain:"The skill ranks suppliers before it reconciles one. In your books a supplier account normally has a credit balance, which is what you owe. A debit balance means you paid too much. It ranks high, because the causes are all money you can get back." },
   { id:"6", title:"Document numbers are text", r:Q.q6, cites:[],
     plain:"The skill strips prefixes and leading zeros on both sides the same way. Then it compares the numbers as text, and it records what it did." },
-  { id:"7", title:"Two dates, one known window", r:Q.q7, cites:[],
-    plain:"The skill reads both dates. It treats activity between them as a known window, not as a list of exceptions." },
+  { id:"7", title:"Two dates, every item listed", r:Q.q7, cites:[],
+    plain:"The skill reads both dates and reconciles at the statement date. It lists each ledger item between the two dates on its own, as a timing item. An invoice inside that window can still be missing." },
   { id:"8", title:"Leave a doubtful match open", r:Q.q8, cites:[],
     plain:"A wrong match marks one item as resolved when it is not. It also leaves a second item looking wrong when it is fine. So the skill leaves doubtful items for a person." },
   { id:"9", title:"Same amount, wrong month", r:Q.q9, cites:[],
@@ -354,10 +355,10 @@ const LEVELS = [
     chips:["Statement at 25 Sep","Ledger at 30 Sep"], src:"Rule 7", cites:[1],
     situation:"Harbor's statement shows $18,640.00 owed at 25 Sep. Your ledger shows $21,115.00 at 30 Sep. The gap is $2,475.00, and none of it is an error.",
     facts:["Evidence from a knowledgeable source outside the company is generally more reliable than the company's own records "+C(1)+". That makes the statement worth comparing, once both dates are clear."],
-    visual:{type:"wf", start:["Your ledger at 30 Sep",21115], steps:[["Invoice 0057, 27 Sep, not yet on the statement",-3100],["Payment of 29 Sep, not yet received by Harbor",625]], end:["Expected statement at 25 Sep",18640], dec:2},
-    rules:[Q.q7],
+    visual:{type:"wf", start:["Your ledger at 30 Sep",21115], steps:[["Invoice 0057, 27 Sep, not yet on the statement",-3100],["Payment of 29 Sep, after the statement date",625]], end:["Expected statement at 25 Sep",18640], dec:2},
+    rules:[Q.q7, Q.q14],
     math:[["Your ledger at 30 Sep","$21,115.00"],["− invoice 0057, dated 27 Sep","$3,100.00"],["+ payment of 29 Sep","$625.00"],["= expected statement balance","$18,640.00",1],["Harbor's statement at 25 Sep","$18,640.00"],["Unexplained","$0.00",1],["Gap explained: $3,100.00 − $625.00","$2,475.00"]],
-    verdict:["ok","The statement ties. Both items fall in the known window between 25 and 30 Sep. The skill lists them as timing items with their dates.","TIES"] },
+    verdict:["ok","The statement ties. The skill reconciles at 25 Sep. It lists the two items dated 26 to 30 Sep one by one, as timing items with their dates.","TIES"] },
 
   { tier:"What only the statement can show" },
   { n:3, title:"An invoice your books never saw",
@@ -370,7 +371,7 @@ const LEVELS = [
       head:["Check before calling it missing","Result"],
       rows:[["A match at any of the four tiers","none"],["A second Harbor record in the vendor master","none"],["Posted to a sibling company","no"],["What remains",["candidate unrecorded liability","bad"]]]},
     rules:[Q.q2, Q.q4, Q.q11, Q.q3],
-    math:[["INV-0049 on the statement","$2,480.00"],["Matching item in your ledger","none"],["Proposed accrual at 30 Sep","$2,480.00",1],["Label on the entry","PROPOSED \u2014 NOT POSTED"],["Next action","ask Harbor for the invoice copy"]],
+    math:[["INV-0049 on the statement","$2,480.00"],["Matching item in your ledger","none"],["Proposed accrual at 30 Sep","$2,480.00",1],["Proposed entry","Dr expense or inventory, Cr accrued liabilities"],["The accrual reverses on","1 Oct, day 1 of the next period"],["Label on the entry","PROPOSED \u2014 NOT POSTED"],["Next action","ask Harbor for the invoice copy"]],
     verdict:["flag","The skill proposes an accrual of $2,480.00 at 30 Sep and asks for the invoice copy. It does not post an invoice from the statement line. When the invoice arrives, it takes the accrual's place.","FLAG"] },
 
   { n:4, title:"A credit note nobody claimed",
@@ -499,7 +500,7 @@ function run(){
   const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
   bridge.innerHTML = line("Your ledger balance (B)", fmt(B))
     + line("− invoices in your books after the statement date (L)", fmt(L))
-    + line("+ your payments the supplier has not received (T)", fmt(T))
+    + line("+ your payments the statement does not show yet (T)", fmt(T))
     + line("+ invoices on the statement, not in your books (M)", fmt(M))
     + line("− credit notes on the statement, not in your books (C)", fmt(Cr))
     + line("= expected statement balance", fmt(expected), 1)
@@ -536,7 +537,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-24", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
