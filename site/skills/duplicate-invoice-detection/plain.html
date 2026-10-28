@@ -155,7 +155,7 @@
   <p class="lede">A supplier chases a bill you already paid. Someone enters it again, and the money goes out a second time. This skill reads your <b>bills</b>, your <b>payments</b>, your <b>supplier records</b> and your <b>open credits</b>. It finds the bill that went out twice, before or after the money left.</p>
   <div class="short">
     <span class="label">The 20-second version</span>
-    <p>You give it a period. It reads every bill and every payment in a wider window, and runs ten tests on them. Each match gets a confidence level and a reason. It lists the unpaid duplicates first, because you can void those at no cost. One test, the bank-account test, cannot run here. The skill says so on every result. It never voids a bill, never merges a supplier and never asks a supplier for money.</p>
+    <p>You give it a period. It reads every bill and every payment in a wider window, and runs ten tests on them. Each match gets a confidence level and a reason. It lists the unpaid duplicates first, because you can void those at no cost. One test, the bank-account test, cannot run from a MosoFin connection. It runs only when you upload your suppliers' bank details. When it does not run, the skill says so on the result. It never voids a bill, never merges a supplier and never asks a supplier for money.</p>
   </div>
 </header>
 
@@ -165,7 +165,7 @@
   <p>Northbrook reviews September. The skill scans 1 July to 31 October, a wider window, because a duplicate often sits on each side of a month end. It reads 1,284 bills from 212 suppliers, including 9 inactive supplier records, 1,197 payments and 14 open credits. It finds six groups of records that look like the same bill. The skill calls each group a <b>cluster</b>.</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 880 400" role="img" aria-label="Two panels. Left: six clusters found in Northbrook Trading's scan. A: Harbor Office Supply INV-0442 entered twice, 1,250 dollars, both paid, very high confidence. B: Crestline Logistics INV-7731, 4,860 dollars, paid by cheque and again by ACH, high confidence. C: Pinnacle Design under two supplier records, INV-2210, 3,200 dollars, one paid and one open, high confidence. D: Acme Corp and Acme Corporation, 980 dollars, two days apart, medium confidence. E: Summit Cleaning, 950 dollars, five days apart, medium confidence. F: Harbor credit note CN-0011, 410 dollars, never used, low confidence. Right: totals under Standard sensitivity. Flagged: 9,310 dollars. Already paid out: 6,110 dollars. Caught before payment: 3,200 dollars. Credit owed to Northbrook: 410 dollars. Rule 7 not run.">
+      <svg viewBox="0 0 880 400" role="img" aria-label="Two panels. Left: six clusters found in Northbrook Trading's scan. A: Harbor Office Supply INV-0442 entered twice, 1,250 dollars, both paid, very high confidence. B: Crestline Logistics INV-7731, 4,860 dollars, paid by cheque and again by ACH, high confidence. C: Pinnacle Design under two supplier records, INV-2210, 3,200 dollars, one paid and one open, high confidence. D: Acme Corp and Acme Corporation, 980 dollars, two days apart, medium confidence. E: Summit Cleaning, 950 dollars, five days apart, medium confidence. F: Harbor credit note CN-0011, 410 dollars, never used, low confidence. Right: totals under Standard sensitivity. Headline exposure: 9,310 dollars. D and E stay on the list below the threshold, 1,930 dollars. Already paid out: 6,110 dollars. Caught before payment: 3,200 dollars. Credit owed to Northbrook: 410 dollars. Rule 7 not run.">
         <g font-family="Archivo,sans-serif" font-size="14">
           <rect x="16" y="20" width="540" height="364" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="36" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">SIX CLUSTERS · NORTHBROOK TRADING · 1 JUL TO 31 OCT</text>
@@ -176,9 +176,9 @@
           <text x="36" y="210" fill="var(--muted)">E · Summit Cleaning · $950 twice, five days apart</text><text x="536" y="210" text-anchor="end" fill="var(--muted)">$950.00</text>
           <text x="36" y="242" fill="var(--green)">F · Harbor credit note CN-0011 · open since 12 Sep, never used</text><text x="536" y="242" text-anchor="end" fill="var(--green)">$410.00</text>
           <line x1="36" y1="262" x2="536" y2="262" stroke="var(--rule-strong)"/>
-          <text x="36" y="292" font-weight="700" fill="var(--ink)">Flagged under Standard: A, B and C</text><text x="536" y="292" text-anchor="end" font-weight="800" font-size="20" fill="var(--wrong)">$9,310.00</text>
+          <text x="36" y="292" font-weight="700" fill="var(--ink)">Headline under Standard: A, B and C</text><text x="536" y="292" text-anchor="end" font-weight="800" font-size="20" fill="var(--wrong)">$9,310.00</text>
           <text x="36" y="322" font-size="13" fill="var(--muted)">Red lines are money that left twice. The amber line is a duplicate still unpaid.</text>
-          <text x="36" y="342" font-size="13" fill="var(--muted)">Grey lines are medium confidence, flagged only under Strict.</text>
+          <text x="36" y="342" font-size="13" fill="var(--muted)">Grey lines are Medium: listed, but in the headline only under Strict.</text>
           <text x="36" y="362" font-size="13" fill="var(--muted)">The green line is money that Harbor owes back to Northbrook.</text>
 
           <rect x="584" y="20" width="280" height="364" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
@@ -195,7 +195,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Example figures for a made-up company. Under Standard sensitivity the skill flags clusters A, B and C: 1,250.00 + 4,860.00 + 3,200.00 = 9,310.00. Clusters A and B were paid twice: 1,250.00 + 4,860.00 = 6,110.00. Under Strict sensitivity it also flags D and E: 980.00 + 950.00 = 1,930.00 more, 11,240.00 in total. The $410.00 credit is not a duplicate. The skill reports it on its own, as money that Harbor owes Northbrook.</figcaption>
+    <figcaption>Example figures for a made-up company. Each figure is the duplicate exposure: the cluster total less the one record that the skill treats as valid. Cluster A holds two bills of 1,250.00, so 2,500.00 − 1,250.00 = 1,250.00. Under Standard sensitivity the headline holds clusters A, B and C: 1,250.00 + 4,860.00 + 3,200.00 = 9,310.00. Clusters A and B were paid twice: 1,250.00 + 4,860.00 = 6,110.00. The skill still lists D and E. The summary counts them below the threshold: 2 matches, 980.00 + 950.00 = 1,930.00. Under Strict they join the headline, 11,240.00 in total. The $410.00 credit is not a duplicate. The skill reports it on its own at every sensitivity, as money that Harbor owes Northbrook.</figcaption>
   </figure>
 </section>
 
@@ -232,7 +232,7 @@
     <div class="card">
       <span class="tag bad">The same number, twice</span>
       <h3>Harbor INV-0442, $1,250.00</h3>
-      <p>The same supplier and the same invoice number is the strongest signal the skill has. It flags this match at Very High confidence, even when the dates or the amounts differ a little. Both copies were paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice as the first option, and a refund as the second.</p>
+      <p>The same supplier and the same invoice number is the strongest signal the skill has. It flags this match at Very High confidence, even when the dates or the amounts differ a little. Both copies were paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice as the first option, and a refund as the second. It also drafts the entry for a person to post.</p>
     </div>
     <div class="card">
       <span class="tag bad">Two channels, one bill</span>
@@ -242,12 +242,12 @@
     <div class="card">
       <span class="tag up">One supplier, two records</span>
       <h3>Pinnacle INV-2210, $3,200.00</h3>
-      <p>Pinnacle Design exists twice in your <b>vendor master</b>, your list of supplier records. INV-2210 sits under each record. One copy was paid and one is still open. The skill reports two findings from one match: a supplier record to merge and a duplicate bill. A person voids the open copy, and the $3,200.00 never leaves. The skill proposes the merge and never does it. In QuickBooks a merge moves the duplicate's history to the record you keep and makes the duplicate inactive. To bring a merged supplier back, you must create its profile again by hand<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+      <p>Pinnacle Design exists twice in your <b>vendor master</b>, your list of supplier records. INV-2210 sits under each record. One copy was paid and one is still open. The skill reports two findings from one match: a supplier record to merge and a duplicate bill. A person voids the open copy, and the $3,200.00 never leaves. If that copy is in a closed period, the skill proposes a vendor credit in the current period instead. The skill proposes the merge and never does it. In QuickBooks a merge moves the duplicate's history to the record you keep and makes the duplicate inactive. To bring a merged supplier back, you must create its profile again by hand<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
     </div>
     <div class="card">
       <span class="tag">A credit nobody used</span>
       <h3>Harbor CN-0011, $410.00</h3>
-      <p>Harbor gave Northbrook a credit note on 12 September. Since then Northbrook paid three later Harbor invoices in full. Nobody used the credit. This is not a duplicate. It is $410.00 that Harbor owes Northbrook. The skill reports it on its own, at the top, so it does not hide among the duplicates.</p>
+      <p>Harbor gave Northbrook a credit note on 12 September. Since then Northbrook paid three later Harbor invoices in full. Nobody used the credit. This is not a duplicate. It is $410.00 that Harbor owes Northbrook. The skill reports it on its own at every sensitivity, so it does not hide among the duplicates.</p>
     </div>
   </div>
 </section>
@@ -267,21 +267,21 @@
 <section>
   <span class="label">The ten tests</span>
   <h2>Ten rules, from the surest to the weakest</h2>
-  <p>The skill runs each rule in this order. The confidence level says how strong the evidence for a match is. Your <b>sensitivity</b> setting decides which levels count as flagged: Standard flags High and Very High, Strict adds Medium, and Permissive flags Very High only. The skill prints the setting on every result, because a clean result under Permissive means something very different from one under Strict.</p>
+  <p>The skill runs every rule, in this order, and lists every match with its confidence. The confidence level says how strong the evidence for a match is. Your <b>sensitivity</b> setting decides which matches go into the headline exposure and the recovery plan. Standard takes High and Very High, Strict adds Medium, and Permissive takes Very High only. The summary also counts the matches below the setting, with their amount. The skill prints the setting on every result, because a clean result under Permissive means something very different from one under Strict.</p>
   <div class="tbl">
     <table>
       <thead><tr><th>Rule</th><th>What it looks for</th><th>Confidence</th><th>Runs here?</th></tr></thead>
       <tbody>
-        <tr><td class="r">1</td><td>Same supplier, same invoice number</td><td><span class="conf">Very High</span></td><td>Yes</td></tr>
+        <tr><td class="r">1</td><td>Same supplier, same invoice number. A near-match number at the same amount, such as 1043 and 1043A, counts too, at High</td><td><span class="conf">Very High</span></td><td>Yes</td></tr>
         <tr><td class="r">2</td><td>Same supplier, same amount, same date, different invoice numbers</td><td><span class="conf">High</span></td><td>Yes</td></tr>
         <tr><td class="r">3</td><td>Same supplier, same amount, dates within 7 days (you can change the window)</td><td><span class="conf mid">Medium</span></td><td>Yes</td></tr>
         <tr><td class="r">4</td><td>Same amount, supplier names that look alike, such as "Acme Corp" and "Acme Corporation"</td><td><span class="conf mid">Medium</span></td><td>Yes</td></tr>
         <tr><td class="r">5</td><td>An invoice number out of sequence, such as one lower than numbers already paid</td><td><span class="conf mid">Medium-Low</span></td><td>Yes</td></tr>
         <tr><td class="r">6</td><td>Same invoice number under two supplier records</td><td><span class="conf">High</span></td><td>Yes</td></tr>
-        <tr class="notrun"><td class="r">7</td><td><b>Two supplier records that share one bank account.</b> The fraud test.</td><td><span class="conf">High</span></td><td><b>No. Reported as not run, with an owner.</b></td></tr>
-        <tr><td class="r">8</td><td>Round amounts that repeat in a short window</td><td><span class="conf low">Low</span></td><td>Yes</td></tr>
+        <tr class="notrun"><td class="r">7</td><td><b>Two supplier records that share one bank account.</b> The fraud test.</td><td><span class="conf">High</span></td><td><b>Not from MosoFin. On the upload path, yes, if you upload supplier bank details. Otherwise reported as not run, with an owner.</b></td></tr>
+        <tr><td class="r">8</td><td>Round amounts that repeat in a short window, above a count that you set</td><td><span class="conf low">Low</span></td><td>Yes</td></tr>
         <tr><td class="r">9</td><td>One bill paid through two channels, such as a cheque and a wire</td><td><span class="conf">High</span></td><td>Yes, when the payment list has the method</td></tr>
-        <tr><td class="r">10</td><td>A credit note never used while later bills were paid in full</td><td><span class="conf low">Low</span></td><td>Yes. Reported as money owed to you</td></tr>
+        <tr><td class="r">10</td><td>A credit note never used while later bills were paid in full</td><td><span class="conf low">Low</span></td><td>Yes. Reported on its own as money owed to you, at every sensitivity</td></tr>
       </tbody>
     </table>
   </div>
@@ -292,8 +292,8 @@
   <div class="limit">
     <span class="label">One honest limit</span>
     <h2>A clean scan never means the fraud test passed</h2>
-    <p>Rule 7 looks for two supplier records that pay into one bank account. That is either one supplier entered twice or a fraud set up on purpose. It is the one rule aimed at fraud, and it is the one rule this skill cannot run. MosoFin does not expose supplier bank details, on purpose, because bank details are the main target in payment fraud. So the skill reports Rule 7 as not run. It names the person or team who runs the test in your banking or payables system. Northbrook's result says: Rule 7 not run, owner the bank's payments team. The rules-run sheet shows 9 rules ran and 1 did not.</p>
-    <p>Two outside facts show why the skill will not stay quiet about it. In 2024 businesses reported $2,770,151,146 lost to business email compromise, a fraud by email, in 21,442 complaints. A supplier's compromised email account is one way the fraud worked<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The standard control is to keep approving, paying and recording with different people, which helps prevent fraud, waste and abuse<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. The skill does not replace either. It tells you, every time, that the bank-account test is still yours to run.</p>
+    <p>Rule 7 looks for two supplier records that pay into one bank account. That is either one supplier entered twice or a fraud set up on purpose. It is the one rule aimed at fraud. MosoFin does not expose supplier bank details, on purpose, because bank details are the main target in payment fraud. So on the MosoFin path the skill cannot run Rule 7, and it reports the rule as not run. It names the person or team who runs the test in your banking or payables system. Northbrook's result says: Rule 7 not run, owner the bank's payments team. The rules-run sheet shows 9 rules ran and 1 did not. On the upload path, you can upload the last four digits of each supplier's account and the routing or sort code. Then Rule 7 runs. The skill masks every account number in the output and never stores them.</p>
+    <p>Two outside facts show why the skill will not stay quiet about it. In 2024 businesses reported $2,770,151,146 lost to business email compromise, a fraud by email, in 21,442 complaints. A supplier's compromised email account is one way the fraud worked<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The standard control is to keep approving, paying and recording with different people, which helps prevent fraud, waste and abuse<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. The skill does not replace either. Each time Rule 7 does not run, the skill tells you that the bank-account test is still yours to run.</p>
   </div>
 </section>
 
@@ -302,19 +302,20 @@
   <h2>It asks six questions before it reads anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your bills and payments from there. Without it, you upload the files and the ten rules stay the same. The skill asks only if your account has a MosoFin connection.</div></li>
-    <li><div class="q">Which period should the scan cover?</div><div class="why">The skill never picks a period for you. It proposes a window wider than the month you review, and says that it proposed it. A duplicate often sits on each side of a month end, and a pair across a year end is a known fraud pattern.</div></li>
-    <li><div class="q">Which suppliers bill the same amount on purpose every month: rent, subscriptions, retainers?</div><div class="why">Those are the main source of false alarms. Without your list the skill runs Rule 8 anyway, and says that it may flag bills that are fine.</div></li>
-    <li><div class="q">Strict, Standard or Permissive? And a window for Rule 3, if not 7 days?</div><div class="why">The setting decides which confidence levels count as flagged. Without an answer the skill uses Standard and 7 days, and prints both on the result.</div></li>
-    <li><div class="q">Who runs the bank-account test, Rule 7, in your payables or banking system, and how often?</div><div class="why">The one rule aimed at fraud, and the one this skill cannot run. Without a name the skill leaves the owner column open, and says so before it reports anything.</div></li>
+    <li><div class="q">Which company, or companies? If you run several, should it also scan across them?</div><div class="why">The skill never picks the company for you. One bill paid by two of your companies is invisible to each company's own scan.</div></li>
+    <li><div class="q">Which period should the scan cover, and how far back before it?</div><div class="why">The skill never picks a period for you. It reads a window wider than the month you review, and it states the window that it read. A duplicate often sits on each side of a month end, and a pair across a year end is a known fraud pattern.</div></li>
+    <li><div class="q">Which suppliers bill the same amount on purpose every month: rent, subscriptions, retainers?</div><div class="why">Those are the main source of false alarms. Without your list, the skill filters their repeat bills by the date pattern at Rule 8, not by name.</div></li>
+    <li><div class="q">Strict, Standard or Permissive? And a window for Rule 3, if not 7 days?</div><div class="why">The setting decides which confidence levels count in the headline exposure. The skill still lists every match. Without an answer it uses Standard and 7 days, and prints both on the result.</div></li>
     <li><div class="q">Do you have results from an earlier scan: clusters you already reviewed and cleared?</div><div class="why">Without them the same false alarms come back every month. The skill scans without them and offers to save the cleared clusters at the end.</div></li>
   </ol>
+  <p>The skill's method also asks you for the Rule 8 threshold: how many equal round-number bills from one supplier, in what window. Without one, it lists those clusters for review and says that it applied no threshold. On the MosoFin path it also says, before any result, that Rule 7 is manual and who should run it.</p>
   <p>Then it reads your answers back and waits for your yes:</p>
-  <blockquote><i>"Scanning Northbrook Trading's bills and payments from 1 July to 31 October. That is a wider window than September, the month under review. I read them from your Mosofin connection, with inactive vendor records included. Sensitivity Standard, Rule 3 window 7 days. The landlord, the insurer and three software suppliers are on the recurring list. Rule 7 is not run here. Your bank runs it. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Scanning Northbrook Trading's bills and payments from 1 July to 31 October. That is a wider window than September, the month under review. I read them from your Mosofin connection, with inactive vendor records included. Sensitivity Standard, Rule 3 window 7 days. The landlord, the insurer and three software suppliers are on the recurring list. Rule 7 cannot run here. It needs your payables or banking system. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
   <span class="label">What you need</span>
-  <h2>Connect once, or upload two files and two lists</h2>
+  <h2>Connect once, or upload the files yourself</h2>
   <div class="two">
     <div class="card">
       <span class="tag">Connected with MosoFin</span>
@@ -322,6 +323,7 @@
       <ul>
         <li>It reads every bill in the window, page by page to the end, and states the count</li>
         <li>It reads every payment with its method, for Rule 9</li>
+        <li>It reads direct purchases, card charges and manual journal entries that skipped the bill process</li>
         <li>It reads your supplier records, inactive ones included</li>
         <li>It reads your open credit notes, for Rule 10</li>
         <li>If you run several companies, it asks whether to scan across them. One bill paid by two companies is invisible to each company's own scan</li>
@@ -331,10 +333,11 @@
       <span class="tag up">Uploading instead</span>
       <h3>Bring the bills and the payments</h3>
       <ul>
-        <li><b>Bill list</b> (CSV or XLSX): every bill in the window, with supplier, invoice number, date, amount, order reference and status. Required</li>
-        <li><b>Payment list</b> (CSV or XLSX): what was paid, when, and how. Required for Rule 9 and for paid status</li>
-        <li><b>Supplier records</b>, inactive ones included, with payment addresses. Recommended, the look-alike rules need it</li>
-        <li><b>Open credit notes</b>. Recommended, Rule 10 needs it</li>
+        <li><b>Bill and payment list</b> (CSV or XLSX): every bill in the window, voided bills included. Give the supplier, invoice number, date, amount, order reference, payment date, payment method and status. Required</li>
+        <li><b>Cheques, expenses and card charges by supplier</b> (CSV or XLSX), for the same window: the payments made outside the bill process. Required for Rule 9</li>
+        <li><b>Supplier records</b>, inactive ones included, with tax IDs and payment addresses. Recommended, the look-alike rules need it</li>
+        <li><b>Open credit notes and open payables</b>. Recommended, for Rule 10 and for paid against unpaid</li>
+        <li><b>Supplier bank details</b>: the last four digits and the routing or sort code. Optional, they let Rule 7 run. The skill masks them and never stores them</li>
         <li>Your recurring-supplier list, sensitivity, Rule 3 window and cleared clusters, typed in the chat</li>
       </ul>
     </div>
@@ -345,12 +348,12 @@
   <span class="label">What you get back</span>
   <h2>Seven sheets: the clusters, the money, and what ran</h2>
   <div class="gets">
-    <div class="get"><b>The summary</b><span>The period, and how many records it scanned against how many exist. The total flagged and the exposure by confidence, paid against open, and the sensitivity used.</span></div>
-    <div class="get"><b>Every cluster, side by side</b><span>Each group of records with its rule, its confidence, the amount per record, the cluster total and the paid status. The records sit next to each other, so a person can agree or dismiss in seconds.</span></div>
+    <div class="get"><b>The summary</b><span>The period, and how many records it scanned against how many exist. The headline exposure by confidence, paid against open, and the sensitivity used. The matches below the setting, with a count and an amount. The Rule 3 window, the Rule 8 threshold and the window that it read.</span></div>
+    <div class="get"><b>Every cluster, side by side</b><span>Each group of records with its rule, its confidence, the amount per record, the cluster total, the duplicate exposure and the paid status. The records sit next to each other, so a person can agree or dismiss in seconds. Columns beside them hold the reviewer's decision, the reason, the name and the date.</span></div>
     <div class="get"><b>The detail</b><span>Every field the skill used to match: the raw and cleaned supplier name and invoice number, the date, the amount, the payment method and date.</span></div>
     <div class="get"><b>Suppliers to merge</b><span>Each pair of supplier records that look like one supplier, with the record to keep and the reason. Proposals only.</span></div>
     <div class="get"><b>The recovery plan</b><span>Per cluster, the action and the contact. Unpaid duplicates first, because voiding one costs nothing.</span></div>
-    <div class="get"><b>Rules run</b><span>Which of the ten rules ran, over how many records, and what each found. Rule 7 appears as not run, with its owner. This sheet is what makes "no duplicates found" a statement you can defend.</span></div>
+    <div class="get"><b>Rules run</b><span>Which of the ten rules ran, over how many records, and what each found. Rule 7 appears as not run, with its owner, unless you uploaded bank details. This sheet is what makes "no duplicates found" a statement you can defend.</span></div>
     <div class="get"><b>Coverage</b><span>For each task, which tool read the data, how many records it read, and any gap.</span></div>
   </div>
   <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat.</p>
@@ -364,7 +367,7 @@
       <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
       <li><b>Never voids a record, merges a supplier, or asks a supplier for money.</b> Every action is a proposal for a person.</li>
       <li><b>Never picks the period or the company for you.</b> The scan window is wider than the month you review, and the result says how many records it scanned against how many exist.</li>
-      <li><b>Never reports a rule that did not run as finding nothing.</b> Rule 7 appears in every result as not run, with its owner. The sensitivity setting is on every result.</li>
+      <li><b>Never reports a rule that did not run as finding nothing.</b> Rule 7 appears as not run, with its owner, whenever it cannot run. The sensitivity setting is on every result.</li>
       <li><b>Never saves bank details, bill-level data, or a suspicion attached to a named person.</b> A duplicate is usually an error. It saves cleared clusters and supplier settings, and only when you say yes.</li>
     </ul>
   </div>
@@ -379,7 +382,7 @@
     <dt>Duplicate payment</dt><dd>The same bill paid twice. The copies can carry the same invoice number, or a changed one, or sit under two supplier records.</dd>
     <dt>Cluster</dt><dd>A group of records that the skill suspects are the same bill. Each cluster carries one rule and one confidence level.</dd>
     <dt>Confidence level</dt><dd>How strong the evidence for a match is, from Very High to Low. Each of the ten rules has a fixed level.</dd>
-    <dt>Sensitivity</dt><dd>How eagerly the scan flags. Strict flags more, Permissive flags less, and Standard sits between. The result always says which one ran.</dd>
+    <dt>Sensitivity</dt><dd>Which confidence levels count in the headline exposure. Strict counts more, Permissive counts less, and Standard sits between. The scan lists every match at every setting, and the result always says which setting ran.</dd>
     <dt>Similarity score</dt><dd>A number from 0 to 1 that says how alike two names are, with extra weight when the first characters agree. The US Census Bureau developed it to match names and addresses between records<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill's threshold is 0.85.</dd>
     <dt>Credit note</dt><dd>A document from a supplier that reduces what you owe. One left unused while you pay later bills in full is money the supplier owes you.</dd>
   </dl>
@@ -403,7 +406,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>duplicate-invoice-detection</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>duplicate-invoice-detection</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. The card format of the skill is on main, merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">Read the skill on GitHub →</a> Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -431,7 +434,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

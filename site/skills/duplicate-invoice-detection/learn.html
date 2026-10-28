@@ -181,7 +181,7 @@
 <header>
   <span class="label">MosoFin skill · duplicate-invoice-detection · learning guide</span>
   <h1>From one invoice number entered twice to the test the scan cannot run</h1>
-  <p class="lede">This page shows how the skill finds a bill your business entered or paid twice, <b>one level at a time</b>. It starts with one invoice number that appears twice. It ends with the one rule the scan cannot run here. The page quotes every rule from the skill itself. It also works every number in front of you.</p>
+  <p class="lede">This page shows how the skill finds a bill your business entered or paid twice, <b>one level at a time</b>. It starts with one invoice number that appears twice. It ends with the one rule that the scan cannot run from a MosoFin connection. The page quotes every rule from the skill itself. It also works every number in front of you.</p>
   <div class="trust">
     <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
     <div><b>Outside sources back the facts</b><span>They are a fraud study, QuickBooks help, a US Census Bureau paper, the IRS, the FBI and the GAO. Each one has a number and a link.</span></div>
@@ -212,7 +212,7 @@
 <section id="try">
   <span class="label">Check it yourself</span>
   <h2>Put in your own scan</h2>
-  <p class="muted">Enter up to six clusters from your own scan, or load an example. For each cluster, pick the rule that matched, the amount per record, the record count and the paid status. Then pick the sensitivity. The page shows which clusters that setting flags and totals the exposure. The page sends nothing anywhere.</p>
+  <p class="muted">Enter up to six clusters from your own scan, or load an example. For each cluster, pick the rule that matched, the amount per record, the record count and the paid status. Then pick the sensitivity. The page shows which clusters that setting puts in the headline and totals their exposure. It also counts the clusters below the setting. The page sends nothing anywhere.</p>
   <div class="calc">
     <div class="presets" role="group" aria-label="Load an example">
       <button type="button" data-p="northbrook">Northbrook, July to October</button>
@@ -220,7 +220,7 @@
       <button type="button" data-p="blank">Start blank</button>
     </div>
     <fieldset><legend>Sensitivity</legend>
-      <label class="field"><span>Which confidence levels the scan flags</span><select data-k="sens" id="sens">
+      <label class="field"><span>Which confidence levels go into the headline</span><select data-k="sens" id="sens">
         <option value="strict">Strict: Medium and above</option>
         <option value="standard" selected>Standard: High and above</option>
         <option value="permissive">Permissive: Very High only</option>
@@ -232,7 +232,7 @@
     </fieldset>
     <div class="math num" id="bridge" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
-    <p class="fine">The page counts one record in each cluster as the real bill. So the exposure of a cluster is the amount per record × (records − 1). Standard flags High and Very High. Strict adds Medium. Permissive flags Very High only. A credit cluster is never exposure. The page shows it as money owed to you, whatever the sensitivity. Rule 7 never runs here, so a Rule 7 cluster adds nothing. The "Northbrook, July to October" preset holds the six clusters from the levels. Under Standard: $1,250.00 + $4,860.00 + $3,200.00 = $9,310.00 flagged. Under Strict: $9,310.00 + $980.00 + $950.00 = $11,240.00.</p>
+    <p class="fine">The page counts one record in each cluster as the real bill. So the exposure of a cluster is the amount per record × (records − 1). The skill lists every cluster, and the sensitivity decides only the headline. Standard takes High and Very High. Strict adds Medium. Permissive takes Very High only. The other clusters count below the threshold. A credit cluster is never exposure. The page shows it as money owed to you, whatever the sensitivity. A Rule 7 cluster can occur only on the upload path, from uploaded supplier bank details. The "Northbrook, July to October" preset holds the six clusters from the levels. Under Standard: $1,250.00 + $4,860.00 + $3,200.00 = $9,310.00 in the headline, and 2 clusters below it: $980.00 + $950.00 = $1,930.00. Under Strict: $9,310.00 + $980.00 + $950.00 = $11,240.00.</p>
   </div>
 </section>
 
@@ -240,9 +240,9 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin, or upload the data yourself? Which period should the scan cover? Which suppliers bill the same amount every month on purpose? Strict, Standard or Permissive, and what window for Rule 3? Who runs the bank-account test, Rule 7, and how often? Do you have results from an earlier scan, with clusters already cleared?</div>
-    <div><b>Needs</b>The skill needs the AP register for the whole window, with vendor, invoice number, date, amount and status. It needs the payment register, with the date and the method of each payment. The vendor master with inactive records and the open vendor credits make the result better.</div>
-    <div><b>Gives back</b>The skill gives back seven sheets. They are a summary, the flagged clusters, the record detail, the vendor aliases to merge and the recovery plan. The last two are the rules-run sheet and a coverage sheet. Unpaid duplicates come first. The skill asks before it makes an Excel file.</div>
+    <div><b>Asks first</b>Do you want to use MosoFin, or upload the data yourself? Which company, and should the scan also run across your companies? Which period should the scan cover, and how far back before it? Which suppliers bill the same amount every month on purpose? Strict, Standard or Permissive, and what window for Rule 3? Do you have results from an earlier scan, with clusters already cleared? The method also asks for the Rule 8 threshold.</div>
+    <div><b>Needs</b>On the upload path, the skill needs the AP register and payment history for the whole window. They give the vendor, invoice number, date, amount, payment date, payment method and status. It also needs the cheques, expenses and card charges by vendor, for Rule 9. The vendor master with inactive records, the open vendor credits and the open payables make the result better. Supplier bank details are optional, and they let Rule 7 run.</div>
+    <div><b>Gives back</b>The skill gives back seven sheets. They are a summary, the flagged clusters, the record detail, the vendor aliases to merge and the recovery plan. The last two are the rules-run sheet and a coverage sheet. Unpaid duplicates come first. Each flagged cluster shows its duplicate exposure and has columns for the reviewer's decision. The skill asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never voids a record, never merges a vendor and never asks a supplier for money. It never defaults the period or the entity. It never reports Rule 7 as finding nothing. It never saves bank details or a suspicion attached to a named person.</div>
   </div>
 </section>
@@ -256,7 +256,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code>, <code>references/edge-cases.md</code> and <code>references/output.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 4, 5 and 6 are US sources. Source 3 is a US statistical method paper. Check with your accountant which rules apply to you. This page explains <code>duplicate-invoice-detection</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code>, <code>references/edge-cases.md</code> and <code>references/output.md</code>. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 4, 5 and 6 are US sources. Source 3 is a US statistical method paper. Check with your accountant which rules apply to you. This page explains <code>duplicate-invoice-detection</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/duplicate-invoice-detection">read it on GitHub</a>). The card format of the skill is on main, merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -300,21 +300,21 @@ const RULES = [
     plain:"The workspace holds the bill register and the vendor master in full. So nine of the ten rules run as searches over that data, each with a confidence level.",
     backed:"One of those searches compares vendor names with the Jaro-Winkler score. The score runs from 0 to 1, with extra weight when the first characters agree.{3}" },
   { id:"3", title:"A clean scan is not a fraud test passed", r:Q.q3, cites:[6],
-    plain:"Rule 7, two vendor records that share one bank account, is the fraud test. Mosofin does not expose bank details, so the scan reports that rule as not run.",
+    plain:"Rule 7, two vendor records that share one bank account, is the fraud test. Mosofin does not expose bank details, so on that path the scan reports the rule as not run. On the upload path, uploaded supplier bank details let it run.",
     backed:"The GAO Green Book says that separating authority, custody and accounting among different people helps prevent fraud, waste and abuse.{6}" },
   { id:"4", title:"Scan wider than the month", r:Q.q4, cites:[],
-    plain:"The skill never defaults the period. It proposes a window wider than the month under review, and it says that it proposed it." },
+    plain:"The skill never defaults the period. It asks for the period and how far back before it. It reads wider than the month under review, and it states the window that it read." },
   { id:"5", title:"Same number, same vendor", r:Q.q5, cites:[],
-    plain:"An identical invoice number under one vendor is the strongest signal the skill has. It flags the pair at Very High, even when the dates or the amounts differ a little." },
+    plain:"An identical invoice number under one vendor is the strongest signal the skill has. It flags the pair at Very High, even when the dates or the amounts differ a little. A near-match number at the same amount, such as 1043 and 1043A, matches at High." },
   { id:"6", title:"Two channels, one bill", r:Q.q6, cites:[4],
     plain:"The skill reads the payment register as well as the bill register. A bill paid once by cheque and once by bank transfer shows only there.",
     backed:"The IRS says that purchases generate supporting documents such as paid bills, invoices, receipts and cancelled checks. It says to keep them in an orderly way.{4}" },
   { id:"7", title:"Not run is not nothing found", r:Q.q7, cites:[],
-    plain:"Every output lists Rule 7 as not run. It names the person or the team that runs the bank-account test elsewhere." },
+    plain:"When Rule 7 does not run, the output lists it as not run. It names the person or the team that runs the bank-account test elsewhere." },
   { id:"8", title:"An unused credit is your money", r:Q.q8, cites:[],
-    plain:"A credit note stays open while later invoices are paid in full. That credit is money the supplier owes you. The skill reports it on its own, and prominently." },
+    plain:"A credit note stays open while later invoices are paid in full. That credit is money the supplier owes you. The skill reports it on its own and prominently, at every sensitivity." },
   { id:"9", title:"Say the sensitivity", r:Q.q9, cites:[],
-    plain:"Standard flags High and above. Strict adds Medium. Permissive flags Very High only. The output states which setting it used." },
+    plain:"Every match stays on the list. The setting decides only the headline exposure. Standard takes High and above, Strict adds Medium, and Permissive takes Very High only. The output states the setting and counts the matches below it." },
   { id:"10", title:"Unpaid first", r:Q.q10, cites:[],
     plain:"A person can void an open duplicate before payment. A paid one needs a credit, a refund or a set-off. So the output lists open duplicates first." },
   { id:"11", title:"Thirty days apart is a pattern", r:Q.q11, cites:[],
@@ -342,7 +342,7 @@ const LEVELS = [
       rows:[["Bill 1","Harbor Office Supply","INV-0442","3 Sep","$1,250.00","yes"],["Bill 2","Harbor Office Supply",["INV-0442","bad"],"19 Sep",["$1,250.00","bad"],"yes"]]},
     rules:[Q.q5, Q.q1],
     math:[["Vendor on both bills","Harbor Office Supply"],["Invoice number on both bills","INV-0442"],["Same vendor and same number?","yes",1],["Confidence, Rule 1","Very High"],["Paid: $1,250.00 + $1,250.00","$2,500.00"],["Owed for one invoice","$1,250.00"],["Paid twice: $2,500.00 − $1,250.00","$1,250.00",1]],
-    verdict:["flag","Cluster A. Rule 1 matches at Very High, so every sensitivity setting flags it. Both bills are paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice.","FLAGGED"] },
+    verdict:["flag","Cluster A. Rule 1 matches at Very High, so every sensitivity setting puts it in the headline. Both bills are paid, so $1,250.00 went out twice. The skill proposes a credit on Harbor's next invoice.","FLAGGED"] },
 
   { n:2, title:"Two channels, one bill",
     chips:["Bill register","Payment register"], src:"Rule 6", cites:[4],
@@ -352,8 +352,8 @@ const LEVELS = [
       head:["Register","Document","Date paid","Method","Amount"],
       rows:[["Bills","INV-7731","","","$4,860.00"],["Payments","Payment of INV-7731","22 Aug","Cheque","$4,860.00"],["Payments","Payment of INV-7731","4 Sep",["ACH","bad"],["$4,860.00","bad"]]]},
     rules:[Q.q6],
-    math:[["Bills for INV-7731","1"],["Payments against INV-7731","2"],["Paid: $4,860.00 + $4,860.00","$9,720.00"],["Owed for the bill","$4,860.00"],["Paid twice: $9,720.00 − $4,860.00","$4,860.00",1],["Confidence, Rule 9","High"],["Flagged under Standard?","yes",1]],
-    verdict:["flag","Cluster B. A search of bills alone finds one bill and nothing wrong. The payment search finds the second payment. The $4,860.00 is paid out, so the skill proposes a credit, a refund or a set-off.","FLAGGED"] },
+    math:[["Bills for INV-7731","1"],["Payments against INV-7731","2"],["Paid: $4,860.00 + $4,860.00","$9,720.00"],["Owed for the bill","$4,860.00"],["Paid twice: $9,720.00 − $4,860.00","$4,860.00",1],["Confidence, Rule 9","High"],["In the headline under Standard?","yes",1]],
+    verdict:["flag","Cluster B. A search of bills alone finds one bill and nothing wrong. The payment search finds the second payment. The $4,860.00 is paid out, so the skill proposes a credit, a refund or a set-off. It drafts the entry for a person to post.","FLAGGED"] },
 
   { tier:"Two registers and two vendor records" },
   { n:3, title:"One supplier, two records",
@@ -366,8 +366,8 @@ const LEVELS = [
       rows:[["C","Pinnacle Design · Pinnacle Design LLC","INV-2210 under each","$3,200.00","","6","High"],["D","Acme Corp · Acme Corporation","12 Sep and 14 Sep","$980.00","0.91","4","Medium"]]},
     pair:[["ok","Caught before payment","$3,200.00","The open INV-2210. A person voids it, and nothing is lost."]],
     rules:[Q.q2, Q.q10],
-    math:[["INV-2210 under Pinnacle Design","$3,200.00, paid"],["INV-2210 under Pinnacle Design LLC","$3,200.00, open"],["Rule 6: same number, two vendor records","High",1],["Findings from one match","2: vendor-master duplicate, duplicate bill"],["Void the open bill before payment: cost","$0.00",1],["Acme name score","0.91"],["Threshold","0.85"],["0.91 ≥ 0.85?","yes, Rule 4 at Medium",1],["Flagged under Standard?","C yes, D no"]],
-    verdict:["flag","Clusters C and D. The skill proposes a merge for each pair of vendor records, and says that a merge is not reversible. Under Standard, the skill flags cluster C and lists cluster D at Medium only. A person voids the open Pinnacle bill before payment, and that saves $3,200.00 at no cost.","FLAGGED"] },
+    math:[["INV-2210 under Pinnacle Design","$3,200.00, paid"],["INV-2210 under Pinnacle Design LLC","$3,200.00, open"],["Rule 6: same number, two vendor records","High",1],["Findings from one match","2: vendor-master duplicate, duplicate bill"],["Void the open bill before payment: cost","$0.00",1],["Acme name score","0.91"],["Threshold","0.85"],["0.91 ≥ 0.85?","yes, Rule 4 at Medium",1],["In the headline under Standard?","C yes, D below it"]],
+    verdict:["flag","Clusters C and D. The skill proposes a merge for each pair of vendor records, and says that a merge is not reversible. Under Standard, cluster C goes into the headline. Cluster D stays on the list at Medium, below the threshold. A person voids the open Pinnacle bill before payment, and that saves $3,200.00 at no cost.","FLAGGED"] },
 
   { n:4, title:"Same amount, five days apart, or thirty",
     chips:["Bill register","Recurring list"], src:"Rules 11, 4 and 13", cites:[],
@@ -377,8 +377,8 @@ const LEVELS = [
       head:["Pair","Days apart","Inside 7 days?","Result"],
       rows:[["1 Sep and 6 Sep","5","yes",["Rule 3, Medium","bad"]],["1 Sep and 1 Oct","30","no","a pattern, not a duplicate"],["6 Sep and 1 Oct","25","no","a pattern, not a duplicate"]]},
     rules:[Q.q11, Q.q4, Q.q13],
-    math:[["6 Sep − 1 Sep","5 days"],["5 ≤ 7?","yes, Rule 3 matches",1],["1 Oct − 1 Sep","30 days"],["30 ≤ 7?","no, a monthly pattern",1],["The suspect","the 6 Sep invoice, $950.00"],["Confidence, Rule 3","Medium"],["Flagged under Standard?","no"],["Flagged under Strict?","yes, $950.00",1],["Same number on both sides of 30 Sep?","none found"]],
-    verdict:["note","Cluster E. The 6 Sep invoice is the suspect, at Medium. Standard does not flag it, and Strict does. Because the scan window runs from July, the skill also saw that no September bill straddled the quarter end with the same number.","MEDIUM"] },
+    math:[["6 Sep − 1 Sep","5 days"],["5 ≤ 7?","yes, Rule 3 matches",1],["1 Oct − 1 Sep","30 days"],["30 ≤ 7?","no, a monthly pattern",1],["The suspect","the 6 Sep invoice, $950.00"],["Confidence, Rule 3","Medium"],["In the headline under Standard?","no, listed below it"],["In the headline under Strict?","yes, $950.00",1],["Same number on both sides of 30 Sep?","none found"]],
+    verdict:["note","Cluster E. The 6 Sep invoice is the suspect, at Medium. Standard lists it below the headline, and Strict puts it in the headline. Because the scan window runs from July, the skill also saw that no September bill straddled the quarter end with the same number.","MEDIUM"] },
 
   { tier:"What the scan can and cannot say" },
   { n:5, title:"The credit nobody used",
@@ -388,22 +388,22 @@ const LEVELS = [
     visual:{type:"table",
       head:["Document","Date","Amount","Status"],
       rows:[["CN-0011","12 Sep",["−$410.00","good"],["open","bad"]],["Three later Harbor invoices","after 12 Sep","","paid in full"]]},
-    pair:[["ok","Money owed to Northbrook","$410.00","CN-0011. Reported on its own, at the top of the output."]],
+    pair:[["ok","Money owed to Northbrook","$410.00","CN-0011. Reported on its own, at every sensitivity."]],
     rules:[Q.q8],
     math:[["Credit open","$410.00"],["Applied against later invoices","$0.00"],["Later invoices paid in full","3"],["Credit not taken: $410.00 − $0.00","$410.00",1],["Confidence, Rule 10","Low, for AP hygiene"],["Is it a duplicate?","no"]],
-    verdict:["ok","Cluster F. It is not a duplicate. Harbor owes Northbrook that $410.00. The skill reports it separately, apart from the exposure, and proposes a refund or a set-off.","OWED TO YOU"] },
+    verdict:["ok","Cluster F. It is not a duplicate. Harbor owes Northbrook that $410.00. The skill reports it separately, apart from the exposure. Its method points to the credit-memo-and-refund-handler skill for the next step.","OWED TO YOU"] },
 
   { n:6, title:"What the scan cannot say",
     chips:["Rules-run sheet","Coverage sheet"], src:"Rules 3, 7, 9 and 12", cites:[1,5,6],
-    situation:"The scan ran nine of the ten rules over all 1,284 bills under Standard. Rule 7, two vendor records that share one bank account, did not run. Mosofin does not expose bank details.",
+    situation:"The scan ran nine of the ten rules over all 1,284 bills under Standard. Rule 7, two vendor records that share one bank account, did not run. This run read from Mosofin, and Mosofin does not expose bank details.",
     facts:["A billing scheme typically ran 18 months before detection, against 12 months for all frauds. Frauds caught within six months had a median loss of $30,000. Those lasting two to three years had a median loss of $250,000 "+C(1)+".",
            "Separating authority, custody and accounting among different people helps prevent fraud, waste and abuse "+C(6)+".",
            "Business email compromise caused $2,770,151,146 in reported losses in 2024, from 21,442 complaints. Compromised vendor emails are one way the scheme worked "+C(5)+"."],
     visual:{type:"table",
       head:["Sheet line","Value"],
-      rows:[["Rules run","9 of 10"],["Rule 7",["not run · owner: the bank's payments team","bad"]],["Sensitivity","Standard"],["Population scanned","1,284 of 1,284 bills"],["Flagged exposure, High and above","$9,310.00"],["Paid out, recoverable","$6,110.00"],["Caught before payment","$3,200.00"],["Credits owed","$410.00"]]},
+      rows:[["Rules run","9 of 10"],["Rule 7",["not run · owner: the bank's payments team","bad"]],["Sensitivity","Standard"],["Population scanned","1,284 of 1,284 bills"],["Headline exposure, High and above","$9,310.00"],["Below the threshold","2 matches, $1,930.00"],["Rule 3 window","7 days"],["Paid out, recoverable","$6,110.00"],["Caught before payment","$3,200.00"],["Credits owed","$410.00"]]},
     rules:[Q.q3, Q.q7, Q.q9, Q.q12],
-    math:[["Cluster A, Rule 1, Very High","$1,250.00"],["Cluster B, Rule 9, High","$4,860.00"],["Cluster C, Rule 6, High","$3,200.00"],["Flagged under Standard: 1,250 + 4,860 + 3,200","$9,310.00",1],["Cluster D, Rule 4, Medium","$980.00"],["Cluster E, Rule 3, Medium","$950.00"],["Flagged under Strict: 9,310 + 980 + 950","$11,240.00",1],["Paid out: A + B","$6,110.00",1],["Caught before payment: C","$3,200.00",1],["Credits owed: F","$410.00"],["Rules run: 10 − 1","9"]],
+    math:[["Cluster A, Rule 1, Very High","$1,250.00"],["Cluster B, Rule 9, High","$4,860.00"],["Cluster C, Rule 6, High","$3,200.00"],["Headline under Standard: 1,250 + 4,860 + 3,200","$9,310.00",1],["Cluster D, Rule 4, Medium","$980.00"],["Cluster E, Rule 3, Medium","$950.00"],["Below the threshold under Standard: 980 + 950","$1,930.00",1],["Headline under Strict: 9,310 + 980 + 950","$11,240.00",1],["Paid out: A + B","$6,110.00",1],["Caught before payment: C","$3,200.00",1],["Credits owed: F","$410.00"],["Rules run: 10 − 1","9"]],
     verdict:["note","The output states the sensitivity, the population and Rule 7 as not run with its owner. A clean scan here means no duplicate error found. It does not mean a fraud test passed. The bank's payments team runs that test.","NOT RUN"] },
 ];
 
@@ -462,17 +462,19 @@ function renderLevels(){
 }
 
 /* --- calculator: which clusters the chosen sensitivity flags, and what they add up to --- */
-const CONF = {1:"Very High",2:"High",3:"Medium",4:"Medium",5:"Medium-Low",6:"High",7:"High",8:"Low",9:"High",10:"Low"};   // the skill's own confidence per rule
+const CONF = {1:"Very High",11:"High",2:"High",3:"Medium",4:"Medium",5:"Medium-Low",6:"High",7:"High",8:"Low",9:"High",10:"Low"};
+const RULE_NO = {11:"1 near match"};   // Rule 1 also covers a near-match invoice number, at High   // the skill's own confidence per rule
 const RANK = {"Very High":4,"High":3,"Medium":2,"Medium-Low":1,"Low":0};
 const FLOOR = {strict:2, standard:3, permissive:4};
 const RULE_NAMES = {
   1:"1 · exact invoice number, same vendor",
+  11:"1 · near-match invoice number, same amount",
   2:"2 · same amount, vendor and invoice date",
   3:"3 · same amount, vendor, dates within N days",
   4:"4 · same amount, similar vendor name",
   5:"5 · invoice number out of sequence",
   6:"6 · same invoice number, two vendor records",
-  7:"7 · same bank account, two vendors (not run here)",
+  7:"7 · same bank account, two vendors (upload path only)",
   8:"8 · round-number amounts in a short window",
   9:"9 · paid through two channels",
   10:"10 · credit memo never applied",
@@ -487,7 +489,7 @@ const PRESETS = {
 function buildRows(){
   const box=document.getElementById("clusters");
   NAMES.forEach((nm,i)=>{
-    const ruleOpts = `<option value="">none</option>` + Object.keys(RULE_NAMES).map(k=>`<option value="${k}">${esc(RULE_NAMES[k])}</option>`).join("");
+    const ruleOpts = `<option value="">none</option>` + [1,11,2,3,4,5,6,7,8,9,10].map(String).map(k=>`<option value="${k}">${esc(RULE_NAMES[k])}</option>`).join("");
     const stOpts = Object.keys(STATUS).map(k=>`<option value="${k}">${esc(STATUS[k])}</option>`).join("");
     box.appendChild(el("div",{class:"crow","data-i":i},
       `<span class="cname">Cluster ${nm}</span>
@@ -526,25 +528,26 @@ function run(){
   const bridge=document.getElementById("bridge"), box=document.getElementById("results");
   const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
   if(!rows.length){ bridge.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter at least one cluster with a rule, an amount and a record count."); return; }
-  let flagged=0, paid=0, open=0, credits=0, nFlag=0, h="";
+  let flagged=0, paid=0, open=0, credits=0, nFlag=0, below=0, nBelow=0, h="";
   rows.forEach(r=>{
     const conf=CONF[r.rule];
-    if(r.st==="credit"){ const c=Math.round(r.amt*r.cnt*100)/100; credits+=c; h+=line(`Cluster ${r.name}: rule ${r.rule}, ${conf}, credit ${fmt(r.amt)} × ${r.cnt}`, `owed ${fmt(c)}`); return; }
-    if(r.rule===7){ h+=line(`Cluster ${r.name}: rule 7, not run here`, "no exposure"); return; }
+    const no=RULE_NO[r.rule]||r.rule;
+    if(r.st==="credit"){ const c=Math.round(r.amt*r.cnt*100)/100; credits+=c; h+=line(`Cluster ${r.name}: rule ${no}, ${conf}, credit ${fmt(r.amt)} × ${r.cnt}`, `owed ${fmt(c)}`); return; }
     const exp=Math.round(r.amt*(r.cnt-1)*100)/100;
     const isFlag=RANK[conf]>=floor;
-    if(isFlag){ flagged+=exp; nFlag++; if(r.st==="open") open+=exp; else paid+=exp; }
-    h+=line(`Cluster ${r.name}: rule ${r.rule}, ${conf}, ${fmt(r.amt)} × (${r.cnt} − 1)`, (isFlag?"flagged ":"listed, not flagged ")+fmt(exp));
+    if(isFlag){ flagged+=exp; nFlag++; if(r.st==="open") open+=exp; else paid+=exp; } else { below+=exp; nBelow++; }
+    h+=line(`Cluster ${r.name}: rule ${no}, ${conf}, ${fmt(r.amt)} × (${r.cnt} − 1)`, (isFlag?"headline ":"below the threshold ")+fmt(exp));
   });
   const label={strict:"Strict",standard:"Standard",permissive:"Permissive"}[sens];
-  h+=line(`= flagged exposure under ${label}`, fmt(flagged), 1);
-  h+=line("Rule 7: not run", "owner to be named", 1);
+  h+=line(`= headline exposure under ${label}`, fmt(flagged), 1);
+  h+=line(`Below the threshold: ${nBelow} ${nBelow===1?"cluster":"clusters"}`, fmt(below), 1);
   bridge.innerHTML=h;
-  let out = res("flag", `Flagged exposure, ${label}`, fmt(flagged), `${nFlag} of ${rows.length} clusters flagged. ${sens==="strict"?"Medium and above.":sens==="standard"?"High and above.":"Very High only."}`);
+  let out = res("flag", `Headline exposure, ${label}`, fmt(flagged), `${nFlag} of ${rows.length} clusters in the headline. ${sens==="strict"?"Medium and above.":sens==="standard"?"High and above.":"Very High only."}`);
   out += res("flag", "Already paid out", fmt(paid), "Money that went out twice. Ask for a credit, a refund or a set-off.");
   out += res("ok", "Caught before payment", fmt(open), "Open duplicates. A person voids them, at no cost. They come first in the output.");
+  out += res("note", "Below the threshold", fmt(below), `${nBelow} ${nBelow===1?"cluster":"clusters"} below the setting. Still on the list, for a person to review.`);
   out += res("ok", "Credits owed to you", fmt(credits), "Open credit notes, shown on their own. Not part of the exposure.");
-  out += res("note", "Rule 7: not run", "—", "The bank-account test does not run here. Name who runs it in your AP or banking system.");
+  out += res("note", "Rule 7", "—", "From MosoFin the bank-account test does not run. Name who runs it in your AP or banking system. On the upload path, supplier bank details let it run.");
   box.innerHTML=out;
 }
 buildRows();
@@ -572,7 +575,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
