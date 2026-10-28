@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Clearing Reconciliation Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked levels on a payroll clearing account that never returns to nil: ageing, stale items, a nil that hides a missed deposit, and a calculator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  details.intake{background:var(--panel)}
+  details.intake ol.abc{margin:0;padding:4px 18px 8px 44px;display:flex;flex-direction:column;gap:8px;font-size:15.5px;list-style:upper-alpha}
+  .readback{margin:4px 14px 14px;padding:12px 14px;border:1px dashed var(--rule-strong);border-radius:10px;display:flex;flex-direction:column;gap:8px;font-size:15.5px}
+  .field input.chk{width:20px;height:20px;justify-self:end;accent-color:var(--green)}
+  code.fn{overflow-wrap:anywhere}
+  .res .s b{color:var(--wrong)}
+  .pair .big{overflow-wrap:anywhere}
+  .level .tbl + .tbl{margin-top:4px}
+  .lvnote a{color:var(--green)}
+  .muted a{color:var(--green)}
+  .calc select{min-width:150px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll clearing reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · payroll-clearing-reconciliation · learning guide</span>
+  <h1>From one pay run to what is stuck in payroll clearing</h1>
+  <p class="lede">This page shows how the skill finds the money that stays in a payroll clearing account, <b>one level at a time</b>. It starts with one pay run that returns to nil. It ends with the clean-up proposals for every item that did not. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are a section of an OpenStax textbook, two IRS pages, two pages from the California State Controller and an HMRC page. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter the movements of your own clearing account and your liabilities. The page ages them and tests their behaviour. It has no tax rate field.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples continue the <a href="../payroll-reconciliation/learn.html">payroll reconciliation example</a>. The company is the same made-up Northbrook Trading, with its books in US dollars on the accrual basis. The period is September 2026, the last month of the quarter that the other page reconciles. The as-at date is Wednesday 30 September 2026. The owner runs the skill on Monday 19 October 2026. Every tax amount comes from the payroll provider's report for Northbrook. This page uses no tax rate.</p>
+  <details class="intake">
+    <summary>Northbrook's answers to the eight intake questions</summary>
+    <ol class="abc">
+      <li><b>Use MosoFin, or upload the data?</b> Northbrook uploads the data. Level 4 and part 2 of the calculator show what changes on the MosoFin path.</li>
+      <li><b>Which entity, and which payroll accounts?</b> Northbrook Trading only. The accounts are 2200 Payroll clearing (net pay), 2210 Federal payroll taxes payable, 2230 401(k) payable and 2240 State unemployment payable. The chart has no suspense account and no garnishment account. The skill finds payroll movement on 2250 Accrued payroll ($2,500 at 30 September), which is not on the list. It flags 2250 as a scope gap. The owner reviews 2250 with the month-end accruals, so the workpaper names it as excluded, with that reason.</li>
+      <li><b>Which period?</b> September 2026.</li>
+      <li><b>The remittance cadence of each liability.</b> Federal taxes each month, by the 15th of the next month, or the next business day after a weekend or holiday. The 401(k) money each month, by the 7th of the next month, under the plan. State unemployment each quarter, by the end of the month after the quarter. Net pay clears on each pay date. The owner gives all of these. The skill supplies none of them.</li>
+      <li><b>The payroll register.</b> The provider's register for September: the bonus run on 15 September and the monthly run on 30 September.</li>
+      <li><b>The bank statement.</b> The statement for September.</li>
+      <li><b>The materiality threshold, and who approves a write-off.</b> $50.00, and the owner approves each write-off.</li>
+      <li><b>The statements of account.</b> Northbrook has none yet. Level 6 asks for the state unemployment statement, because of 2240.</li>
+    </ol>
+    <div class="readback">
+      <p class="fine">The uploads are the GL detail of the four accounts, from 1 October 2025 to 30 September 2026. They also include trial balances at 31 August and 30 September, the register, the remittance records and the bank statement. This is the first run. The workpaper says: “Opening agreed to prior reconciliation: N, no prior reconciliation. Opening taken from the 31 August trial balance.”</p>
+      <p class="fine">The card's own read-back sample is a UK one, with PAYE on the 22nd. For this US example, the skill reads back the scope and waits for a yes:</p>
+      <p>“Reconciling the payroll control accounts of Northbrook Trading for September 2026: payroll clearing 2200, federal payroll taxes 2210, 401(k) 2230 and state unemployment 2240. I use the files you uploaded. They are the GL detail for the last twelve months, and trial balances at 31 August and 30 September. They also include the September payroll register, the remittance records and the September bank statement. The accrual side uses the register. Federal taxes remitted monthly by the 15th, 401(k) monthly by the 7th, state unemployment quarterly. The bank tie-out is to the bank statement. Shall I go ahead?”</p>
+      <p class="fine">The read-back never repeats the line of one employee.</p>
+    </div>
+  </details>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Find what is stuck in your clearing account</h2>
+  <p class="muted">Enter the movements of your own clearing account, or load an example. The page runs the arithmetic of Step 0b and Step 7 from <code>references/method.md</code>. Part 2 tests the behaviour of up to four liabilities. The page has no tax rate field and calculates no penalty. It sends nothing anywhere.</p>
+  <div class="calc">
+    <h3 class="part">Part 1 · The clearing account</h3>
+    <div class="presets" role="group" aria-label="Load an example for part 1">
+      <button type="button" data-p="nb">Northbrook 2200, 12 months to 30 Sep 2026</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The account</legend>
+        <label class="field"><span>As-at date (period end)</span><input data-k="asof" type="date"></label>
+        <label class="field"><span>Materiality threshold for write-offs</span><input data-k="thr" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>The opening balance</legend>
+        <label class="field"><span>Opening balance (credit = owed)</span><input data-k="op" inputmode="decimal"></label>
+        <label class="field"><span>Its date</span><input data-k="opd" type="date"></label>
+      </fieldset>
+    </div>
+    <p class="fine">Enter only the movements that did not return to nil. A normal pay run credits the account and the payout debits it on the same day, so you can omit it. A plus amount goes into the account. A minus amount leaves it.</p>
+    <div class="tbl"><table class="bills" aria-label="Movements in the clearing account">
+      <thead><tr><th>Date</th><th>Amount</th><th>Reference</th><th>Type</th></tr></thead>
+      <tbody id="mvrows"></tbody>
+    </table></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <hr>
+    <h3 class="part">Part 2 · Liability behaviour</h3>
+    <div class="presets" role="group" aria-label="Load an example for part 2">
+      <button type="button" data-q="nb">Northbrook liabilities, September 2026</button>
+      <button type="button" data-q="blank">Start blank</button>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Liabilities">
+      <thead><tr><th>Liability</th><th>Opening</th><th>Accrued</th><th>Remitted</th><th>GL closing</th><th>One period's accrual</th></tr></thead>
+      <tbody id="liabrows"></tbody>
+    </table></div>
+    <label class="field" style="max-width:520px"><span>The accrued column comes from the payroll journal, because I have no register</span><input data-k="proxy" type="checkbox" class="chk"></label>
+    <div class="results" id="results2" aria-live="polite"></div>
+    <p class="fine">The page sorts the movements by date. A minus amount first settles the item with the same reference. Without a match, it settles the oldest item first (FIFO). The bands count whole months from the month of the item to the as-at month. Days count calendar days to the as-at date. “One period's accrual” is what the cadence says the account should carry at the period end. A result from this page is a proposal. A person decides and posts each entry.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Eight things, in one message. Use MosoFin, or upload the data? Which entity and which payroll accounts? Which period? The remittance cadence of each liability. Then the payroll register, the bank statement, your write-off threshold and its approver, and any statements of account.</div>
+    <div><b>Needs</b>The GL detail of each payroll account for the period and the prior twelve months, and the balances at both period ends. It also needs the register and the remittance records. It recommends the bank statement, the provider statements and the prior reconciliation.</div>
+    <div><b>Gives back</b>Nine tabs: one for each account, the master summary, the bank tie-out, the proposed entries, the stale balances and the coverage sheet. It makes the Excel file only on a yes, for example <code class="fn">Payroll_Recs_2026-09_Northbrook Trading.xlsx</code>.</div>
+    <div><b>Never</b>The skill never reads your data before your yes to the read-back. It never writes, posts or pays, and never names a person or shows the pay of one. It never writes off the pay that a person did not get, and never guesses a cadence, a write-off or an escheatment treatment. It never saves a balance or an ageing.</div>
+  </div>
+  <p class="muted">The overdue flag, the penalties and the tax filings belong to <a href="../payroll-reconciliation/learn.html">payroll reconciliation</a>. The skill sends the entries to <code>journal-entry-builder</code>. The payroll journal itself belongs to <code>payroll-journal-entry-builder</code>.</p>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are a section of an OpenStax textbook, two IRS pages, two pages from the California State Controller's Office and an HMRC page. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The ageing bands, the 60-day threshold and the rule of one cycle plus its due-date lag are the skill's own. So are the lowest running balance as the residual, the table of nine causes, the [auto], [gated] and [manual] verdicts and the workpaper tabs. MosoFin made up Northbrook Trading and every figure in the examples. This page states no tax rate, no wage cap and no escheatment period for Northbrook. Every tax amount comes from Northbrook's payroll provider report. The California rules are the example of one state only.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The skill works in any country. This example is a US one, and source 6 shows the UK equivalent. Payroll tax rules and unclaimed property rules differ between countries and states, and they change. Ask your accountant, your payroll adviser or the unclaimed property office of your state which rules apply to you. This page explains <code>payroll-clearing-reconciliation</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-clearing-reconciliation">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll", u:"https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll", at:"paying salaries payable; employer payroll taxes and benefits", checked:"2026-10-28", via:"from search results, page not opened", w:"When the company pays accrued wages, it debits the payable and credits cash, so the liability goes down. Employer payroll taxes and benefits follow the same pattern. Deductions stay current liabilities until the company remits them. The textbook uses 2017 figures, so this page copies no rate from it."},
+  {t:"IRS: Publication 15 (2026), (Circular E), Employer's Tax Guide", u:"https://www.irs.gov/publications/p15", at:"section 11, Depositing Taxes (monthly schedule)", checked:"2026-10-28", via:"from search results, page not opened", w:"In Publication 15 (2026), a lookback-period total of $50,000 or less makes a monthly schedule depositor for the year. A monthly depositor deposits by the 15th of the month after the payments. If the 15th is a weekend or a holiday, the deposit is due on the next business day."},
+  {t:"IRS: Employment taxes and the Trust Fund Recovery Penalty (TFRP)", u:"https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes-and-the-trust-fund-recovery-penalty-tfrp", checked:"2026-10-28", via:"from search results, page not opened", w:"A person who must collect, account for or pay withheld taxes, and who willfully does not, can be personally liable. Officers, employees and others with authority over the payment of funds can qualify. The penalty equals the unpaid trust fund tax. This is a US rule."},
+  {t:"California State Controller's Office: Unclaimed Property, Holder Reporting, Frequently Asked Questions", u:"https://sco.ca.gov/upd_reporting_portal_faq.html", at:"dormancy periods", checked:"2026-10-28", via:"from search results, page not opened", w:"In California, the dormancy period for payroll, wages and commissions is one year. For most other property it is three years. A business that holds unclaimed property must report it each year. This is one state. Other states have different periods and rules."},
+  {t:"California State Controller's Office: Holder Due Diligence", u:"https://sco.ca.gov/Files-UPD/upd_duediligence.pdf", checked:"2026-10-28", via:"from search results, page not opened", w:"Before it reports, the holder sends a due diligence letter to the owner's address of record for property of $50 or more. If the owner replies, the holder returns the property to the owner. The holder is free of liability for property given to the state only if it obeyed the notice rules."},
+  {t:"HMRC: Pay employers' PAYE: Overview", u:"https://www.gov.uk/pay-paye-tax", checked:"2026-10-28", via:"from search results, page not opened", w:"A UK employer that pays monthly pays HMRC by the 22nd of the next tax month. For example, the tax month from 6 April to 5 May is due on 22 May. A quarterly payer pays by the 22nd after the quarter. A cheque by post must arrive by the 19th."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"a clearing account that never returns to nil, or a withholding account that only grows", w:"SKILL.md · Payroll clearing reconciliation"},
+  q2:{q:"A nil balance is not a reconciled account.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"reconcile the balance, not the people.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Unclaimed pay is not proposed for write-off to income; escheatment is flagged as a compliance obligation.", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"Never default it — without it the behaviour test has no benchmark.", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q6:{q:"A month-end balance on a monthly-remitted account is the month's withholdings, not a residual.", w:"references/method.md · Step 0b — Age every balance and test its behaviour (Mosofin addition)"},
+  q7:{q:"A reconciliation that explains this period's movement while a four-year-old residual sits underneath it has explained the wrong thing.", w:"references/method.md · Step 0b — Age every balance and test its behaviour (Mosofin addition)"},
+  q8:{q:"it is what was posted, not what the register says.", w:"references/method.md · Step 2 — Pull the expected balance for each account"},
+  q9:{q:"note that a nil difference is not a reconciled account where the expected balance was derived from the same postings as the actual.", w:"references/method.md · Step 3 — Compare actual GL to expected"},
+  q10:{q:"Classify first from the pattern, then confirm.", w:"references/method.md · Step 4 — Itemize reconciling items per account"},
+  q11:{q:"Tying payroll to recorded disbursements proves the bookkeeping; tying it to the bank statement proves the money left.", w:"references/method.md · Step 5 — Reconcile to bank disbursements"},
+  q12:{q:"Any clearing or suspense balance over 60 days, and any liability amount older than one full remittance cycle plus its due-date lag, warrants investigation.", w:"references/method.md · Step 7 — Investigate stale balances"},
+  q13:{q:"it belongs to the employee until it belongs to the state.", w:"references/method.md · Step 7 — Investigate stale balances"},
+  q14:{q:"The returned amount is owed to the employee", w:"references/edge-cases.md · Edge Cases"},
+  q15:{q:"A liability is removed only when it is paid or the creditor releases it.", w:"references/method.md · Step 8 — Construct cleanup JEs"},
+  q16:{q:"For timing differences: document but do not adjust.", w:"references/method.md · Step 8 — Construct cleanup JEs"},
+};
+
+const RULES = [
+  { id:"1", title:"Clearing returns to nil", r:Q.q1, cites:[1],
+    plain:"The skill's glossary says that a payroll clearing account holds net pay between the payroll entry and the payout. It should return to nil after each cycle. A balance that stays there is the finding.",
+    backed:"When a company pays accrued wages, it debits the payable and credits cash, so the liability goes down.{1}" },
+  { id:"2", title:"Never guess a cadence", r:Q.q5, cites:[2],
+    plain:"The cadence tells the skill which balance to expect. So the skill asks you for the cadence of each liability and assumes none.",
+    backed:"In the US, the schedule of the employer sets the due date of each federal deposit. A monthly depositor deposits by the 15th of the next month.{2}" },
+  { id:"3", title:"One month on the books is normal", r:Q.q6, cites:[2,3],
+    plain:"A tax account that the employer pays each month carries one month of withholdings at each month end. Two months on the account is a finding.",
+    backed:"A monthly depositor pays the taxes of a month by the 15th of the next month.{2} Part of that money is withheld from employees, and a responsible person can be personally liable if it stays unpaid.{3}" },
+  { id:"4", title:"Unclaimed pay is never income", r:Q.q4, cites:[4],
+    plain:"A returned deposit or a voided check is pay that a person did not get. The skill never proposes it as income. It flags the escheatment question for a person to decide.",
+    backed:"For example, in California, wages become reportable unclaimed property after a one-year dormancy period. Other states have different periods and rules.{4}" },
+  { id:"5", title:"First the employee, then the state", r:Q.q13, cites:[5],
+    plain:"Unclaimed pay stays the property of the employee. The first action is to try to reach the person, by reference. The skill sends no letter itself.",
+    backed:"In California, before it reports, the holder sends a letter to the owner's address of record for property of $50 or more. If the owner replies, the holder pays the owner.{5}" },
+  { id:"6", title:"Balances, not people", r:Q.q3, cites:[],
+    plain:"The skill reports totals and counts. It refers to an item about one employee by a reference number, never by name." },
+  { id:"7", title:"A nil is not a reconciliation", r:Q.q2, cites:[],
+    plain:"A difference of nil can come from an expected balance that uses the same postings as the GL. So the skill states the basis of every expected balance." },
+  { id:"8", title:"The old residual comes first", r:Q.q7, cites:[],
+    plain:"Before it explains this month, the skill ages the whole balance, tests its behaviour and finds the residual. It reports all three first." },
+  { id:"9", title:"Sixty days, or one cycle plus its lag", r:Q.q12, cites:[],
+    plain:"A clearing balance older than 60 days is stale. A liability amount is stale when it is older than its cadence plus the time to its due date." },
+  { id:"10", title:"Recorded is not bank-verified", r:Q.q11, cites:[],
+    plain:"The skill says which side of the bank it used: the payments recorded in the books, or the bank statement." },
+  { id:"11", title:"Pay it, or the creditor releases it", r:Q.q15, cites:[1],
+    plain:"A tax or benefit residual is a remittance to make or a refund to claim. The skill writes off neither. It asks for the statement of account first.",
+    backed:"The textbook debits each payable only when the company pays it.{1}" },
+  { id:"12", title:"Leave timing alone", r:Q.q16, cites:[],
+    plain:"An amount that the cadence says is not due yet is timing. The skill documents it and proposes no entry." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"The clearing account · 2200, twelve months to 30 September 2026" },
+  { n:1, title:"One pay run that returns to nil",
+    chips:["Payroll register","General ledger"], src:"Rule 1", cites:[1],
+    situation:"On Wednesday 30 September, the monthly run credits 2200 Payroll clearing with net pay of $36,600. On the same day, the payout debits 2200 with $36,600. The skill's glossary calls clearing a holding account that should return to nil after each cycle.",
+    facts:["When a company pays accrued wages, it debits the payable and credits cash, so the liability goes down "+C(1)+".",
+           "Employer payroll taxes and benefits follow the same pattern. Deductions stay current liabilities until the company remits them "+C(1)+". This page copies no rate from the textbook, because it uses 2017 figures."],
+    visual:{type:"table",
+      head:["September, from the register","Monthly run","Bonus run","September"],
+      rows:[["Gross","$48,000","$6,000","$54,000"],["− Federal income tax withheld","","","−$6,600"],["− Employee social security and Medicare","","","−$3,900"],["− 401(k) pre-tax","","","−$2,700"]],
+      total:["Net pay","$36,600","$4,200","$40,800"]},
+    visual2:{type:"table",
+      head:["Date","Entry","Credit 2200","Debit 2200","Net in 2200"],
+      rows:[["Tue 15 Sep","Bonus run and its payout","$4,200.00","$4,200.00",["$0.00","good"]],["Wed 30 Sep","Monthly run and its payout","$36,600.00","$36,600.00",["$0.00","good"]]]},
+    rules:[Q.q1],
+    math:[["Net pay: 54,000 − 6,600 − 3,900 − 2,700","$40,800",1],["Monthly run 36,600 + bonus run 4,200","$40,800"],["Bonus run: 4,200 in − 4,200 out","$0.00",1],["Monthly run: 36,600 in − 36,600 out","$0.00",1],["July and August net pay, each: 48,000 − 5,700 − 3,450 − 2,400","$36,450"],["Q3 net pay: 36,450 + 36,450 + 40,800","$113,700",1],["Source of every tax amount","the provider report"]],
+    verdict:["ok","Each run nets to nil in 2200. So a balance that stays in 2200 is a payment that did not reach a person, or an entry with no pay run behind it. The Q3 net pay of $113,700 agrees with the payroll reconciliation page.","NIL"] },
+
+  { n:2, title:"What is stuck, and how old it is",
+    chips:["General ledger, twelve months"], src:"Rules 6 and 8", cites:[],
+    situation:"At 30 September 2026, 2200 holds $4,023.40, but it should hold nil. The skill reads twelve months of GL detail, from 1 October 2025. It lists each movement that did not net to nil and ages what remains.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Date","Movement","Ref","Amount","Running balance"],
+      rows:[["before 1 Oct 2025","Balance from the old books, no detail in the window","none","$23.40","$23.40"],["Tue 3 Feb 2026","Direct deposit from the 30 Jan run returned (account closed), not paid again","EE-03","+$640.00","$663.40"],["Thu 30 Apr 2026","Final pay held: disputed final settlement","EE-05","+$1,150.00","$1,813.40"],["Tue 30 Jun 2026","Check #1987 from the 31 Oct 2025 run, not cashed, voided as stale","EE-11","+$410.00","$2,223.40"],["Tue 4 Aug 2026","Direct deposit from the 31 Jul run returned","EE-07","+$1,250.00","$3,473.40"],["Thu 6 Aug 2026","Paid again as check #2214","EE-07","−$1,250.00","$2,223.40"],["Thu 24 Sep 2026","JE-0912, memo “reclass contractor”, debit 6000 Wages, no payroll run","JE-0912",["+$1,800.00","bad"],["$4,023.40","bad"]]]},
+    visual2:{type:"table",
+      head:["Age band","Items","Amount"],
+      rows:[["Current period (September)","1 · JE-0912","$1,800.00"],["1–2 periods","0 · EE-07 nets to nil","$0.00"],["3–6 periods","2 · June (3), April (5)","$1,560.00"],["Over 6 periods","2 · February (7), before October 2025",["$663.40","bad"]]],
+      total:["Total","5 items","$4,023.40"]},
+    rules:[Q.q7, Q.q3, Q.q14],
+    math:[["Opening of the window","$23.40"],["+ 640 + 1,150 + 410 + 1,250 − 1,250 + 1,800","+$4,000.00"],["= closing at 30 September","$4,023.40",1],["Opening at 31 August: 23.40 + 640 + 1,150 + 410","$2,223.40"],["3–6 periods: 410 + 1,150","$1,560.00"],["Over 6 periods: 640 + 23.40","$663.40"],["Bands: 1,800 + 0 + 1,560 + 663.40","$4,023.40",1],["Periods = months before September","June 3, April 5, February 7"],["Names on this page","0"]],
+    verdict:["flag","Five items make up the $4,023.40, and two of them are older than six months. Each memo names its pay run or journal, so the ageing uses specific identification. The card's default is FIFO, unless the memo identifies the period. The workpaper states the convention. EE-07 nets to nil in 2200, but check #2214 is still not cashed at 30 September.","AGED"] },
+
+  { n:3, title:"The residual and the stale items",
+    chips:["General ledger","Step 7, 60 days"], src:"Rules 8 and 9", cites:[],
+    situation:"The card calls the never-clearing residual the headline finding. For a clearing account, it is the lowest running balance in the GL detail over twelve cycles. Step 7 then looks for every clearing balance older than 60 days.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Amount","In 2200 since","Days","Items","Probable cause","Escheatment applicable?"],
+      rows:[["$23.40","before 1 Oct 2025","over 364","1","unknown, from before the window","not known: ask for older detail"],["$640.00","Tue 3 Feb 2026","239","1 · EE-03","unclaimed pay: returned direct deposit",["possibly: [manual]","bad"]],["$1,150.00","Thu 30 Apr 2026","153","1 · EE-05","final-pay dispute of a former employee","no, while the dispute is open"],["$410.00","Tue 30 Jun 2026","92","1 · EE-11","unclaimed pay: check not cashed",["possibly: [manual]","bad"]]],
+      total:["$2,223.40","","","4","",""]},
+    pair:[["note","Never-clearing residual","$23.40","The lowest running balance. This amount never cleared at any time in the window."],["bad","Stale, over 60 days","$2,223.40","Four items. The oldest is from before October 2025."]],
+    rules:[Q.q12, Q.q10],
+    math:[["Lowest of 23.40, 663.40, 1,813.40, 2,223.40, 3,473.40, 2,223.40, 4,023.40","$23.40",1],["Days, Tue 3 Feb to Wed 30 Sep","239"],["Days, Thu 30 Apr to Wed 30 Sep","153"],["Days, Tue 30 Jun to Wed 30 Sep","92"],["EE-11: days from the pay date, Fri 31 Oct 2025","334"],["Stale: 23.40 + 640 + 1,150 + 410","$2,223.40",1],["Unclaimed pay: 640 + 410, 2 items","$1,050.00",1],["JE-0912: Thu 24 Sep to Wed 30 Sep","6 days, not stale"],["Arrived inside the window: 4,023.40 − 23.40","$4,000.00"]],
+    verdict:["flag","The residual alone shows only $23.40. The ageing and the 60-day test find the other $4,000.00. The skill reports: “$2,223.40 in payroll clearing is more than 60 days old, in four items. The oldest is from before October 2025 (specific identification).” JE-0912 is 6 days old. Its pattern classifies it: a journal with no payroll cycle behind it.","STALE"] },
+
+  { tier:"The expected balance · what a nil can hide" },
+  { n:4, title:"The nil that hides a gap",
+    chips:["General ledger","Payroll register","Cadences from the owner"], src:"Rules 2, 3 and 7", cites:[2,3],
+    situation:"Step 2 rolls each account forward: opening, plus accrued, less paid. For 2200, the formula carries the old $2,223.40 forward as expected. Step 2 also says that a clearing account should be nil after the cycle settles. For 2210, the roll-forward gives $27,000, equal to the GL.",
+    facts:["The IRS sets a monthly or semiweekly deposit schedule for each employer. In Publication 15 (2026), a lookback-period total of $50,000 or less makes a monthly depositor "+C(2)+".",
+           "A monthly depositor deposits by the 15th of the month after the payments. If the 15th is a weekend or a holiday, the deposit is due on the next business day "+C(2)+". Northbrook told the skill that it deposits each month.",
+           "Part of 2210 is trust fund money: the income tax and the employee share that Northbrook withheld. A person with authority over the payments who willfully does not pay it can be personally liable "+C(3)+". The penalty equals the unpaid trust fund tax "+C(3)+".",
+           "This page calculates no split and no penalty. It gives no legal advice."],
+    visual:{type:"table",
+      head:["Account","Expected by","Expected","GL","Difference"],
+      rows:[["2200 Payroll clearing","the formula","$2,223.40","$4,023.40","$1,800.00"],["2200 Payroll clearing","the nil target","$0.00","$4,023.40",["$4,023.40","bad"]],["2210 Federal payroll taxes","the roll-forward","$27,000.00","$27,000.00",["$0.00","good"]],["2210 Federal payroll taxes","the cadence: one month","$14,400.00","$27,000.00",["$12,600.00","bad"]]]},
+    pair:[["bad","2200 against nil","$4,023.40","The nil target shows all five items. The formula shows only the $1,800 of September."],["bad","2210 against its cadence","+$12,600","Two months of taxes at a month end. No remittance in September."]],
+    note:"On the MosoFin path with no payroll platform, the accrued side is the payroll journals' credit to 2200: $40,800 in September. JE-0912 still shows, because it has no payroll cycle behind it. The bank tie-out is then to recorded disbursements, and the output says so. The skill reads the remittances from the payments, but not the acknowledgement of the authority. The overdue flag and its days past due belong to <a href=\"../payroll-reconciliation/learn.html#lv4\">payroll reconciliation, Level 4</a>.",
+    rules:[Q.q2, Q.q9, Q.q6, Q.q5, Q.q8],
+    math:[["2200 by the formula: 2,223.40 + 40,800 − 40,800","$2,223.40"],["+ JE-0912, an adjustment","+$1,800.00"],["= roll-forward closing, equal to the GL","$4,023.40",1],["2200 difference to nil: 4,023.40 − 0","$4,023.40",1],["Five items: 23.40 + 640 + 1,150 + 410 + 1,800","$4,023.40",1],["2210: 12,600 + 14,400 − 0","$27,000.00",1],["2210 accrued in September: 6,600 + 3,900 + 3,900","$14,400.00"],["Opening is August: 5,700 + 3,450 + 3,450","$12,600.00"],["Excess over one month: 27,000 − 14,400","$12,600.00",1],["Residual of 2210 over twelve cycles: each trough after a remittance","$0.00"],["August accrued Mon 31 Aug: days to Wed 30 Sep","30"],["Stale test for 2210: one month + 15 days","about 45 days, not yet"]],
+    verdict:["flag","Both nils tell the wrong story. The 2200 formula hides four old items, and the nil target shows them. The 2210 roll-forward ties, but the account carries two months. The stale test does not catch August yet, and its troughs are nil. Only the behaviour test finds the $12,600 that Northbrook did not remit.","BEHAVIOUR"] },
+
+  { n:5, title:"The bank and the year",
+    chips:["Bank statement","Remittance records","Payroll register, year to date"], src:"Rule 10", cites:[2,6],
+    situation:"Step 5 ties the net pay of each cycle to the bank statement. It ties each remittance to its deposit period, as the cadence sets it. Step 6 then runs the year-to-date test on 2210, with the opening balance.",
+    facts:["A monthly depositor deposits the taxes of August by the 15th of September "+C(2)+". In 2026, that is Tuesday 15 September.",
+           "The card's read-back sample uses a UK cadence: PAYE on the 22nd. A UK employer that pays monthly pays HMRC by the 22nd of the next tax month "+C(6)+". A quarterly payer pays by the 22nd after the quarter, and a cheque by post must arrive by the 19th "+C(6)+".",
+           "The skill works in any country. Only the cadence changes."],
+    visual:{type:"table",
+      head:["Pay date","Cycle","Net pay per register","Per bank (statement)","Difference"],
+      rows:[["Tue 15 Sep 2026","Bonus run","$4,200.00","$4,200.00",["$0.00","good"]],["Wed 30 Sep 2026","September run","$36,600.00","$36,600.00",["$0.00","good"]]]},
+    visual2:{type:"table",
+      head:["Liability","Deposit period","Accrued","Paid","Due","Difference"],
+      rows:[["2230 401(k)","August","$3,400.00","$3,400.00 on Fri 4 Sep","Mon 7 Sep",["$0.00","good"]],["2210 Federal taxes","August","$12,600.00","$0.00","Tue 15 Sep",["$12,600.00","bad"]]]},
+    rules:[Q.q11],
+    math:[["Bank: 4,200 + 36,600","$40,800.00"],["Register net pay for September","$40,800.00"],["Net pay difference","$0.00",1],["YTD accruals: Q1 37,800 + Q2 38,700 + Q3 39,600","$116,100"],["YTD remittances: 12,300 + 63,600 + 12,900 + 12,600","$101,400"],["Opening 1 Jan 2026 (December 2025)","$12,300"],["Closing: 12,300 + 116,100 − 101,400","$27,000",1],["Register test: 101,400 + 27,000 − 12,300","$116,100",1],["Register YTD","$116,100"]],
+    verdict:["note","Net pay ties to the bank statement, so the money left. The YTD test ties too, because it uses the same closing balance. It cannot show that August is unpaid. Only the deposit period and the cadence show the $12,600. The YTD test is a preview in mid-year. The formal one is at the year end.","TIED, AUGUST OPEN"] },
+
+  { tier:"The clean-up · proposals, not postings" },
+  { n:6, title:"Clean-up, and what the skill refuses",
+    chips:["Step 8","Proposed entries"], src:"Rules 4, 5, 11 and 12", cites:[3,4,5],
+    situation:"Step 8 proposes entries for journal-entry-builder. The skill posts none of them. The owner wants 2200 at nil, and asks the skill to write the whole $4,023.40 off to miscellaneous expense. The skill refuses, because $1,050.00 of it is pay that people did not get.",
+    facts:["For example, in California, the dormancy period for payroll and wages is one year. For most other property it is three years "+C(4)+". A holder reports unclaimed property each year "+C(4)+".",
+           "Other states have different periods and rules. This page does not name Northbrook's state and applies no period to it.",
+           "In California, the holder first sends a due diligence letter for property of $50 or more. If the owner replies, the holder pays the owner "+C(5)+". The holder is free of liability for property given to the state only if it obeyed the notice rules "+C(5)+".",
+           "The unpaid $12,600 in 2210 includes trust fund money "+C(3)+". It needs a remittance, not an entry."],
+    visual:{type:"table",
+      head:["Item","Proposal","Debit","Credit","Amount"],
+      rows:[["P1 · EE-03, EE-11","Reclass unclaimed pay. Escheatment: [manual]","2200","2260 Unclaimed wages payable","$1,050.00"],["P2 · from before October 2025","Write-off per policy, under $50.00, the owner approves","2200","7900 Other income","$23.40"],["P3 · JE-0912","If it is a contractor's bill. The owner and the accountant decide","2200","2000 Accounts payable",["$1,800.00","bad"]],["EE-05","No entry. Investigating until the parties settle the dispute","—","—","$1,150.00"],["2210 · August","A remittance for the owner to make. No entry","—","—","$12,600.00"],["2210 · September","Timing, due Thu 15 Oct. Documented, not adjusted","—","—","$14,400.00"],["2240","A refund to claim. Statement of account first","—","—","−$150.00"]]},
+    pair:[["bad","Refused","$4,023.40","A write-off of the whole balance to miscellaneous expense."],["ok","Left in 2200 after P1, P2 and P3","$1,150.00","EE-05 only, until the parties settle the dispute."]],
+    note:"P2 needs two conditions. The owner first asks for the older detail. And P2 stays only while the owner cannot identify a person. If the $23.40 is pay, it counts as unclaimed pay and P2 goes. If the same small write-off came back each month, Step 8 would call it a process fault. If JE-0912 is wages, the register, the Q3 Form 941 and the W-2s are short: see <a href=\"../payroll-reconciliation/learn.html#lv6\">payroll reconciliation, Level 6</a>.",
+    rules:[Q.q4, Q.q13, Q.q15, Q.q16],
+    math:[["P1: 640 + 410","$1,050.00"],["2200 after P1, P2, P3: 4,023.40 − 1,050.00 − 23.40 − 1,800.00","$1,150.00",1],["2240: −300 + 150 − 0","−$150.00"],["2240 in Q3: 600 paid Thu 30 Jul, 600 paid again Mon 3 Aug","the duplicate"],["2230: 3,400 + 3,700 − 3,400","$3,700.00"],["2230 September: due Wed 7 Oct, paid Tue 6 Oct","tied"],["Entries the skill posts","0",1],["Letters the skill sends","0",1],["Escheatment decisions the skill makes","0",1]],
+    verdict:["flag","2200 does not return to zero, because $4,023.40 of five items never left it. That is two unpaid wages owed to people ($1,050.00) and one disputed final pay ($1,150.00). It is also one journal with no pay run behind it ($1,800.00) and $23.40 of unknown origin. The skill proposes. The owner decides, posts and pays.","PROPOSALS"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.visual2) vis += table(L.visual2);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    if(L.note) vis += `<p class="fine lvnote">${L.note}</p>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span${/^[−+$\d]/.test(m[1])?' style="white-space:nowrap"':""}>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator, part 1: Step 0b and Step 7 on a clearing account. Part 2: the behaviour test on up to 4 liabilities. No rate field. --- */
+const MROWS = 10, LROWS = 4;
+const TYPES = [["ret","Returned deposit"],["void","Voided check"],["held","Held or disputed pay"],["man","Manual entry, no pay run"],["out","Reissue or payout"],["unk","Unknown"]];
+const P1 = {
+  nb:{asof:"2026-09-30", thr:"50.00", op:"23.40", opd:"2025-10-01", rows:[
+    ["2026-02-03","640.00","EE-03","ret"],["2026-04-30","1150.00","EE-05","held"],["2026-06-30","410.00","EE-11","void"],
+    ["2026-08-04","1250.00","EE-07","ret"],["2026-08-06","-1250.00","EE-07","out"],["2026-09-24","1800.00","JE-0912","man"]]},
+  blank:{asof:"", thr:"", op:"", opd:"", rows:[]},
+};
+const P2 = {
+  nb:{proxy:false, rows:[["2210 Federal payroll taxes",12600,14400,0,27000,14400],["2230 401(k)",3400,3700,3400,3700,3700],["2240 State unemployment",-300,150,0,-150,150]]},
+  blank:{proxy:false, rows:[]},
+};
+const mv=document.getElementById("mvrows"), tb=document.getElementById("liabrows");
+const opts=TYPES.map(([v,t])=>`<option value="${v}">${t}</option>`).join("");
+for(let i=1;i<=MROWS;i++){
+  mv.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="d" type="date" aria-label="Movement ${i} date"></td>
+    <td><input data-c="a" class="n" inputmode="decimal" aria-label="Movement ${i} amount, plus into the account" style="width:120px"></td>
+    <td><input data-c="ref" aria-label="Movement ${i} reference" style="min-width:110px"></td>
+    <td><select data-c="t" aria-label="Movement ${i} type">${opts}</select></td></tr>`);
+}
+for(let i=1;i<=LROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="nm" aria-label="Liability ${i} name" style="min-width:170px"></td>
+    <td><input data-c="op" class="n" inputmode="decimal" aria-label="Liability ${i} opening balance" style="width:100px"></td>
+    <td><input data-c="ac" class="n" inputmode="decimal" aria-label="Liability ${i} accrued this period" style="width:100px"></td>
+    <td><input data-c="rm" class="n" inputmode="decimal" aria-label="Liability ${i} remitted this period" style="width:100px"></td>
+    <td><input data-c="gl" class="n" inputmode="decimal" aria-label="Liability ${i} closing balance in the GL" style="width:100px"></td>
+    <td><input data-c="pa" class="n" inputmode="decimal" aria-label="Liability ${i} accrual of one period" style="width:100px"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const dnum = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?Date.UTC(+m[1],+m[2]-1,+m[3])/86400000:NaN; };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n*86400000); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const mon = n => { const d=new Date(n*86400000); return d.getUTCFullYear()*12+d.getUTCMonth(); };
+const r2 = n => Math.round(n*100)/100;
+const z = v => isNaN(v)?0:v;
+const m2 = n => fmt(r2(n),2);
+
+function load1(p){
+  const P=P1[p];
+  ["asof","thr","op","opd"].forEach(k=>{ fld(k).value=P[k]; });
+  [...mv.rows].forEach((tr,i)=>{ const b=P.rows[i]||["","","","ret"];
+    ["d","a","ref","t"].forEach((k,j)=>{ tr.querySelector(`[data-c="${k}"]`).value=b[j]; }); });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run1();
+}
+function load2(p){
+  const P=P2[p];
+  fld("proxy").checked=P.proxy;
+  [...tb.rows].forEach((tr,i)=>{ const b=P.rows[i]||["","","","","",""];
+    ["nm","op","ac","rm","gl","pa"].forEach((k,j)=>{ tr.querySelector(`[data-c="${k}"]`).value=b[j]; }); });
+  document.querySelectorAll(".presets [data-q]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.q===p));
+  run2();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function treat(it, thr){
+  if(it.type==="ret"||it.type==="void") return "Owed to a person. Reclass to unclaimed wages. Escheatment check [manual]. Never written off.";
+  if(it.type==="held") return "Investigating.";
+  if(it.type==="man") return "Investigate: reclass or reverse.";
+  if(it.type==="unk" && !isNaN(thr) && it.left<=thr+0.001) return "Write-off proposal per policy. The owner approves. Only if the owner cannot identify a person.";
+  return "Investigate.";
+}
+function run1(){
+  const box=document.getElementById("results"), steps=document.getElementById("steps");
+  const A=dnum(fld("asof").value), thr=money(fld("thr").value), op=money(fld("op").value), opd=dnum(fld("opd").value);
+  const rows=[...mv.rows].map((tr,i)=>{ const q=k=>tr.querySelector(`[data-c="${k}"]`).value;
+      return {i, d:dnum(q("d")), amt:money(q("a")), ref:q("ref").trim()||"row "+(i+1), type:q("t")}; })
+    .filter(r=>!isNaN(r.amt) && r.amt!==0)
+    .sort((a,b)=>(isNaN(a.d)?1e9:a.d)-(isNaN(b.d)?1e9:b.d) || a.i-b.i);
+  if(!rows.length && isNaN(op)){ box.innerHTML=res("","Waiting","—","Enter an opening balance or a movement, or load an example."); steps.innerHTML=""; return; }
+  const items=[]; let bal=z(op), low=bal, unmatched=0;
+  if(!isNaN(op) && op>0) items.push({ref:"Opening balance", type:"unk", d:opd, left:op});
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span style="white-space:nowrap">${b}</span></div>`;
+  let s=line("Running balance after each movement","balance",1);
+  s+=line(`Opening${isNaN(opd)?"":", "+dshow(opd)}`, m2(bal));
+  rows.forEach(r=>{
+    bal=r2(bal+r.amt); low=Math.min(low,bal);
+    s+=line(`${isNaN(r.d)?"no date":dshow(r.d)} · ${esc(r.ref)} · ${r.amt>0?"+":"−"}${m2(Math.abs(r.amt)).slice(1)}`, m2(bal));
+    if(r.amt>0){ items.push({ref:r.ref, type:r.type, d:r.d, left:r.amt}); return; }
+    let need=-r.amt;
+    const first=items.filter(it=>it.ref===r.ref && it.left>0), rest=items.filter(it=>it.ref!==r.ref && it.left>0);
+    for(const it of first.concat(rest)){ const take=Math.min(it.left,need); it.left=r2(it.left-take); need=r2(need-take); if(need<=0) break; }
+    if(need>0) unmatched=r2(unmatched+need);
+  });
+  const open=items.filter(it=>it.left>0.005);
+  const bands=[0,0,0,0], bandN=[0,0,0,0]; let undated=0;
+  open.forEach(it=>{
+    if(isNaN(it.d)||isNaN(A)){ undated=r2(undated+it.left); return; }
+    const m=mon(A)-mon(it.d), b=m<=0?0:m<=2?1:m<=6?2:3;
+    bands[b]=r2(bands[b]+it.left); bandN[b]++; });
+  const stale=open.filter(it=>!isNaN(it.d)&&!isNaN(A)&&A-it.d>60);
+  const staleSum=r2(stale.reduce((t,it)=>t+it.left,0));
+  let o="";
+  o+=res(bal===0?"ok":"flag","Closing balance",m2(bal),`Opening ${m2(z(op))} and ${rows.length} movement${rows.length===1?"":"s"}.`,"r-close");
+  o+=res(bal===0?"ok":"flag","Expected for a clearing account","nil",`Difference = closing: ${m2(bal)}.`,"r-diff");
+  o+=res(low>0.005?"flag":"ok","Lowest running balance",m2(low),low>0.005?"The never-clearing residual. It never cleared in the window.":"The account reached nil, or below, in the window.","r-low");
+  const BN=["Current period","1–2 months","3–6 months","Over 6 months"];
+  BN.forEach((n,k)=>{ o+=res(k===3&&bands[k]>0?"flag":k===2&&bands[k]>0?"note":"",n,m2(bands[k]),`${bandN[k]} item${bandN[k]===1?"":"s"}`,"r-b"+k); });
+  if(isNaN(A)) o+=res("note","Ageing","needs a date","Enter the as-at date.","r-age");
+  o+=res(stale.length?"flag":"ok","Over 60 days",m2(staleSum),stale.length?`${stale.length} item${stale.length===1?"":"s"}: `+stale.map(it=>`${m2(it.left)} at ${A-it.d} days`).join(", ")+".":"No item older than 60 days.","r-stale");
+  box.innerHTML=o;
+  s+=line("Lowest running balance", m2(low), 1);
+  s+=line("What remains, item by item","amount",1);
+  open.forEach(it=>{ const age=(!isNaN(it.d)&&!isNaN(A))?`${A-it.d} days`:"no age"; s+=line(`${esc(it.ref)} · ${age} · ${treat(it,thr)}`, m2(it.left)); });
+  if(!open.length) s+=line("Nothing remains.","—");
+  if(undated) s+=line("Items with no date, not aged", m2(undated));
+  if(unmatched) s+=line("Money out with no item to settle. The account went below nil. Investigate.", "−"+m2(unmatched).slice(1));
+  if(isNaN(thr)) s+=line("No threshold entered. The skill never assumes one, so the page proposes no write-off.","—");
+  steps.innerHTML=s;
+}
+function run2(){
+  const box=document.getElementById("results2"), proxy=fld("proxy").checked;
+  const L=[...tb.rows].map(tr=>{ const q=k=>tr.querySelector(`[data-c="${k}"]`).value;
+    return {nm:q("nm").trim()||"Liability "+tr.dataset.r, op:money(q("op")), ac:money(q("ac")), rm:money(q("rm")), gl:money(q("gl")), pa:money(q("pa"))}; })
+    .filter(r=>!isNaN(r.op)||!isNaN(r.ac)||!isNaN(r.rm)||!isNaN(r.gl));
+  if(!L.length){ box.innerHTML=res("","Waiting","—","Enter a liability, or load an example."); return; }
+  box.innerHTML=L.map((r,i)=>{
+    const ex=r2(z(r.op)+z(r.ac)-z(r.rm)), carried=isNaN(r.gl)?ex:r.gl, d=isNaN(r.gl)?NaN:r2(r.gl-ex);
+    let cls="ok", flag="", s=`${m2(z(r.op))} + ${m2(z(r.ac))} − ${m2(z(r.rm))} = ${m2(ex)}. `;
+    s+= isNaN(d)?"No GL closing entered. ":`GL ${m2(r.gl)}, difference ${m2(d)}. `;
+    if(!isNaN(d)&&d!==0){ cls="flag"; flag+="DIFFERENCE. "; }
+    if(isNaN(r.pa)) s+="Enter one period's accrual for the behaviour test. ";
+    else { const xs=r2(Math.max(0,carried-r.pa)); s+=`Excess over one period's accrual: ${m2(xs)}. `;
+      if(xs>0){ cls="flag"; flag+="BEHAVIOUR FAILURE. "; } }
+    if(carried<0||ex<0){ cls="flag"; flag+="NEGATIVE. "; s+="A refund or credit to claim, never a write-off. Get the statement of account first. "; }
+    if(!isNaN(d)&&d===0) s+="A nil difference is not a reconciled account. ";
+    if(proxy) s+="Accrued is the payroll journal's credit, a stated proxy. ";
+    return res(cls,esc(r.nm),m2(ex),(flag?`<b>${flag}</b>`:"")+esc(s.trim()),"r2-"+(i+1));
+  }).join("");
+}
+document.querySelectorAll('.calc [data-k]:not([data-k="proxy"]), #mvrows [data-c]').forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run1();}));
+document.querySelectorAll('.calc [data-k="proxy"], #liabrows [data-c]').forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-q]").forEach(b=>b.setAttribute("aria-pressed","false"));run2();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load1(b.dataset.p)));
+document.querySelectorAll(".presets [data-q]").forEach(b=>b.addEventListener("click",()=>load2(b.dataset.q)));
+
+renderSources(); renderRules(); renderLevels(); load1("nb"); load2("nb");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
