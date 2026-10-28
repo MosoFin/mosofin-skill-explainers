@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance Sheet Reconciliations Anatomy | MosoFin</title>
+<meta name="description" content="How the balance sheet reconciliations skill is built on main: a 161-line card, seven reference files, tools by step, sources and 7 open findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+  sup.c a{color:var(--mosofin);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-size:.8em}
+  .note{color:var(--muted);font-size:15px}
+</style>
+
+
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Balance sheet reconciliations</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">balance-sheet-reconciliations · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the balance sheet reconciliations skill, and what it does</h1>
+  <p class="lede">On main, the skill is a 161-line card and seven reference files. Pull request #1 merged the card format on 26 October 2026. A bookkeeping-audit commit, ad37a25, then changed the method on 27 October 2026. The skill gives each account a verdict on two sides: the GL side and the support side. An account without independent support is not reconciled. The skill posts nothing. This page shows how the files connect, the run stage by stage, the tool that each step names, and the source behind each step. It also shows the audit for the skill owner: one check passed and seven open findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md on main. The eight files total 1,195 lines</span></div>
+    <div class="stat"><span class="k">Description</span><span class="v">1,012</span><span class="s">characters of the limit of 1,024, from a YAML parse</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">80 · 10 · 52</span><span class="s">[auto] · [gated] · [manual] in the eight files on main</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">7 + 29</span><span class="s">Mosofin workflow tools, and typical evidence tools in 16 purpose rows. Steps name 20 of the 29. Nine have no step</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">7 open</span><span class="s">A1 and A3 to A8. A2 passed. The audit commit ad37a25 reports 7 earlier findings as fixed</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. The rules point to mosofin-protocol.md, 262 lines. Stage 2 points to gates.md, 147 lines. Stages 3 to 6 point to method.md, the largest file at 385 lines. Stage 4 also points to edge-cases.md, 79 lines, and stage 5 also to output.md, 43 lines. overview.md, 50 lines, and tools-and-glossary.md, 68 lines, are read on demand.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · two-sided verdict</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend · 6</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to H</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Map accounts, two sides</text>
+          <text x="48" y="272">Stage 4 · Find, investigate</text>
+          <text x="48" y="312">Stage 5 · Correct, roll, age</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="211" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="118" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">147</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">385</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="64" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">79</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="35" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">43</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="40" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">50</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="55" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">68</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–9</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read on demand</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. <b>method.md</b> holds Steps 0 to 9 and both entity scenarios. Step 1 has the table of 26 account types, and Step 8 has the seven sections of each account tab. <b>edge-cases.md</b> holds 18 edge cases. <b>gates.md</b> holds Gates 0 to 3 and the Gate 3 interview of 11 rows. <b>output.md</b> holds 9 general standards and 15 Mosofin additions. <b>tools-and-glossary.md</b> holds the 7 workflow tools, the 29 typical evidence tools and the glossary. Each bar uses the line count of the file on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Stage</th><th>Asks or reads</th><th>Computes</th><th>Hands on</th><th>Loads</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Intake</td><td>Eight questions A to H in one message. They ask for the path, entity, accounts, period end and outside support. They also ask for materiality, last period's rec, and preparer and reviewer. On the Mosofin path, it also asks for the write-off limit and its P&amp;L account. On the upload path, it gives a checklist of seven rows</td><td>Nothing. It reads no data before the user says yes to the read-back</td><td>The scope that the user accepts</td><td>SKILL.md, mosofin-protocol.md</td></tr>
+      <tr><td>2 · Gates 0–3</td><td>The workspace and the company files by name, the tool catalogue for each side of each account, and the company profile</td><td>The capability map, side by side</td><td>The tools that it can use, and the gaps</td><td>gates.md</td></tr>
+      <tr><td>3 · Steps 0–2</td><td>The trial balance, the chart, the GL detail, the agings and the journal entries, in one batch. It checks the <code>mock</code> flag</td><td>The source for each account from the table of 26 types. Both balances, each with its source and date. Clearing accounts first</td><td>Two balances for each account</td><td>method.md</td></tr>
+      <tr><td>4 · Steps 3–4</td><td>GL detail for each difference</td><td>The rec formula. Each item is timing, permanent or investigating. It records the checks that found nothing</td><td>Typed items</td><td>method.md, edge-cases.md</td></tr>
+      <tr><td>5 · Steps 5–8</td><td>The chart for real account names, and the activity for the roll-forward</td><td>Proposed entries, roll-forward and opening check, age and materiality flags, one tab for each account, and the coverage sheet</td><td>The workpaper. Excel only on a yes</td><td>method.md, output.md</td></tr>
+      <tr><td>6 · Step 9</td><td>An explicit yes, after the results</td><td>The decisions to keep: the account-to-source map, the threshold, the owners, the write-off limit and the always-zero accounts. Never balances</td><td>A client-scoped saved skill</td><td>method.md</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, the tools it names, and what stands behind it</p>
+  <p class="note">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>, with the same numbers. This page uses all five. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule.</p>
+  <p class="note">The Operations column places each tool where the skill's own files on main name it. The gates and the protocol name the workflow tools. method.md names the evidence tools step by step. edge-cases.md and output.md name no tool. Nine typical evidence tools appear only in the tools table and in no step: <code>get_account</code>, <code>get_journal_entry</code>, <code>search_credit_memos</code>, <code>search_vendor_credits</code>, <code>search_sales_receipts</code>, <code>search_transfers</code>, <code>read_item</code>, <code>search_attachables</code> and <code>get_attachable</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to H. Checks the workspace, the company files, the tool catalogue and the saved profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>invoke_datasource_api_tool</code> <code>get_skills</code> <code>get_my_skill</code> <code>get_company_info</code></td><td>The skill's shared protocol. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · question F</td><td>Asks for the materiality threshold. Suggests a basis and never assumes one</td><td>None named</td><td>[<a href="#src3">3</a>] A percentage threshold can be a first assessment, but a threshold alone has no basis in law or accounting literature. The $500 in the example is the owner's answer</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the evidence in one batch. Handles the error envelopes. A <code>mock</code> result can show the format but cannot support a signed rec</td><td><code>get_trial_balance</code> <code>get_balance_sheet</code> <code>search_accounts</code> <code>get_general_ledger</code> <code>get_aged_receivables</code> <code>get_aged_payables</code> <code>get_customer_balance</code> <code>get_vendor_balance</code> <code>search_journal_entries</code> <code>get_company_info</code></td><td>[<a href="#src2">2</a>] A reconciliation of summary information to supporting detail is a control activity. The GAO guide is a US federal government standard, used here for the idea only</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Gives each of 26 account types its source and its typical verdict on each side. An A/R or A/P aging from the same books is a mechanical check only</td><td><code>get_aged_receivables</code> <code>search_invoices</code> <code>get_aged_payables</code> <code>search_bills</code> <code>search_items</code> <code>search_tax_codes</code> <code>search_tax_rates</code> <code>get_general_ledger</code> <code>search_deposits</code></td><td>[<a href="#src1">1</a>] The subsidiary ledger total must equal the control account. The textbook describes a manual ledger. The "same system" rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Records the GL balance and the supporting balance, each with its source and date</td><td><code>get_trial_balance</code> <code>get_balance_sheet</code></td><td>No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Bridges GL to support. Types each item as timing, permanent or investigating</td><td>None named</td><td>No outside authority. The three types are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4</td><td>Checks the prior rec, cutoffs, mispostings, FX and rounding. Reviews the A/R and A/P aging. Records the checks that found nothing</td><td><code>get_general_ledger</code> <code>search_journal_entries</code> <code>search_classes</code> <code>search_departments</code> <code>get_aged_receivables</code> <code>get_aged_payables</code></td><td>[<a href="#src2">2</a>] The control activity is the check of summary against detail. The list of checks is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Proposes an entry for each permanent item. Writes off a residual only below the approved limit, to a P&amp;L account. Never adjusts a timing item</td><td><code>search_accounts</code></td><td>[<a href="#src5">5</a>] An auditor must evaluate the period-end process, which includes the adjusting entries. AS 2201 applies to audits of public companies. A private company uses it only as the reason for the practice. The $100 limit in the example is the owner's answer</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Rolls activity accounts forward. The opening check finds a closed period that changed, and logs a possible prior-period adjustment</td><td><code>get_general_ledger</code> <code>search_journal_entries</code> <code>search_invoices</code> <code>search_payments</code> <code>search_bills</code> <code>search_bill_payments</code></td><td>[<a href="#src4">4</a>] A prior-period adjustment is a fix for an error in an earlier period and changes opening retained earnings. The skill only flags. The owner and the accountant decide if an amount is material</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Ages each item. An item older than 3 months escalates. An item above the threshold needs resolution now</td><td>None named. The posting date comes from the Step 0 reads</td><td>[<a href="#src3">3</a>] The bulletin considers each misstatement separately and in total, not by size alone. The 3-month limit is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Builds one tab for each account in seven sections, and the coverage sheet. Gives a master workbook as an option. Asks before it makes an Excel file</td><td>None named</td><td>[<a href="#src2">2</a>] A rec is a control, so an account without support stays not reconciled. The four status values and the file name are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 6 · Step 9</td><td>Offers to save the decisions after the results, on an explicit yes. Never saves balances, item detail or the workpaper</td><td><code>create_skill</code></td><td>No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>No step</td><td>Listed as typical in tools-and-glossary.md only</td><td><code>get_account</code> <code>get_journal_entry</code> <code>search_credit_memos</code> <code>search_vendor_credits</code> <code>search_sales_receipts</code> <code>search_transfers</code> <code>read_item</code> <code>search_attachables</code> <code>get_attachable</code></td><td>Not applicable</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr id="src1"><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/7-2-describe-and-explain-the-purpose-of-special-journals-and-their-importance-to-stakeholders" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 7.2 Describe and Explain the Purpose of Special Journals and Their Importance to Stakeholders</a></td><td>A subsidiary ledger must agree with its control account (accounts receivable subsidiary ledger)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr id="src2"><td>2</td><td><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" style="color:var(--mosofin)">GAO: Internal Control Standards (Green Book guidance, GAO-01-1008G)</a></td><td>A reconciliation of summary to detail is a control. The 2001 guide. The Green Book had a revision in 2025</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr id="src3"><td>3</td><td><a href="https://www.sec.gov/interps/account/sab99.htm" style="color:var(--mosofin)">SEC: Staff Accounting Bulletin No. 99, Materiality</a></td><td>Why the skill asks for the threshold, and why age escalates an item of any size. Staff views, not Commission rules</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr id="src4"><td>4</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/14-4-compare-and-contrast-owners-equity-versus-retained-earnings" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 14.4 Compare and Contrast Owners' Equity versus Retained Earnings</a></td><td>What a prior-period adjustment is (prior period adjustments)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr id="src5"><td>5</td><td><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS2201" style="color:var(--mosofin)">PCAOB: AS 2201, An Audit of Internal Control Over Financial Reporting That Is Integrated with An Audit of Financial Statements</a></td><td>Why period-end recs and adjusting entries matter (period-end financial reporting process). Audits of public companies</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note" style="font-size:14.5px">The audit checked the five sources on 28 Oct 2026 through search results. Nobody opened the pages. All five are US sources. Some items have no outside authority behind them. They are the three item types, the 3-month escalation, the four status values, the coverage sheet and the verdict tags. The $500 threshold, the $100 write-off limit and every example figure are our own invention. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">One check passed, seven findings open for the skill owner</p>
+  <p class="note">This site did not change the skill. Each finding below is open on main, read on 28 Oct 2026.</p>
+  <div class="findings">
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter reports 50 findings on SKILL.md on main, over 1,802 words. 35 findings are hard, such as long sentences, semicolons and passives. The skill owner can fix the card in a later pass.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. Every skill that the files name is in the library</h3>
+      <p>The reference files name ten skills in code format, from accruals-and-deferrals to vendor-statement-reconciliation. inventory-to-gl-reconciliation is one of them. The description also names month-end-close-checklist. All eleven are in <code>skills/</code> on main. This is no finding.</p>
+      <span class="where">SKILL.md, method.md, output.md · no change needed</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A3. Gate 3 points to the wrong step for one check</h3>
+      <p>Gate 3 says that the carry-forward check is "in Step 8". Step 8 Section 6 holds the carry-forward table. But the opening check, which compares the opening balance with the prior rec, is in Step 6. The pointer is right for one check only. This is a small problem.</p>
+      <span class="where">references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. Only the Mosofin path asks for the write-off limit</h3>
+      <p>The card asks for the approved write-off limit and its P&amp;L account on the Mosofin path only. The Gate 3 table and the upload checklist do not ask for them. Step 5 needs both on each path.</p>
+      <span class="where">SKILL.md · Mosofin path and upload checklist · references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A5. The status list has gaps</h3>
+      <p>No status value fits an A/R or A/P account with the same-system tie done and the independent test not yet done. The list also does not say if an account is "Reconciled" when permanent items with proposed entries explain each difference. The worked example uses "Reconciled" for prepaid and accrued expenses. That is our reading. The status is true only after a person posts the proposed entries. Until then, the books do not agree with the support.</p>
+      <span class="where">references/method.md · Step 8 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A6. "Older than 3 months" has no unit</h3>
+      <p>Step 7 says "Items aged &gt; 3 months should escalate". It does not say days or calendar months. In the worked example, a 410 clearing line is 92 days old at 30 September. That is exactly three calendar months, so the line is at the limit.</p>
+      <span class="where">references/method.md · Step 7 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A7. The read-back says "all" but names six kinds of support</h3>
+      <p>Question C lets the user choose "all balance sheet accounts". Step 1 says never guess a source, so an account type that is not in the table stops the run for a question. That is correct. But the read-back example says "all balance sheet accounts" and names only six kinds of support. The worked example names seven accounts. That is the example's choice.</p>
+      <span class="where">SKILL.md · question C and read-back · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A8. The description is almost at its limit</h3>
+      <p>The description has 1,012 characters of the limit of 1,024. A change of more than 12 characters breaks the limit.</p>
+      <span class="where">SKILL.md · front matter · open</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>History: the bookkeeping audit changed the method</h3>
+      <p>The commit ad37a25 reports 7 fixed, 0 partly fixed and 0 rejected. An A/R or A/P aging tie from the same books is now a mechanical check, not independent support. The skill tests a clearing account as "zero, every line explained". A write-off goes to a P&amp;L account below an approved limit, never to a suspense account. The commit added the opening check and the dates for sign-off.</p>
+      <span class="where">SKILL.md, method.md, edge-cases.md, overview.md, tools-and-glossary.md · fixed on main in ad37a25</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Site owner</h2>
+  <p class="sec-title">Open conflicts between the explainer pages</p>
+  <div class="findings">
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The September balances of month-end-close-checklist disagree with other pages</h3>
+      <p>The month-end-close-checklist pages give Northbrook Trading A/R of 126,500, prepaid of 15,000, accrued liabilities of 18,200 and A/P of 61,400 at September. The A/R, prepaid and accrual pages give other figures. The pages of this skill do not use the checklist figures and do not cite them. The site owner must choose one set.</p>
+      <span class="where">site/skills/month-end-close-checklist · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Does Northbrook Trading hold stock?</h3>
+      <p>month-end-close-checklist says that Northbrook has no inventory account. ap-accrual-cutoff and accruals-and-deferrals post stock to Inventory. The pages of this skill do not name an Inventory account, and use the AP-cutoff 14,650 only for its credit to accrued expenses.</p>
+      <span class="where">site/skills/month-end-close-checklist, ap-accrual-cutoff, accruals-and-deferrals · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The eight files on main have 161, 79, 147, 385, 262, 43, 50 and 68 lines.</span></li>
+    <li><span class="ok">PASS</span><span>The description has 1,012 characters, under the limit of 1,024.</span></li>
+    <li><span class="ok">PASS</span><span>The eleven skills that the files name are all in <code>skills/</code> on main.</span></li>
+    <li><span class="ok">PASS</span><span>"Never writes, updates or deletes anything, in any system" is in the card. Step 5 and output.md say that every entry is a proposal.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 80 [auto], 10 [gated] and 52 [manual] in the eight files.</span></li>
+    <li><span class="ok">PASS</span><span>The card has 8 intake rows and 6 stages. method.md has Steps 0 to 9 and 26 account types. edge-cases.md has 18 edge cases. gates.md has Gates 0 to 3.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p class="note" style="font-size:14.5px">Nobody ran the skill live against a company file. The audit did not read the tool catalogue, so nothing here shows which reads Gate 2 finds. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/balance-sheet-reconciliations">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The history of the skill on main has eight commits. daa6d6a (30 Sep 2026) added the skill in Wave 2. d86fa27 (20 Oct) limits approved=true to reads. 4d5637c (21 Oct) makes spreadsheet and PDF output ask first. c667dc1, 8729449, d4ef930 and 5d38260 (25 Oct) delete references to skills outside the library and split the file. ad37a25 (27 Oct) holds the bookkeeping-audit fixes. A live run, a catalogue read, and fixes for A1 and A3 to A8 are still to do.</footer>
+
+</div>
