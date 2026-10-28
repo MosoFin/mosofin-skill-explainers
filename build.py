@@ -128,8 +128,8 @@ def write_tracker(rows):
             w.writerow({c: r.get(c, "") for c in COLUMNS})
 
 def sort_key(r):
-    has = any(r[k] != "todo" for k, *_ in KINDS)
-    return (0 if has else 1, r["genre"], r["skill"])
+    has_public_pages = any(r[k] == "published" for k, *_ in KINDS)
+    return (0 if has_public_pages else 1, r["genre"], r["skill"])
 
 def title_of(r):
     return r["title"] or r["skill"].replace("-", " ").capitalize()
@@ -414,8 +414,7 @@ def landing(r):
 
 def chip(r, k):
     st = r[k]
-    if st == "todo": return '<td class="c"><span class="dash">—</span></td>'
-    if st == "internal": return '<td class="c"><span class="dash">—</span></td>'
+    if st != "published": return '<td class="c"><span class="pill soon">Coming soon</span></td>'
     anchor = {"plain": "Read overview", "learn": "Step-by-step guide", "anatomy": "Review skill design"}[k]
     return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill ok">{anchor}</span></a></td>'
 
@@ -469,7 +468,7 @@ def index(rows):
   </div>
 </section>
 <section id="all-skills" class="library-section">
-  <div class="library-heading"><div><span class="label">THE LIBRARY</span><h2>Explore all skills</h2><p>Search finance workflows by skill name or topic.</p></div><span class="library-total">{n} skills</span></div>
+  <div class="library-heading"><div><span class="label">THE LIBRARY</span><h2>Explore all skills</h2><p>Search by skill name or topic. Published guides appear first. Other skills are marked coming soon.</p></div><span class="library-total">{n} skills</span></div>
   <div class="library-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="skill-search" type="search" placeholder="Search skills, e.g. reconciliation" autocomplete="off" aria-label="Search skills"></label><div class="genre-filters" role="group" aria-label="Filter skills by category"><button type="button" class="filter-button is-active" data-genre="all" aria-pressed="true">All</button><button type="button" class="filter-button" data-genre="analysis" aria-pressed="false">Analysis</button><button type="button" class="filter-button" data-genre="dashboard" aria-pressed="false">Dashboards</button></div></div>
   <p id="skill-result-count" class="result-count" aria-live="polite">Showing {min(n, 10)} of {n} skills</p>
   <div class="tbl"><table>
