@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Accrual Cutoff Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked AP accrual examples, from one delivery with no bill to small items that add up, with an accrual calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .bills{min-width:1080px}
+  .bills input:disabled{opacity:.35}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← AP accrual cutoff</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · ap-accrual-cutoff · learning guide</span>
+  <h1>From one delivery with no bill to a full month-end accrual schedule</h1>
+  <p class="lede">This page shows how the skill finds and prices the costs of a month that have no bill yet, <b>one level at a time</b>. It starts with one delivery. It ends with the requests that the skill refuses. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are two sections of an OpenStax textbook, two US audit standards, an IRS publication and an older GAO tool. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter up to 10 items of your own. The page prices each item and applies your limit.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading. It keeps its books in US dollars on the accrual basis, with a calendar year. The month is Tuesday 1 September to Wednesday 30 September 2026, and the books close on Saturday 10 October.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Price your own month-end accruals</h2>
+  <p class="muted">Enter up to 10 items, or load an example. The page runs Steps 1 to 4 and Step 6 from <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="nb">Northbrook, September 2026, $500</button>
+      <button type="button" data-p="tight">Same month, tighter $1,000 limit</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The period</legend>
+        <label class="field"><span>Period end</span><input data-k="pe" type="date"></label>
+      </fieldset>
+      <fieldset><legend>The limit</legend>
+        <label class="field"><span>Materiality (blank: accrue all)</span><input data-k="mat" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Accrual candidates">
+      <thead><tr><th>Type</th><th>Item</th><th>Qty received</th><th>Unit price</th><th>Invoiced to period end</th><th>Amount</th><th>Service start</th><th>Service end</th><th>Prior amount</th><th>Bill in window</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <p class="fine">Goods received: quantity × price − amount invoiced. If the result is below zero, the page shows "billed ahead of receipt: check" and accrues 0. That is the page's choice, not a rule of the skill. Late invoice: the page counts days in full, and it accrues the part of the work up to the period end. Recurring: the page flags a change of 25% or more from the prior amount. The skill says only "significant", so the 25% is the page's choice. The page skips an item below your limit. It flags the skipped total when that total is equal to or more than your limit. That test is the example's choice.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? Which period, and the accrual or the cash basis? Where do you record deliveries? How many days after the month end to look for late bills? Which account holds accrued liabilities? Can you recover tax, and where? Is there a materiality limit?</div>
+    <div><b>Needs</b>Open purchase orders with line detail, and proof of delivery for goods received. The chart of accounts. The bills of the month and of the late-bill window, with the bills from the inbox that are not in the books yet. Supplier history and last month's accruals help.</div>
+    <div><b>Gives back</b>Seven sheets: Accrual Summary, GRNI Accruals, Recurring Accruals, Subsequent Invoices, Proposed JEs, Exceptions / Open Items and Coverage. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to your books. It never accrues an open order without proof of delivery, and it never counts a cost twice.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. MosoFin found each one on 28 October 2026 in search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The seven intake questions, the three groups and their order are the skill's own rules. The $500 limit and the 1 to 10 October window are the example's choices. The same is true for the seven sheets and the test of the skipped items together. MosoFin made up Northbrook Trading, its suppliers and every figure in the examples.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a commit from the bookkeeping audit followed on 27 October 2026. This page describes that version. All figures come from made-up worked examples, not from your data. All six sources are US sources, and the IRS publication covers tax only. Your books and your tax return can differ. Ask your accountant which rules apply to you. This page explains <code>ap-accrual-cutoff</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-accrual-cutoff">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 4.2 Discuss the Adjustment Process and Illustrate Common Types of Adjusting Entries", u:"https://openstax.org/books/principles-financial-accounting/pages/4-2-discuss-the-adjustment-process-and-illustrate-common-types-of-adjusting-entries", at:"accrued expenses", checked:"2026-10-28", via:"from search results, page not opened", w:"Accrued expenses are costs of a period that the business did not record yet and did not pay. They create a liability that the business must pay later. The matching principle puts each cost with the income that it helped to earn."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 12.1 Identify and Describe Current Liabilities", u:"https://openstax.org/books/principles-financial-accounting/pages/12-1-identify-and-describe-current-liabilities", checked:"2026-10-28", via:"from search results, page not opened", w:"A liability needs a future payment of assets or services, and it results from an earlier business activity or transaction. Accounts payable is what a business owes suppliers after a purchase on credit."},
+  {t:"PCAOB: AS 1105, Audit Evidence", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS1105", at:"AS 1105.11, the assertion categories", checked:"2026-10-28", via:"from search results, page not opened", w:"The assertions of management include existence or occurrence and completeness. Recorded transactions occurred in the period, and all transactions that belong there are in. This standard is for audits of US public companies. We cite it as background only."},
+  {t:"PCAOB: AS 2801, Subsequent Events", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS2801", at:"AS 2801.03 and .05", checked:"2026-10-28", via:"from search results, page not opened", w:"Some events after the balance-sheet date give more evidence about conditions at that date. They can call for an adjustment. Other events concern conditions that started later, and they generally call for disclosure only. This is a US audit standard. We cite it as background only."},
+  {t:"IRS: Publication 538 (01/2022), Accounting Periods and Methods", u:"https://www.irs.gov/publications/p538", at:"Accrual method, \"Expenses\" (all-events test, economic performance)", checked:"2026-10-28", via:"from search results, page not opened", w:"Under an accrual method, you generally deduct a business cost when the all-events test is met and economic performance occurs. In its example, office supplies that arrived with the bill in December 2020 count for 2020, although payment came in January 2021. A recurring-item exception has its own conditions. This is US tax only."},
+  {t:"GAO: Internal Control Management and Evaluation Tool (GAO-01-1008G), based on the Standards for Internal Control in the Federal Government (the Green Book)", u:"https://www.gao.gov/assets/gao-01-1008g.pdf", at:"control activities, \"Recording of Transactions and Events\"", checked:"2026-10-28", via:"from search results, page not opened", w:"The tool lists prompt and proper recording of transactions and events as a control activity. It is an older US federal tool from 2001. We did not check the wording of the current Green Book."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files on main (markdown bold, italic and backticks removed). */
+const Q = {
+  q1:{q:"The mistake it catches is a month that looks cheaper than it was.", w:"SKILL.md · AP accrual cutoff"},
+  q2:{q:"Never treats an open purchase order as received without evidence", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"spend is what was already billed, the one population that needs no accrual.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"a cost is GRNI, a subsequent invoice or a recurring accrual — only one — and every PO-to-bill match says whether it was linked or inferred.", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"For each line: GRN qty × PO unit price = expected accrual value", w:"references/method.md · Step 1 — Identify accrual candidates from open POs (GRNI)"},
+  q6:{q:"goods received in an earlier month and still unbilled are GRNI too; receipts dated after period end are excluded", w:"references/method.md · Step 1 — Identify accrual candidates from open POs (GRNI)"},
+  q7:{q:"a bill dated after period end for these goods leaves the line as GRNI here and is excluded from Step 3.", w:"references/method.md · Step 1 — Identify accrual candidates from open POs (GRNI)"},
+  q8:{q:"an unreceived order is a commitment, not a liability, and accruing it overstates costs.", w:"references/edge-cases.md · Edge Cases"},
+  q9:{q:"The service period is the test — not the invoice date:", w:"references/method.md · Step 3 — Identify post-period invoices for in-period services"},
+  q10:{q:"Service period straddles the cutoff → accrue the in-period portion (pro rata)", w:"references/method.md · Step 3 — Identify post-period invoices for in-period services"},
+  q11:{q:"Where the bill does not state its service period, that judgment is [manual] — record it in the exceptions sheet rather than guessing a split.", w:"references/method.md · Step 3 — Identify post-period invoices for in-period services"},
+  q12:{q:"A recurring vendor whose bill for this service period is found in the subsequent window is priced from that bill under Step 3 and dropped from Step 2.", w:"references/method.md · Step 4 — Calculate the accrual amount"},
+  q13:{q:"Don't silently post a 50% larger accrual.", w:"references/edge-cases.md · Edge Cases"},
+  q14:{q:"Goods received and held at period end are stock or equipment, not this month's expense.", w:"references/method.md · Step 5 — Build the accrual JE (hand off to journal-entry-builder)"},
+  q15:{q:"The sum of skipped items must remain immaterial in aggregate", w:"references/method.md · Step 6 — Materiality screen"},
+  q16:{q:"a bill dated on or before period end is not an accrual — it should simply be posted.", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"A cost goes in its own month", r:Q.q1, cites:[1],
+    plain:"The skill looks for costs of the month that have no bill in the books yet. Without them, the month shows less cost than it had.",
+    backed:"Accrued expenses are costs of a period that the business did not record or pay yet. They create a liability.{1}" },
+  { id:"2", title:"No proof of delivery, no accrual", r:Q.q2, cites:[2],
+    plain:"The skill asks where you record deliveries. It accrues an order line only when a record shows that the goods arrived.",
+    backed:"A liability results from an earlier business activity or transaction.{2} This page reads a delivery as that activity. The textbook does not discuss purchase orders." },
+  { id:"3", title:"An order is a commitment", r:Q.q8, cites:[3],
+    plain:"An order that did not arrive stays out of the accruals. The skill lists it as an open order.",
+    backed:"A US audit standard lists occurrence among the assertions of management: recorded transactions occurred in the period.{3} A small business does not apply that standard." },
+  { id:"4", title:"Quantity received × order price", r:Q.q5, cites:[],
+    plain:"The skill takes the quantity that arrived by the period end, multiplies it by the price on the order, and subtracts the amount already billed." },
+  { id:"5", title:"The service period decides", r:Q.q9, cites:[4],
+    plain:"For a bill that comes after the month end, the dates of the work decide the month. The date of the bill does not.",
+    backed:"A US audit standard separates later events that give more evidence about conditions at the balance-sheet date from events about new conditions.{4} Only the first kind can call for an adjustment." },
+  { id:"6", title:"The receipt date decides", r:Q.q6, cites:[5],
+    plain:"Goods that arrived in an earlier month and still have no bill count too. Goods that arrive after the period end do not.",
+    backed:"For US tax, an accrual method generally deducts a cost when the all-events test is met and economic performance occurs.{5} The date of payment does not decide. This is a tax rule only." },
+  { id:"7", title:"Split a straddle by days", r:Q.q10, cites:[],
+    plain:"When the work crosses the month end, the skill accrues the part inside the month. It splits the amount in proportion to the days on each side." },
+  { id:"8", title:"No dates, no guess", r:Q.q11, cites:[],
+    plain:"If a late bill shows no dates of work, the skill puts it on the Exceptions sheet. A person decides the split." },
+  { id:"9", title:"One cost, one place", r:Q.q4, cites:[],
+    plain:"Each cost goes into one group only: goods received, a late bill or a regular supplier. Each match of a bill to an order shows how the skill made it." },
+  { id:"10", title:"Stock is not this month's cost", r:Q.q14, cites:[],
+    plain:"The debit goes to the account that the real bill will use. For goods on the shelf, that is stock (inventory)." },
+  { id:"11", title:"Small items can add up", r:Q.q15, cites:[],
+    plain:"The skill can skip items below your limit, and it lists them. It also tests their total." },
+  { id:"12", title:"A bill dated in the month is a bill", r:Q.q16, cites:[],
+    plain:"A bill in the inbox with a date on or before the period end goes into the books as a normal bill. It is not an accrual." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const LEVELS = [
+  { tier:"Goods received, not invoiced · Northbrook Trading, September 2026" },
+  { n:1, title:"One delivery, no bill",
+    chips:["Purchase order","Warehouse log","Bills"], src:"Rules 4 and 10", cites:[1,2],
+    situation:"Northbrook ordered 400 units from Ridgeway Wholesale on PO-2041, at $12.00 each. The warehouse log shows that all 400 arrived on Tuesday 29 September (GRN-0917). No bill is in the books on 30 September.",
+    facts:["Accrued expenses are costs of a period that the business did not record or pay yet. They create a liability that the business must pay later "+C(1)+".",
+           "A liability results from an earlier business activity or transaction. Accounts payable is what a business owes suppliers after a purchase on credit "+C(2)+".",
+           "This page reads the delivery as that earlier activity. That step is our own reading, and the textbook does not discuss purchase orders."],
+    visual:{type:"table",
+      head:["PO","Line","Received to 30 Sep","Unit price","Invoiced to 30 Sep","GRNI","Debit"],
+      rows:[["PO-2041","1","400","$12.00","$0.00","$4,800.00","Inventory"]]},
+    rules:[Q.q5, Q.q14, Q.q7],
+    math:[["Received × price: 400 × 12.00","$4,800.00"],["Invoiced to 30 September","$0.00"],["GRNI to accrue: 4,800 − 0","$4,800.00",1],["Entry: DR Inventory, CR Accrued Expenses","$4,800.00",1],["Reversal, Thu 1 Oct: DR Accrued Expenses, CR Inventory","$4,800.00"],["Bill RW-8840, Tue 6 Oct, posts to Inventory","$4,800.00"],["Inventory after October: 4,800 − 4,800 + 4,800","$4,800.00",1],["September cost from this item","$0.00"]],
+    verdict:["ok","The skill drafts DR Inventory 4,800.00 and CR Accrued Expenses 4,800.00, with a reversal on 1 October. The memo names Ridgeway, PO-2041 line 1 and GRN-0917, and says that the bill is due in October. The goods are stock, so September cost does not change. The bill of 6 October stays with the goods.","GRNI"] },
+
+  { n:2, title:"Received, or only ordered?",
+    chips:["Purchase orders","Warehouse log","Bills"], src:"Rules 2, 3, 6 and 9", cites:[2,3],
+    situation:"Two more orders are open. PO-2033 is from Tuesday 14 July, so the skill searches from the oldest open order and not from 1 September. PO-2044 is from Friday 25 September, and nothing arrived.",
+    facts:["A liability results from an earlier business activity or transaction "+C(2)+". An order with no delivery has no such activity yet. That is our own reading.",
+           "A US audit standard names two assertions: completeness, where everything that belongs is in, and occurrence, where each recorded item happened in the period "+C(3)+".",
+           "Auditors use the word cutoff for tests on both sides of the period end. That is our summary. A small business does not apply that standard."],
+    visual:{type:"table",
+      head:["PO line","Ordered","Received to 30 Sep","Unit price","Invoiced to 30 Sep","GRNI"],
+      rows:[["PO-2033 line 1","200","200 on Mon 31 Aug","$15.00","$3,000.00 (RW-8812, inferred)","$0.00"],["PO-2033 line 2","150","90 on Fri 18 Sep","$20.00","$0.00","$1,800.00"],["PO-2044 line 1","300",["0","bad"],"$10.00","$0.00","$0.00"]],
+      total:["GRNI, three levels","","","","","$6,600.00"]},
+    rules:[Q.q6, Q.q2, Q.q8, Q.q4],
+    math:[["PO-2033 line 1: 200 × 15.00 − 3,000","$0.00"],["PO-2033 line 2: 90 × 20.00 − 0","$1,800.00"],["PO-2044: 0 received","$0.00"],["GRNI: 4,800 + 0 + 1,800 + 0","$6,600.00",1],["Not received, line 2: 60 × 20.00","$1,200.00"],["Not received, PO-2044: 300 × 10.00","$3,000.00"],["Open orders, not accrued: 1,200 + 3,000","$4,200.00",1]],
+    verdict:["note","GRNI is $6,600. Bill RW-8812 shows no order number, so the skill matches it by supplier, date, amount and description. It labels the match as inferred and puts it on the Exceptions sheet. The $4,200 of open orders appears only as \"open orders, not received\".","$6,600"] },
+
+  { tier:"Late bills and regular suppliers" },
+  { n:3, title:"Bills that arrive late",
+    chips:["Bills, 1 to 10 October","Inbox"], src:"Rules 5, 7 and 8", cites:[4],
+    situation:"The owner agreed to search for late bills from 1 to 10 October, the close date. Five bills dated in that window are for September work, October work or goods. The owner also sent PD-305 from the inbox.",
+    facts:["A US audit standard separates later events that give more evidence about conditions at the balance-sheet date from events about conditions that started later "+C(4)+".",
+           "The first kind can call for an adjustment, and the second kind generally calls for disclosure only "+C(4)+". The skill applies the same idea with the service period. That link is our own reading."],
+    visual:{type:"table",
+      head:["Supplier","Invoice","Date","Service period","Amount","Accrued"],
+      rows:[["Lakeside Freight","LF-7781","Fri 2 Oct","1–30 Sep","$2,600.00","$2,600.00"],["Westfield Consulting","WC-118","Thu 8 Oct","16 Sep–15 Oct","$6,000.00","$3,000.00"],["Brightline Software","BS-5521","Thu 1 Oct","1–31 Oct","$1,200.00","$0.00"],["Pinnacle Design","PD-305","Wed 7 Oct",["not stated","bad"],"$2,400.00","$0.00"],["Ridgeway Wholesale","RW-8840","Tue 6 Oct","goods of PO-2041","$4,800.00","$0.00"]],
+      total:["Late invoices","","","","","$5,600.00"]},
+    rules:[Q.q9, Q.q10, Q.q11],
+    math:[["LF-7781: all work in September","$2,600.00"],["WC-118: 16 Sep to 15 Oct, in full days","30 days"],["Days in September: 16 to 30 Sep","15 days"],["6,000 × 15 ÷ 30","$3,000.00",1],["BS-5521: all work in October","$0.00"],["PD-305: no dates, to Exceptions","$0.00"],["RW-8840: already in GRNI (Level 1)","$0.00"],["Late invoices: 2,600 + 3,000","$5,600.00",1]],
+    verdict:["note","The skill accrues $5,600 for late bills. It splits Westfield by days, because the skill reads pro rata as a split by days. Pinnacle's $2,400 goes to Exceptions with no guessed split. If the work was all in September, up to $2,400 of September cost is missing.","$5,600"] },
+
+  { n:4, title:"Regular suppliers, and one cost in one place",
+    chips:["Supplier history","Contracts","Bills"], src:"Rule 9", cites:[1],
+    situation:"The skill reads supplier history and finds the suppliers that bill each month. The owner agrees to the list. The owner removes Power Co, because the accruals-and-deferrals run already accrued $2,100 of electricity for September.",
+    facts:["An accrued expense is a cost of the period that the business did not record or pay yet "+C(1)+". A September service with no bill is that kind of cost.",
+           "The skill does not say which amount wins when the last bill and a contract differ. In this example, the owner approves the contract amount for Crestline."],
+    visual:{type:"table",
+      head:["Supplier","Jun / Jul / Aug","Expected Sep","Basis","Change","Decision"],
+      rows:[["Summit Cleaning","950 / 950 / 950","$950.00","last bill","0%","accrue"],["Crestline Logistics","1,000 / 1,000 / 1,000","$1,500.00","contract letter",["+50%","bad"],"flag, owner approves"],["Metro Shred","120 / 120 / 120","$120.00","last bill","0%","see Level 5"],["Keystone Pest Control","350 / 350 / 350","$350.00","last bill","0%","see Level 5"],["Lakeside Freight","2,450 / 2,700 / 2,550","—","bill in window","—","moved to Level 3"],["Power Co","bills each month","—","—","—","excluded by the owner"]]},
+    rules:[Q.q12, Q.q13, Q.q4],
+    math:[["Summit: last bill","$950.00"],["Crestline change: (1,500 − 1,000) ÷ 1,000","+50%",1],["Crestline, after the owner approves it","$1,500.00"],["Lakeside: priced from LF-7781 in Level 3","$0.00 here"],["Power Co: accrued by the other skill","$0.00 here"],["Regular suppliers accrued: 950 + 1,500","$2,450.00",1]],
+    verdict:["flag","The skill accrues $2,450 for regular suppliers. It flags the Crestline increase and asks the owner, and the owner approves $1,500 from the contract letter. Lakeside and Power Co each appear once, in another place.","+50%"] },
+
+  { tier:"The schedule, and the limits of the skill" },
+  { n:5, title:"Entries, reversals, roll-forward and small items",
+    chips:["Proposed entries","Trial balance","Journal entries"], src:"Rules 1 and 11", cites:[1,6],
+    situation:"Northbrook set a materiality limit of $500. Metro Shred at $120 and Keystone at $350 are each below it. The skill builds the entries, the reversals and the roll-forward of Accrued Expenses.",
+    facts:["An accrued expense creates a liability "+C(1)+". So every entry credits Accrued Expenses, the account that the owner named.",
+           "An older US federal tool lists prompt and proper recording of transactions as a basic control "+C(6)+". It dates from 2001. We did not check the wording of the current Green Book."],
+    visual:{type:"table",
+      head:["Group","Accrued","Debit"],
+      rows:[["Goods received","$6,600.00","Inventory 6,600"],["Late invoices","$5,600.00","Freight and Delivery 2,600, IT Services 3,000"],["Regular suppliers","$2,450.00","Cleaning 950, Warehouse Storage 1,500"],["Skipped, below $500","$470.00","none: listed only"]],
+      total:["Proposed accruals","$14,650.00","CR Accrued Expenses"]},
+    rules:[Q.q15, Q.q1],
+    math:[["6,600 + 5,600 + 2,450","$14,650.00",1],["Stock: 4,800 + 1,800","$6,600.00"],["September cost: 2,600 + 3,000 + 950 + 1,500","$8,050.00"],["Check: 6,600 + 8,050","$14,650.00",1],["Reversals, Thu 1 Oct, six lines","$14,650.00"],["Skipped: 120 + 350, below 500","$470.00"],["Roll-forward: 1,950 − 1,950 + 14,650 ± 0","$14,650.00",1]],
+    verdict:["ok","September cost rises by $8,050, and stock rises by $6,600. The skipped $470 is below $500, so this example treats it as small in total. The skill does not say what to compare the total with, so that test is the example's choice. The opening $1,950 was Summit and Crestline for August, and both reversals posted on Tuesday 1 September.","$14,650"] },
+
+  { n:6, title:"What it will not do, and where other items go",
+    chips:["Inbox","Owner requests"], src:"Rules 2, 3 and 12", cites:[3,5],
+    situation:"The owner sends bill HOS-4410 from Harbor Office Supply, dated Wednesday 30 September, for $640. Then the owner makes three requests that the skill refuses.",
+    facts:["An accrual for an order that never arrived is an occurrence problem in audit terms "+C(3)+". The skill refuses it.",
+           "For US tax, an accrual method generally deducts a cost when the all-events test is met and economic performance occurs "+C(5)+". In the publication's example, office supplies that arrived with the bill in December 2020 count for 2020, although payment came in January 2021 "+C(5)+".",
+           "A recurring-item exception has its own conditions "+C(5)+". This is US tax only. Your books and your tax return can differ, so ask your accountant."],
+    visual:{type:"table",
+      head:["Item or request","What the skill does"],
+      rows:[["HOS-4410, $640, dated 30 Sep","post it as a September bill"],["\"Just accrue all the open POs\"",["declines: no proof of delivery, $4,200","bad"]],["\"Use the vendor spend report\"",["declines: spend is already billed","bad"]],["\"Post these in QuickBooks\"",["declines once, gives the drafts","bad"]],["Insurance paid 1 Sep, $7,200","prepaid: goes to prepaid-amortization-schedule"],["Electricity and audit fees","done by accruals-and-deferrals"]]},
+    rules:[Q.q16, Q.q2, Q.q3],
+    math:[["HOS-4410: through the normal bill","+$640.00 to September"],["Refused open orders: 1,200 + 3,000","$4,200.00"],["Exceptions, due Fri 9 Oct","5"],["Entries the skill posts","0",1]],
+    verdict:["flag","The skill writes nothing to the books. Every entry is a draft for a person to post. Five items go to Exceptions: PD-305, the inferred match, the Crestline increase, PO-2044 and HOS-4410. Each has an owner, an action and the effect if nobody acts.","NOT POSTED"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    const vis = table(L.visual);
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.map(f=>`<div class="fact">${f}</div>`).join("");
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: up to 10 rows of three types --- */
+const ROWS = 10;
+const NB = [
+  ["grni","PO-2041",400,12,0,"","","","",false],
+  ["grni","PO-2033 L1",200,15,3000,"","","","",false],
+  ["grni","PO-2033 L2",90,20,0,"","","","",false],
+  ["late","LF-7781","","","",2600,"2026-09-01","2026-09-30","",false],
+  ["late","WC-118","","","",6000,"2026-09-16","2026-10-15","",false],
+  ["late","BS-5521","","","",1200,"2026-10-01","2026-10-31","",false],
+  ["rec","Summit Cleaning","","","",950,"","",950,false],
+  ["rec","Crestline Logistics","","","",1500,"","",1000,false],
+  ["rec","Metro Shred","","","",120,"","",120,false],
+  ["rec","Keystone Pest Control","","","",350,"","",350,false],
+];
+const PRESETS = { nb:{pe:"2026-09-30", mat:500, rows:NB}, tight:{pe:"2026-09-30", mat:1000, rows:NB}, blank:{pe:"", mat:"", rows:[]} };
+const KEYS=["t","i","q","p","inv","a","s","e","pr","f"];
+const USE={grni:["q","p","inv"], late:["a","s","e"], rec:["a","pr","f"]};
+const tb=document.getElementById("rows");
+for(let i=1;i<=ROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><select data-c="t" aria-label="Row ${i} type"><option value="grni">Goods received</option><option value="late">Late invoice</option><option value="rec">Recurring</option></select></td>
+    <td><input data-c="i" aria-label="Row ${i} item" style="min-width:140px"></td>
+    <td><input data-c="q" class="n" inputmode="decimal" aria-label="Row ${i} quantity received" style="width:80px"></td>
+    <td><input data-c="p" class="n" inputmode="decimal" aria-label="Row ${i} unit price" style="width:80px"></td>
+    <td><input data-c="inv" class="n" inputmode="decimal" aria-label="Row ${i} invoiced to period end" style="width:100px"></td>
+    <td><input data-c="a" class="n" inputmode="decimal" aria-label="Row ${i} amount" style="width:100px"></td>
+    <td><input data-c="s" type="date" aria-label="Row ${i} service start"></td>
+    <td><input data-c="e" type="date" aria-label="Row ${i} service end"></td>
+    <td><input data-c="pr" class="n" inputmode="decimal" aria-label="Row ${i} prior amount" style="width:90px"></td>
+    <td style="text-align:center"><input data-c="f" type="checkbox" aria-label="Row ${i} bill found in window"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { if(String(s).trim()==="") return NaN; const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const dnum = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?Date.UTC(+m[1],+m[2]-1,+m[3])/86400000:NaN; };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n*86400000); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const r2 = x => Math.round(x*100)/100;
+const TN={grni:"Goods received", late:"Late invoice", rec:"Recurring"};
+
+function lock(tr){ const t=tr.querySelector('[data-c="t"]').value;
+  ["q","p","inv","a","s","e","pr","f"].forEach(k=>{ tr.querySelector(`[data-c="${k}"]`).disabled=!USE[t].includes(k); }); }
+function load(p){
+  const P=PRESETS[p];
+  fld("pe").value=P.pe; fld("mat").value=P.mat;
+  [...tb.rows].forEach((tr,i)=>{ const b=P.rows[i]||["grni","","","","","","","","",false];
+    KEYS.forEach((k,j)=>{ const inp=tr.querySelector(`[data-c="${k}"]`); if(inp.type==="checkbox") inp.checked=!!b[j]; else inp.value=b[j]; }); lock(tr); });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const pe=dnum(fld("pe").value), mat=money(fld("mat").value), hasMat=!isNaN(mat)&&mat>0;
+  const rows=[...tb.rows].map(tr=>{ const g=k=>tr.querySelector(`[data-c="${k}"]`);
+    return {t:g("t").value, i:g("i").value.trim(), q:money(g("q").value), p:money(g("p").value), inv:money(g("inv").value), a:money(g("a").value), s:dnum(g("s").value), e:dnum(g("e").value), pr:money(g("pr").value), f:g("f").checked}; })
+    .filter(r=>r.i!=="");
+  if(isNaN(pe) || !rows.length){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the period end and at least one row with an item name."); return; }
+  const tot={grni:0,late:0,rec:0}; let skip=0, nskip=0; const flags=[];
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  let s=line("Item: working","amount and decision",1);
+  rows.forEach(r=>{
+    let amt=0, how="", dec="";
+    if(r.t==="grni"){
+      if(isNaN(r.q)||isNaN(r.p)){ dec="missing quantity or price: check"; how="—"; }
+      else { const inv=isNaN(r.inv)?0:r.inv; const x=r2(r.q*r.p-inv); how=`${r.q} × ${fmt(r.p)} − ${fmt(inv)}`;
+        if(x<0){ dec="billed ahead of receipt: check"; } else { amt=x; dec=x>0?"accrue":"nothing to accrue"; } }
+    } else if(r.t==="late"){
+      const A=isNaN(r.a)?0:r.a;
+      if(isNaN(r.s)||isNaN(r.e)){ how="no dates"; dec="no dates: Exceptions, no guessed split"; }
+      else if(r.e<r.s){ how="end before start"; dec="dates in the wrong order: check"; }
+      else if(r.s>pe){ how="all after the period end"; dec="do not accrue"; }
+      else if(r.e<=pe){ amt=r2(A); how="all in the period"; dec="accrue"; }
+      else { const tot_d=r.e-r.s+1, inn=pe-r.s+1; amt=r2(A*inn/tot_d); how=`${fmt(A)} × ${inn} ÷ ${tot_d} days`; dec="accrue the part in the period"; }
+    } else {
+      if(r.f){ how="bill in the window"; dec="move to late invoices"; }
+      else { amt=r2(isNaN(r.a)?0:r.a); how="expected amount"; dec=amt>0?"accrue":"nothing to accrue";
+        if(!isNaN(r.pr)&&r.pr>0){ const v=(amt-r.pr)/r.pr; const vs=(v>=0?"+":"−")+(Math.abs(v)*100).toFixed(1)+"%"; how+=`, change ${vs}`;
+          if(Math.abs(v)>=0.25){ flags.push(`${esc(r.i)} ${vs}`); dec+=", flag: ask the owner"; } } }
+    }
+    if(amt>0 && hasMat && amt<mat){ skip=r2(skip+amt); nskip++; dec="below the limit: skip and list"; amt=0; }
+    tot[r.t]=r2(tot[r.t]+amt);
+    s+=line(`${esc(r.i)} (${TN[r.t]}): ${how}`, `${fmt(amt)} · ${dec}`);
+  });
+  const total=r2(tot.grni+tot.late+tot.rec);
+  s+=line("Total accruals",fmt(total),1);
+  steps.innerHTML=s;
+  let out=res("ok","Goods received",fmt(tot.grni),"Quantity × price − invoiced","r-grni");
+  out+=res("ok","Late invoices",fmt(tot.late),"The part of the work up to the period end","r-late");
+  out+=res("ok","Recurring",fmt(tot.rec),"Regular suppliers with no bill","r-rec");
+  out+=res("ok","Total accruals",fmt(total),"Credit: your accrued liabilities account","r-total");
+  out+=res("note","Reversals",fmt(total),`Dated ${dshow(pe+1)}, the first day of the next period`,"r-rev");
+  out+=res(nskip?"note":"ok","Skipped",fmt(skip),hasMat?`${nskip} item${nskip===1?"":"s"} below ${fmt(mat)}, listed`:"No limit: the page accrues every item and says so.","r-skip");
+  if(hasMat){ const big=skip>=mat;
+    out+=res(big?"flag":"ok","Skipped items together",big?"Review":"Small",big?"Small items add up to a material amount: review.":`${fmt(skip)} is below ${fmt(mat)}.`,"r-agg"); }
+  out+=res(flags.length?"flag":"ok","Changes to approve",String(flags.length),flags.length?flags.join(" · "):"No change of 25% or more.","r-flag");
+  box.innerHTML=out;
+}
+tb.addEventListener("change",e=>{ if(e.target.dataset.c==="t") lock(e.target.closest("tr")); });
+document.querySelectorAll(".calc [data-k], #rows [data-c]").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("nb");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
