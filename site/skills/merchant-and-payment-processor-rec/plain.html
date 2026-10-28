@@ -19,7 +19,7 @@
 <meta property="og:url" content="https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/plain.html">
 <meta property="og:title" content="Payment Processor Reconciliation in Plain English | MosoFin">
 <meta property="og:description" content="Does Stripe, Square or PayPal match your books? What a payment processor reconciliation checks, and the common mistake of booking sales net of fees.">
-<meta property="article:modified_time" content="2026-10-20">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Payment Processor Reconciliation in Plain English | MosoFin">
 <meta name="twitter:description" content="Does Stripe, Square or PayPal match your books? What a payment processor reconciliation checks, and the common mistake of booking sales net of fees.">
@@ -58,7 +58,7 @@
         "@type": "CollectionPage",
         "@id": "https://mosofin.github.io/mosofin-skill-explainers/skills/merchant-and-payment-processor-rec/#page"
       },
-      "dateModified": "2026-10-20",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "merchant-and-payment-processor-rec",
@@ -315,20 +315,21 @@
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks five questions before it looks at anything</h2>
+  <h2>It asks five questions, and one optional one, before it looks at anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files. The checks are the same. You need no subscription.</div></li>
     <li><div class="q">Which payment app: Stripe, Square or PayPal?</div><div class="why">Each one sends its money differently.</div></li>
     <li><div class="q">Which month?</div><div class="why">It never assumes a period.</div></li>
     <li><div class="q">Does your bookkeeper record each sale, or one entry per payout?</div><div class="why">Not sure? It will show you what is in your books. Then you decide.</div></li>
     <li><div class="q">Does your payment app ever withhold money?</div><div class="why">Held money is still yours, so the skill shows it separately.</div></li>
+    <li><div class="q">Optional: what fee rate does your contract set?</div><div class="why">With it, the skill also checks your fees against your contract. Without it, the skill checks only how your fee rate changes over time.</div></li>
   </ol>
   <p>Then it repeats your answers to you: <i>"Checking Stripe against your books for September. Go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
   <span class="label">What you need</span>
-  <h2>Connect once, or upload three files</h2>
+  <h2>Connect once, or upload four files</h2>
   <div class="two">
     <div class="card">
       <span class="tag">Connected with MosoFin</span>
@@ -341,12 +342,14 @@
     </div>
     <div class="card">
       <span class="tag up">Uploading instead</span>
-      <h3>Bring three files</h3>
+      <h3>Bring four files</h3>
       <ul>
         <li><b>Payout report</b> from your payment app's dashboard (CSV)</li>
+        <li><b>Transactions report</b> with the charges, fees, refunds and disputes (CSV)</li>
         <li><b>Your books</b> for sales, fees and the waiting-room account, as an export or trial balance</li>
-        <li><b>Bank statement</b> for the month (PDF or CSV)</li>
+        <li><b>Bank statement</b> for the month (PDF or CSV). It is strongly recommended. Without it, the skill ties payouts only to the deposits in your books, and the result says so.</li>
       </ul>
+      <p class="muted" style="font-size:15px;margin:0">Also type the name of the waiting-room account, your currency and your country.</p>
     </div>
   </div>
 </section>
@@ -408,7 +411,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. It describes the current version, which asks five questions first and accepts uploads. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Do you want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>merchant-and-payment-processor-rec</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. This page describes the version on the main branch. The card format of the skill went onto main on 20 October 2026. Pull request #1, merged on 26 October 2026, added the fixes from a bookkeeping audit, dated 27 October 2026. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">Read the skill on GitHub →</a> Do you want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -436,7 +439,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-20", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
