@@ -157,39 +157,39 @@
   <p class="lede">Closing the month means four things. Everything that happened is in the books. Someone checks every balance against something outside the books. The estimates are up to date. And the numbers go to the people who decide, <b>by a date, with a name against each piece</b>.</p>
   <div class="short">
     <span class="label">The 20-second version</span>
-    <p>You give it the month, the target date, your team and your materiality threshold. It builds the list of close tasks, day by day, and removes the tasks that do not apply to your business. It shows each task's status from what your books show. At the end, it checks that this month starts where last month ended. People run the close. The skill plans it, tracks it and reports. It never changes your books.</p>
+    <p>You give it the month, the target date, your accounting basis, your team and your materiality threshold. It builds the list of close tasks, day by day, and removes the tasks that do not apply to your business. It shows each task's status from what your books show. At the end, it checks that last month's balances in the books are still the balances that you reported. People run the close. The skill plans it, tracks it and reports. It never changes your books.</p>
   </div>
 </header>
 
 <section>
   <span class="label">A list that fits the business</span>
-  <h2>46 default tasks become 39 for Northbrook Trading</h2>
+  <h2>48 default tasks become 41 for Northbrook Trading</h2>
   <p>Northbrook Trading is a single US company. It sells professional services, keeps its books in US dollars only and uses the accrual method. It closes October 2026 as a hard close. Day 1 is Monday 2 November and the target close is Day 7, Tuesday 10 November.</p>
-  <p>The skill starts from a default list. The list has 5 tasks before the close and 46 tasks on Days 1 to 7. Then it reads your chart of accounts and removes the tasks that do not apply. It states the evidence for each removal. So you can see a task that it removed in error and put the task back.</p>
+  <p>The skill starts from a default list. The list has 5 tasks before the close and 48 tasks on Days 1 to 7. Then it reads your chart of accounts and removes the tasks that do not apply. It states the evidence for each removal. So you can see a task that it removed in error and put the task back.</p>
   <figure>
     <div class="canvas">
-      <table class="grid" aria-label="How the default list of 46 tasks on Days 1 to 7 becomes 39 for Northbrook Trading, plus 5 tasks before the close, 44 in total">
+      <table class="grid" aria-label="How the default list of 48 tasks on Days 1 to 7 becomes 41 for Northbrook Trading, plus 5 tasks before the close, 46 in total">
         <thead><tr><th scope="col" style="text-align:left">Change</th><th scope="col" style="text-align:left">Evidence in the books</th><th scope="col">Tasks</th><th scope="col">Running total</th></tr></thead>
         <tbody>
-        <tr><th scope="row">Default list, Days 1 to 7</th><td class="t">Day 1: 5, Day 2: 8, Day 3: 12, Day 4: 5, Day 5: 5, Day 6: 5, Day 7: 6</td><td>46</td><td>46</td></tr>
-        <tr><th scope="row">Inventory tasks removed</th><td class="t">No inventory account in the chart. Day 1 inventory cutoff, Day 2 inventory count and Day 3 inventory write-downs go</td><td class="w">−3</td><td>43</td></tr>
-        <tr><th scope="row">Day 6 consolidation removed</th><td class="t">One company file. Day 6 applies only to a group of companies</td><td class="w">−5</td><td>38</td></tr>
-        <tr><th scope="row">Currency revaluation removed</th><td class="t">One currency and no foreign-currency balances. The Day 3 task goes</td><td class="w">−1</td><td>37</td></tr>
-        <tr><th scope="row">Industry tasks added</th><td class="t h">Professional services, from the company profile: unbilled work in progress and project profitability. Each has an account behind it</td><td class="h">+2</td><td>39</td></tr>
-        <tr><th scope="row">Tasks before the close</th><td class="t">Calendar, open systems, final data feeds, bank statements, vendor statements</td><td>+5</td><td>44</td></tr>
-        <tr class="tot"><th scope="row">Northbrook's list</th><td></td><td></td><td class="c">44</td></tr>
+        <tr><th scope="row">Default list, Days 1 to 7</th><td class="t">Day 1: 5, Day 2: 8, Day 3: 13, Day 4: 6, Day 5: 5, Day 6: 5, Day 7: 6</td><td>48</td><td>48</td></tr>
+        <tr><th scope="row">Inventory tasks removed</th><td class="t">No inventory account in the chart. Day 1 inventory cutoff, Day 2 inventory count and Day 3 inventory write-downs go</td><td class="w">−3</td><td>45</td></tr>
+        <tr><th scope="row">Day 6 consolidation removed</th><td class="t">One company file. Day 6 applies only to a group of companies</td><td class="w">−5</td><td>40</td></tr>
+        <tr><th scope="row">Currency revaluation removed</th><td class="t">One currency and no foreign-currency balances. The Day 3 task goes</td><td class="w">−1</td><td>39</td></tr>
+        <tr><th scope="row">Industry tasks added</th><td class="t h">Professional services, from the company profile: unbilled work in progress and project profitability. Each has an account behind it</td><td class="h">+2</td><td>41</td></tr>
+        <tr><th scope="row">Tasks before the close</th><td class="t">Calendar, open systems, final data feeds, bank statements, vendor statements</td><td>+5</td><td>46</td></tr>
+        <tr class="tot"><th scope="row">Northbrook's list</th><td></td><td></td><td class="c">46</td></tr>
         </tbody>
       </table>
     </div>
-    <figcaption>Example figures for a made-up company. 46 − 3 − 5 − 1 + 2 = 39 tasks on Days 1 to 7. With the 5 tasks before the close, the list has 44 tasks. The default list and the removal rules are the skill's own.</figcaption>
+    <figcaption>Example figures for a made-up company. 48 − 3 − 5 − 1 + 2 = 41 tasks on Days 1 to 7. With the 5 tasks before the close, the list has 46 tasks. The default list and the removal rules are the skill's own.</figcaption>
   </figure>
-  <p>Many of the Day 3 tasks are adjusting entries: accruals, prepaid expenses and deferred revenue. Under the accrual method, you report income in the year you earn it. You deduct an expense in the year you incur it, whatever the payment date<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. These entries put income and expenses in the correct period before the numbers are final.</p>
+  <p>Many of the Day 3 tasks are adjusting entries: accruals, prepaid expenses and deferred revenue. Under the accrual method, you report income in the year you earn it. You deduct an expense in the year you incur it, whatever the payment date<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. These entries put income and expenses in the correct period before the numbers are final. Northbrook told the skill that it uses the accrual basis, so these tasks stay. Day 3 also checks that each accrual from last month has a reversing entry this month.</p>
 </section>
 
 <section>
   <span class="label">The mistake it catches</span>
   <h2>A task marked Complete with no entry in the books</h2>
-  <p>On Wednesday 4 November, Day 3, the owner asks for the status. A usual checklist shows what each person says. The skill adds one more column: Evidence. It shows what the books show for each task that makes a journal entry.</p>
+  <p>On Wednesday 4 November, Day 3, the owner asks for the status. A usual checklist shows what each person says. The skill adds one more column: Evidence. It shows what the books show for each task that makes a journal entry. Before it reads, it states the test for each task: the account, the side and the dates. For depreciation, the test is a credit to accumulated depreciation, dated in October, with the amount compared to September's.</p>
   <figure>
     <div class="canvas">
       <table class="grid" aria-label="The status board on Wednesday 4 November: three entries posted, the deferred revenue release open, the payroll accrual marked Complete with no entry, the bank reconciliation manual">
@@ -235,11 +235,11 @@
 <section>
   <span class="label">The final check</span>
   <h2>Does October start where September ended?</h2>
-  <p>On Day 7, the skill compares two figures for each balance sheet account: the September closing balance and the October opening balance. They must be equal. It checks every account, not only the total. A trial balance that balances proves less. Accounting software makes debits equal credits on every entry.</p>
+  <p>On Day 7, the skill compares two figures for each balance sheet account. The first is the September balance in the trial balance that Northbrook reported last month. The second is the September balance that the books show now. They must be equal. It checks every account, not only the total. Two reads of the books today always agree, so the skill needs the reported trial balance. Without it, the skill writes "not performed", not a pass. A trial balance that balances proves less. Accounting software makes debits equal credits on every entry.</p>
   <figure>
     <div class="canvas">
-      <table class="grid" aria-label="Continuity check for seven accounts: accounts payable is 500 lower and accrued liabilities 500 higher, so the differences total zero">
-        <thead><tr><th scope="col" style="text-align:left">Account</th><th scope="col">Sept closing</th><th scope="col">Oct opening</th><th scope="col">Difference</th></tr></thead>
+      <table class="grid" aria-label="Continuity check for seven accounts, September as reported against September in the books now: accounts payable is 500 lower and accrued liabilities 500 higher, so the differences total zero">
+        <thead><tr><th scope="col" style="text-align:left">Account</th><th scope="col">Sept as reported</th><th scope="col">Sept in books now</th><th scope="col">Difference</th></tr></thead>
         <tbody>
         <tr><th scope="row">Cash</th><td>84,300</td><td>84,300</td><td>0</td></tr>
         <tr><th scope="row">Accounts receivable</th><td>126,500</td><td>126,500</td><td>0</td></tr>
@@ -255,7 +255,7 @@
     <figcaption>Example figures for a made-up company, in dollars. −500 + 500 = 0. Two accounts break and the total does not.</figcaption>
   </figure>
   <p>Someone moved $500 from accounts payable to accrued liabilities. The entry carries the date 30 September. Someone posted it on Tuesday 20 October, after the company reported September. Accountants call this a prior-period reclassification. It may be correct. The owner must know about it before the October statements go to anyone.</p>
-  <p>A total that also breaks tells more. It means that someone opened a prior period and changed it after the company reported it.</p>
+  <p>Any break means that someone opened a prior period and changed it after the company reported it. When the total still agrees, the change is a move between accounts.</p>
   <p>Day 5 compares this month with the budget, the forecast and last month. Management reviews actual results against budgets, forecasts and prior periods. It investigates unexpected results so it can correct them<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
 </section>
 
@@ -268,27 +268,28 @@
     <div class="stat"><span class="label">Northbrook's calendar</span><span class="v num good">9 days</span><span class="s">Mon 2 Nov to Tue 10 Nov, weekend included. That is 7 business days: 2, 3, 4, 5, 6, 9 and 10 November</span></div>
   </div>
   <p class="muted" style="font-size:15px">The benchmark covers mostly larger organisations. A small business can close faster or slower. The skill does not set a target. You give it your close date.</p>
-  <p>After the close, the skill reads the posting dates to find where the close slipped. At Northbrook, the September deferred revenue release posted on Day 6, three days after its Day 3 due date. The August release also posted on Day 6. That is a slip the books measure, so nobody must remember it.</p>
+  <p>After the close, the skill reads the time when each entry was created to find where the close slipped. It does not use the entry date, because close entries carry the last day of the month. At Northbrook, someone entered the September deferred revenue release on Day 6, three days after its Day 3 due date. The August release also went in on Day 6. That is a slip the books measure, so nobody must remember it. If the books do not give the created time, the skill says so and asks the owner.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks six questions before it reads anything</h2>
+  <h2>It asks seven questions before it reads anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files and the checks are the same. The skill asks this only if your account has a MosoFin connection. If not, it says once that the run is manual.</div></li>
     <li><div class="q">Which month do you close, and is it a soft close or a hard close?</div><div class="why">Required. A soft close and a hard close need different levels of care.</div></li>
     <li><div class="q">Your close calendar: the target close date.</div><div class="why">Required. The days in the task list change to fit this date.</div></li>
     <li><div class="q">Your reporting framework, for example US GAAP.</div><div class="why">Required. It decides which tasks and reports apply.</div></li>
-    <li><div class="q">Your team, the owner of each task, and your close template if you have one.</div><div class="why">Recommended. Your books do not hold the names of the owners. Without them, each owner reads "to assign". The skill prefers your template to its generic list.</div></li>
+    <li><div class="q">Do you report on a cash or an accrual basis?</div><div class="why">Required. It decides if most Day 1 and Day 3 tasks apply. The skill uses it on every read and writes it in the workpaper header.</div></li>
+    <li><div class="q">Your team, the owner of each task, your close template and last month's close, if you have them.</div><div class="why">Recommended. Your books do not hold the names of the owners. Without them, each owner reads "to assign". The skill prefers your template to its generic list.</div></li>
     <li><div class="q">Your materiality threshold: the amount below which a difference needs less attention.</div><div class="why">Recommended. It decides which differences need full attention. The skill never assumes a threshold.</div></li>
   </ol>
   <p>Then it reads your answers back and waits for your yes. For Northbrook, the read-back is like this:</p>
-  <blockquote><i>"Closing October for Northbrook Trading, a hard close, read from your Mosofin connection. Target close Tuesday 10 November. US GAAP. Owners from your template. Materiality $5,000. One company, one currency, no inventory, so those tasks do not apply. Shall I go ahead?"</i></blockquote>
+  <blockquote><i>"Closing October for Northbrook Trading, a hard close, read from your Mosofin connection. Target close Tuesday 10 November. US GAAP, accrual basis. Owners from your template. Materiality $5,000. One company, one currency, no inventory, so those tasks do not apply. Shall I go ahead?"</i></blockquote>
 </section>
 
 <section>
   <span class="label">What you need</span>
-  <h2>Connect once, or upload two trial balances and the chart</h2>
+  <h2>Connect once, or upload the trial balances and the chart</h2>
   <div class="two">
     <div class="card">
       <span class="tag">Connected with MosoFin</span>
@@ -297,8 +298,9 @@
         <li>It reads the chart of accounts, to remove the tasks that do not apply</li>
         <li>It reads the journal entries for the month, to show each task's evidence</li>
         <li>It reads the trial balance for this month and last month, for the final check</li>
+        <li>You give it last month's trial balance as you reported it, from last month's close pack. Without it, the continuity check is not performed</li>
         <li>It reads the company profile: currency, period ends and industry</li>
-        <li>You still give it the <b>month</b>, the <b>close date</b>, the <b>framework</b>, the <b>owners</b> and the <b>materiality threshold</b></li>
+        <li>You still give it the <b>month</b>, the <b>close date</b>, the <b>framework</b>, the <b>accounting basis</b>, the <b>owners</b> and the <b>materiality threshold</b></li>
       </ul>
     </div>
     <div class="card">
@@ -306,10 +308,11 @@
       <h3>Bring the trial balances and the chart</h3>
       <ul>
         <li><b>Trial balance</b> for this month and last month, CSV or XLSX, required</li>
-        <li><b>Chart of accounts</b>, CSV or XLSX, required to fit the list to your business</li>
+        <li><b>Last month's trial balance as you reported it</b>, from last month's close pack, for the continuity check</li>
+        <li><b>Chart of accounts</b>, CSV or XLSX, recommended to fit the list to your business. Without it, the skill asks you the questions instead</li>
         <li><b>Journal entries</b> posted in the month, a general journal export, recommended to fill the status</li>
         <li><b>Last month's close</b> and its open items, recommended</li>
-        <li>The close date, framework, owners and materiality, typed in the chat</li>
+        <li>The close date, framework, accounting basis, owners and materiality, typed in the chat</li>
       </ul>
     </div>
   </div>
@@ -319,11 +322,11 @@
   <span class="label">What you get back</span>
   <h2>A close workpaper with nine sheets</h2>
   <div class="gets">
-    <div class="get"><b>Close calendar</b><span>Each task by day, with owner, due date, dependencies and status. Three more columns show if the task applies, if the books can prove it, and the evidence.</span></div>
+    <div class="get"><b>Close calendar</b><span>Each task by day, with owner, due date, dependencies and status. Three more columns show if the task applies, if the books can prove it, and the evidence with its test. Two more show the reviewer and the review date.</span></div>
     <div class="get"><b>Open items</b><span>Blockers, with the tasks that wait on outside information in a separate group.</span></div>
-    <div class="get"><b>Variances and materiality</b><span>Budget against actual, and every balance sheet account listed above or below your threshold.</span></div>
-    <div class="get"><b>Final tie-out</b><span>The trial balance, each account's status, the continuity check account by account, and the sign-off.</span></div>
-    <div class="get"><b>Lessons learned</b><span>The problems, the proposed changes and the close timing, measured from posting dates.</span></div>
+    <div class="get"><b>Variances and materiality</b><span>Actual against the budget or last month, and every balance sheet account listed above or below your threshold.</span></div>
+    <div class="get"><b>Final tie-out</b><span>The trial balance and each account's reconciliation status from its owner or workpaper. The continuity check, account by account. The sign-off by a preparer and a reviewer.</span></div>
+    <div class="get"><b>Lessons learned</b><span>The problems, the proposed changes and the close timing, measured from the times that entries were created.</span></div>
     <div class="get"><b>Scoping and coverage</b><span>Each task group, if it applies, and the evidence. For each task, what the skill read and what it could not read.</span></div>
   </div>
   <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save the task list, the owners, the dependencies, the materiality basis and the scoping decisions. It never saves statuses or results. It reads them again on each run.</p>
@@ -335,7 +338,7 @@
     <span class="label">What it never does</span>
     <ul>
       <li><b>Never uses MosoFin without asking.</b> A connected account is not permission to read it.</li>
-      <li><b>Never reads anything before you answer the six questions</b> and say yes to the read-back.</li>
+      <li><b>Never reads anything before you answer the seven questions</b> and say yes to the read-back.</li>
       <li><b>Never locks the books, posts an entry or marks a task complete.</b> It observes evidence and reports it. People run the close.</li>
       <li><b>Never treats a posted entry as proof that the entry is correct or complete.</b> The task owner still owns the task.</li>
       <li><b>Never assumes a materiality threshold.</b> It asks you for one.</li>
@@ -353,7 +356,7 @@
     <dt>Accrual</dt><dd>An entry for income you earned or a cost you incurred that nobody has paid yet<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
     <dt>Materiality threshold</dt><dd>The amount you choose. A difference below it needs less detail. A difference above it gets full attention.</dd>
     <dt>Tie-out</dt><dd>The final checks that show the books are ready to report.</dd>
-    <dt>Continuity</dt><dd>This month's opening balance equals last month's closing balance, for each account.</dd>
+    <dt>Continuity</dt><dd>This month's opening balance equals last month's closing balance as you reported it, for each account.</dd>
   </dl>
 </section>
 
@@ -373,7 +376,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>month-end-close-checklist</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">Read the skill on GitHub →</a> This page describes a rewrite of that skill into the shorter card format. The rewrite is on a branch and has not shipped. It is not yet on the main branch. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>month-end-close-checklist</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">Read the skill on GitHub →</a> The card format of the skill is on the main branch. It merged in pull request #1 on 26 October 2026, with bookkeeping-audit changes on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 
@@ -401,7 +404,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

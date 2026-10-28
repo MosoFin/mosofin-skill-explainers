@@ -202,7 +202,7 @@
 <header>
   <span class="label">MosoFin skill · month-end-close-checklist · learning guide</span>
   <h1>From a list that fits your business to books that tie out</h1>
-  <p class="lede">This page shows how the skill plans and tracks a month-end close, <b>one level at a time</b>. It starts with what closing means. It ends with the check that this month starts where last month ended. The page quotes every rule from the skill and works every number in front of you.</p>
+  <p class="lede">This page shows how the skill plans and tracks a month-end close, <b>one level at a time</b>. It starts with what closing means. It ends with the check that last month's reported balances are still in the books. The page quotes every rule from the skill and works every number in front of you.</p>
   <div class="trust">
     <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
     <div><b>Outside sources back the facts</b><span>They are an APQC benchmark, an IRS publication, an OpenStax textbook and two GAO publications. Each one has a number and a link.</span></div>
@@ -233,7 +233,7 @@
 <section id="try">
   <span class="label">Check it yourself</span>
   <h2>Check your own continuity</h2>
-  <p class="muted">Enter up to 10 balance sheet accounts, or load an example. For each account, type last period's closing balance and this period's opening balance. The page finds the difference for each account and adds the differences. This is the check in Step 6 of <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <p class="muted">Enter up to 10 balance sheet accounts, or load an example. For each account, type last period's closing balance as you reported it. Then type the same balance as the books show it now. The page finds the difference for each account and adds the differences. This is the check in Step 6 of <code>references/method.md</code>. The page sends nothing anywhere.</p>
   <div class="calc" id="contcalc">
     <div class="presets" role="group" aria-label="Load a continuity example">
       <button type="button" data-p="northbrook">Northbrook, October</button>
@@ -241,16 +241,16 @@
       <button type="button" data-p="blank">Start blank</button>
     </div>
     <div class="tbl"><table class="cont" aria-label="Balance sheet accounts">
-      <thead><tr><th>Account</th><th class="n">Last period's closing</th><th class="n">This period's opening</th><th class="n">Difference</th></tr></thead>
+      <thead><tr><th>Account</th><th class="n">Last period as reported</th><th class="n">Same date, books now</th><th class="n">Difference</th></tr></thead>
       <tbody id="controws"></tbody>
     </table></div>
     <div class="math num" id="contsteps" aria-live="polite"></div>
     <div class="results" id="contresults" aria-live="polite"></div>
-    <p class="fine">The page takes a difference as the opening balance minus the closing balance. A credit balance, such as accounts payable, goes in as a positive number. If no account differs, the period continues. If accounts differ and the differences add to 0, someone moved an amount between accounts in a prior period. If the differences do not add to 0, a prior period changed after someone reported it. A reclassification may be proper. Someone must know about it before this month's statements go out.</p>
+    <p class="fine">The page takes a difference as the balance in the books now minus the balance as reported. A credit balance, such as accounts payable, goes in as a positive number. Two reads of the books today always agree, so the first column must come from last month's close pack. Without it, the skill writes "not performed". If no account differs, the period continues. If accounts differ and the differences add to 0, someone moved an amount between accounts in a prior period. If the differences do not add to 0, a prior period changed after someone reported it. A reclassification may be proper. Someone must know about it before this month's statements go out.</p>
   </div>
 
   <h3>Scope your list</h3>
-  <p class="muted">Tick what is true for your business. The page starts from the 46 tasks on Days 1 to 7 in Step 1 of <code>references/method.md</code>. It removes and adds tasks with the rules of Step 2. The 5 pre-close tasks always stay.</p>
+  <p class="muted">Tick what is true for your business. The page starts from the 48 tasks on Days 1 to 7 in Step 1 of <code>references/method.md</code>. It removes and adds tasks with the rules of Step 2. The 5 pre-close tasks always stay.</p>
   <div class="calc scope" id="scopecalc">
     <div class="presets" role="group" aria-label="Load a scoping example">
       <button type="button" data-s="northbrook">Northbrook</button>
@@ -269,7 +269,7 @@
     </div>
     <div class="math num" id="scopesteps" aria-live="polite"></div>
     <div class="results" id="scoperesults" aria-live="polite"></div>
-    <p class="fine">The SaaS list in Step 2 names deferred revenue release, and Day 3 already holds that task. The page counts the list as the method writes it, so your count may be 1 lower. The skill takes each answer from the books and writes the evidence beside it. The industry tasks are a judgement, and the owner makes the decision.</p>
+    <p class="fine">The SaaS list in Step 2 names deferred revenue release, and Day 3 already holds that task. The page counts the list as the method writes it, so your count may be 1 lower. The skill takes each answer from the books and writes the evidence beside it. The industry tasks are a judgement, and the owner makes the decision. On a cash basis, Step 2 removes most accruals, but it does not say which. So this tool does not count them.</p>
   </div>
 </section>
 
@@ -277,8 +277,8 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which period do you close, and is it a soft or a hard close? What is your target close date? Which reporting framework do you use? Who is on your team, who owns each task, and do you have a close template? What is your materiality threshold?</div>
-    <div><b>Needs</b>The skill needs the trial balance for this period and the prior period, and the chart of accounts. The journal entries of the period and last month's close make the result better. You type in the calendar, the framework, the owners and the materiality threshold.</div>
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which period do you close, and is it a soft or a hard close? What is your target close date? Which reporting framework do you use? Do you report on a cash or an accrual basis? Who is on your team, who owns each task, and do you have a close template and last month's close? What is your materiality threshold?</div>
+    <div><b>Needs</b>The skill needs the trial balance for this period and the prior period. For the continuity check, it also needs last month's trial balance as you reported it. The chart of accounts, the journal entries of the period and last month's close make the result better. You type in the calendar, the framework, the accounting basis, the owners and the materiality threshold.</div>
     <div><b>Gives back</b>The skill gives back a close workpaper with nine sheets. They are the close calendar, task detail, open items, variance tracker, materiality, final tie-out, lessons learned, scoping and coverage. It asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never uses MosoFin before it asks you. It reads nothing before you answer its questions and say yes to its summary. It never locks the books, posts an entry or marks a task complete. It never assumes a materiality threshold. It never saves balances, variances, statuses or close results.</div>
   </div>
@@ -293,7 +293,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code> and <code>references/method.md</code>. These files come from the card-format rewrite of the skill. The rewrite is on a branch and has not shipped. The skill on main holds the same text in one longer file. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. All five sources are US-based, and the APQC benchmark is international. Ask your accountant which rules apply to you. This page explains <code>month-end-close-checklist</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code> and <code>references/method.md</code>. These files are on the main branch of the skill. The card format merged in pull request #1 on 26 October 2026, with bookkeeping-audit changes on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. All five sources are US-based, and the APQC benchmark is international. Ask your accountant which rules apply to you. This page explains <code>month-end-close-checklist</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -310,7 +310,7 @@ const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="sour
 const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
 const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
 
-/* The fourteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
+/* The seventeen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
 const Q = {
   q1:{q:"Almost every task in this checklist hands off to another skill.", w:"references/overview.md · This is the orchestration hub — and three things the workspace changes"},
   q2:{q:"The checklist scopes itself.", w:"references/overview.md · This is the orchestration hub — and three things the workspace changes"},
@@ -326,6 +326,9 @@ const Q = {
   q12:{q:"A total that continues while individual accounts do not means a prior-period reclassification", w:"references/method.md · Step 6 — Tie-out workpaper at close"},
   q13:{q:"Measured slip beats remembered slip", w:"references/method.md · Step 7 — Lessons learned and improvements"},
   q14:{q:"Decisions are the user's; state is the workspace's.", w:"references/method.md · Step 9 — Evolve the skill (Mosofin-specific, final step)"},
+  q15:{q:"State the test before reading.", w:"references/method.md · Step 3 — Assign owners and deadlines"},
+  q16:{q:"Compare against what was reported, not against the ledger itself.", w:"references/method.md · Step 6 — Tie-out workpaper at close"},
+  q17:{q:"the entry-created timestamp (not the transaction date) shows when tasks actually completed", w:"references/method.md · Step 7 — Lessons learned and improvements"},
 };
 
 const RULES = [
@@ -341,7 +344,7 @@ const RULES = [
   { id:"5", title:"Entries are evidence", r:Q.q3, cites:[],
     plain:"For depreciation, accruals and other entries, the skill finds the entry and shows its date, amount and reference. An entry that posted shows that an entry exists. It does not show that the entry is correct." },
   { id:"6", title:"Status and Evidence side by side", r:Q.q6, cites:[],
-    plain:"The board has a Status column and an Evidence column. Status is what the owner reports. Evidence is what the skill found in the books." },
+    plain:"The board has a Status column and an Evidence column. Status is what the owner reports. Evidence is what the skill found in the books, with the test it applied: the account, the side and the dates." },
   { id:"7", title:"A disagreement goes to the top", r:Q.q7, cites:[],
     plain:"If a task says Complete and the books show no entry, the skill shows that line first." },
   { id:"8", title:"Outside information stands apart", r:Q.q9, cites:[],
@@ -349,10 +352,10 @@ const RULES = [
   { id:"9", title:"Materiality comes from balances", r:Q.q8, cites:[],
     plain:"You give the threshold. Each month, the skill lists every balance sheet account above and below it, from the balances." },
   { id:"10", title:"Continuity, account by account", r:Q.q11, cites:[3],
-    plain:"This period's opening balance must equal last period's closing balance. The skill checks this for every balance sheet account, and in total.",
+    plain:"Last month's balances as you reported them must equal the same balances in the books now. The skill checks this for every balance sheet account, and in total. Without the reported trial balance, the check is not performed.",
     backed:"Balance sheet accounts are permanent and carry their balance into the next period.{3}" },
   { id:"11", title:"Measure the slip", r:Q.q13, cites:[],
-    plain:"The posting dates show when each task really finished. The skill uses them to find the tasks that are late month after month." },
+    plain:"The time when each entry was created shows when each task really finished. The entry date does not, because close entries carry the last day of the month. The skill uses the created times to find the tasks that are late month after month." },
   { id:"12", title:"Save the decisions, not the state", r:Q.q14, cites:[],
     plain:"On your yes, the skill saves the task list, the owners, the dependencies, the materiality basis and the scoping decisions. It never saves statuses or results." },
 ];
@@ -377,24 +380,24 @@ const LEVELS = [
 
   { n:2, title:"A list that fits the business",
     chips:["Chart of accounts","Company files","Profile"], src:"Rules 3 and 4", cites:[],
-    situation:"The default list has 5 pre-close tasks and 46 tasks on Days 1 to 7. Northbrook has no inventory account, one company file and one currency. Its profile says professional services.",
+    situation:"The default list has 5 pre-close tasks and 48 tasks on Days 1 to 7. Northbrook has no inventory account, one company file and one currency. Its profile says professional services. At intake, Northbrook said that it uses the accrual basis.",
     facts:[], nofact:NOFACT,
     visual:{type:"table",
       head:["Evidence","Change","Tasks"],
-      rows:[["No inventory account in the chart","Remove inventory cutoff (Day 1), cycle count (Day 2), write-downs (Day 3)",["−3","bad"]],["One company file","Remove Day 6, consolidation",["−5","bad"]],["One currency, no foreign-currency balances","Remove FX revaluation (Day 3)",["−1","bad"]],["Industry: professional services, each with an account behind it","Add WIP unbilled and project profitability",["+2","good"]]]},
+      rows:[["Accrual basis, from intake","Keep the accruals on Day 1 and Day 3","0"],["No inventory account in the chart","Remove inventory cutoff (Day 1), cycle count (Day 2), write-downs (Day 3)",["−3","bad"]],["One company file","Remove Day 6, consolidation",["−5","bad"]],["One currency, no foreign-currency balances","Remove FX revaluation (Day 3)",["−1","bad"]],["Industry: professional services, each with an account behind it","Add WIP unbilled and project profitability",["+2","good"]]]},
     rules:[Q.q2, Q.q5],
-    math:[["Day 1 + Day 2 + Day 3 + Day 4: 5 + 8 + 12 + 5","30"],["Day 5 + Day 6 + Day 7: 5 + 5 + 6","16"],["Default list on Days 1 to 7: 30 + 16","46 tasks",1],["46 − 3 − 5 − 1 + 2","39 tasks",1],["With the 5 pre-close tasks: 39 + 5","44 tasks",1]],
-    verdict:["ok","Northbrook's list has 39 tasks on Days 1 to 7, and 44 with pre-close. The skill writes the evidence beside each of the 9 removed tasks. Step 2's own example says four inventory tasks, but the Step 1 list has three.","SCOPED"] },
+    math:[["Day 1 + Day 2 + Day 3 + Day 4: 5 + 8 + 13 + 6","32"],["Day 5 + Day 6 + Day 7: 5 + 5 + 6","16"],["Default list on Days 1 to 7: 32 + 16","48 tasks",1],["48 − 3 − 5 − 1 + 2","41 tasks",1],["With the 5 pre-close tasks: 41 + 5","46 tasks",1]],
+    verdict:["ok","Northbrook's list has 41 tasks on Days 1 to 7, and 46 with pre-close. The skill writes the evidence beside each of the 9 removed tasks. Step 2's own example says four inventory tasks, but the Step 1 list has three.","SCOPED"] },
 
   { tier:"The status · Wednesday 4 November, Day 3" },
   { n:3, title:"Status from evidence",
     chips:["Journal entries","Close template"], src:"Rules 5, 6 and 7", cites:[],
-    situation:"On Day 3, the skill reads the journal entries of the period. It puts what it finds beside the status that each owner gave in the template.",
+    situation:"On Day 3, the skill reads the journal entries of the period. First it states the test for each task. For depreciation, the test is a credit to accumulated depreciation, dated in October, with the amount compared to September's. It puts what it finds beside the status that each owner gave in the template.",
     facts:[], nofact:NOFACT,
     visual:{type:"table",
       head:["Task","Status in the template","Evidence in the books"],
       rows:[["Depreciation","—","Posted Tue 3 Nov, $4,210, JE-2611-004"],["Prepaid amortization","—","Posted Tue 3 Nov, $1,250, JE-2611-005"],["Accruals (utilities)","—","Posted Wed 4 Nov, $2,800, JE-2611-009"],["Deferred revenue release","—",["No entry found: open","bad"]],["Payroll cutoff accrual",["Complete","bad"],["No entry posted","bad"]]]},
-    rules:[Q.q3, Q.q6, Q.q7],
+    rules:[Q.q3, Q.q15, Q.q6, Q.q7],
     math:[["Entries found on Day 3","3"],["$4,210 + $1,250 + $2,800","$8,260",1],["Deferred revenue release, due Day 3","no entry"],["Payroll cutoff accrual: Status says","Complete"],["Payroll cutoff accrual: Evidence shows","no entry",1]],
     verdict:["flag","Three entries are in the books, for a total of $8,260. Deferred revenue release is still open. The payroll accrual says Complete with no entry, so the skill puts that line at the top. Each owner still owns the task.","CHECK"] },
 
@@ -411,31 +414,31 @@ const LEVELS = [
 
   { tier:"The tie-out · Day 7, Tuesday 10 November" },
   { n:5, title:"The tie-out",
-    chips:["Trial balance, September","Trial balance, October"], src:"Rule 10", cites:[3],
-    situation:"The trial balance balances, as it does on every double-entry system. Then the skill compares each balance sheet account's September closing balance with its October opening balance.",
+    chips:["Trial balance, September as reported","Trial balance, September read now"], src:"Rule 10", cites:[3],
+    situation:"The trial balance balances, as it does on every double-entry system. Northbrook gives the skill its September trial balance from the September close pack. The skill reads the books again at 30 September and compares each balance sheet account.",
     facts:["Revenue and expense accounts are temporary and close to zero at the period end. Balance sheet accounts are permanent and carry their balance into the next period "+C(3)+".",
            "So each balance sheet account must open October at the same amount that closed September "+C(3)+"."],
     visual:{type:"table",
-      head:["Account","Sept closing","Oct opening","Difference"],
+      head:["Account","Sept as reported","Sept in books now","Difference"],
       rows:[["Cash","84,300","84,300","0"],["Accounts receivable","126,500","126,500","0"],["Prepaid expenses","15,000","15,000","0"],["Property and equipment, net","212,000","212,000","0"],["Accounts payable","61,400","60,900",["−500","bad"]],["Accrued liabilities","18,200","18,700",["+500","bad"]],["Deferred revenue","42,000","42,000","0"]],
       total:["Sum of the seven differences","","","0"]},
-    rules:[Q.q10, Q.q11, Q.q12],
-    math:[["Accounts payable: 60,900 − 61,400","−500",1],["Accrued liabilities: 18,700 − 18,200","+500",1],["Other five accounts","0 each"],["Sum: −500 + 500 + 0","0",1],["The entry: dated Wed 30 Sep, posted Tue 20 Oct","$500, AP to accrued liabilities"],["If only AP changed: 61,400 to 61,900","+500, sum +500",1]],
-    verdict:["flag","Two accounts differ and the sum is 0, so this is a $500 reclassification from AP to accrued liabilities. Someone posted it on Tuesday 20 October, after Northbrook reported September. It may be proper. Someone must know about it before October's statements go out. If only AP changed, the sum would be +500. That would mean a prior period changed after someone reported it.","BREAK"] },
+    rules:[Q.q10, Q.q16, Q.q11, Q.q12],
+    math:[["Accounts payable: 60,900 − 61,400","−500",1],["Accrued liabilities: 18,700 − 18,200","+500",1],["Other five accounts","0 each"],["Sum: −500 + 500 + 0","0",1],["The entry: dated Wed 30 Sep, posted Tue 20 Oct","$500, AP to accrued liabilities"],["If only AP changed: 61,400 to 61,900","+500, sum +500",1],["Without the September close pack","not performed"]],
+    verdict:["flag","Two accounts differ and the sum is 0, so this is a $500 reclassification from AP to accrued liabilities. Someone posted it on Tuesday 20 October, after Northbrook reported September. It may be proper. Someone must know about it before October's statements go out. If only AP changed, the sum would be +500. That would mean a prior period changed after someone reported it. Without the reported September trial balance, the skill writes \"not performed\", because two reads of the books today always agree.","BREAK"] },
 
   { tier:"Next month" },
   { n:6, title:"Faster next month",
-    chips:["Posting dates","Saved preferences"], src:"Rules 11 and 12", cites:[1,5],
-    situation:"After the close, the skill reads the posting dates of past months. Deferred revenue release is a Day 3 task. In August and in September, it posted on Day 6.",
+    chips:["Entry-created times","Saved preferences"], src:"Rules 11 and 12", cites:[1,5],
+    situation:"After the close, the skill reads when each entry of past months was created. Deferred revenue release is a Day 3 task. In August and in September, someone entered it on Day 6. If the books give no created time, the skill marks this measurement as manual.",
     facts:["In APQC's open-standards benchmark, the median time is 6 calendar days, weekends included, from the first trial balance to agreed statements. Top performers take about 5 days and the slowest about 10 "+C(1)+".",
            "Most organisations in that benchmark are large. A small business may close faster or slower "+C(1)+". Northbrook's calendar runs 9 calendar days, but APQC measures from a different start, so the two do not compare exactly.",
            "Different people should hold the authority, the custody of assets and the accounting "+C(5)+". So the skill saves owners by role, and a manager reviews and signs off."],
     visual:{type:"table",
-      head:["Month","Due","Posted","Days late"],
+      head:["Month","Due","Entered","Days late"],
       rows:[["August","Day 3","Day 6",["3","bad"]],["September","Day 3","Day 6",["3","bad"]]]},
-    rules:[Q.q13, Q.q14],
+    rules:[Q.q17, Q.q13, Q.q14],
     math:[["September: Day 6 − Day 3","3 days late",1],["August: Day 6 − Day 3","3 days late",1],["Calendar days, Mon 2 Nov to Tue 10 Nov","9"],["Saved: task list, owners, dependencies, materiality basis, scoping","yes",1],["Saved: statuses, balances, results","never",1]],
-    verdict:["note","Deferred revenue release posted three days late in two months in a row. The posting dates measure this, so nobody has to remember it. The skill saves the decisions for next month and reads every status again.","SLIP"] },
+    verdict:["note","Deferred revenue release went in three days late in two months in a row. The entry-created times measure this, so nobody has to remember it. The skill saves the decisions for next month and reads every status again.","SLIP"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -500,8 +503,8 @@ const tb=document.getElementById("controws");
 for(let i=1;i<=ROWS;i++){
   tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
     <td><input data-c="v" aria-label="Account ${i} name" style="min-width:170px"></td>
-    <td><input data-c="c" class="n" inputmode="decimal" aria-label="Account ${i} last period's closing balance" style="width:120px"></td>
-    <td><input data-c="o" class="n" inputmode="decimal" aria-label="Account ${i} this period's opening balance" style="width:120px"></td>
+    <td><input data-c="c" class="n" inputmode="decimal" aria-label="Account ${i} last period's balance as reported" style="width:120px"></td>
+    <td><input data-c="o" class="n" inputmode="decimal" aria-label="Account ${i} same date, balance in the books now" style="width:120px"></td>
     <td class="n" data-c="d">—</td></tr>`);
 }
 const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
@@ -523,13 +526,13 @@ function run(){
     return r; }).filter(r=>r.ok);
   if(!rows.length){ steps.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter at least one account with both balances."); return; }
   const diff=rows.filter(r=>r.d!==0), sum=Math.round(rows.reduce((x,r)=>x+r.d,0)*100)/100;
-  let s=line("Difference = this period's opening − last period's closing","difference",1);
+  let s=line("Difference = books now − as reported","difference",1);
   diff.forEach(r=>{ s+=line(`${esc(r.v)}: ${r.o.toLocaleString("en-US")} − ${r.c.toLocaleString("en-US")}`, sgn(r.d)); });
   if(rows.length>diff.length) s+=line(`Other ${rows.length-diff.length} account(s)`, "0 each");
   s+=line(`Sum of ${rows.length} differences`, sgn(sum), 1);
   steps.innerHTML=s;
   let verdict;
-  if(!diff.length) verdict=res("ok","Verdict","Continues","No account differs. This period opens where last period closed.");
+  if(!diff.length) verdict=res("ok","Verdict","Continues","No account differs. The books still show last period as it was reported.");
   else if(sum===0) verdict=res("note","Verdict","Prior-period reclassification","Accounts differ, but the sum is 0. Someone moved an amount between accounts in a prior period. Find out before the statements go out.");
   else verdict=res("flag","Verdict","Prior period changed","The sum is not 0. A prior period changed after someone reported it.");
   box.innerHTML = res(diff.length?"flag":"ok","Accounts that differ",String(diff.length),diff.length?diff.map(r=>`${esc(r.v)} ${sgn(r.d)}`).join(" · "):"None.")
@@ -539,7 +542,7 @@ document.querySelectorAll("#controws input").forEach(i=>i.addEventListener("inpu
 document.querySelectorAll("#contcalc .presets button").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
 
 /* --- calculator 2: scope your list (Steps 1 and 2) --- */
-const BASE=46, PRE=5, IND={none:["none",0],ps:["professional services",2],saas:["SaaS",3],ecom:["e-commerce",3]};
+const BASE=48, PRE=5, IND={none:["none",0],ps:["professional services",2],saas:["SaaS",3],ecom:["e-commerce",3]};
 const SP={ northbrook:{inv:false,multi:false,fx:false,ind:"ps"}, full:{inv:true,multi:true,fx:true,ind:"none"} };
 const sk=k=>document.querySelector(`#scopecalc [data-s-k="${k}"]`);
 function loadScope(p){ const P=SP[p]; ["inv","multi","fx"].forEach(k=>sk(k).checked=P[k]); sk("ind").value=P.ind;
@@ -578,7 +581,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

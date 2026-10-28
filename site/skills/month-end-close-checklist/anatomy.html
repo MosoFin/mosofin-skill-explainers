@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Month-End Close Checklist Anatomy | MosoFin</title>
-<meta name="description" content="How the month-end close checklist skill is built: the hub card, seven reference files, the run stage by stage, its sources and three audit findings.">
+<meta name="description" content="How the month-end close checklist skill is built on main: the hub card, seven reference files, the run stage by stage, its sources and the audit findings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -106,34 +106,34 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Month-end close checklist</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">month-end-close-checklist · on main as one file · card-format rewrite on a local branch, not on main · audited 27 Oct 2026</div>
+  <div class="eyebrow">month-end-close-checklist · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
   <h1>The structure of the month-end close checklist skill, and what it does</h1>
-  <p class="lede">On main the skill is one 991-line file. The rewrite described here turns it into a 127-line card and seven reference files, and it keeps the original text. Two things set this skill apart. It is the hub of the close: its task list names 15 other skills in the library. And it observes and reports only: it locks no period, posts no entry and marks no task complete. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows the three audit findings, all fixed, and one observation.</p>
+  <p class="lede">On main the skill is a 158-line card and seven reference files. Before the split it was one 991-line file, and the split kept the original text. A bookkeeping audit then changed the method on main. Two things set this skill apart. It is the hub of the close: its task list names 15 other skills in the library. And it observes and reports only: it locks no period, posts no entry and marks no task complete. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows the audit findings: four fixed on main, one that main never needed, and two open observations.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">Card</span><span class="v">127</span><span class="s">lines in SKILL.md, down from 991</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">751/753</span><span class="s">original lines byte for byte, and 30 of 30 sections in one piece</span></div>
-    <div class="stat"><span class="k">Verdicts</span><span class="v">60 · 23 · 42</span><span class="s">[auto] · [gated] · [manual] on main, unchanged in the references</span></div>
-    <div class="stat"><span class="k">Skills named</span><span class="v">15</span><span class="s">skills in the library that the task list names. None checked yet for a matching card</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">3 fixed</span><span class="s">one in the rewrite, two in their own commits, and one observation</span></div>
+    <div class="stat"><span class="k">Card</span><span class="v">158</span><span class="s">lines in SKILL.md on main, down from 991</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">745/746</span><span class="s">non-blank lines of the pre-split file, byte for byte, at f5e9ba2. One link path changed</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">69 · 6 · 62</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. 937f77b adds a "mixed" tag. Before: 60 · 23 · 42</span></div>
+    <div class="stat"><span class="k">Skills named</span><span class="v">15</span><span class="s">skills that the task list names, all in the library on main. No name outside the library</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">4 fixed</span><span class="s">on main in 7e38716, f5e9ba2 and 937f77b. One not needed on main, two observations open</span></div>
   </div>
 </section>
 
 <section>
   <h2>Construction</h2>
-  <p class="sec-title">One card, seven files behind it, 127 lines instead of 991</p>
+  <p class="sec-title">One card, seven files behind it, 158 lines instead of 991</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 127-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 398 lines, then mosofin-protocol.md at 262, gates.md at 141, edge-cases.md at 76, tools-and-glossary.md at 60, overview.md at 53 and output.md at 51.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 158-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 431 lines, then mosofin-protocol.md at 262, gates.md at 144, edge-cases.md at 78, tools-and-glossary.md at 62, overview.md at 54 and output.md at 51.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
-        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 127</text>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 158</text>
         <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
           <text x="48" y="78" font-weight="600">What closing means · with Mosofin</text>
           <text x="48" y="112" font-weight="600">Rules that never bend</text>
-          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to F</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to J</text>
           <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
           <text x="48" y="232">Stage 3 · Build and scope the list</text>
           <text x="48" y="272">Stage 4 · Owners, materiality</text>
@@ -142,13 +142,13 @@
         </g>
         <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
-          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="204" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
-          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="110" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">141</text></g>
-          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">398</text></g>
-          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="59" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">76</text></g>
-          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="40" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">51</text></g>
-          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="41" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">53</text></g>
-          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="47" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">60</text></g>
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="188" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="104" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">144</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">431</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="56" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">78</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="37" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">51</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="39" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">54</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="45" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">62</text></g>
         </g>
         <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
           <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
@@ -168,7 +168,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 9 and both entity scenarios. <b>edge-cases.md</b> holds the 24 edge cases, 13 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>tools-and-glossary.md</b> names the 7 workflow tools, the 13 evidence tools and the glossary. Each bar uses the file's own line count from <code>wc -l</code>.</figcaption>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 9 and both entity scenarios. <b>edge-cases.md</b> holds the 24 edge cases, 13 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>tools-and-glossary.md</b> names the 7 workflow tools, the 13 evidence tools and the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
   </figure>
 </section>
 
@@ -177,7 +177,7 @@
   <p class="sec-title">What the skill does, stage by stage</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 1216" role="img" aria-label="Stage 1 asks six questions: Mosofin or upload, the period and whether it is a soft or a hard close, the target close date, the reporting framework, the team with the owner of each task, and the materiality threshold. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company files, settle the entity scenario, read the tool catalogue and read the company profile. Otherwise the user uploads the trial balance for this and the prior period and the chart of accounts, which are required, plus the journal entries and last month's close. Both paths read back and wait for a yes. Stage 3: step 0 reads the evidence in one batch and checks the mock flag, steps 1 and 2 build the task list by day and scope it from the chart, with the evidence for each removal. Stage 4: step 3 assigns owners, deadlines and dependencies and adds an Evidence column, step 4 applies materiality to a list rebuilt from balances, step 5 shows the tasks that wait on outside information separately. Stage 5: step 6 ties out, with the trial balance true by construction and continuity checked per account, step 7 measures the slip from posting dates, step 8 delivers nine sheets. Stage 6: step 9 offers to save the task list, owners, dependencies, materiality basis and scoping decisions, never statuses or results, on an explicit yes.">
+      <svg viewBox="0 0 920 1216" role="img" aria-label="Stage 1 asks questions A to J: Mosofin or upload, the period, the close calendar, soft or hard close, the reporting framework, the owners, the materiality threshold, the template and last month's close, the profile on the upload path only, and cash or accrual basis. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company files, settle the entity scenario, read the tool catalogue and read the company profile. Otherwise the user uploads the trial balance for this and the prior period, which is required, last month's trial balance as reported for the continuity check, and the chart of accounts and the journal entries, which are recommended. Both paths read back and wait for a yes. Stage 3: step 0 reads the evidence in one batch and checks the mock flag, steps 1 and 2 build the task list by day and scope it from the chart, with the evidence for each removal. Stage 4: step 3 assigns owners, deadlines and dependencies and adds an Evidence column with its test and a reviewer, step 4 applies materiality to a list rebuilt from balances, step 5 shows the tasks that wait on outside information separately. Stage 5: step 6 ties out, with the trial balance true by construction and continuity checked per account against last month's trial balance as reported, step 7 measures the slip from entry-created times, step 8 delivers nine sheets. Stage 6: step 9 offers to save the task list, owners, dependencies, materiality basis and scoping decisions, never statuses or results, on an explicit yes.">
         <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
           <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
@@ -193,13 +193,17 @@
         <g font-family="Archivo,sans-serif">
           <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
-          <g font-size="13.5" fill="var(--ink)">
-            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
-            <text x="330" y="74"><tspan font-weight="600">B</tspan> Period · soft or hard close</text>
-            <text x="590" y="74"><tspan font-weight="600">C</tspan> Target close date</text>
-            <text x="80" y="100"><tspan font-weight="600">D</tspan> Reporting framework</text>
-            <text x="330" y="100"><tspan font-weight="600">E</tspan> Team, owners, template</text>
-            <text x="590" y="100"><tspan font-weight="600">F</tspan> Materiality, never assumed</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload</text>
+            <text x="236" y="74"><tspan font-weight="600">B</tspan> Period</text>
+            <text x="392" y="74"><tspan font-weight="600">C</tspan> Close calendar</text>
+            <text x="548" y="74"><tspan font-weight="600">D</tspan> Soft or hard</text>
+            <text x="704" y="74"><tspan font-weight="600">E</tspan> Framework</text>
+            <text x="80" y="100"><tspan font-weight="600">F</tspan> Owners</text>
+            <text x="236" y="100"><tspan font-weight="600">G</tspan> Materiality</text>
+            <text x="392" y="100"><tspan font-weight="600">H</tspan> Template, last close</text>
+            <text x="548" y="100"><tspan font-weight="600">I</tspan> Profile, upload only</text>
+            <text x="704" y="100"><tspan font-weight="600">J</tspan> Cash or accrual</text>
           </g>
           <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
@@ -216,16 +220,16 @@
           <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
           <g font-size="13" fill="var(--ink)">
             <text x="558" y="316">Trial balance, now and prior, required</text>
-            <text x="558" y="340">Chart of accounts, required to scope</text>
-            <text x="558" y="364">Journal entries posted in the period</text>
-            <text x="558" y="388">Last month's close and open items</text>
+            <text x="558" y="340">Last month's TB as reported</text>
+            <text x="558" y="364">Chart of accounts, recommended</text>
+            <text x="558" y="388">Journal entries posted in the period</text>
           </g>
           <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
           <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
 
           <rect x="60" y="510" width="800" height="210" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–2 · READ THE EVIDENCE, THEN BUILD AND SCOPE THE LIST</text>
-          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch · data_source_id, accounting_method on every read</text>
           <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
             <text x="80" y="584">search_accounts · search_journal_entries</text>
             <text x="80" y="604">get_trial_balance (this and prior period)</text>
@@ -233,7 +237,7 @@
             <text x="80" y="644">get_general_ledger · search_classes</text>
             <text x="80" y="664">search_locations · get_company_info</text>
           </g>
-          <text x="80" y="698" font-size="13" fill="var(--ink)"><tspan font-weight="600">Steps 1–2</tspan> · 5 pre-close tasks, 46 on Days 1 to 7 · scoped from the chart · each removal with its evidence</text>
+          <text x="80" y="698" font-size="13" fill="var(--ink)"><tspan font-weight="600">Steps 1–2</tspan> · 5 pre-close tasks, 48 on Days 1 to 7 · scoped from the chart · each removal with its evidence</text>
           <rect x="640" y="556" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
           <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
           <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">a board on fixtures shows</text>
@@ -241,15 +245,15 @@
 
           <rect x="60" y="752" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="778" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 3–5 · OWNERS, MATERIALITY, OPEN ITEMS · + EDGE-CASES.MD</text>
-          <text x="80" y="806" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  owner, due date, dependencies · Evidence column: what the books show, beside Status</text>
+          <text x="80" y="806" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  owner, due date, dependencies · Evidence with its test, beside Status · reviewer</text>
           <text x="80" y="834" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 4–5</tspan>  materiality list rebuilt from balances · outside information shown separately</text>
           <text x="80" y="862" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Edge cases</tspan>  soft or hard close · late information · re-open · startup materiality · year-end</text>
 
           <rect x="60" y="914" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="940" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 6–8 · TIE OUT, THEN NINE SHEETS · + OUTPUT.MD</text>
-          <text x="80" y="968" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  trial balance balances: true by construction · each BS account listed</text>
-          <text x="80" y="994" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  inter-period continuity, per account, not only in total</text>
-          <text x="80" y="1020" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 7</tspan>  lessons learned: posting dates measure where the close slipped</text>
+          <text x="80" y="968" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  trial balance: true by construction · reconciliation status from owner or workpaper</text>
+          <text x="80" y="994" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  continuity per account, against last month's TB as reported, or "not performed"</text>
+          <text x="80" y="1020" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 7</tspan>  lessons learned: entry-created times measure where the close slipped</text>
           <text x="80" y="1046" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8</tspan>  calendar · task detail · open items · variances · materiality · tie-out</text>
           <text x="80" y="1072" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8</tspan>  lessons · scoping · coverage · ask before Excel · one Data sources line</text>
 
@@ -264,7 +268,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. On both paths the skill asks B to D every run, and asks for F. No ledger holds the close calendar, the team or the materiality threshold. The card and Step 3 both say that Status is what someone claims and Evidence is what the books show. The highlighted box shows the mock rule from Step 0. Stage 4 also reads edge-cases.md, for example for late information or a re-opened period. Step 9 runs only after the user saw the results.</figcaption>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. On both paths the skill asks B to E and J every run, and asks for F to H. Question I is for the upload path only. No ledger holds the close calendar, the team or the materiality threshold. The card and Step 3 both say that Status is what someone claims and Evidence is what the books show. The highlighted box shows the mock rule from Step 0. Stage 4 also reads edge-cases.md, for example for late information or a re-opened period. Step 9 runs only after the user saw the results.</figcaption>
   </figure>
 </section>
 
@@ -275,16 +279,16 @@
   <div class="tbl"><table>
     <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to F. Checks the workspace, the company files, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Stage 1 · questions B to F</td><td>Asks for the period, the close type, the target date, the framework, the owners and the materiality threshold. Never assumes a threshold</td><td>None. The user supplies them</td><td>No outside authority. The $5,000 threshold in the worked example is the example owner's own choice</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to J. Checks the workspace, the company files, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · questions B to J</td><td>Asks for the period, the close calendar, the close type, the framework, the owners, the materiality threshold, the template and the accounting basis. Never assumes a threshold</td><td>None. The user supplies them</td><td>No outside authority. The $5,000 threshold in the worked example is the example owner's own choice</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 0</td><td>Reads the evidence in one batch and checks the <code>mock</code> flag</td><td><code>search_accounts</code> <code>search_journal_entries</code> <code>get_trial_balance</code> <code>get_balance_sheet</code> <code>get_profit_and_loss</code> <code>get_general_ledger</code> <code>search_classes</code> <code>search_locations</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue. The mock rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 1</td><td>Builds the task list by day: 5 pre-close tasks and 46 tasks on Days 1 to 7. Names 15 other skills for the work</td><td>None beyond the reads</td><td>[2] Under the accrual method, a business reports income in the year it earns it and expenses in the year it incurs them. This is why Day 3 posts accruals, prepaid releases and deferred revenue entries. The day-by-day structure is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Builds the task list by day: 5 pre-close tasks and 48 tasks on Days 1 to 7. Names 15 other skills for the work</td><td>None beyond the reads</td><td>[2] Under the accrual method, a business reports income in the year it earns it and expenses in the year it incurs them. This is why Day 3 posts accruals, prepaid releases and deferred revenue entries. The day-by-day structure is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 2</td><td>Scopes the list from the chart of accounts and reports each removal with its evidence. Adds industry tasks</td><td><code>search_accounts</code> <code>get_company_info</code></td><td>No outside authority. The scoping rules and the industry lists are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 3</td><td>Assigns owners, deadlines and dependencies. Adds an Evidence column beside Status</td><td><code>search_journal_entries</code> <code>get_journal_entry</code></td><td>[5] Separate authority, custody and accounting. The skill observes and reports, owners do the tasks, a manager reviews and signs off. The Evidence column is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Assigns owners, deadlines and dependencies. Adds an Evidence column beside Status, with the test for each task, and a reviewer and review date</td><td><code>search_journal_entries</code> <code>get_journal_entry</code></td><td>[5] Separate authority, custody and accounting. The skill observes and reports, owners do the tasks, a manager reviews and signs off. The Evidence column is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
       <tr><td>Steps 4–5</td><td>Lists every balance sheet account above and below the threshold. Shows the tasks that wait on outside information separately</td><td><code>get_balance_sheet</code> <code>get_trial_balance</code></td><td>No outside authority. The materiality list and the open-items grouping are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 6 · reasonableness</td><td>Compares the income statement with the expected result, within a tolerance the user sets</td><td><code>get_profit_and_loss</code></td><td>[4] Management reviews actual results against budgets, forecasts and prior periods, and investigates unexpected results</td><td><span class="kind auth">Authority</span></td></tr>
-      <tr><td>Step 6 · continuity</td><td>Checks that this period's opening balance equals last period's closing balance, account by account</td><td><code>get_trial_balance</code> <code>get_balance_sheet</code></td><td>[3] Balance sheet accounts are permanent and carry their balance into the next period. The per-account rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 7</td><td>Measures where the close slipped from the posting dates</td><td><code>search_journal_entries</code></td><td>[1] Median 6 calendar days to agreed monthly statements, in a benchmark of mostly larger organisations. A small business may close faster or slower</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 6 · continuity</td><td>Compares last month's trial balance as reported with a fresh read of the same date, account by account. Without the reported trial balance, the check is "not performed"</td><td><code>get_trial_balance</code> <code>get_balance_sheet</code></td><td>[3] Balance sheet accounts are permanent and carry their balance into the next period. The per-account rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Measures where the close slipped from the entry-created times. Manual if the read gives no created time</td><td><code>search_journal_entries</code></td><td>[1] Median 6 calendar days to agreed monthly statements, in a benchmark of mostly larger organisations. A small business may close faster or slower</td><td><span class="kind auth">Authority</span></td></tr>
       <tr><td>Step 8</td><td>Delivers nine sheets. Asks before it makes an Excel file</td><td>None</td><td>No outside authority. The nine sheets and the Evidence column are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 9</td><td>Offers to save the task list, owners, dependencies, materiality basis and scoping. Never statuses or results</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
     </tbody>
@@ -304,50 +308,62 @@
 
 <section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Three findings, all fixed, and one observation</p>
+  <p class="sec-title">Four findings fixed on main, one that main never needed, and two open observations</p>
   <div class="findings">
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>The continuity check could never break</h3>
+      <p>F4. Step 6 compared this period's opening balance with last period's closing balance, both read live from the same ledger. Live, the opening balance <i>is</i> the prior closing balance, so the two reads always agreed. Now the check compares last month's trial balance as reported with a fresh read of the same date, account by account. Without the reported trial balance, the result is "not performed", never a pass. The first month of a fiscal year expects a break on the P&amp;L lines and retained earnings.</p>
+      <span class="where">references/method.md · Step 0, Step 6 · SKILL.md upload table · fixed on main in 937f77b</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>Nine more findings from the bookkeeping audit</h3>
+      <p>F5. The same commit fixed nine more findings. <code>[gated]</code> now means only that a tool needs approval, and a task that is partly observable carries "mixed" with a verdict for each part. Each <code>[auto]</code> task states its test: the account, the side and the date window. The reconciliation status comes from the owner or the workpaper. Close timing uses entry-created times, not entry dates. Intake question J asks for the cash or accrual basis. Day 3 checks the reversal of last month's accruals, and Day 4 checks clearing and suspense accounts. Each task records a reviewer and a review date. An owner agrees the inventory cutoff to receiving and shipping records by hand. The variance tracker has a prior-period column.</p>
+      <span class="where">SKILL.md, gates.md, method.md, overview.md · fixed on main in 937f77b</span>
+    </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>991 lines in one file, against a 500-line guide</h3>
-      <p>F1. The rewrite splits the skill into a 127-line card. The card holds the six rules that never bend, questions A to F, the upload checklist and six stages. The original text moved unchanged into <code>references/</code>. 751 of the 753 content lines are present byte for byte, and all 30 sections stay in one piece. The audit counted them on the 987-line file after eaa4a96. The description has 903 characters, against the limit of 1,024. On main it has 924.</p>
+      <p>F1. The split turns the skill into a 157-line card, now 158 after 937f77b. The card holds the six rules that never bend, intake questions A to I, the upload checklist and six stages. 937f77b added question J. The original text moved unchanged into <code>references/</code>. 745 of the 746 non-blank lines of the pre-split file are present byte for byte. The one that differs is the link to <code>shared/onboarding.md</code>, with one more <code>../</code> for the new folder. The description has 1,000 characters on main, against the limit of 1,024. Before the split it had 924.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">SKILL.md + references/ · commit 6cc0088, local, not on main</span>
+      <span class="where">SKILL.md + references/ · fixed on main in f5e9ba2</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Twenty names of skills that are not in the library</h3>
-      <p>F2. The task list and its notes named 20 skills that are not in the library, in 24 places. Examples are <code>year-end-close</code>, <code>intercompany-reconciliation</code> and <code>ipo-readiness-accounting</code>. Where the task name already said what the work is, the commit removed the bracketed name. Each "see" sentence now describes the work. The year-end note now says that this checklist does not cover the full year-end procedure. The 15 names that are in the library did not change.</p>
-      <span class="where">SKILL.md on main, before the split · commit eaa4a96, local, not on main</span>
+      <p>F2. The task list and its notes named 20 skills that are not in the library, in 24 places on 15 lines. Examples are <code>year-end-close</code>, <code>intercompany-reconciliation</code> and <code>ipo-readiness-accounting</code>. Where the task name already said what the work is, the commit removed the bracketed name. The 15 names that are in the library did not change. Main now names no skill outside the library.</p>
+      <span class="where">SKILL.md, before the split · fixed on main in 7e38716</span>
     </div></div>
-    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+    <div class="f low"><span class="sev">Low · not on main</span><div class="body">
       <h3>The read-back example named the wrong weekday</h3>
-      <p>F3. The card's read-back example said "Friday 7 November". In 2026, 7 November is a Saturday. The example now says "Friday 6 November".</p>
-      <span class="where">SKILL.md · Stage 1 read-back · commit d70ab76, local, not on main</span>
+      <p>F3. A local draft of the card said "Friday 7 November". In 2026, 7 November is a Saturday. The card on main never had this text. Its read-back example closes August 2026 with a target of "Day 6" and names no weekday. So main needs no fix.</p>
+      <span class="where">SKILL.md · Stage 1 read-back · no change needed on main</span>
     </div></div>
-    <div class="f low add"><span class="sev">Observation</span><div class="body">
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
       <h3>"The four inventory tasks", but the list has three</h3>
-      <p>Step 2's example says that the scoping step removes "the four inventory tasks". The Step 1 list has three tasks with "inventory" in the name. They are the Day 1 inventory cutoff, the Day 2 cycle count and the Day 3 write-downs. The audit did not change the sentence, because the moved text stays byte-identical. It records the difference for the skill owner.</p>
-      <span class="where">references/method.md · Step 2 · not changed</span>
+      <p>Step 2's example says that the scoping step removes "the four inventory tasks". The Step 1 list on main has three tasks with "inventory" in the name. They are the Day 1 inventory cutoff, the Day 2 cycle count and the Day 3 write-downs. The audit commit 937f77b did not change the sentence. This page records the difference for the skill owner.</p>
+      <span class="where">references/method.md · Step 2 · still on main</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>Two files still describe the old continuity check</h3>
+      <p>The glossary defines inter-period continuity as "this period's opening balances equalling last period's closing ones". The output standards check continuity "per balance sheet account" and do not name last month's trial balance as reported. Step 6 now compares against the reported trial balance. Also, Step 6 still opens with "[auto] for most of it", but after 937f77b several of its items are <code>[manual]</code>. The skill owner can align these lines.</p>
+      <span class="where">references/tools-and-glossary.md · references/output.md · references/method.md Step 6 · still on main</span>
     </div></div>
   </div>
-  <p style="color:var(--muted);font-size:14.5px">The audit found no open finding.</p>
+  <p style="color:var(--muted);font-size:14.5px">History note for reviewers: 56f9f95 puts the 984-line file back, and 94abe0d splits it again. Their content is the same as 7e38716 and f5e9ba2, so the result on main does not change.</p>
 </section>
-
 <section>
   <h2>Passed</h2>
   <p class="sec-title">What checked out</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>The repository's validator passes with the rewrite (31 skills, 0 failures). The shared blocks are in sync.</span></li>
-    <li><span class="ok">PASS</span><span>751 of the 753 content lines are present byte for byte, and all 30 of 30 sections stay in one piece.</span></li>
-    <li><span class="ok">PASS</span><span>No broken links in the bundle.</span></li>
-    <li><span class="ok">PASS</span><span>The audit traced each statement on the card to the reference line that it summarises.</span></li>
+    <li><span class="ok">PASS</span><span>The split commit f5e9ba2 reports that the repository's validator and the shared-block sync pass.</span></li>
+    <li><span class="ok">PASS</span><span>745 of the 746 non-blank lines of the pre-split file are present byte for byte. The one difference is a relative link path.</span></li>
+    <li><span class="ok">PASS</span><span>Every relative link in the eight files on main resolves.</span></li>
+    <li><span class="ok">PASS</span><span>Each Step that the card names exists in method.md on main.</span></li>
     <li><span class="ok">PASS</span><span>The rule that a posted entry shows only that an entry exists is in the card and in the overview.</span></li>
     <li><span class="ok">PASS</span><span>The 15 skills that the task list names are all in the library on main.</span></li>
-    <li><span class="ok">PASS</span><span>The verdict tags are 60 [auto], 23 [gated] and 42 [manual], on main and in the references.</span></li>
-    <li><span class="ok">PASS</span><span>The card linter leaves 3 hard findings, all in intake row A. Row A is the same on every card.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 69 [auto], 6 [gated] and 62 [manual] in the eight files. The tool names on main use underscores only.</span></li>
   </ul>
   <h3 style="margin:0;font-size:18px">Not yet tested</h3>
-  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with a real close. The audit did not read the tool catalogue. So nothing here shows which of the 13 evidence tool names Gate 2 would find. The audit did not check whether each of the 15 named skills has a matching card yet. The audit checked the outside sources through search results only, and did not open the pages.</p>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with a real close. The audit did not read the tool catalogue. So nothing here shows which of the 13 evidence tool names Gate 2 would find, or if the journal-entry read returns a created time. The audit did not check whether each of the 15 named skills has a matching card yet. The audit checked the outside sources through search results only, and did not open the pages.</p>
 </section>
-
-<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">MosoFin/mosofin-finance-skills</a> as the 991-line file. The card-format rewrite is four local commits on the branch <code>claude/month-end-close-card-format</code>. They are eaa4a96 (no reference to a skill outside the library), 6cc0088 (the split), 76dd9ae (the README line) and d70ab76 (the read-back weekday). These commits are not on <code>main</code>, and the rewrite has not shipped. When it ships, replace these hashes with the merged hashes. A live run, a catalogue read and a check of the 15 named skills are still to do after the audit on 27 Oct 2026.</footer>
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The commits for this skill on main are 7e38716 (no reference to a skill outside the library) and f5e9ba2 (the split). Then come 56f9f95 and 94abe0d (the same two changes again) and 14f616a (the cross-entity pointer in gates.md). Last is 937f77b, the bookkeeping-audit changes of 27 Oct 2026. A live run, a catalogue read and a check of the 15 named skills are still to do.</footer>
 
 </div>
