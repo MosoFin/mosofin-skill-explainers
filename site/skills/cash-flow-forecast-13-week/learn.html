@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn.html">
 <meta property="og:title" content="13-Week Cash Flow Forecast Worked Examples | MosoFin">
 <meta property="og:description" content="Six worked cash forecast examples, from one week&#x27;s chain to the week that breaks a covenant floor, with a 13-week calculator. Rules quoted, facts cited.">
-<meta property="article:modified_time" content="2026-10-27">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="13-Week Cash Flow Forecast Worked Examples | MosoFin">
 <meta name="twitter:description" content="Six worked cash forecast examples, from one week&#x27;s chain to the week that breaks a covenant floor, with a 13-week calculator. Rules quoted, facts cited.">
@@ -59,7 +59,7 @@
         "@type": "CollectionPage",
         "@id": "https://skills.mosofin.com/skills/cash-flow-forecast-13-week/#page"
       },
-      "dateModified": "2026-10-27",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "cash-flow-forecast-13-week",
@@ -296,7 +296,7 @@
 <section>
   <span class="label">How it thinks</span>
   <h2>Fourteen rules the whole skill runs on</h2>
-  <p class="muted">Every level below applies one or more of these rules. The examples use one company, Northbrook Trading, and one forecast of 13 weeks from Monday 6 October. Its floor is a covenant of $150,000, measured on cash net of restricted cash. Its opening available cash is $182,400: the Operating account at $151,900 plus the Savings account at $30,500. The Tax Reserve account holds $24,000 of restricted cash, so the skill leaves it out.</p>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one company, Northbrook Trading, and one forecast of 13 weeks from Monday 6 October. Its floor is a covenant of $150,000, measured on cash net of restricted cash. Its opening available cash is $182,400: the Operating account at $151,900 plus the Savings account at $30,500. The Tax Reserve account holds $24,000 of restricted cash, so the skill leaves it out. The two figures are the bank balances on 6 October. The skill agrees them to the books through the latest bank reconciliation.</p>
   <div class="rules" id="rules"></div>
 </section>
 
@@ -338,9 +338,9 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which accounts count as available cash, and is any cash restricted? What is your payroll calendar: pay dates, net pay, tax remittance dates and benefit dates? Which debt payments, tax due dates and other large one-off payments fall inside the horizon? What is your minimum cash floor, is it a covenant or your own preference, and how does it define cash? Do you have a credit facility, and is the horizon 13 weeks?</div>
-    <div><b>Needs</b>The skill needs your opening cash by account, with restricted accounts marked. It needs your open invoices and bills with their due dates, and the payment history that measures days-to-pay. It needs the payroll calendar, debt service, tax dates, the floor and the facility typed in, because no ledger holds them. Twelve months of cash account activity makes the result better.</div>
-    <div><b>Gives back</b>The skill gives back seven sheets. They are the 13-week forecast, the collection detail with each customer's days-to-pay and sample size, and the disbursement detail. Then come the liquidity alerts, the sensitivities, the forecast-versus-actual tracker and a coverage sheet. It asks before it makes an Excel file.</div>
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? What horizon, from which start date? Which accounts count as available cash, and is any cash restricted? What is your payroll calendar: pay dates, net pay, tax remittance dates and benefit dates? Which debt payments, tax due dates and other large one-off payments fall inside the horizon? Which open bills do you plan to pay, and when? What is your minimum cash floor, is it a covenant or your own preference, and how does it define cash? Do you have a credit facility? Is cash pooled between your companies? On the MosoFin path, it also asks for the bank balance of each account on the start date.</div>
+    <div><b>Needs</b>The skill needs the bank balance of each account on the start date, with restricted accounts marked, and the latest bank reconciliation. It needs your open invoices and bills with their due dates, and the payment history that measures days-to-pay. If you use credit cards, it needs the latest card statements. It asks how many days past due an invoice can be before it counts as at risk. It needs the payroll calendar, debt service, tax dates, the floor and the facility typed in, because no ledger holds them. Twelve months of cash account activity makes the result better.</div>
+    <div><b>Gives back</b>The skill gives back seven sheets. They are the 13-week forecast, the collection detail with each customer's days-to-pay and sample size, and the disbursement detail with the source of each payment. Then come the liquidity alerts, the sensitivities, the forecast-versus-actual tracker and a coverage sheet. It asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never draws on a facility, schedules a payment or defers anything. It never defaults the opening balance, the floor, the payroll amounts or the entity. It never puts payroll or a tax remittance on the lever list. It reads nothing before you answer its questions and say yes.</div>
   </div>
 </section>
@@ -377,7 +377,7 @@ const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").
 /* The fourteen quotes, word for word from the skill's files. Section names are written as the files write them. */
 const Q = {
   q1:{q:"profit is an opinion; cash is a fact", w:"references/overview.md · 13-Week Cash Flow Forecast (Mosofin)"},
-  q2:{q:"\"this customer pays on average 15 days late\" is a measurement, not an assumption", w:"references/overview.md · Why this skill fits a connected workspace particularly well"},
+  q2:{q:"For example: a customer who pays on average 15 days late → forecast collection 15 days after the due date — with the derived figure, this stops being an example and becomes the method", w:"references/method.md · Step 2 — Forecast cash receipts (cash in)"},
   q3:{q:"never default the opening balance, the floor, the payroll amounts, or the entity", w:"references/gates.md · Gate 3 — Profile the entity, then interview the user"},
   q4:{q:"restricted cash is excluded, and a deposit account you cannot access this week is not liquidity", w:"references/method.md · Step 1 — Set up the weekly grid"},
   q5:{q:"Show the sample size; a days-to-pay from two invoices is not a pattern", w:"references/method.md · Step 2 — Forecast cash receipts (cash in)"},
@@ -397,7 +397,7 @@ const RULES = [
     plain:"The forecast counts money that moves in and out of the bank. It ignores accruals and non-cash items. A profitable month can still miss payroll.",
     backed:"IAS 7 describes the direct method as a report of the major classes of gross cash receipts and gross cash payments. The standard encourages it because it gives information useful for estimating future cash flows." },
   { id:"2", title:"The skill measures days-to-pay", r:Q.q2, cites:[7,8],
-    plain:"Invoice dates and payment dates are both in the books. The skill compares them for each customer and uses the result as the collection date.",
+    plain:"Due dates and payment dates are both in the books. For each customer, the skill measures how many days past the due date each payment came, weighted by amount. The expected collection date is the due date plus that average.",
     backed:"An aging report shows only how long each balance is past due, in periods such as 1–30 and 31–60 days.{8} A bank-history planner projects the next 90 days from past bank activity and leaves out manually entered transactions.{7} Neither one says when a customer will pay." },
   { id:"3", title:"Four inputs are never defaulted", r:Q.q3, cites:[],
     plain:"The skill proposes defaults for some inputs. It never proposes one for the opening balance, the floor, the payroll amounts or the entity. It asks for each one." },
@@ -446,12 +446,12 @@ const LEVELS = [
 
   { n:2, title:"A customer who pays late",
     chips:["Open invoices","Payment history","Aging report"], src:"Rules 2, 5 and 6", cites:[4,8],
-    situation:"Northbrook invoiced Harbor Retail $24,000 on net 30 terms, due 17 October. Harbor paid its last 9 invoices on average 16 days after the due date, with a spread of 4 days.",
+    situation:"Northbrook invoiced Harbor Retail $24,000 on net 30 terms, due 17 October. Harbor paid its last 9 invoices on average 16 days after the due date, weighted by amount, with a spread of 4 days.",
     facts:["The aging report shows unpaid balances by how long they are past due, in periods such as 1–30 and 31–60 days "+C(8)+". On 6 October this invoice is not yet due, so the report says nothing about when Harbor will pay.",
            "If Harbor pays by ACH, the money settles the same day, the next banking day, or in two banking days, and never later "+C(4)+"."],
     visual:{type:"table",
       head:["Input","Value","Where it comes from"],
-      rows:[["Invoice amount","$24,000","open invoices"],["Due date","17 Oct, week 2","open invoices"],["Harbor's average days late","16 days","9 paid invoices"],["Spread","4 days","the same 9 invoices"],["Expected in the bank",["2 Nov, week 5","good"],"the skill's days-to-pay"]]},
+      rows:[["Invoice amount","$24,000","open invoices"],["Due date","17 Oct, week 2","open invoices"],["Harbor's average days late","16 days","9 paid invoices, weighted by amount"],["Spread","4 days","the same 9 invoices"],["Expected in the bank",["2 Nov, week 5","good"],"the skill's days-to-pay"]]},
     rules:[Q.q2, Q.q5, Q.q6],
     math:[["Due date","17 Oct"],["+ Harbor's average days late","16 days"],["= expected payment date","2 Nov",1],["2 Nov is a Sunday. The first banking day after it","3 Nov, week 5"],["Week of the due date","week 2"],["Week the skill uses","week 5",1],["Sample size shown","9 invoices"]],
     verdict:["ok","The skill places the $24,000 in week 5, three weeks after the due-date week, and shows the sample size of 9. A forecast that used the due date would put $24,000 into week 2 that will not arrive.","MEASURED"] },
@@ -470,7 +470,7 @@ const LEVELS = [
 
   { n:4, title:"The week that breaks the floor",
     chips:["Payroll calendar","Tax dates","Last year's cash","Floor"], src:"Rules 9, 10 and 12", cites:[1,3],
-    situation:"In week 7 four outflows land together: net pay, the payroll tax deposit, the $21,000 insurance renewal and $37,200 of other bills. The skill found the renewal by scanning last year's cash for anniversaries inside the horizon. Only $40,200 comes in.",
+    situation:"In week 7 four outflows land together: net pay, the payroll tax deposit, the $21,000 insurance renewal and $37,200 of other bills. The skill found the renewal by scanning last year's cash for anniversaries inside the horizon. No open bill covers the renewal, so the skill places it only once. Only $40,200 comes in.",
     facts:["In a 2024 Federal Reserve survey of 7,653 small employer firms, 56% named paying operating expenses as a financial challenge. Those expenses include payroll, rent and inventory "+C(1)+".",
            "State law sets how often wages must be paid, on paydays designated in advance "+C(3)+". So a payday cannot move to suit the forecast."],
     visual:{type:"wf", start:["Opening cash, week 7",187200], steps:[["+ receipts",40200],["− net pay",-28900],["− payroll taxes",-9300],["− insurance renewal",-21000],["− other bills",-37200]], end:["Closing cash, week 7",131000], dec:0, warn:true},
@@ -493,14 +493,14 @@ const LEVELS = [
 
   { n:6, title:"Rolling it forward",
     chips:["Bank activity","Payment history","Forecast tracker"], src:"Rules 11 and 13", cites:[5],
-    situation:"One week passed. The bank shows that week 1 received $44,900, against the $46,200 the skill forecast. One customer paid 3 days late, by check, and the check cleared on the next Monday.",
+    situation:"One week passed. The bank shows that week 1 received $44,900, against the $46,200 the skill forecast. Disbursements were $38,500, as forecast. One customer paid 3 days late, by check, and the check cleared on the next Monday.",
     facts:["A local check must be available by the second business day after deposit "+C(5)+". A check deposited late in a week can land in the next one."],
     visual:{type:"table",
       head:["Week 1","Forecast","Actual","Variance"],
       rows:[["Receipts","$46,200","$44,900",["−$1,300","bad"]],["Cause","","one customer, 3 days late, by check",""],["Where the $1,300 lands","week 1","week 2, next Monday",""]]},
     rules:[Q.q11, Q.q13],
-    math:[["Actual receipts, week 1","$44,900"],["− forecast receipts, week 1","$46,200"],["= variance","−$1,300",1],["Actual closing, week 1: $182,400 + $44,900 − $38,500","$188,800",1],["Week 2 now opens at","$188,800"],["New grid","weeks 2 to 14",1]],
-    verdict:["note","The skill records the $1,300 variance and its cause. It measures that customer's days-to-pay again with the new payment. Then it drops week 1, opens week 2 at $188,800 and adds a new week 14.","ROLLED"] },
+    math:[["Actual receipts, week 1","$44,900"],["− forecast receipts, week 1","$46,200"],["= variance","−$1,300",1],["Actual bank balance, end of week 1: $182,400 + $44,900 − $38,500","$188,800",1],["− forecast closing, week 1","$190,100"],["= variance line on the new grid","−$1,300",1],["The new first week, week 2, opens at","$188,800"],["New grid","weeks 2 to 14",1]],
+    verdict:["note","The skill records the $1,300 variance and its cause. It measures that customer's days-to-pay again with the new payment. Then it drops week 1 and adds a new week 14. Week 2 opens at the actual bank balance of $188,800, not at the forecast $190,100. Transfers between Northbrook's own accounts are not receipts or disbursements, so the skill leaves them out.","ROLLED"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -659,7 +659,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-27", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

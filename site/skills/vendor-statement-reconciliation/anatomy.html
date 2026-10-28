@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vendor Statement Reconciliation Anatomy | MosoFin</title>
-<meta name="description" content="How the vendor statement reconciliation skill is built: the card, six reference files, the run step by step, its sources and three audit findings.">
+<meta name="description" content="How the vendor statement reconciliation skill is built: the card, six reference files, the run step by step, its sources, and the audit findings that main fixed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -105,34 +105,34 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Vendor statement reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">vendor-statement-reconciliation · on main as one file · card-format rewrite prepared, not yet on main · audited 24 Oct 2026</div>
+  <div class="eyebrow">vendor-statement-reconciliation · card format on main · PR #1, 26 Oct 2026 · audit fix 27 Oct 2026</div>
   <h1>The structure of the vendor statement reconciliation, and what it does</h1>
-  <p class="lede">On main the skill is one 733-line file. A fix to its cross-references, on the branch, brings it to 730 lines. The rewrite described here turns those 730 lines into a 136-line card and six reference files, and it keeps the original text. Two things set this skill apart. The supplier's statement never comes from the books, so the skill always asks for it. And the skill names no QuickBooks tool, so Gate 2 reads the tool names from the catalogue on each run. This page shows how the files connect, the run step by step, and the source behind each step. It also shows the three audit findings, all fixed in the rewrite.</p>
+  <p class="lede">The card format is on main of MosoFin/mosofin-finance-skills, merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. On main the skill is a 158-line card and six reference files. The split kept the original text of the 730-line file. Two things set this skill apart. The supplier's statement never comes from the books, so the skill always asks for it. And the skill names no QuickBooks tool, so Gate 2 reads the tool names from the catalogue on each run. This page shows how the files connect, the run step by step, and the source behind each step. It also shows the three earlier audit findings, all fixed on main, and two small open points.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">Card</span><span class="v">136</span><span class="s">lines in SKILL.md, down from 730</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">495/497</span><span class="s">original lines byte for byte. The other 2 are the description and one link depth</span></div>
-    <div class="stat"><span class="k">Verdicts</span><span class="v">29 · 3 · 25</span><span class="s">[auto] · [gated] · [manual] in the references. Main has 24 [manual], and the F3 fix adds one</span></div>
+    <div class="stat"><span class="k">Card</span><span class="v">158</span><span class="s">lines in SKILL.md on main, down from 730</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">462/464</span><span class="s">non-empty lines of the 730-line file, byte for byte. The other 2 are the description and one link</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">30 · 3 · 24</span><span class="s">[auto] · [gated] · [manual] in the six reference files on main</span></div>
     <div class="stat"><span class="k">Tool names</span><span class="v">None</span><span class="s">QuickBooks tools named. The skill reads the catalogue on each run</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">3/3</span><span class="s">fixed in the rewrite, which is not yet on main</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">3/3</span><span class="s">fixed on main. Two small points are still open</span></div>
   </div>
 </section>
 
 <section>
   <h2>Construction</h2>
-  <p class="sec-title">One card, six files behind it, 136 lines instead of 730</p>
+  <p class="sec-title">One card, six files behind it, 158 lines instead of 730</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 136-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md is read on demand. method.md is the largest file at 281 lines, then mosofin-protocol.md at 262, gates.md at 104, overview.md at 72, output.md at 30 and edge-cases.md at 27.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 158-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md is read on demand. mosofin-protocol.md is the largest file at 262 lines, then method.md at 244, gates.md at 112, output.md at 94, overview.md at 72 and edge-cases.md at 29.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
-        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 136</text>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 158</text>
         <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
           <text x="48" y="78" font-weight="600">What it does · the statement limit</text>
           <text x="48" y="112" font-weight="600">Rules that never bend</text>
-          <text x="48" y="152" font-weight="600">Stage 1 · Intake, six questions</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, seven questions</text>
           <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
           <text x="48" y="232">Stage 3 · Rank, then normalise</text>
           <text x="48" y="272">Stage 4 · Match, then explain</text>
@@ -141,12 +141,12 @@
         </g>
         <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
-          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="289" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
-          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="115" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">104</text></g>
-          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">281</text></g>
-          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="30" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">27</text></g>
-          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="33" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">30</text></g>
-          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="79" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">72</text></g>
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="133" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">112</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="289" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">244</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="34" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">29</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="111" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">94</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="85" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">72</text></g>
         </g>
         <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
           <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
@@ -166,7 +166,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Step 0, Steps 1 to 5, the six sheets, the output standards, what to save and the 15 anti-patterns. <b>edge-cases.md</b> holds the 11 edge cases. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>overview.md</b> explains why the statement is outside evidence and gives the three near-substitutes. Each bar uses the file's own line count from <code>wc -l</code>.</figcaption>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Step 0, Steps 1 to 5, what to save and the 15 anti-patterns. <b>output.md</b> carries the six sheets, the 14 output quality standards and the coverage sheet. <b>edge-cases.md</b> holds the 11 edge cases. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>overview.md</b> explains why the statement is outside evidence and gives the three near-substitutes. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
   </figure>
 </section>
 
@@ -175,7 +175,7 @@
   <p class="sec-title">What the skill does, step by step</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 1030" role="img" aria-label="Stage 1 asks six questions: Mosofin or upload, which suppliers, the statement, which company and account the statement is addressed to, the dates and the statement's scope, and the dispute log and exception owner. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, read the tool catalogue and read the saved profile. Otherwise the user uploads the statement, the AP ageing or vendor ledger, and the cutoff date, with the payment register and dispute log recommended. Both paths read back and wait for a yes. Without a statement there is nothing to reconcile, and the skill offers the Step 0 ranking. Stage 3: Step 0 ranks the suppliers on seven signals and Step 1 normalises both sides. Stage 4: Step 2 matches in four tiers and Step 3 explains six difference types. Stage 5: Steps 4 and 5 propose an owner, action, date and entries marked proposed, not posted, then six sheets. Stage 6 offers to save, on an explicit yes.">
+      <svg viewBox="0 0 920 1030" role="img" aria-label="Stage 1 asks seven questions: Mosofin or upload, the statement, which company and account the statement is addressed to, both cutoff dates, the statement's scope, the dispute log, and the vendor programme with its exception owner. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, read the tool catalogue and read the saved profile. Otherwise the user uploads the statement, the full vendor ledger to today, and the vendor list or a bill search, and types the cutoff, the addressee and the account reference. The AP ageing total and trial balance, the payment register and the dispute log are recommended. Both paths read back and wait for a yes. The statement is always required. On the Mosofin path, Step 0 can still rank which statements to request. Stage 3: Step 0 ranks the suppliers on seven signals. Step 1 agrees the subledger to the general ledger, normalises both sides and reconciles at the statement date. Stage 4: Step 2 matches in four tiers and Step 3 explains seven difference types. Stage 5: Steps 4 and 5 propose an owner, action, date and entries by case, marked proposed, not posted, then six sheets. Stage 6 offers to save after the results, on an explicit yes.">
         <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
           <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
@@ -192,12 +192,13 @@
           <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
           <g font-size="13.5" fill="var(--ink)">
-            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
-            <text x="330" y="74"><tspan font-weight="600">B</tspan> Which supplier or suppliers?</text>
-            <text x="590" y="74"><tspan font-weight="600">C</tspan> The statement, PDF or CSV</text>
-            <text x="80" y="100"><tspan font-weight="600">D</tspan> Addressed to which company?</text>
-            <text x="330" y="100"><tspan font-weight="600">E</tspan> Both dates, statement scope</text>
-            <text x="590" y="100"><tspan font-weight="600">F</tspan> Dispute log, exception owner</text>
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Mosofin or upload?</text>
+            <text x="275" y="74"><tspan font-weight="600">B</tspan> The statement, PDF/CSV</text>
+            <text x="480" y="74"><tspan font-weight="600">C</tspan> Addressee, account ref</text>
+            <text x="680" y="74"><tspan font-weight="600">D</tspan> Both cutoff dates</text>
+            <text x="80" y="100"><tspan font-weight="600">E</tspan> Statement scope</text>
+            <text x="275" y="100"><tspan font-weight="600">F</tspan> Dispute log</text>
+            <text x="480" y="100"><tspan font-weight="600">G</tspan> Vendor programme, exception owner</text>
           </g>
           <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
@@ -212,11 +213,12 @@
           </g>
           <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
           <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
-          <g font-size="13" fill="var(--ink)">
-            <text x="558" y="316">Vendor statement (PDF/CSV), required</text>
-            <text x="558" y="340">AP ageing or vendor ledger, required</text>
-            <text x="558" y="364">Cutoff date, typed in, required</text>
-            <text x="558" y="388">Payment register, dispute log: recommended</text>
+          <g font-size="12" fill="var(--ink)">
+            <text x="558" y="312">Vendor statement (PDF/CSV), required</text>
+            <text x="558" y="333">Full vendor ledger to today, required</text>
+            <text x="558" y="354">Vendor list or bill search, required</text>
+            <text x="558" y="375">Cutoff, addressee, account ref, typed</text>
+            <text x="558" y="396">Ageing + TB, payments, disputes: advised</text>
           </g>
           <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
           <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
@@ -225,29 +227,29 @@
           <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–1 · RANK THE SUPPLIERS, THEN NORMALISE</text>
           <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · seven ranking signals, ledger only, Mosofin path</text>
           <g font-size="13" fill="var(--muted)">
-            <text x="80" y="584">largest balances · annual spend · never reconciled (saved history)</text>
-            <text x="80" y="604">credit balances · old open items · broken invoice pattern · high GRNI</text>
+            <text x="80" y="584">largest balances · annual spend · never reconciled (saved runs or the user)</text>
+            <text x="80" y="604">debit balances in your AP · old open items · broken invoice pattern · high GRNI</text>
           </g>
-          <text x="80" y="630" font-size="13" font-weight="600" fill="var(--ink)">Step 1 · normalise both sides, read beyond the cutoff</text>
-          <text x="80" y="652" font-size="13" fill="var(--muted)">document numbers as text · both cutoff dates · one sign convention</text>
+          <text x="80" y="630" font-size="13" font-weight="600" fill="var(--ink)">Step 1 · subledger to GL, normalise, reconcile at the statement date</text>
+          <text x="80" y="652" font-size="13" fill="var(--muted)">numbers as text · window items listed · statement adds up · one sign</text>
           <rect x="640" y="556" width="202" height="96" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
-          <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">No statement?</text>
-          <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">nothing to reconcile:</text>
-          <text x="741" y="618" text-anchor="middle" font-size="12" fill="var(--ink)">say so, and offer the</text>
-          <text x="741" y="636" text-anchor="middle" font-size="12" fill="var(--ink)">Step 0 ranking</text>
+          <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">Statement: always asked</text>
+          <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">On the Mosofin path,</text>
+          <text x="741" y="618" text-anchor="middle" font-size="12" fill="var(--ink)">Step 0 can still rank</text>
+          <text x="741" y="636" text-anchor="middle" font-size="12" fill="var(--ink)">which to request</text>
 
           <rect x="60" y="702" width="800" height="102" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
-          <text x="80" y="728" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–3 · MATCH IN FOUR TIERS, EXPLAIN SIX DIFFERENCES</text>
+          <text x="80" y="728" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–3 · MATCH IN FOUR TIERS, EXPLAIN SEVEN DIFFERENCES</text>
           <text x="80" y="756" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Tiers</tspan>  1 document number → 2 amount + date → 3 PO + amount → 4 fuzzy reference · tier kept · ties reported</text>
-          <text x="80" y="784" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Types</tspan>  missing invoice · missing credit (shown apart) · in transit · misapplied · duplicate · dispute</text>
+          <text x="80" y="784" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Types</tspan>  missing invoice · missing credit (apart) · in transit · misapplied · duplicate · dispute · short payment</text>
 
           <rect x="60" y="836" width="800" height="102" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="862" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 4–5 + OUTPUTS · PROPOSALS, THEN SIX SHEETS</text>
-          <text x="80" y="890" font-size="13.5" fill="var(--ink)">Owner, next action, target date · exceptions aged · PROPOSED — NOT POSTED · accruals kept apart</text>
-          <text x="80" y="918" font-size="13.5" fill="var(--ink)">Summary · matched items + tier · exceptions · proposed JEs · vendor prioritisation · coverage</text>
+          <text x="80" y="890" font-size="13.5" fill="var(--ink)">Owner, next action, target date · exceptions aged · entries by case · PROPOSED — NOT POSTED</text>
+          <text x="80" y="918" font-size="13.5" fill="var(--ink)">Summary that proves itself · matched + tier · exceptions · proposed JEs · vendor ranking · coverage</text>
 
           <rect x="60" y="970" width="800" height="46" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
-          <text x="80" y="999" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Offer to save</tspan>: programme, statement conventions, open exceptions, vendors reconciled and when · explicit yes</text>
+          <text x="80" y="999" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Offer to save</tspan>: only after the results, on an explicit yes · programme, conventions, open exceptions</text>
 
           <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
             <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
@@ -256,7 +258,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. The highlighted box shows the statement rule. No accounting system holds the statement, so the skill always asks for it. Without one, the skill says there is nothing to reconcile and offers the Step 0 ranking, which needs only the ledger. Step 0 runs on the Mosofin path only. Stage 4 also reads edge-cases.md, for example for a statement addressed to another company or a duplicate vendor record.</figcaption>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. The highlighted box shows the statement rule. No accounting system holds the statement, so the skill always asks for it. On the Mosofin path, Step 0 can still rank which suppliers to ask for a statement. Step 0 runs on the Mosofin path only. Step 2 rolls a balance-forward statement forward from its opening balance. Stage 4 also reads edge-cases.md, for example for a statement addressed to another company or a duplicate vendor record.</figcaption>
   </figure>
 </section>
 
@@ -267,64 +269,78 @@
   <div class="tbl"><table>
     <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>Stage 1 · Gates 0–3</td><td>Asks the six questions. Checks the workspace, the company file, the tools and the saved profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_my_skill</code> <code>get_skills</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Stage 1 · question C</td><td>Asks for the supplier's statement as a required, [manual] input</td><td>None. The user supplies the statement</td><td>[1] Evidence from an independent, knowledgeable source is generally more reliable than the company's own records</td><td><span class="kind auth">Authority</span></td></tr>
-      <tr><td>Step 0</td><td>Ranks the suppliers on seven signals. "Never reconciled" comes from the saved history, or from the user on a first run</td><td>Read tools from the Gate 2 catalogue, not named in the skill. <code>get_my_skill</code> for the saved history</td><td>The seven signals are the skill's own. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 1</td><td>Normalises document numbers, both cutoff dates and the sign convention. Reads beyond the cutoff</td><td>Read tools from the Gate 2 catalogue. The statement side is [manual]</td><td>No outside authority. The three traps are the skill's own text</td><td><span class="kind prac">Practice</span></td></tr>
-      <tr><td>Step 2</td><td>Matches in four tiers, records the tier, leaves doubtful items unmatched and reports ties</td><td>None beyond Step 1's reads</td><td>The four tiers and the tie rule are the skill's own. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Step 3 · missing invoices</td><td>Treats a statement item missing from the ledger as a candidate unrecorded liability. First it rules out a duplicate vendor record and a wrong entity</td><td>Read tools from the Gate 2 catalogue for the vendor master and connected entities</td><td>[2] Sampling recorded items cannot find omitted ones. [1] Why the supplier's list is better evidence. The six difference types are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks the seven questions. Checks the workspace, the company file, the tools and the saved profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_my_skill</code> <code>get_skills</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · question B</td><td>Asks for the supplier's statement as a required, [manual] input</td><td>None. The user supplies the statement</td><td>[1] Evidence from an independent, knowledgeable source is generally more reliable than the company's own records</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 0</td><td>Ranks the suppliers on seven signals. A debit balance in your AP marks an overpaid supplier. The last-reconciled date comes from saved runs or the user, else "not known"</td><td>Read tools from the Gate 2 catalogue, not named in the skill. <code>get_my_skill</code> for the saved history</td><td>The seven signals are the skill's own. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Agrees the AP subledger to the GL. Normalises document numbers, both cutoff dates and the sign convention. Reconciles at the statement date and lists each item between the dates. Checks that the statement adds up</td><td>Read tools from the Gate 2 catalogue. The statement side is [manual]</td><td>No outside authority. The traps and the subledger tie are the skill's own text</td><td><span class="kind prac">Practice</span></td></tr>
+      <tr><td>Step 2</td><td>Matches in four tiers, records the tier, leaves doubtful items unmatched and reports ties. Rolls a balance-forward statement forward from its opening balance</td><td>None beyond Step 1's reads</td><td>The four tiers and the tie rule are the skill's own. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3 · missing invoices</td><td>Treats a statement item missing from the ledger as a candidate unrecorded liability. First it rules out a duplicate vendor record and a wrong entity</td><td>Read tools from the Gate 2 catalogue for the vendor master and connected entities</td><td>[2] Sampling recorded items cannot find omitted ones. [1] Why the supplier's list is better evidence. The seven difference types are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 3 · missing credits</td><td>Reports a credit note missing from the ledger apart from the problems, as money owed to the business</td><td>None beyond Step 1's reads</td><td>[5] A vendor credit applies only to an open bill. With no open bill it stays unapplied until one arrives</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 3 · short payments</td><td>Finds a discount the supplier did not allow, a bank charge, a small FX difference or a fee. Proposes a write-off or a claim, and asks for the write-off limit</td><td>None beyond Step 1's reads</td><td>The skill's own rule, added on main in a31eacd. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Step 4</td><td>Proposes an owner, a next action and a target date for each exception, and ages exceptions across reconciliations</td><td>None</td><td>No outside authority. The owner and the date are the user's to set</td><td><span class="kind prac">Practice</span></td></tr>
-      <tr><td>Step 5</td><td>Drafts entries marked "PROPOSED — NOT POSTED". Proposes an accrual, not an invoice posting, until the invoice arrives</td><td>None. Hands drafts to <code>journal-entry-builder</code></td><td>[3] Accruals are liabilities for goods or services received but not yet invoiced. [4] Input tax is the VAT on the supplier's VAT invoice (UK rule)</td><td><span class="kind auth">Authority</span></td></tr>
-      <tr><td>Outputs</td><td>Delivers six sheets, with the coverage sheet from output.md. Asks before it makes an Excel file</td><td>None</td><td>The six sheets and the file-name rule are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
-      <tr><td>Stage 6 · Seed to evolved</td><td>Offers to save the programme, the statement conventions, the open exceptions and the record of which vendors it reconciled, and when</td><td><code>create_skill</code></td><td>The skill's own rule. It never saves the capability map</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Drafts entries by case, each with a support reference, marked "PROPOSED — NOT POSTED". Proposes an accrual that reverses on day 1 of the next period, not an invoice posting, until the invoice arrives</td><td>None. Hands drafts to <code>journal-entry-builder</code></td><td>[3] Accruals are liabilities for goods or services received but not yet invoiced. [4] Input tax is the VAT on the supplier's VAT invoice (UK rule)</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Outputs</td><td>Delivers the six sheets from output.md. The summary goes from the statement balance to the ledger balance, with a separate subledger-to-GL line. Asks before it makes an Excel file</td><td>None</td><td>The six sheets and the file-name rule are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 6 · Seed to evolved</td><td>Offers to save the programme, the statement conventions, the open exceptions and the record of which vendors it reconciled, and when. It asks only after the user sees the results</td><td><code>create_skill</code></td><td>The skill's own rule, from baf43ef. A general yes from earlier does not count. It never saves the capability map</td><td><span class="kind">Skill rule</span></td></tr>
       <tr><td>Edge case: payment to an old bank account</td><td>Flags a payment that cleared your bank and that the supplier did not receive as serious and [manual]</td><td>None</td><td>[7] Business email compromise losses in 2024, and the advice to check changes through a second channel. [6] Billing schemes, a separate risk</td><td><span class="kind auth">Authority</span></td></tr>
       <tr><td>Edge cases: other entity, duplicate vendor</td><td>Checks the addressee, the account reference and the vendor master before it calls an item missing</td><td>Read tools from the Gate 2 catalogue</td><td>The skill's own rules. No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
     </tbody>
   </table></div>
-  <p style="color:var(--muted);font-size:14.5px">The audit checked the seven sources on 24 Oct 2026 through search results. Nobody opened the pages. Sources [1], [2], [6] and [7] are US, [4] is UK and [3] is international. The four match tiers, the six difference types, the Step 0 signals, the three near-substitutes and the six sheets have no outside authority behind them. The public pages present them as the skill's rules.</p>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the seven sources on 24 Oct 2026 through search results. Nobody opened the pages. Sources [1], [2], [6] and [7] are US, [4] is UK and [3] is international. The four match tiers, the seven difference types, the Step 0 signals, the three near-substitutes and the six sheets have no outside authority behind them. The public pages present them as the skill's rules.</p>
 </section>
 
 <section>
   <h2>Audit → findings</h2>
-  <p class="sec-title">Three findings, all fixed in the rewrite, none on main yet</p>
+  <p class="sec-title">Three findings, all fixed on main, and two small open points</p>
   <div class="findings">
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>733 lines in one file, against a 500-line guide</h3>
-      <p>The file on main has 733 lines, and the cross-reference fix brings it to 730. The split follows the one used for three-way-match. The result is a 136-line card with the five rules that never bend, the six intake questions, the upload checklist and six stages. The original text moved unchanged into <code>references/</code>. 495 of the 497 content lines are present byte for byte, and all 35 sections stay in one piece. The other two lines are the description, rewritten for the card at 993 of 1,024 characters, and the onboarding link. The link gains one <code>../</code> for the new depth.</p>
+      <p>The file had 733 lines, and the cross-reference fix brought it to 730. Commit 273bb88 split it into a 155-line card and six reference files. The bookkeeping-audit fix a31eacd brought the card to 158 lines. The card holds the six rules that never bend, the seven intake questions, the upload checklist and six stages. The original text moved unchanged into <code>references/</code>. 462 of the 464 non-empty lines are present byte for byte. The other two lines are the description and the onboarding link. The description is now 1,024 characters, which is exactly the limit.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">SKILL.md + references/ · commit 644c5c2, not yet on main</span>
+      <span class="where">SKILL.md + references/ · fixed on main in 273bb88</span>
     </div></div>
     <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
       <h3>Cross-references pointed at skills that are not in the library</h3>
-      <p>Eight sentences named skills that are not in the library: <code>segment-reporting</code>, <code>quickbooks-ar-aging-collections</code>, <code>statement-of-equity-changes</code>, <code>internal-audit-workpaper</code>, <code>sox-controls-design-and-testing</code>, <code>vendor-onboarding-and-w9-tin</code>, <code>vat-gst-international</code>, <code>multicurrency-fx-revaluation</code>. Six rows of the Related skills table did the same, with <code>accounts-payable-automation</code>. One more sentence used a wrong name, <code>accruals-and-prepayments</code>. The library's skill is <code>accruals-and-deferrals</code>. Each sentence now stands without the name, the table lists only skills in the library, and the fix replaces the wrong name with <code>accruals-and-deferrals</code>. The fix is the same as three-way-match 9882a07.</p>
+      <p>Eight sentences named skills that are not in the library: <code>segment-reporting</code>, <code>quickbooks-ar-aging-collections</code>, <code>statement-of-equity-changes</code>, <code>internal-audit-workpaper</code>, <code>sox-controls-design-and-testing</code>, <code>vendor-onboarding-and-w9-tin</code>, <code>vat-gst-international</code>, <code>multicurrency-fx-revaluation</code>. Five rows of the Related skills table did the same, one of them with <code>accounts-payable-automation</code>. A table row and one sentence used a wrong name, <code>accruals-and-prepayments</code>. The library's skill is <code>accruals-and-deferrals</code>. On main, each sentence stands without the name, and the table lists only skills in the library. One sentence under the table names the kinds of skill that are still queued.</p>
       <blockquote>“Keep references one level deep from SKILL.md.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
-      <span class="where">now in overview.md, gates.md Gate 1, method.md Steps 1, 3 and 5, edge-cases.md · commit bc005b7, not yet on main</span>
+      <span class="where">overview.md, gates.md Gate 1, method.md Steps 1, 3 and 5, edge-cases.md · fixed on main in 347fde2</span>
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>Step 0 ranked "vendors never reconciled" as [auto], but no ledger holds that fact</h3>
-      <p>No ledger records which statements somebody reconciled. The skill already saves "vendors reconciled and when" (Seed to evolved, item 7). The signal now comes from that saved history. On a first run the skill asks the user and marks the row [manual]. It never infers the signal from the ledger.</p>
-      <span class="where">method.md · Step 0 · commit cf215d7, not yet on main</span>
+      <p>No ledger records which statements somebody reconciled. On main, Step 0 says that the reconciliation history comes from saved runs or from the user. On a first run, the skill asks when each top-ranked vendor was last reconciled. Where nobody gives a date, it reports "not known". It never infers "never reconciled" from the ledger.</p>
+      <span class="where">method.md · Step 0 · fixed on main in a31eacd</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Step 0 still says the workspace produces the ranking exactly</h3>
+      <p>Step 0 has the label [auto], and it says the workspace "can produce exactly" the ranking. After a31eacd, one of the seven signals, the last-reconciled date, comes from saved runs or from the user. So the label says more than the step does on a first run.</p>
+      <p class="fix"><b>Suggested:</b> mark the last-reconciled signal [manual] on a first run, as the step text already does in words.</p>
+      <span class="where">method.md · Step 0 · open on main</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>The Inputs table did not follow the new upload checklist</h3>
+      <p>The Inputs table in method.md still names "AP ageing / vendor ledger" as the required ledger input. The card's upload checklist now says that an ageing alone is not enough. It also asks for a vendor list or a bill search. The Cutoff date row keeps the verdict "Split", but its source cell now says that the user states the period end.</p>
+      <p class="fix"><b>Suggested:</b> make the Inputs table agree with the card's upload checklist.</p>
+      <span class="where">method.md · Inputs · open on main</span>
     </div></div>
   </div>
+  <p style="color:var(--muted);font-size:14.5px">The bookkeeping-audit commit a31eacd made more changes that the pages now follow. The skill reconciles at the statement date and lists each ledger item between the two dates. It agrees the AP subledger to the GL, and it checks that the statement adds up. It rolls a balance-forward statement forward. It finds short payments and charges. It drafts entries by case. The overpayment signal is now a debit balance in your own AP. In your AP a credit balance is normal, so a debit balance means you paid too much. The earlier wording, "a supplier account in credit", described the balance as the supplier's statement shows it.</p>
 </section>
 
 <section>
   <h2>Passed</h2>
-  <p class="sec-title">What checked out</p>
+  <p class="sec-title">What checked out on main</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>The repository's validator passes with the rewrite (31 skills, 0 failures). The shared blocks are in sync.</span></li>
-    <li><span class="ok">PASS</span><span>495 of the 497 content lines are present byte for byte, and all 35 of 35 sections stay in one piece. The other two lines are the expected rewrites.</span></li>
-    <li><span class="ok">PASS</span><span>No broken links in the bundle.</span></li>
-    <li><span class="ok">PASS</span><span>The audit checked every statement on the card against the reference line it summarises. Two statements said more than the skill does: "then stop" when there is no statement, and "leave the owner column open". The audit fixed both before the commit.</span></li>
-    <li><span class="ok">PASS</span><span>The description is 993 characters, under the 1,024-character limit.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on an export of main (31 skills, 0 failures), run on 28 Oct 2026. The shared blocks are in sync.</span></li>
+    <li><span class="ok">PASS</span><span>462 of the 464 non-empty lines of the 730-line file are present byte for byte after the split. The other two lines are the expected rewrites.</span></li>
+    <li><span class="ok">PASS</span><span>No broken links in the bundle. Each Step and Gate that the card names is in method.md or gates.md.</span></li>
+    <li><span class="ok">PASS</span><span>The description is 1,024 characters. This is at the 1,024-character limit, with no margin.</span></li>
     <li><span class="ok">PASS</span><span>The skill marks the statement Required and [manual].</span></li>
     <li><span class="ok">PASS</span><span>The skill reports missing credits apart from the problems, as money owed to the business.</span></li>
     <li><span class="ok">PASS</span><span>The skill marks every drafted entry "PROPOSED — NOT POSTED".</span></li>
+    <li><span class="ok">PASS</span><span>The save step asks only after the user sees the results, and only on an explicit yes (baf43ef).</span></li>
   </ul>
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run against a company file with a real supplier statement. The audit did not read the tool catalogue, because it could not reach the Mosofin connector on 24 Oct 2026. So nothing here shows which read tools Gate 2 would find for the AP ledger, the payment register or the vendor master. The audit checked the outside sources through search results only, and did not open the pages.</p>
 </section>
 
-<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">MosoFin/mosofin-finance-skills</a> as the 733-line file. The card-format rewrite is three commits on the branch <code>claude/vendor-statement-card-format</code>: bc005b7 (cross-references), 644c5c2 (the split) and cf215d7 ("never reconciled" from saved history). These commits are not on <code>main</code>. When the rewrite ships, replace these hashes with the merged hashes. A live run with a real statement is still to do after the audit on 24 Oct 2026.</footer>
+<footer>The card format is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/vendor-statement-reconciliation">MosoFin/mosofin-finance-skills</a>, merged in PR #1 (b200ad9) on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The commits on main for this skill are 347fde2 (cross-references) and 273bb88 (the split). Then come baf43ef (ask before saving, after the results) and a31eacd (fixes from the bookkeeping audit). An earlier version of this page described a local branch that never reached GitHub. A live run with a real statement is still to do.</footer>
 
 </div>

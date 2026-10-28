@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://skills.mosofin.com/skills/credit-card-reconciliation/plain.html">
 <meta property="og:title" content="Credit Card Reconciliation Explained in Plain English | MosoFin">
 <meta property="og:description" content="What a corporate card reconciliation checks: the statement tied to your books, receipts matched, and the charges that hide in a total. Facts cited.">
-<meta property="article:modified_time" content="2026-10-22">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Credit Card Reconciliation Explained in Plain English | MosoFin">
 <meta name="twitter:description" content="What a corporate card reconciliation checks: the statement tied to your books, receipts matched, and the charges that hide in a total. Facts cited.">
@@ -59,7 +59,7 @@
         "@type": "CollectionPage",
         "@id": "https://skills.mosofin.com/skills/credit-card-reconciliation/#page"
       },
-      "dateModified": "2026-10-22",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "credit-card-reconciliation",
@@ -235,16 +235,16 @@
 <section>
   <span class="label">Where the numbers come from</span>
   <h2>The statement and the books should land on the same figure</h2>
-  <p>Your books carry a card liability: what the company owes the issuer. The statement says the same thing from the issuer's side. They differ at month end for ordinary reasons. Two examples are a charge posted on the 30th that the issuer records on the 1st, and a payment still on its way. They also differ for one bad reason: a charge nobody entered. The skill walks the two figures towards each other and names every step.</p>
+  <p>Your books carry a card liability: what the company owes the issuer. The statement says the same thing from the issuer's side. They differ at month end for ordinary reasons. Two examples are a charge posted on the 30th that the issuer records on the 1st, and a payment still on its way. They also differ for one bad reason: a charge nobody entered. The skill first checks that the statement adds up. Then it reads the books at the statement's closing date and walks the two figures towards each other. It names every step.</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 880 300" role="img" aria-label="Two columns. Left: the card liability in the books, 8,240 dollars 60, plus a 340 dollar charge posted on 30 September that is not on the statement yet, minus a 148 dollar 50 charge on the statement that was never entered in the books, equals 8,432 dollars 10. Right: the statement closing balance, 8,432 dollars 10. They meet.">
+      <svg viewBox="0 0 880 300" role="img" aria-label="Two columns. Left: the card liability in the books at the statement closing date, 8,623 dollars 60, minus a 340 dollar charge posted on 30 September that is not on the statement yet, plus a 148 dollar 50 charge on the statement that was never entered in the books, equals 8,432 dollars 10. Right: the statement closing balance, 8,432 dollars 10. They meet.">
         <g font-family="Archivo,sans-serif" font-size="14">
           <rect x="16" y="20" width="520" height="264" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="36" y="48" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">YOUR BOOKS</text>
-          <text x="36" y="80" fill="var(--ink)">Card liability at 30 September</text><text x="516" y="80" text-anchor="end" font-weight="700" fill="var(--ink)">$8,240.60</text>
-          <text x="36" y="112" fill="var(--hold)">+ Charge posted 30 Sep, issuer records it 1 Oct</text><text x="516" y="112" text-anchor="end" fill="var(--hold)">+ 340.00</text>
-          <text x="36" y="144" fill="var(--wrong)">− Charge on the statement, never entered</text><text x="516" y="144" text-anchor="end" fill="var(--wrong)">− 148.50</text>
+          <text x="36" y="80" fill="var(--ink)">Card liability at statement close, 30 Sep</text><text x="516" y="80" text-anchor="end" font-weight="700" fill="var(--ink)">$8,623.60</text>
+          <text x="36" y="112" fill="var(--hold)">− Charge posted 30 Sep, issuer records it 1 Oct</text><text x="516" y="112" text-anchor="end" fill="var(--hold)">− 340.00</text>
+          <text x="36" y="144" fill="var(--wrong)">+ Charge on the statement, never entered</text><text x="516" y="144" text-anchor="end" fill="var(--wrong)">+ 148.50</text>
           <line x1="36" y1="166" x2="516" y2="166" stroke="var(--rule-strong)"/>
           <text x="36" y="196" font-weight="700" fill="var(--ink)">Adjusted books</text><text x="516" y="196" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">$8,432.10</text>
           <text x="36" y="236" font-size="13" fill="var(--muted)">The $340 is timing. The $148.50 is a charge the books</text>
@@ -255,7 +255,7 @@
           <text x="588" y="80" fill="var(--ink)">Closing balance</text>
           <text x="588" y="120" font-weight="800" font-size="26" fill="var(--ink)">$8,432.10</text>
           <text x="588" y="160" font-size="13" fill="var(--muted)">42 charges · 1 payment</text>
-          <text x="588" y="180" font-size="13" fill="var(--muted)">Cardholder: D. Reyes</text>
+          <text x="588" y="180" font-size="13" fill="var(--muted)">Cardholder: operations manager</text>
           <rect x="588" y="206" width="256" height="40" rx="20" fill="var(--green-soft)" stroke="var(--green)"/>
           <text x="716" y="231" text-anchor="middle" font-weight="700" fill="var(--green)">They meet, to the cent</text>
         </g>
@@ -279,7 +279,7 @@
         <div class="row off"><span>Laptop coded to office supplies, over the $2,500 line</span><span class="v">$2,900.00</span></div>
         <div class="row same"><span>Receipts missing above your $75 policy</span><span class="v">1 of 42</span></div>
       </div>
-      <div class="verdict">The skill finds four exceptions, each with a severity, a next step and a name. It proposes entries to move the laptop to fixed assets and to record the missing charge.</div>
+      <div class="verdict">The skill finds four exceptions, each with a severity and the action it needs. It flags the laptop for fixed-asset coding and proposes coding for the missing charge.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -310,16 +310,17 @@
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks six questions before it looks at anything</h2>
+  <h2>It asks seven questions before it looks at anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin as your data source, or upload the files yourself?</div><div class="why">MosoFin is the connection to your books (QuickBooks and the other platforms you link). With it, the skill reads the data from there. Without it, you upload the files. The checks are the same. You need no subscription.</div></li>
-    <li><div class="q">Which card, and whose?</div><div class="why">The skill does one reconciliation per card. For a programme with several cards, it reconciles each cardholder, then sums the results to the statement.</div></li>
-    <li><div class="q">Which statement period, and does it match your accounting month?</div><div class="why">A 16th-to-15th statement against calendar-month books is the most common reason a card won't tie. It's structural, not an error, and the skill cuts by your dates.</div></li>
+    <li><div class="q">Which card, and who holds it?</div><div class="why">The skill records each card by the role of its holder, never by card number. It does one reconciliation per card. For a programme with several cards, it reconciles each cardholder, then sums the results to the statement.</div></li>
+    <li><div class="q">Which statement period, and does it match your accounting month?</div><div class="why">A 16th-to-15th statement against calendar-month books is the most common reason a card won't tie. It's structural, not an error. The skill ties the books to the statement at the statement's closing date. Then it cuts by your dates and puts each charge in the month you spent it.</div></li>
     <li><div class="q">The statement.</div><div class="why">The statement is the one thing no accounting connection holds. The skill asks early so you know whether the result will be a reconciliation or a review.</div></li>
     <li><div class="q">The receipts.</div><div class="why">You give the receipts, or an export from your receipt tool. The skill does not count a file attached to a charge in your books as a matched receipt.</div></li>
-    <li><div class="q">Your policies: below what amount is no receipt needed, above what amount is a purchase an asset, and can you reclaim tax?</div><div class="why">Your policy decides which missing receipt is acceptable and which laptop belongs in fixed assets. The skill never sets a default value for the thresholds. If you can reclaim tax, a card slip is not enough evidence. The receipt has to show the tax.</div></li>
+    <li><div class="q">Your policies: below what amount is no receipt needed, and above what amount is a purchase an asset?</div><div class="why">Your policy decides which missing receipt is acceptable and which laptop belongs in fixed assets. The skill never sets a default value for the thresholds. If you give no threshold, it says which test it could not run.</div></li>
+    <li><div class="q">Can you reclaim tax on card spend, and where?</div><div class="why">If you can reclaim tax, a card slip is not enough evidence. The receipt has to show the tax. Without an answer, the skill does not assess tax recovery, and the output says so.</div></li>
   </ol>
-  <p>Then it reads your answers back: <i>"Reconciling Dana Reyes's card for the September statement against the statement and receipts you uploaded, $75 receipt policy, $2,500 capitalisation line. Go ahead?"</i> It waits for your yes.</p>
+  <p>Then it reads your answers back: <i>"Reconciling the operations manager's card for September, against the statement and receipts you uploaded. Receipt policy $75, capitalisation line $2,500. Go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
@@ -342,8 +343,9 @@
       <ul>
         <li><b>Card statement</b> for the period (PDF, CSV or spreadsheet)</li>
         <li><b>Receipts</b>, or an export from your receipt tool</li>
-        <li><b>Your books' card activity</b>: the card account's transactions and its closing balance</li>
-        <li>You type the cardholder, the receipt threshold, the capitalisation threshold and the tax rules</li>
+        <li><b>Your books' card activity</b>: the card account's transactions, and its balance at the statement closing date and at month end</li>
+        <li>If you have it, <b>last month's reconciliation</b>, so the skill can check that its open items cleared</li>
+        <li>You type the cardholder's role, the receipt threshold, the capitalisation threshold and the tax rules</li>
       </ul>
     </div>
   </div>
@@ -353,10 +355,10 @@
   <span class="label">What you get back</span>
   <h2>A balance that ties, every charge with its status, and the entries to post</h2>
   <div class="gets">
-    <div class="get"><b>The tie-out</b><span>It ties the books to the statement and names each reconciling item. If you did not give a statement, it says it did not do the tie-out.</span></div>
+    <div class="get"><b>The tie-out</b><span>It checks that the statement adds up. It matches each statement line to a charge in the books, then ties the two at the statement's closing date and names each reconciling item. It checks that last month's open items cleared. If you did not give a statement, it says it did not do the tie-out.</span></div>
     <div class="get"><b>Every charge, with a receipt status</b><span>Each charge shows a status of matched, below threshold, missing, disputed or refunded. The skill also shows whether the charge has a business purpose recorded. "File attached" and "receipt matched" are separate columns.</span></div>
     <div class="get"><b>Exceptions, by severity</b><span>The exceptions are missing receipts, possible personal charges, duplicates, and subscriptions with their annual cost. Others are purchases over the capital line, charges sitting in suspense, and tax reclaimed with no invoice.</span></div>
-    <div class="get"><b>Proposed entries</b><span>The skill drafts the entries in your real account names and marks them as proposals. It also says which way you already post card activity, charge by charge or by statement total.</span></div>
+    <div class="get"><b>Proposed entries</b><span>The skill drafts the entries in your real account names and marks them as proposals. It also says which way you already post card activity, charge by charge or by statement total. If a person decides that a charge is personal, it drafts the entry that moves the charge out of expenses.</span></div>
   </div>
 </section>
 
@@ -431,7 +433,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-22", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

@@ -96,17 +96,17 @@
   <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payment processor reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
 
 <header>
-  <div class="eyebrow">merchant-and-payment-processor-rec · shipped on main · fixes applied</div>
+  <div class="eyebrow">merchant-and-payment-processor-rec · shipped on main · bookkeeping-audit fixes in b114b88</div>
   <h1>The structure of the processor reconciliation, and what it does</h1>
-  <p class="lede">The skill splits one 862-line file into a 121-line card and seven reference files. This page shows how the files connect. It shows the run stage by stage. It also shows the fix for each audit finding, with the published source behind each fix.</p>
+  <p class="lede">The skill is a 122-line card and seven reference files. It replaced one 862-line file and was the first card-format skill on main. This page shows how the files connect. It shows the run stage by stage. It also shows the fix for each audit finding, with the published source behind each fix, and the findings that are still open on main.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">Card</span><span class="v">121</span><span class="s">lines in SKILL.md, down from 862</span></div>
+    <div class="stat"><span class="k">Card</span><span class="v">122</span><span class="s">lines in SKILL.md, down from 862</span></div>
     <div class="stat"><span class="k">References</span><span class="v">7</span><span class="s">files, each loaded at one step</span></div>
-    <div class="stat"><span class="k">Content kept</span><span class="v">562/575</span><span class="s">original lines. The other 13 were the fixes</span></div>
-    <div class="stat"><span class="k">Findings</span><span class="v">6/6</span><span class="s">fixed, plus 2 from Anthropic's guide</span></div>
+    <div class="stat"><span class="k">Bookkeeping audit</span><span class="v">10</span><span class="s">fixes on main in b114b88</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">6/6</span><span class="s">fixed, plus 2 from Anthropic's guide. 3 small ones open on main</span></div>
   </div>
 </section>
 
@@ -115,11 +115,11 @@
   <p class="sec-title">One card, seven files behind it</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 121-line card with rules and six steps. Each step points to one reference file: rules to mosofin-protocol.md, step 2 to gates.md, steps 3 to 6 to method.md, step 3 also to edge-cases.md, step 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 453 lines.">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 122-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 3 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 475 lines.">
         <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
 
         <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
-        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 121</text>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 122</text>
         <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
           <text x="48" y="78" font-weight="600">What it does</text>
           <text x="48" y="112" font-weight="600">Rules that never bend</text>
@@ -134,19 +134,19 @@
 
         <g font-family="'IBM Plex Mono',monospace" font-size="12">
           <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
-             <rect x="580" y="24" width="175" height="40" rx="7" fill="var(--mosofin-soft)"/>
+             <rect x="580" y="24" width="167" height="40" rx="7" fill="var(--mosofin-soft)"/>
              <text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">256</text></g>
           <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
-             <rect x="580" y="78" width="100" height="40" rx="7" fill="var(--mosofin-soft)"/>
+             <rect x="580" y="78" width="95" height="40" rx="7" fill="var(--mosofin-soft)"/>
              <text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">146</text></g>
           <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
              <rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/>
-             <text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">453</text></g>
+             <text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">475</text></g>
           <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
              <rect x="580" y="186" width="57" height="40" rx="7" fill="var(--mosofin-soft)"/>
-             <text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">83</text></g>
+             <text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">88</text></g>
           <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/>
-             <rect x="580" y="240" width="36" height="40" rx="7" fill="var(--mosofin-soft)"/>
+             <rect x="580" y="240" width="35" height="40" rx="7" fill="var(--mosofin-soft)"/>
              <text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">53</text></g>
           <g><rect x="580" y="304" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/>
              <text x="594" y="329" fill="var(--muted)">overview.md</text><text x="878" y="329" text-anchor="end" fill="var(--faint)">62</text></g>
@@ -182,7 +182,7 @@
   <p class="sec-title">What the skill does, step by step</p>
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 920 960" role="img" aria-label="Stage 1 asks five intake questions. If Mosofin is present and chosen, Stage 2 runs gates 0 to 3; otherwise the user gets an upload checklist. Both paths read back and wait for a yes. Step 3 reads the books and processor and runs the net-revenue test. Step 4 rolls forward the clearing account and ties payouts. Step 5 proposes entries and builds the output. Step 6 offers to save, only after results and only on an explicit yes.">
+      <svg viewBox="0 0 920 960" role="img" aria-label="Stage 1 asks five intake questions and one optional question. If Mosofin is present and chosen, Stage 2 runs gates 0 to 3; otherwise the user gets an upload checklist. Both paths read back and wait for a yes. Step 3 reads the books and processor and runs the net-revenue test. Step 4 rolls forward the clearing account and ties payouts. Step 5 proposes entries and builds the output. Step 6 offers to save, only after results and only on an explicit yes.">
         <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
 
         <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
@@ -205,7 +205,8 @@
             <text x="330" y="74"><tspan font-weight="600">B</tspan> Which processor?</text>
             <text x="560" y="74"><tspan font-weight="600">C</tspan> Which period?</text>
             <text x="80" y="100"><tspan font-weight="600">D</tspan> Sales posted per sale or per payout?</text>
-            <text x="440" y="100"><tspan font-weight="600">E</tspan> Any reserve or payout hold?</text>
+            <text x="420" y="100"><tspan font-weight="600">E</tspan> Any reserve or payout hold?</text>
+            <text x="640" y="100"><tspan font-weight="600">F</tspan> Contract fee rate? (optional)</text>
           </g>
 
           <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
@@ -226,7 +227,7 @@
           <g font-size="13" fill="var(--ink)">
             <text x="558" y="316">Payout report · transactions (CSV)</text>
             <text x="558" y="340">GL detail or trial balance (CSV/XLSX)</text>
-            <text x="558" y="364">Bank statement (PDF/CSV)</text>
+            <text x="558" y="364">Bank statement (strongly recommended)</text>
             <text x="558" y="388">Each file named back with its totals</text>
           </g>
 
@@ -249,12 +250,12 @@
           </g>
           <rect x="660" y="552" width="182" height="82" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
           <text x="751" y="578" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">Net-revenue test</text>
-          <text x="751" y="598" text-anchor="middle" font-size="12" fill="var(--ink)">revenue ≈ payouts and</text>
+          <text x="751" y="598" text-anchor="middle" font-size="12" fill="var(--ink)">processor revenue ≈ payouts,</text>
           <text x="751" y="616" text-anchor="middle" font-size="12" fill="var(--ink)">fees ≈ $0 → booked net</text>
 
           <rect x="60" y="692" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="718" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · CLEARING &amp; PAYOUTS · Steps 4–7</text>
-          <text x="80" y="746" font-size="13.5" fill="var(--ink)">Clearing roll-forward and ageing · payouts tied to recorded deposits · currency · tax on fees</text>
+          <text x="80" y="746" font-size="13.5" fill="var(--ink)">Clearing roll-forward and ageing · payouts tied to deposits and bank statement · currency · tax</text>
 
           <rect x="60" y="802" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
           <text x="80" y="828" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · ENTRIES &amp; OUTPUT · Steps 8–9 + output.md</text>
@@ -276,13 +277,13 @@
 
 <section>
   <h2>Audit → fixes</h2>
-  <p class="sec-title">Each finding fixed, and the published source behind the fix</p>
+  <p class="sec-title">Each finding, its state on main, and the published source behind each fix</p>
   <div class="findings">
     <div class="f high done"><span class="sev">High · fixed</span><div class="body">
-      <h3>Every <code>approved=true</code> allows reads only, on main, in all 30 skills</h3>
-      <p>The approval loop now says "reads only; if it would write, never re-invoke". The audit found 23 skills. A wider search found 56 lines across all 30. CI now inspects every <code>approved=true</code>, not just the policy row. CI fails both single-line and wrapped regressions.</p>
+      <h3>Every <code>approved=true</code> allows reads only, on main, in every skill</h3>
+      <p>The approval loop now says "Reads only — never re-invoke a write with <code>approved=true</code>". The audit found 23 skills. A wider search found 56 lines across all 30. CI now inspects every <code>approved=true</code>, not just the policy row. CI fails both single-line and wrapped regressions.</p>
       <blockquote>“Limit the permissions that LLM extensions are granted to other systems to the minimum necessary.”<cite><a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP Top 10 for LLM Applications 2025 · LLM06 Excessive Agency</a></cite></blockquote>
-      <span class="where">main · commit d86fa27 · pushed</span>
+      <span class="where">main · d86fa27 for the library, ef5b11a for this skill · all four lines in this skill say reads only</span>
     </div></div>
     <div class="f high done"><span class="sev">High · fixed</span><div class="body">
       <h3>Gate 3 confirms Stage 1 instead of asking again</h3>
@@ -298,7 +299,7 @@
     </div></div>
     <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
       <h3>"Stage" for the card, "Step" for the method</h3>
-      <p>The card's six steps are now Stages 1–6, with a one-line note that "Steps 0–10" always mean method.md. Reference headers follow the rename.</p>
+      <p>The card's six steps are now Stages 1–6, with a one-line note that "Steps 0–10" always mean method.md. Reference headers follow the rename. The rename missed one word: Stage 2 on main still says "so Step 1's answers do not need asking twice". It means Stage 1. See the open findings below.</p>
       <blockquote>“Choose one term and use it throughout the Skill … Consistency helps Claude parse and follow instructions.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md · references/*.md headers</span>
     </div></div>
@@ -314,6 +315,11 @@
       <blockquote>“Fees paid for this transaction. Expressed in major units of the currency (e.g. dollars for USD, yen for JPY).”<cite><a href="https://docs.stripe.com/reports/report-types/payout-reconciliation">Stripe Docs · Payout reconciliation report</a></cite></blockquote>
       <span class="where">references/method.md · Step 0</span>
     </div></div>
+    <div class="f high done"><span class="sev">High · fixed</span><div class="body">
+      <h3>Bookkeeping audit: ten fixes to the accounting</h3>
+      <p>An independent bookkeeping audit raised ten findings. Main has a fix for all ten. Gross sales now include sales tax, so Step 2 and the Step 4 roll-forward agree. Step 2 deducts tax only for marketplace-remitted sales. The aggregate entry gives the clearing line a sign, and refunds reverse output tax. Step 8 adds an entry to fix revenue booked net of fees. The net-revenue test now compares only revenue from the processor, not total revenue. Undeposited Funds counts as a clearing account. Open disputes stay in revenue. The fee test splits into an automatic trend and an optional comparison with the contract rate (new intake question F). The bank statement is now "strongly recommended" in the upload checklist.</p>
+      <span class="where">main · b114b88 · SKILL.md · references/method.md · edge-cases.md · overview.md</span>
+    </div></div>
     <div class="f add done"><span class="sev">Added</span><div class="body">
       <h3>Long reference files open with a Contents list</h3>
       <p>gates.md, method.md and mosofin-protocol.md are over 100 lines, so each now starts with a list of its sections.</p>
@@ -322,9 +328,24 @@
     </div></div>
     <div class="f add done"><span class="sev">Added</span><div class="body">
       <h3>The card stays well under the published limit</h3>
-      <p>The card is 121 lines. The guide's limit is 500, so the card has room to grow before the skill must split anything else from it.</p>
+      <p>The card is 122 lines. The guide's limit is 500, so the card has room to grow before the skill must split anything else from it.</p>
       <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
       <span class="where">SKILL.md</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The card and gates.md disagree about the bank statement</h3>
+      <p>Since b114b88, the card's upload checklist calls the bank statement "Strongly recommended". The Gate 3 table in gates.md still marks it "Required — [manual], always". Both files say that without it the skill ties payouts to recorded deposits only. One word should change, so the two files agree.</p>
+      <span class="where">SKILL.md · Stage 1 · references/gates.md · Gate 3</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Stage 2 says "Step 1" for the intake</h3>
+      <p>Stage 2 reads the company profile "so Step 1's answers do not need asking twice". The card's own note says "Steps 0–10" always mean method.md, and method.md Step 1 is the processor's data structure. The sentence means Stage 1.</p>
+      <span class="where">SKILL.md · Stage 2</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Two small pointers and one condition</h3>
+      <p>The Gate 2 policy table in gates.md says "see the hard stop below", but the hard stop is in mosofin-protocol.md. All 31 skills on main carry the same words. Also, overview.md flags net revenue when revenue matches payouts <i>and</i> the fee account is near empty. Step 7 and edge-cases.md list each signal on its own.</p>
+      <span class="where">references/gates.md · Gate 2 · references/overview.md · references/method.md · Step 7</span>
     </div></div>
   </div>
 </section>
@@ -333,19 +354,19 @@
   <h2>Passed</h2>
   <p class="sec-title">What passed</p>
   <ul class="pass">
-    <li><span class="ok">PASS</span><span>The fixes left 562 of 575 original lines untouched. The other 13 are exactly the lines the fixes replaced.</span></li>
+    <li><span class="ok">PASS</span><span>At ef5b11a, the fixes left 562 of 575 original lines untouched. The other 13 are exactly the lines the fixes replaced. Later commits on main changed more lines on purpose.</span></li>
     <li><span class="ok">PASS</span><span>The bundle has no broken links anywhere. Every method Step the card cites exists.</span></li>
-    <li><span class="ok">PASS</span><span>Every QuickBooks tool named (15) exists in the live catalogue read on 1 Sep.</span></li>
+    <li><span class="ok">PASS</span><span>The skill names 11 QuickBooks tools and 7 Mosofin workflow tools, all with underscores. A comparison with the live catalogue on 1 Sep found the QuickBooks names. No later run repeated it.</span></li>
     <li><span class="ok">PASS</span><span>The skill has no write-directing language outside the protocol file.</span></li>
-    <li><span class="ok">PASS</span><span>The intake covers all 7 inputs the original marked Required.</span></li>
+    <li><span class="ok">PASS</span><span>The intake asks for all 7 inputs that Gate 3 marks Required. The bank statement is "strongly recommended" in the intake (see the open finding).</span></li>
     <li><span class="ok">PASS</span><span>The skill inspects the mock flag on both sides, so fixture processor data cannot pass as real.</span></li>
-    <li><span class="ok">PASS</span><span>The repository's validator passes: 31 skills, 0 failures. For a card-format skill it reads SKILL.md and every reference file together.</span></li>
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main: 31 skills, 0 failures. For a card-format skill it reads SKILL.md and every reference file together.</span></li>
     <li><span class="ok">PASS</span><span>The shared onboarding, scope and write-guardrail blocks sit in mosofin-protocol.md and stay in sync with the repository's single copy. An edited line is caught as drift.</span></li>
-    <li><span class="ok">PASS</span><span>gates.md carries the same ONBOARDING and PART A framing as the other 30 skills, word for word.</span></li>
+    <li><span class="ok">PASS</span><span>gates.md carries the same ONBOARDING and PART A framing as the other 30 skills. Only the manual-run pointer differs: it names the card's upload checklist.</span></li>
   </ul>
   <p style="color:var(--muted);font-size:14.5px">Not yet tested: a live run, and the processor's own tool names. No Stripe or Square catalogue has been read. One claim is the skill's own and not independently sourced here: that revenue net of fees is an error. The search found practitioner guides, not the accounting standard, so the page does not cite the claim.</p>
 </section>
 
-<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">MosoFin/mosofin-finance-skills</a> as e4a34f4, with the card (c2adc10) and the audit fixes (ef5b11a). The approved=true fix is d86fa27. Still to do: a live run against QuickBooks and Stripe.</footer>
+<footer>The skill shipped on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/merchant-and-payment-processor-rec">MosoFin/mosofin-finance-skills</a> as e4a34f4 on 20 October 2026, with the card (c2adc10) and the first audit fixes (ef5b11a). The approved=true fix is d86fa27. Later commits on main are 4d5637c (ask before making the .xlsx file) and fde2da3 (intake question A names Mosofin as the data source). Pull request #1, merged on 26 October 2026, then added three commits. They are 313d7c0 (no links to unshipped skills), 14f616a (the cross-entity pointer names method.md) and b114b88 (the bookkeeping-audit fixes, 27 October 2026). Still to do: a live run against QuickBooks and Stripe.</footer>
 
 </div>

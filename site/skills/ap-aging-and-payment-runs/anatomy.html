@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Aging and Payment Runs Anatomy | MosoFin</title>
+<meta name="description" content="How the AP aging and payment runs skill is built on main: the card, seven reference files, the run stage by stage, its sources and the audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← AP aging and payment runs</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">ap-aging-and-payment-runs · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the AP aging and payment runs skill, and what it does</h1>
+  <p class="lede">The skill was one 911-line file. On main it is now a 156-line card and seven reference files, merged in PR #1 on 26 October 2026. A bookkeeping-audit commit on 27 October 2026 then changed some behaviour. Two things set this skill apart. It never reads a bank balance and calls it available cash. And the payment run is only a proposal: the skill sends, releases and schedules no payment. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows six findings, five fixed on main and one open, and one new observation.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">156</span><span class="s">lines in SKILL.md on main, down from 911</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">688/688</span><span class="s">original non-blank lines in the split, ead73fa. One link path changed for the new folder</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">35 · 8 · 29</span><span class="s">[auto] · [gated] · [manual] on main. Before f02fa65 they were 35 · 12 · 25</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">20</span><span class="s">evidence tools named, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">5 fixed · 1 open</span><span class="s">all fixes are on main, in e76e4ed, ead73fa and f02fa65</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 156 lines instead of 911</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 156-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 336 lines, then mosofin-protocol.md at 262, gates.md at 173, edge-cases.md at 84, tools-and-glossary.md at 70, output.md at 40 and overview.md at 26.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 156</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · what stays with you</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to G</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read the bills, build aging</text>
+          <text x="48" y="272">Stage 4 · Discounts and penalties</text>
+          <text x="48" y="312">Stage 5 · Rank the run, sheets</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="242" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="160" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">173</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">336</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="78" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">84</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="37" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">40</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="24" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">26</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="65" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">70</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–8</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 8 and both entity scenarios. <b>edge-cases.md</b> holds the 18 edge cases, 8 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text, kept in sync from the repository's single copy. <b>tools-and-glossary.md</b> names the 7 workflow tools, the 20 evidence tools and the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1216" role="img" aria-label="Stage 1 asks seven questions: Mosofin or upload, the as-of date and buckets, aging only or a run and the cash available, the vendor tiers, holds and disputes with payments in flight and bank-detail changes, the payment method, and the FX rate with its source. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, settle the entity scenario, read the tool catalogue and read the company profile. Otherwise the user uploads the open bills and the A/P control balance, which are required, plus payments, credits and the vendor list. Both paths read back and wait for a yes. Stage 3: step 0 reads the evidence in one batch and checks the mock flag, step 1 keeps open credits as negatives, flags possible duplicates and derives a missing due date from the terms, step 2 sorts each item into an aging bucket. Stage 4: step 3 finds each early-pay discount with its deadline and annual return, step 4 finds late fees and interest that are accruing. Stage 5: step 5 nets each vendor's credits, ranks the run and stops when the cash paid uses the cash, step 6 converts other currencies at the stated rate, step 7 delivers six sheets plus a held and disputed sheet, headed as a proposal. Stage 6: step 8 offers to save the tiers, methods and holds, never bank details or the cash available, on an explicit yes.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="720" x2="460" y2="750" marker-end="url(#a2)"/>
+          <line x1="460" y1="882" x2="460" y2="912" marker-end="url(#a2)"/>
+          <line x1="460" y1="1100" x2="460" y2="1130" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> As-of date, buckets</text>
+            <text x="590" y="74"><tspan font-weight="600">C</tspan> Run? Cash for it, asked</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> Vendor tiers</text>
+            <text x="330" y="100"><tspan font-weight="600">E</tspan> Holds, in flight, bank changes</text>
+            <text x="590" y="100"><tspan font-weight="600">F</tspan> Method · <tspan font-weight="600">G</tspan> FX rate</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · entity scenario</text>
+            <text x="98" y="364">G2  tool catalogue · writes out of scope</text>
+            <text x="98" y="388">G3  currency, time zone, then B to G</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Open bills with due dates, required</text>
+            <text x="558" y="340">Payments made · open credits</text>
+            <text x="558" y="364">Vendor list, terms, payment method</text>
+            <text x="558" y="388">A/P control balance, required</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="210" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–2 · READ THE BILLS, THEN BUILD THE AGING</text>
+          <text x="80" y="562" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="584">get_aged_payables · search_bills · get-bill</text>
+            <text x="80" y="604">search_bill_payments · search_vendor_credits</text>
+            <text x="80" y="624">get_vendor_balance (tie-out only) · search_terms</text>
+            <text x="80" y="644">search_vendors · get_balance_sheet</text>
+            <text x="80" y="664">search_accounts · get_company_info</text>
+          </g>
+          <text x="80" y="698" font-size="13" fill="var(--ink)"><tspan font-weight="600">Steps 1–2</tspan> · credits as negatives · duplicate bill numbers · derived due dates · six buckets</text>
+          <rect x="640" y="556" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="580" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="600" text-anchor="middle" font-size="12" fill="var(--ink)">never drives a run,</text>
+          <text x="741" y="618" text-anchor="middle" font-size="12" fill="var(--ink)">illustrative only</text>
+
+          <rect x="60" y="752" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="778" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 3–4 · DISCOUNTS AND PENALTIES · + EDGE-CASES.MD</text>
+          <text x="80" y="806" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  discount: deadline, amount, D% / (1 − D%) × 365 / (Net − Discount days)</text>
+          <text x="80" y="834" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 4</tspan>  late fees and interest from the terms record, or asked where a contract holds them</text>
+          <text x="80" y="862" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Edge cases</tspan>  credit holds · credits · payments in flight · disputes · new bank details</text>
+
+          <rect x="60" y="914" width="800" height="186" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="940" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 5–7 · RANK, THEN THE SHEETS · + OUTPUT.MD</text>
+          <text x="80" y="968" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 5</tspan>  critical · past due with penalty · expiring discount · this week · next week · defer</text>
+          <text x="80" y="994" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 5</tspan>  net vendor credits · cash paid within the cash · show what is left unpaid</text>
+          <text x="80" y="1020" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  other currencies at the stated rate, with the rate and its date</text>
+          <text x="80" y="1046" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 7</tspan>  summary · detail · run · 3b held and disputed · discounts · exceptions · coverage</text>
+          <text x="80" y="1072" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 7</tspan>  headed as a proposal · bank-detail flag · approval block · ask before Excel</text>
+
+          <rect x="60" y="1132" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1158" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 8</tspan>: only after the results are shown, and only on an explicit yes</text>
+          <text x="80" y="1182" font-size="13.5" fill="var(--muted)">save the tiers, the methods, the holds and the order · never bank details or the cash available</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. On both paths the skill still asks B and C every run. No ledger holds the cash the owner chooses to spend or the vendor tiers. The card and Gate 3 both say that a bank balance is not available cash. The highlighted box shows the mock rule from Step 0. Stage 4 also reads edge-cases.md, for example for a credit hold or a change of bank details. Step 8 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The sources are [1] OpenStax, Principles of Finance 19.2. [2] FBI IC3, PSA I-060923-PSA. [3] FBI IC3, 2024 Internet Crime Report. [4] GOV.UK, Late commercial payments. [5] US Treasury, Prompt Payment. [6] GAO, Green Book. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to G. Checks the workspace, the company file, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · questions B and C</td><td>Asks for the as-of date and the cash available on each run. Never reads a bank balance as available cash</td><td>None. The user supplies them</td><td>No outside authority. The $40,000 in the worked example is the example owner's own choice</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · question D</td><td>Asks which vendors are critical, standard or discretionary</td><td>None. The user supplies them</td><td>No outside authority. The tiers are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · question E</td><td>Asks for holds, disputes, payments sent outside the books and requests to change bank details</td><td>None. The user supplies them</td><td>No outside authority. Added in f02fa65</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the evidence in one batch and checks the <code>mock</code> flag</td><td><code>get_aged_payables</code> <code>search_bills</code> <code>get-bill</code> <code>search_bill_payments</code> <code>search_vendor_credits</code> <code>get_vendor_balance</code> <code>search_vendors</code> <code>search_terms</code> <code>get_balance_sheet</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue. The mock rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 1–2</td><td>Keeps open credits and unapplied payments as negatives. Flags possible duplicates by bill number. Derives a missing due date from the terms and says so. Sorts each item into one of six buckets</td><td><code>get_term</code> <code>get_aged_payables</code></td><td>No outside authority. The default buckets are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Finds each early-pay discount with its deadline, amount and annual return</td><td><code>search_terms</code> <code>get_term</code></td><td>[1] Not taking a 2/10, net 30 discount costs about 36% a year. The skill's formula gives 37.2% on a 365-day year, the textbook 36.73% on a 360-day year</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4</td><td>Finds late fees and interest that are accruing</td><td><code>search_terms</code> <code>search_vendors</code></td><td>[4] [5] Examples of penalties that law sets, in the UK and for US federal agencies. The skill reads penalties from the terms record or asks where a contract holds them</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Nets each vendor's credits. Ranks the run and stops when the cash paid uses the cash available. Shows the bills that the run leaves unpaid</td><td>None beyond the reads</td><td>No outside authority. The ranking order is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Edge case · new bank details</td><td>Flags each vendor named at question E on Sheet 3. The payment waits for a phone check on a number from the user's records. Puts no bank details in an output</td><td>None. Mosofin only reads data</td><td>[2] Check a change of payment details through a second channel. [3] Business email compromise caused $2,770,151,146 in reported losses in 2024</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 6</td><td>Converts other currencies at the stated rate, and shows the rate and its date</td><td><code>get_company_info</code></td><td>No outside authority. The rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Delivers six sheets plus Sheet 3b, held and disputed. Heads the run as a proposal, with blank Prepared by and Approved by lines. Asks before it makes an Excel file</td><td>None</td><td>[6] Separate authority, custody and accounting. The skill proposes, a person approves, the bank or accounting system executes. The sheets are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Offers to save the tiers, methods, holds and order. Never bank details or the cash available</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-finance/pages/19-2-what-is-trade-credit" style="color:var(--mosofin)">OpenStax: Principles of Finance, 19.2 What Is Trade Credit?</a></td><td>The annual cost of a missed 2/10, net 30 discount</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://www.ic3.gov/PSA/2023/psa230609" style="color:var(--mosofin)">FBI IC3: Public Service Announcement I-060923-PSA, Business Email Compromise</a></td><td>Check a change of payment details through a second channel</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" style="color:var(--mosofin)">FBI IC3: 2024 Internet Crime Report</a></td><td>Reported business email compromise losses in 2024</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.gov.uk/late-commercial-payments-interest-debt-recovery/charging-interest-commercial-debt" style="color:var(--mosofin)">GOV.UK: Late commercial payments: charging interest</a></td><td>A late-payment penalty that UK law sets</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://fiscal.treasury.gov/payments-from-government/prompt-payment" style="color:var(--mosofin)">US Treasury, Bureau of the Fiscal Service: Prompt Payment</a></td><td>A late-payment penalty that US federal law sets</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://www.gao.gov/assets/gao-25-107721.pdf" style="color:var(--mosofin)">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721</a></td><td>Segregation of duties between proposal, approval and payment</td><td>2026-10-27</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the six sources on 27 Oct 2026 through search results. Nobody opened the pages. Sources 1, 2, 3, 5 and 6 are US. Source 4 is UK. Some items have no outside authority behind them. They are the default buckets, the ranking order, the output sheets, the tiers and every example figure. The worked example uses made-up figures. The public pages present these as the skill's rules or as the example's choices. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Six findings, five fixed on main, one open, and one observation</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>911 lines in one file, against a 500-line guide</h3>
+      <p>F1. The split on main makes a 156-line card. The card holds the six rules that never bend, questions A to G, the upload checklist and six stages. The original text moved into <code>references/</code>. All 688 non-blank original lines are present. Only one link path changed for the new folder.</p>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md + references/ · fixed on main in ead73fa</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The description was over the 1,024-character limit</h3>
+      <p>F2. Before the split the description had 1,033 characters. The same guide sets a limit of 1,024. The description on main has 1,024 characters, at the limit.</p>
+      <span class="where">SKILL.md · front matter · fixed on main in ead73fa</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Two lines named skills that are not in the library</h3>
+      <p>F3. Step 6 pointed at <code>multicurrency-fx-revaluation</code>. The group scenario pointed at <code>intercompany-reconciliation</code>. No skill of either name is in the library. The text on main now says "an FX revaluation task" and "an intercompany reconciliation".</p>
+      <span class="where">references/method.md · Steps 6 and Both entity scenarios · fixed on main in e76e4ed</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>Two tool names use a hyphen</h3>
+      <p>F4. The tool table names <code>get-bill</code> and <code>get-vendor</code>. The other tool names use underscores. They are still on main. Only a live catalogue read can show the real names. Gate 2 already tells the agent to read each name from the catalogue.</p>
+      <span class="where">references/tools-and-glossary.md · Tool reference · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>The discount formula was the simpler one</h3>
+      <p>F5. The old formula was Discount % × 365 / (Net − Discount days), which gives 36.5% for 2/10 Net 30. Main now divides by the discounted price too: 2% / 98% × 365 / 20 = about 37.2%. It calls 36.5% an approximation. The textbook uses a 360-day year and gives 36.73% [1].</p>
+      <span class="where">references/method.md · Step 3 · fixed on main in f02fa65</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The bookkeeping audit changed how the run works</h3>
+      <p>F6. An independent bookkeeper audit raised 10 findings, and f02fa65 fixed all 10. Open credits and unapplied payments now stay in the aging as negatives, and each vendor's payment is net of its credits. The cash test counts the cash paid, and a discount taken is recorded with the payment. Question E now asks for payments made outside the books and for bank-detail change requests. The duplicate test matches bill numbers. The upload tie-out needs the A/P control balance. Four [gated] tasks are now [manual] (judgment). Sheet 3b and an approval block are new.</p>
+      <span class="where">SKILL.md, method.md, edge-cases.md · fixed on main in f02fa65</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation</span><div class="body">
+      <h3>The card still says "the six sheets"</h3>
+      <p>Stage 5 on the card says "build the six sheets". Step 7 in method.md now also has Sheet 3b, Held and Disputed, which f02fa65 added. So the card and Step 7 name a different number of sheets. This page records it for the skill owner.</p>
+      <span class="where">SKILL.md · Stage 5 · open</span>
+    </div></div>
+  </div>
+  <p style="color:var(--muted);font-size:14.5px">The audit found no sandbox path. The card's read-back example on main says "as of 14 October", with no weekday. So the weekday error in an earlier local draft does not apply to main.</p>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on main (31 skills, 0 failures).</span></li>
+    <li><span class="ok">PASS</span><span>All 688 non-blank lines of the original file are in the split on main.</span></li>
+    <li><span class="ok">PASS</span><span>No broken links in the bundle.</span></li>
+    <li><span class="ok">PASS</span><span>Each behaviour that this site's pages describe traces to a line on main.</span></li>
+    <li><span class="ok">PASS</span><span>"Do not read a bank balance and call it available" is in the card and in Gate 3.</span></li>
+    <li><span class="ok">PASS</span><span>The bank-details rule is in the card, in the edge cases and in Step 8.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 35 [auto], 8 [gated] and 29 [manual]. The four tags that moved from [gated] to [manual] are the judgment steps in f02fa65.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with real bills. The audit did not read the tool catalogue, because it could not reach the Mosofin connector on 27 Oct 2026. So nothing here shows which of the 20 evidence tool names Gate 2 would find. The audit checked the outside sources through search results only, and did not open the pages. The STE linter reports 33 hard findings on the card on main. The skill files do not claim STE.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">MosoFin/mosofin-finance-skills</a> in the card format. Three commits on main changed it. They are e76e4ed (no reference to a skill outside the library), ead73fa (the split into the card format) and f02fa65 (fixes from the bookkeeping audit). The split merged in PR #1, b200ad9, on 26 October 2026, and f02fa65 followed on 27 October 2026. A live run, a catalogue read and a fix for F4 are still to do.</footer>
+
+</div>

@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://skills.mosofin.com/skills/three-way-match/plain.html">
 <meta property="og:title" content="Three-Way Match Explained: Pay, Hold or Reject | MosoFin">
 <meta property="og:description" content="How a three-way match compares the purchase order, goods receipt and invoice before you pay: what it catches, what it asks, what it never does. Sources cited.">
-<meta property="article:modified_time" content="2026-10-21">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Three-Way Match Explained: Pay, Hold or Reject | MosoFin">
 <meta name="twitter:description" content="How a three-way match compares the purchase order, goods receipt and invoice before you pay: what it catches, what it asks, what it never does. Sources cited.">
@@ -59,7 +59,7 @@
         "@type": "CollectionPage",
         "@id": "https://skills.mosofin.com/skills/three-way-match/#page"
       },
-      "dateModified": "2026-10-21",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "three-way-match",
@@ -265,7 +265,7 @@
         </g>
       </svg>
     </div>
-    <figcaption>These figures are examples. The invoice has two differences. The supplier charged more per chair than agreed. The supplier also billed for four chairs that were returned. If you paid the invoice as billed, you would overpay $318, and nothing on the invoice itself would tell you.</figcaption>
+    <figcaption>These figures are examples. The invoice has two differences. The supplier charged more per chair than agreed. The supplier also billed for four chairs that the warehouse rejected. If you paid the invoice as billed, you would overpay $318, and nothing on the invoice itself would tell you.</figcaption>
   </figure>
 </section>
 
@@ -281,9 +281,9 @@
         <div class="row"><span>Ordered: 100 × $42.00</span><span class="v">$4,200.00</span></div>
         <div class="row"><span>Arrived and accepted</span><span class="v">96 chairs</span></div>
         <div class="row off"><span>Billed: 100 × $43.50</span><span class="v">$4,350.00</span></div>
-        <div class="row same"><span>Pay the matched part: 96 × $42.00</span><span class="v">$4,032.00</span></div>
+        <div class="row same"><span>Owed at the order price: 96 × $42.00</span><span class="v">$4,032.00</span></div>
       </div>
-      <div class="verdict">Recommendation: pay $4,032, and dispute $318 (that is $150 of price and $168 for the four chairs that never stayed). The skill lists two exceptions, each with an owner.</div>
+      <div class="verdict">Recommendation: Hold. The skill lists three exceptions, each with an owner: the price, the short delivery billed in full, and the damaged chairs billed in full. A $318 credit note from the supplier brings the bill to $4,032. That is $150 of price and $168 for the four rejected chairs.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -309,7 +309,7 @@
   <span class="label">One honest limit</span>
   <h2>It can only match the documents you actually have</h2>
   <p>The invoice is always in your books. The purchase order often is. In QuickBooks Online, purchase orders exist only on the Plus and Advanced plans<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. QuickBooks closes a PO automatically once all its quantities are on bills, expenses or checks<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. The delivery record usually isn't: receiving happens in a warehouse, on a clipboard, or nowhere. So the first thing the skill does is count the legs it has.</p>
-  <p>With all three, it runs a three-way match. With orders and invoices but no delivery records, it runs a two-way match and <b>says so</b>, in the report and in the file name. It does so because the missing leg is the one that proves the goods arrived. The five tests that depend on that leg did not run. Without that line, a test that never ran would look like one that passed.</p>
+  <p>With all three, it runs a three-way match. With orders and invoices but no delivery records, it runs a two-way match and <b>says so</b>, in the report and in the file name. It does so because the missing leg is the one that proves the goods arrived. The report lists the tests that need that leg as not run. Without that list, a test that never ran would look like one that passed. The skill still checks the billed quantity against the order. It also recommends Hold until the delivery record is available.</p>
 </section>
 
 <section>
@@ -323,12 +323,12 @@
     <li><div class="q">Do you have any orders in a foreign currency? How do you convert them?</div><div class="why">A price difference that is really an exchange-rate move is the classic false alarm.</div></li>
     <li><div class="q">Who resolves the exceptions?</div><div class="why">Every difference gets a named owner, not a pile.</div></li>
   </ol>
-  <p>Then it repeats your answers to you: <i>"Matching September's invoices for Northbrook Trading against purchase orders and goods receipts, 2% price tolerance, exact on quantity. Go ahead?"</i> It waits for your yes.</p>
+  <p>Then it repeats your answers to you: <i>"Matching September's open invoices for Northbrook Trading against purchase orders and goods receipts. 2% price tolerance, exact on quantity. This will be a three-way match. Shall I go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
   <span class="label">What you need</span>
-  <h2>Connect once, or upload three kinds of document</h2>
+  <h2>Connect once, or upload the documents</h2>
   <div class="two">
     <div class="card">
       <span class="tag">Connected with MosoFin</span>
@@ -347,6 +347,7 @@
         <li><b>Purchase order(s)</b>: PDF, spreadsheet or CSV</li>
         <li><b>Delivery record</b>: goods receipt, proof of delivery, or a signed service confirmation</li>
         <li><b>Invoice(s)</b>: PDF, spreadsheet or CSV</li>
+        <li><b>Earlier bills on the same orders</b>: needed for progress billing and the duplicate test</li>
         <li>Helpful: your tolerance policy and approval limits, which you type in the chat</li>
       </ul>
     </div>
@@ -357,10 +358,10 @@
   <span class="label">What you get back</span>
   <h2>Pay, hold or reject, and why, line by line</h2>
   <div class="gets">
-    <div class="get"><b>A recommendation per invoice</b><span>Pay, Hold or Reject, with the matched amount and the disputed amount. A person acts on it.</span></div>
-    <div class="get"><b>Every line, side by side</b><span>The skill shows the ordered, received and billed quantities. It shows the ordered and billed prices, the difference and the tolerance it applied. It also shows how it matched the line.</span></div>
+    <div class="get"><b>A recommendation per invoice</b><span>Pay, Hold or Reject, with the matched amount and the disputed amount. Reject is for a wrong supplier or a duplicate. Hold is for a Critical or High exception, an unconfirmed approval or a missing delivery record. A person acts on it.</span></div>
+    <div class="get"><b>Every line, side by side</b><span>The skill shows the ordered, received and billed quantities. It shows the ordered and billed prices, the difference and the tolerance it applied. It also shows how it matched the line. It notes payment terms that are shorter than agreed.</span></div>
     <div class="get"><b>Every exception, with an owner</b><span>The skill uses fifteen kinds of exception, from price creep to a damaged delivery billed in full to an order nobody approved. Each has a severity and a next step.</span></div>
-    <div class="get"><b>What only the whole month shows</b><span>The skill shows a supplier always just inside tolerance, receipts posted in bulk on one date, and goods received but never billed. You owe for those goods and should book them<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</span></div>
+    <div class="get"><b>What only the whole month shows</b><span>The skill shows a supplier always just inside tolerance, receipts posted in bulk on one date, and goods received but never billed. You owe for those goods and should book them<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill values them at the order price and drafts the accrual entry for a person to post.</span></div>
   </div>
 </section>
 
@@ -436,7 +437,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-21", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

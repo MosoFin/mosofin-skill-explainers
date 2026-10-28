@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://skills.mosofin.com/skills/bank-reconciliation/learn.html">
 <meta property="og:title" content="Bank Reconciliation Worked Examples, Step by Step | MosoFin">
 <meta property="og:description" content="Seven worked bank reconciliation examples, from one uncashed cheque to two companies sharing an account, with a calculator and cited sources.">
-<meta property="article:modified_time" content="2026-10-21">
+<meta property="article:modified_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bank Reconciliation Worked Examples, Step by Step | MosoFin">
 <meta name="twitter:description" content="Seven worked bank reconciliation examples, from one uncashed cheque to two companies sharing an account, with a calculator and cited sources.">
@@ -59,7 +59,7 @@
         "@type": "CollectionPage",
         "@id": "https://skills.mosofin.com/skills/bank-reconciliation/#page"
       },
-      "dateModified": "2026-10-21",
+      "dateModified": "2026-10-28",
       "about": {
         "@type": "SoftwareSourceCode",
         "name": "bank-reconciliation",
@@ -350,8 +350,8 @@
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
     <div><b>Asks first</b>Is MosoFin the data source, or do you upload the data? Which account(s)? Which period? It also asks for the bank statement. When did you last reconcile the account? How small a difference is worth chasing?</div>
-    <div><b>Needs</b>The skill always needs your books' cash activity and ending balance, connected or exported, and the bank statement. Last month's reconciliation helps.</div>
-    <div><b>Gives back</b>The skill gives you the two ladders and every match with the method that made it. It also gives you the unmatched items sorted, proposed entries tied to statement lines, and a sign-off line for two different people<sup class="c"><a href="#src7">7</a></sup>.</div>
+    <div><b>Needs</b>The skill always needs your books' cash activity and ending balance, connected or exported, and the bank statement. Last month's reconciliation helps. The skill uses it to agree the opening balance and to bring forward last month's open items. The first days of next month's statement also help.</div>
+    <div><b>Gives back</b>The skill gives you the two ladders and every match with the method that made it. It also gives you the unmatched items sorted, proposed entries each tied to its evidence, and a sign-off line for two different people<sup class="c"><a href="#src7">7</a></sup>.</div>
     <div><b>Never</b>The skill never changes your books, marks anything cleared, approves the reconciliation, calls a book-side total "reconciled", or shows a full account number. It reads nothing before you say yes.</div>
   </div>
 </section>
@@ -424,21 +424,21 @@ const LEVELS = [
     facts:["The IRS lists bank charges not yet recorded as a normal source of difference between the statement and the books "+C(1)+".","A returned deposited item is a cheque you deposited that a bank returned because it could not be processed against the writer's account "+C(5)+". The bank removes the $300 from the account again."],
     visual:{type:"wf", start:["Book balance",12180.50], steps:[["Bank fee not recorded",-15],["Interest not recorded",4.50],["Customer cheque returned",-300]], end:["Adjusted book balance",11870], dec:2},
     rule:{q:"Interest and credits not recorded / fees and debits not recorded — [manual] to identify without the statement, since by definition they are not in the books.", w:"references/method.md · Step 2"},
-    rule2:{q:"Every proposed entry names the statement line that evidences it — an entry proposed without that evidence is a guess at what the bank did.", w:"references/method.md · Step 5"},
+    rule2:{q:"Every proposed entry names its evidence: the statement line for bank-originated items, and the GL rows and source document for book errors — an entry proposed without that evidence is a guess.", w:"references/method.md · Step 5"},
     math:[["Book balance","$12,180.50"],["− bank fee (statement line 14 Sep)","$15.00"],["+ interest (statement line 30 Sep)","$4.50"],["− returned deposit (statement line 19 Sep)","$300.00"],["= adjusted book balance","$11,870.00",1],["Adjusted bank balance (Level 1)","$11,870.00"],["Difference","$0.00",1]],
-    verdict:["ok","It ties after three entries that the skill proposes. Each entry points at its statement line. The entries record the fee, record the interest, and reverse the bounced receipt. You also chase the customer. A person posts the entries."] },
+    verdict:["ok","It ties after three entries that the skill proposes. Each entry points at its statement line. The entries record the fee, record the interest, and reverse the bounced receipt. The $300 goes back to what the customer owes. It is not an expense. You also chase the customer. A person posts the entries."] },
 
   { n:3, title:"The $25 that won't go away",
     chips:["Books vs books"], src:"Rule 3", cites:[3],
-    situation:"It is the same month, but the adjusted book balance comes to $11,895.00. This is $25.00 more than the bank balance. Every statement line has a match. The gap is inside the books.",
+    situation:"It is the same month, but the adjusted book balance comes to $11,845.00. This is $25.00 less than the bank balance. Every statement line has a match. The gap is inside the books.",
     facts:["When a difference remains, Intuit advises you to resolve it rather than accept an adjusting entry. Intuit also advises you to talk to your accountant first "+C(3)+".","The skill goes one step further, before it even needs the statement. It runs the book side against itself for duplicates."],
     visual:{type:"table",
       head:["Date","Payee","Type","Amount","Reference"],
       rows:[["12 Sep","Acme Supplies","Bill payment","$25.00","#1031"],["12 Sep","Acme Supplies","Bill payment",["$25.00","bad"],["#1031","bad"]],["12 Sep","Acme Supplies","Bill payment","$25.00","#1032"]]},
     rule:{q:"Adjusted balances tie to the cent — not to materiality. A bridge that nearly balances has an unidentified item in it", w:"references/method.md · Quality checks"},
     rule2:{q:"[auto] even without a statement: run the book side against itself to find duplicates — the same amount, counterparty and date recorded twice.", w:"references/method.md · Step 3"},
-    math:[["Adjusted bank balance","$11,870.00"],["Adjusted book balance","$11,895.00"],["Unexplained","$25.00",1],["Book entries: same payee, date, amount, reference","2 × #1031"],["One is a duplicate, so remove it","−$25.00"],["Adjusted book balance after fix","$11,870.00",1]],
-    verdict:["flag","The books record cheque #1031 twice. If a person recorded the difference as \"miscellaneous\", the duplicate would stay in the books. If someone ever reissued #1031, Northbrook would pay the supplier twice."] },
+    math:[["Adjusted bank balance","$11,870.00"],["Adjusted book balance","$11,845.00"],["Unexplained","$25.00",1],["Book entries: same payee, date, amount, reference","2 × #1031"],["Proposed entry: reverse the duplicate payment","+$25.00"],["Adjusted book balance after fix","$11,870.00",1]],
+    verdict:["flag","The books record cheque #1031 twice. The skill proposes an entry that reverses the second one, with the two book entries as its evidence. If a person recorded the difference as \"miscellaneous\", the duplicate would stay in the books. If someone ever reissued #1031, Northbrook would pay the supplier twice."] },
 
   { n:4, title:"Matching four ways, and how much to trust each",
     chips:["Bank statement","Books"], src:"Rule 1", cites:[6],
@@ -446,7 +446,7 @@ const LEVELS = [
     facts:["A single bank line can settle many transactions at once: a card processor's payout groups many charges, refunds and fees into one deposit "+C(6)+". Matching one line to several entries is normal. It is also where false matches start."],
     visual:{type:"table",
       head:["Statement line","Book entry","Method","Confidence"],
-      rows:[["18 Sep · $742.10 · ACH","18 Sep · $742.10 · Bill payment","1 · exact amount + date","strongest"],["20 Sep · $1,100.00 · \"NORTHBRK INS PREM\"","19 Sep · $1,100.00 · \"Insurance premium\"","2 · amount + similar wording","good"],["22 Sep · $1,860.00 · CHK 1043","28 Sep · $1,860.00 · cheque #1043","3 · reference","strong where the reference survives"],["25 Sep · $3,420.00 · deposit","$1,200 + $1,500 + $720 · three receipts","4 · split / combined",["look closely","bad"]]]},
+      rows:[["18 Sep · $742.10 · ACH","18 Sep · $742.10 · Bill payment","1 · exact amount + date","strongest"],["20 Sep · $1,100.00 · \"NORTHBRK INS PREM\"","19 Sep · $1,100.00 · \"Insurance premium\"","2 · amount + similar wording","good"],["22 Sep · $615.00 · CHK 1039","17 Sep · $615.00 · cheque #1039","3 · reference","strong where the reference survives"],["25 Sep · $3,420.00 · deposit","$1,200 + $1,500 + $720 · three receipts","4 · split / combined",["look closely","bad"]]]},
     rule:{q:"Work down the methods; record which one produced each match, because a level-1 match and a level-4 match carry very different confidence.", w:"references/method.md · Step 3"},
     rule2:{q:"Split / combined matches — one bank line covering several book entries, or vice versa. Common with batched deposits and card settlements, and the level where false matches start.", w:"references/method.md · Step 3"},
     math:[["Method 4: 1,200 + 1,500 + 720","$3,420.00"],["Statement deposit 25 Sep","$3,420.00"],["Difference","$0.00",1],["But: could 1,200 + 1,500 + 720 be a different three receipts?","check the deposit slip"]],
@@ -454,7 +454,7 @@ const LEVELS = [
 
   { n:5, title:"When timing stops being timing",
     chips:["Aging"], src:"Age the leftovers", cites:[2,4],
-    situation:"At 30 September two items from earlier months are still outstanding. One is a $980 deposit recorded on 14 August that the bank never credited. The other is cheque #0988 for $640, written on 2 June and never cashed.",
+    situation:"At 30 September two items from earlier months are still outstanding. Both come forward from the August reconciliation, and the skill matches them first. One is a $980 deposit recorded on 14 August that the bank never credited. The other is cheque #0988 for $640, written on 2 June and never cashed.",
     facts:["Deposits must generally be available by the second business day "+C(2)+". A deposit missing after 33 business days is not timing.","A cheque that nobody cashes becomes unclaimed property after a dormancy period that each state sets, often a year or more. The holder must then give it to the state "+C(4)+"."],
     visual:{type:"table",
       head:["Item","Recorded","Age at 30 Sep","Threshold","Status"],
@@ -559,7 +559,7 @@ function renderLevels(){
 const PRESETS = {
   clean: {bank:12480,dit:1250,oc:1860,berr:0,book:11870,   fees:0, int:0,   ret:0,  kerr:0,  ditage:0, ocage:2},
   bank:  {bank:12480,dit:1250,oc:1860,berr:0,book:12180.50,fees:15,int:4.50,ret:300,kerr:0,  ditage:0, ocage:2},
-  dup:   {bank:12480,dit:1250,oc:1860,berr:0,book:12205.50,fees:15,int:4.50,ret:300,kerr:0,  ditage:0, ocage:2},
+  dup:   {bank:12480,dit:1250,oc:1860,berr:0,book:12155.50,fees:15,int:4.50,ret:300,kerr:0,  ditage:0, ocage:2},
   blank: {bank:"",dit:"",oc:"",berr:"",book:"",fees:"",int:"",ret:"",kerr:"",ditage:"",ocage:""},
 };
 const inputs=[...document.querySelectorAll("[data-k]")];
@@ -607,7 +607,7 @@ sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6)
 @media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
 </style>
 <script>(()=>{
-const CHECKED="2026-10-21", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};

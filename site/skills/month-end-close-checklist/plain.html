@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Month-End Close Checklist in Plain English | MosoFin</title>
+<meta name="description" content="What a month-end close checklist shows: which tasks apply to your business, what the books prove is done, and if this month starts where last ended.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Month-end close checklist</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Month-end close, in plain words</span>
+  <h1>Are the books done? How do I know?</h1>
+  <p class="lede">Closing the month means four things. Everything that happened is in the books. Someone checks every balance against something outside the books. The estimates are up to date. And the numbers go to the people who decide, <b>by a date, with a name against each piece</b>.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it the month, the target date, your accounting basis, your team and your materiality threshold. It builds the list of close tasks, day by day, and removes the tasks that do not apply to your business. It shows each task's status from what your books show. At the end, it checks that last month's balances in the books are still the balances that you reported. People run the close. The skill plans it, tracks it and reports. It never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">A list that fits the business</span>
+  <h2>48 default tasks become 41 for Northbrook Trading</h2>
+  <p>Northbrook Trading is a single US company. It sells professional services, keeps its books in US dollars only and uses the accrual method. It closes October 2026 as a hard close. Day 1 is Monday 2 November and the target close is Day 7, Tuesday 10 November.</p>
+  <p>The skill starts from a default list. The list has 5 tasks before the close and 48 tasks on Days 1 to 7. Then it reads your chart of accounts and removes the tasks that do not apply. It states the evidence for each removal. So you can see a task that it removed in error and put the task back.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="How the default list of 48 tasks on Days 1 to 7 becomes 41 for Northbrook Trading, plus 5 tasks before the close, 46 in total">
+        <thead><tr><th scope="col" style="text-align:left">Change</th><th scope="col" style="text-align:left">Evidence in the books</th><th scope="col">Tasks</th><th scope="col">Running total</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Default list, Days 1 to 7</th><td class="t">Day 1: 5, Day 2: 8, Day 3: 13, Day 4: 6, Day 5: 5, Day 6: 5, Day 7: 6</td><td>48</td><td>48</td></tr>
+        <tr><th scope="row">Inventory tasks removed</th><td class="t">No inventory account in the chart. Day 1 inventory cutoff, Day 2 inventory count and Day 3 inventory write-downs go</td><td class="w">−3</td><td>45</td></tr>
+        <tr><th scope="row">Day 6 consolidation removed</th><td class="t">One company file. Day 6 applies only to a group of companies</td><td class="w">−5</td><td>40</td></tr>
+        <tr><th scope="row">Currency revaluation removed</th><td class="t">One currency and no foreign-currency balances. The Day 3 task goes</td><td class="w">−1</td><td>39</td></tr>
+        <tr><th scope="row">Industry tasks added</th><td class="t h">Professional services, from the company profile: unbilled work in progress and project profitability. Each has an account behind it</td><td class="h">+2</td><td>41</td></tr>
+        <tr><th scope="row">Tasks before the close</th><td class="t">Calendar, open systems, final data feeds, bank statements, vendor statements</td><td>+5</td><td>46</td></tr>
+        <tr class="tot"><th scope="row">Northbrook's list</th><td></td><td></td><td class="c">46</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company. 48 − 3 − 5 − 1 + 2 = 41 tasks on Days 1 to 7. With the 5 tasks before the close, the list has 46 tasks. The default list and the removal rules are the skill's own.</figcaption>
+  </figure>
+  <p>Many of the Day 3 tasks are adjusting entries: accruals, prepaid expenses and deferred revenue. Under the accrual method, you report income in the year you earn it. You deduct an expense in the year you incur it, whatever the payment date<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. These entries put income and expenses in the correct period before the numbers are final. Northbrook told the skill that it uses the accrual basis, so these tasks stay. Day 3 also checks that each accrual from last month has a reversing entry this month.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>A task marked Complete with no entry in the books</h2>
+  <p>On Wednesday 4 November, Day 3, the owner asks for the status. A usual checklist shows what each person says. The skill adds one more column: Evidence. It shows what the books show for each task that makes a journal entry. Before it reads, it states the test for each task: the account, the side and the dates. For depreciation, the test is a credit to accumulated depreciation, dated in October, with the amount compared to September's.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The status board on Wednesday 4 November: three entries posted, the deferred revenue release open, the payroll accrual marked Complete with no entry, the bank reconciliation manual">
+        <thead><tr><th scope="col" style="text-align:left">Task</th><th scope="col" style="text-align:left">Evidence from the books</th><th scope="col">Amount $</th><th scope="col" style="text-align:left">Reference</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Depreciation</th><td class="t h">Posted Tue 3 Nov</td><td>4,210</td><td class="t">JE-2611-004</td></tr>
+        <tr><th scope="row">Prepaid amortization</th><td class="t h">Posted Tue 3 Nov</td><td>1,250</td><td class="t">JE-2611-005</td></tr>
+        <tr><th scope="row">Accruals (utilities)</th><td class="t h">Posted Wed 4 Nov</td><td>2,800</td><td class="t">JE-2611-009</td></tr>
+        <tr><th scope="row">Deferred revenue release</th><td class="t a">No entry found. Open</td><td>—</td><td class="t">—</td></tr>
+        <tr class="breach"><th scope="row">Payroll cutoff accrual</th><td class="t w">The template says Complete. Nobody posted an entry</td><td>—</td><td class="t">—</td></tr>
+        <tr><th scope="row">Bank reconciliation</th><td class="t a">Manual. The skill cannot see a bank statement. The owner of the task reconciles</td><td>—</td><td class="t">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The entry references are made up. A dash means that the books show no amount for the task.</figcaption>
+  </figure>
+  <div class="compare">
+    <div class="book">
+      <h3>Status from evidence</h3>
+      <span class="who">What the skill shows</span>
+      <div class="rows num">
+        <div class="row"><span>Payroll cutoff accrual</span><span class="v">no entry</span></div>
+        <div class="row off"><span>Status in the template</span><span class="v">Complete</span></div>
+        <div class="row"><span>Next step</span><span class="v">ask the owner</span></div>
+      </div>
+      <div class="verdict">The two columns disagree. The skill calls this the most useful line on the whole board. The task owner finds the entry or posts it.</div>
+    </div>
+    <div class="book bad">
+      <h3>Status from memory</h3>
+      <span class="who">A checklist that someone ticked</span>
+      <div class="rows num">
+        <div class="row"><span>Payroll cutoff accrual</span><span class="v">Complete</span></div>
+        <div class="row off"><span>Entry in the books</span><span class="v">none</span></div>
+        <div class="row off"><span>October payroll cost</span><span class="v">too low</span></div>
+      </div>
+      <div class="verdict">The close continues on a false status. The October statements can show too little payroll cost.</div>
+    </div>
+  </div>
+  <p>A posted entry shows that an entry exists. It does not show that the entry is correct or complete. The task owner still owns the task, and people run the close.</p>
+  <p>Some tasks wait for information from outside the business. The skill cannot see these tasks and cannot chase them. It shows them in a separate list. At Northbrook, the vendor statement from Crestline Logistics is not yet received.</p>
+</section>
+
+<section>
+  <span class="label">The final check</span>
+  <h2>Does October start where September ended?</h2>
+  <p>On Day 7, the skill compares two figures for each balance sheet account. The first is the September balance in the trial balance that Northbrook reported last month. The second is the September balance that the books show now. They must be equal. It checks every account, not only the total. Two reads of the books today always agree, so the skill needs the reported trial balance. Without it, the skill writes "not performed", not a pass. A trial balance that balances proves less. Accounting software makes debits equal credits on every entry.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Continuity check for seven accounts, September as reported against September in the books now: accounts payable is 500 lower and accrued liabilities 500 higher, so the differences total zero">
+        <thead><tr><th scope="col" style="text-align:left">Account</th><th scope="col">Sept as reported</th><th scope="col">Sept in books now</th><th scope="col">Difference</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Cash</th><td>84,300</td><td>84,300</td><td>0</td></tr>
+        <tr><th scope="row">Accounts receivable</th><td>126,500</td><td>126,500</td><td>0</td></tr>
+        <tr><th scope="row">Prepaid expenses</th><td>15,000</td><td>15,000</td><td>0</td></tr>
+        <tr><th scope="row">Property and equipment, net</th><td>212,000</td><td>212,000</td><td>0</td></tr>
+        <tr class="breach"><th scope="row">Accounts payable</th><td>61,400</td><td>60,900</td><td class="w">−500</td></tr>
+        <tr class="breach"><th scope="row">Accrued liabilities</th><td>18,200</td><td>18,700</td><td class="w">+500</td></tr>
+        <tr><th scope="row">Deferred revenue</th><td>42,000</td><td>42,000</td><td>0</td></tr>
+        <tr class="tot"><th scope="row">Total of the differences</th><td></td><td></td><td class="c">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. −500 + 500 = 0. Two accounts break and the total does not.</figcaption>
+  </figure>
+  <p>Someone moved $500 from accounts payable to accrued liabilities. The entry carries the date 30 September. Someone posted it on Tuesday 20 October, after the company reported September. Accountants call this a prior-period reclassification. It may be correct. The owner must know about it before the October statements go to anyone.</p>
+  <p>Any break means that someone opened a prior period and changed it after the company reported it. When the total still agrees, the change is a move between accounts.</p>
+  <p>Day 5 compares this month with the budget, the forecast and last month. Management reviews actual results against budgets, forecasts and prior periods. It investigates unexpected results so it can correct them<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+</section>
+
+<section>
+  <span class="label">How long a close takes</span>
+  <h2>Seven business days for Northbrook, six calendar days at the median</h2>
+  <div class="scale">
+    <div class="stat"><span class="label">Benchmark median</span><span class="v num">6 days</span><span class="s">Calendar days, weekends included, from the first trial balance to agreed monthly statements<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Range</span><span class="v num">5 to 10</span><span class="s">About 5 days for the top performers, about 10 for the slowest<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup></span></div>
+    <div class="stat"><span class="label">Northbrook's calendar</span><span class="v num good">9 days</span><span class="s">Mon 2 Nov to Tue 10 Nov, weekend included. That is 7 business days: 2, 3, 4, 5, 6, 9 and 10 November</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The benchmark covers mostly larger organisations. A small business can close faster or slower. The skill does not set a target. You give it your close date.</p>
+  <p>After the close, the skill reads the time when each entry was created to find where the close slipped. It does not use the entry date, because close entries carry the last day of the month. At Northbrook, someone entered the September deferred revenue release on Day 6, three days after its Day 3 due date. The August release also went in on Day 6. That is a slip the books measure, so nobody must remember it. If the books do not give the created time, the skill says so and asks the owner.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>It asks seven questions before it reads anything</h2>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files and the checks are the same. The skill asks this only if your account has a MosoFin connection. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">Which month do you close, and is it a soft close or a hard close?</div><div class="why">Required. A soft close and a hard close need different levels of care.</div></li>
+    <li><div class="q">Your close calendar: the target close date.</div><div class="why">Required. The days in the task list change to fit this date.</div></li>
+    <li><div class="q">Your reporting framework, for example US GAAP.</div><div class="why">Required. It decides which tasks and reports apply.</div></li>
+    <li><div class="q">Do you report on a cash or an accrual basis?</div><div class="why">Required. It decides if most Day 1 and Day 3 tasks apply. The skill uses it on every read and writes it in the workpaper header.</div></li>
+    <li><div class="q">Your team, the owner of each task, your close template and last month's close, if you have them.</div><div class="why">Recommended. Your books do not hold the names of the owners. Without them, each owner reads "to assign". The skill prefers your template to its generic list.</div></li>
+    <li><div class="q">Your materiality threshold: the amount below which a difference needs less attention.</div><div class="why">Recommended. It decides which differences need full attention. The skill never assumes a threshold.</div></li>
+  </ol>
+  <p>Then it reads your answers back and waits for your yes. For Northbrook, the read-back is like this:</p>
+  <blockquote><i>"Closing October for Northbrook Trading, a hard close, read from your Mosofin connection. Target close Tuesday 10 November. US GAAP, accrual basis. Owners from your template. Materiality $5,000. One company, one currency, no inventory, so those tasks do not apply. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the trial balances and the chart</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads the chart of accounts, to remove the tasks that do not apply</li>
+        <li>It reads the journal entries for the month, to show each task's evidence</li>
+        <li>It reads the trial balance for this month and last month, for the final check</li>
+        <li>You give it last month's trial balance as you reported it, from last month's close pack. Without it, the continuity check is not performed</li>
+        <li>It reads the company profile: currency, period ends and industry</li>
+        <li>You still give it the <b>month</b>, the <b>close date</b>, the <b>framework</b>, the <b>accounting basis</b>, the <b>owners</b> and the <b>materiality threshold</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the trial balances and the chart</h3>
+      <ul>
+        <li><b>Trial balance</b> for this month and last month, CSV or XLSX, required</li>
+        <li><b>Last month's trial balance as you reported it</b>, from last month's close pack, for the continuity check</li>
+        <li><b>Chart of accounts</b>, CSV or XLSX, recommended to fit the list to your business. Without it, the skill asks you the questions instead</li>
+        <li><b>Journal entries</b> posted in the month, a general journal export, recommended to fill the status</li>
+        <li><b>Last month's close</b> and its open items, recommended</li>
+        <li>The close date, framework, accounting basis, owners and materiality, typed in the chat</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>A close workpaper with nine sheets</h2>
+  <div class="gets">
+    <div class="get"><b>Close calendar</b><span>Each task by day, with owner, due date, dependencies and status. Three more columns show if the task applies, if the books can prove it, and the evidence with its test. Two more show the reviewer and the review date.</span></div>
+    <div class="get"><b>Open items</b><span>Blockers, with the tasks that wait on outside information in a separate group.</span></div>
+    <div class="get"><b>Variances and materiality</b><span>Actual against the budget or last month, and every balance sheet account listed above or below your threshold.</span></div>
+    <div class="get"><b>Final tie-out</b><span>The trial balance and each account's reconciliation status from its owner or workpaper. The continuity check, account by account. The sign-off by a preparer and a reviewer.</span></div>
+    <div class="get"><b>Lessons learned</b><span>The problems, the proposed changes and the close timing, measured from the times that entries were created.</span></div>
+    <div class="get"><b>Scoping and coverage</b><span>Each task group, if it applies, and the evidence. For each task, what the skill read and what it could not read.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save the task list, the owners, the dependencies, the materiality basis and the scoping decisions. It never saves statuses or results. It reads them again on each run.</p>
+  <p>A manager reviews the close and signs it off. The skill only observes and reports. When different people hold authority, custody and accounting, that helps prevent fraud, waste and abuse<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</p>
+</section>
+
+<section>
+  <div class="never">
+    <span class="label">What it never does</span>
+    <ul>
+      <li><b>Never uses MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the seven questions</b> and say yes to the read-back.</li>
+      <li><b>Never locks the books, posts an entry or marks a task complete.</b> It observes evidence and reports it. People run the close.</li>
+      <li><b>Never treats a posted entry as proof that the entry is correct or complete.</b> The task owner still owns the task.</li>
+      <li><b>Never assumes a materiality threshold.</b> It asks you for one.</li>
+      <li><b>Never saves balances, variances, task statuses or close results.</b> It observes every status and every tie-out again on each run.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Six terms, in plain English</h2>
+  <dl>
+    <dt>Close</dt><dd>The work at the end of a month that makes the numbers complete and correct enough to report.</dd>
+    <dt>Soft and hard close</dt><dd>A soft close is a lighter close for internal use. A hard close is the full close, with more care.</dd>
+    <dt>Accrual</dt><dd>An entry for income you earned or a cost you incurred that nobody has paid yet<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Materiality threshold</dt><dd>The amount you choose. A difference below it needs less detail. A difference above it gets full attention.</dd>
+    <dt>Tie-out</dt><dd>The final checks that show the books are ready to report.</dd>
+    <dt>Continuity</dt><dd>This month's opening balance equals last month's closing balance as you reported it, for each account.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a close benchmark, an IRS publication and two US control standards. We found each one on 27 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.apqc.org/resources/benchmarking/open-standards-benchmarking/measures/cycle-time-days-complete-monthly" rel="noopener">APQC: Cycle time in days to complete the monthly consolidated financial statements</a><span class="what">In APQC's benchmark, the median is 6 calendar days, weekends included, from the first trial balance to agreed monthly statements. Top performers take about 5 days and the slowest about 10. The benchmark covers mostly larger organisations.</span></li>
+    <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Accrual Method"><a href="https://www.irs.gov/publications/p538" rel="noopener">IRS: Publication 538, Accounting Periods and Methods</a><span class="what">Under the accrual method, you report income in the year you earn it. You deduct expenses in the year you incur them, whatever the payment date.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Control Activities, top-level and functional reviews"><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" rel="noopener">GAO: Internal Control Standards: Management and Evaluation Tool (GAO-01-1008G)</a><span class="what">Management regularly reviews actual performance against budgets, forecasts and prior-period results, and investigates unexpected results.</span></li>
+    <li id="src4" data-checked="2026-10-27" data-via="from search results, page not opened" data-at="Principle 10, Segregation of Duties, ¶10.21–10.23"><a href="https://www.gao.gov/assets/gao-25-107721.pdf" rel="noopener">GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721</a><span class="what">Separating authority, custody and accounting among different people helps prevent fraud, waste and abuse.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the day-by-day structure, the task list, the scoping rules or the Evidence column. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources. APQC's benchmark is international.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>month-end-close-checklist</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/month-end-close-checklist">Read the skill on GitHub →</a> The card format of the skill is on the main branch. It merged in pull request #1 on 26 October 2026, with bookkeeping-audit changes on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading and every figure in the example. They are not your data. The close date, the owners and the materiality threshold are the company's own choices. The IRS publication and the control standards are US sources. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

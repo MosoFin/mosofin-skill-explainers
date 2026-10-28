@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Aging and Payment Run Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked AP aging examples, from one late bill to a payment run that fits the cash you choose to spend, with a run calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← AP aging and payment runs</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · ap-aging-and-payment-runs · learning guide</span>
+  <h1>From one late bill to a payment run that fits your cash</h1>
+  <p class="lede">This page shows how the skill builds an aging and proposes a payment run, <b>one level at a time</b>. It starts with one bill in one bucket. It ends with the things a run must never do. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are an OpenStax textbook, two FBI IC3 publications, a GOV.UK page, a US Treasury page and the GAO Green Book. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter up to 10 bills of your own. The page builds the aging and ranks the run.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading, which keeps its books in US dollars. Its weekly run has an as-of date of Friday 6 November 2026. The owner keeps $10,000 back and gives $40,000 as the cash available for the run. The owner marks Power Co and PayrollCo as critical and Brightline Software as discretionary. All other vendors are standard.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in your own week</h2>
+  <p class="muted">Enter up to 10 open bills, or load the example. The page sorts each bill into its bucket and ranks the run in the default order of Step 5 in <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="northbrook">Northbrook, 6 November</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The run</legend>
+        <label class="field"><span>As-of date</span><input data-k="asof" type="date"></label>
+        <label class="field"><span>Cash available: cash you choose to spend, not your bank balance</span><input data-k="cash" inputmode="decimal"></label>
+        <label class="field"><span>Next run date</span><input data-k="next" type="date"></label>
+      </fieldset>
+      <fieldset><legend>How the page ranks</legend>
+        <p class="fine">Critical vendors come first. Past-due bills with a penalty or a collection threat come next. Then come discounts with a deadline before the next run, bills due this week and bills due next week. The page defers discretionary bills and later bills. It leaves held bills out of the run.</p>
+      </fieldset>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Open bills">
+      <thead><tr><th>Vendor</th><th>Open amount</th><th>Due date</th><th>Tier</th><th>Penalty or threat</th><th>Discount %</th><th>Discount deadline</th><th>On hold</th></tr></thead>
+      <tbody id="billrows"></tbody>
+    </table></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div id="aging"></div>
+    <p class="fine">The page counts days past due in whole calendar days from the as-of date. "This week" ends on the Sunday after the as-of date, and "next week" is the 7 days after that. The page puts a past-due bill with no penalty and no threat with the bills due this week. The skill's own order does not name that case, so your judgement may differ. The run stops at the first bill that does not fit in the cash that is left. The preset gives $33,090 proposed and $6,910 left. A figure from the calculator is a proposal. A person approves it, and the bank or the accounting system pays it.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? What is the as-of date, and do you use your own buckets? Aging only, or a payment run too, and how much cash is available? Which vendors are critical, standard or discretionary? Which vendors are on hold or in dispute, which payments are on their way outside the books, and which vendor asked to change bank details? How do you pay each vendor? If the bills are in more than one currency, what is the exchange rate and its source?</div>
+    <div><b>Needs</b>The skill needs the open bills, with the vendor, bill number, bill date, due date or terms, open amount and currency. It needs the A/P control balance to agree the aging to it. The payments made, the open vendor credits and the vendor list make the result better. You type in the as-of date and the cash available.</div>
+    <div><b>Gives back</b>The skill gives back six numbered sheets: aging summary, aging detail, proposed payment run, discount opportunities, exceptions and coverage. A Held and disputed sheet, 3b, follows the payment run. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its summary. It never sends, releases or schedules a payment, changes bank details or puts a vendor on hold. It never assumes the as-of date or the cash. It never runs a real payment run from test data, and never saves bank details.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are an OpenStax textbook, two FBI IC3 publications, a GOV.UK page, a US Treasury page and the GAO Green Book. MosoFin checked each one on 27 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The default buckets, the ranking order, the output sheets and the three vendor tiers are the skill's own. Northbrook Trading, its bills, its tiers and every figure in the examples are made up. The page marks them where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. The card format is on the main branch of MosoFin/mosofin-finance-skills. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1, 2, 3, 5 and 6 are US sources. Source 4 is a UK source. Check with your accountant which rules apply to you. This page explains <code>ap-aging-and-payment-runs</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/ap-aging-and-payment-runs">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Finance, 19.2 What Is Trade Credit?", u:"https://openstax.org/books/principles-finance/pages/19-2-what-is-trade-credit", at:"the 2/10, net 30 example", checked:"2026-10-27", via:"from search results, page not opened", w:"For terms of 2/10, net 30, the textbook puts the annual cost of not taking the discount at 36.73 percent. If you pay a supplier late instead of early, you give up the discount. That is an opportunity cost."},
+  {t:"FBI IC3: Public Service Announcement I-060923-PSA, Business Email Compromise", u:"https://www.ic3.gov/PSA/2023/psa230609", at:"Tips to protect yourself", checked:"2026-10-27", via:"from search results, page not opened", w:"Check a request to change payment or account details through a second channel. For example, use a phone number that is already on file. Do not use a number or a link in the request."},
+  {t:"FBI IC3: 2024 Internet Crime Report", u:"https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", at:"loss table, Business Email Compromise", checked:"2026-10-27", via:"from search results, page not opened", w:"In 2024, people reported losses of $2,770,151,146 to business email compromise, from 21,442 complaints."},
+  {t:"GOV.UK: Late commercial payments: charging interest", u:"https://www.gov.uk/late-commercial-payments-interest-debt-recovery/charging-interest-commercial-debt", checked:"2026-10-27", via:"from search results, page not opened", w:"In the UK, if a contract sets no other rate, a supplier can claim statutory interest on a late business payment. The rate is 8% plus the Bank of England base rate. The supplier can also claim fixed compensation of £40, £70 or £100, by the size of the debt."},
+  {t:"US Treasury, Bureau of the Fiscal Service: Prompt Payment", u:"https://fiscal.treasury.gov/payments-from-government/prompt-payment", at:"interest rate table", checked:"2026-10-27", via:"from search results, page not opened", w:"A US federal agency that pays a supplier late owes interest automatically. The rate for 1 July to 31 December 2026 is 4.75%, on a 360-day year."},
+  {t:"GAO: Standards for Internal Control in the Federal Government (Green Book), GAO-25-107721", u:"https://www.gao.gov/assets/gao-25-107721.pdf", at:"Principle 10, Segregation of Duties, ¶10.21–10.23", checked:"2026-10-27", via:"from search results, page not opened", w:"Different people should hold the authority, the custody of assets and the accounting. This helps to prevent fraud, waste and abuse."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The eighteen quotes, word for word from the skill's files (markdown bold and italic removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"who do we owe, and how late are we?", w:"references/overview.md · AP Aging and Payment Runs (Mosofin)"},
+  q2:{q:"Ask; do not read a bank balance and call it available.", w:"references/gates.md · Gate 3 — Profile the entity, then interview the user"},
+  q3:{q:"The books do not know which supplier stops serving you first.", w:"references/gates.md · Gate 3 — Profile the entity, then interview the user"},
+  q4:{q:"A payment proposed from fixture data would be a real transfer of real money against an imaginary bill.", w:"references/method.md · Step 0 — Fetch the evidence (grounding)"},
+  q5:{q:"since a derived due date drives every bucket downstream.", w:"references/method.md · Step 1 — Parse and normalize"},
+  q6:{q:"Sorting bills into bands is what turns a list of debts into a picture of a problem.", w:"references/method.md · Step 2 — Build the aging buckets"},
+  q7:{q:"\"2/10 Net 30\" means: 2% discount if paid within 10 days, otherwise the full amount is due in 30 days.", w:"references/method.md · Step 3 — Identify early-pay discounts"},
+  q8:{q:"few uses of cash return 36% a year.", w:"references/method.md · Step 3 — Identify early-pay discounts"},
+  q9:{q:"a bill quietly accruing interest can outrank a larger one that is not.", w:"references/method.md · Step 4 — Identify late-pay penalties"},
+  q10:{q:"When there isn't enough cash for everything, the order matters more than the total.", w:"references/method.md · Step 5 — Prioritize the payment run (if cash is constrained)"},
+  q11:{q:"The unpaid remainder is not a footnote", w:"references/method.md · Step 5 — Prioritize the payment run (if cash is constrained)"},
+  q12:{q:"never phrase a line as though a payment has been made or scheduled.", w:"references/method.md · Step 5 — Prioritize the payment run (if cash is constrained)"},
+  q13:{q:"this is the top payment-fraud vector", w:"references/edge-cases.md · Edge Cases"},
+  q14:{q:"require user confirmation through a channel the vendor did not supply.", w:"references/edge-cases.md · Edge Cases"},
+  q15:{q:"a converted figure without its rate and date cannot be checked later", w:"references/method.md · Step 6 — Multi-currency handling"},
+  q16:{q:"Cash available is also state, not a decision", w:"references/method.md · Step 8 — Evolve the skill (Mosofin-specific, final step)"},
+  q17:{q:"the simpler 2% × 365 / 20 = 36.5% is an approximation", w:"references/method.md · Step 3 — Identify early-pay discounts"},
+  q18:{q:"Hold until confirmed by phone on a number from your records, not from the request.", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"Two questions, every week", r:Q.q1, cites:[],
+    plain:"The aging answers the first question. The payment run answers the second: with the cash you have this week, who do you pay first?" },
+  { id:"2", title:"Bands make the problem visible", r:Q.q6, cites:[],
+    plain:"The skill sorts every open bill into a bucket by days past due. It totals each bucket, and each vendor." },
+  { id:"3", title:"A derived due date is marked", r:Q.q5, cites:[],
+    plain:"If a bill has no due date, the skill calculates one from the bill date and the terms. The sheet says that the date was derived." },
+  { id:"4", title:"A discount is a return on cash", r:Q.q8, cites:[1],
+    plain:"The skill calculates the last day, the amount and the annual return of each early-pay discount.",
+    backed:"For 2/10, net 30, a finance textbook puts the annual cost of a missed discount at 36.73 percent.{1}" },
+  { id:"5", title:"A penalty moves a bill up", r:Q.q9, cites:[4,5],
+    plain:"The skill reads late fees and interest from the terms. If a penalty clause is only in a contract, the skill asks you for it.",
+    backed:"In the UK, a supplier can claim statutory interest of 8% plus the Bank of England base rate.{4} US federal agencies that pay late owe interest by law.{5}" },
+  { id:"6", title:"Ask for the cash", r:Q.q2, cites:[],
+    plain:"Cash available is the cash you choose to spend this week. It is not your bank balance. The skill asks you for it." },
+  { id:"7", title:"Tiers come from you", r:Q.q3, cites:[],
+    plain:"You tell the skill which vendors are critical, standard or discretionary. Critical vendors rank first in the run." },
+  { id:"8", title:"Show what is left unpaid", r:Q.q11, cites:[],
+    plain:"The skill stops adding payments when the cash is used. It shows the deferred and held bills on the face of the output." },
+  { id:"9", title:"A proposal, never a payment", r:Q.q12, cites:[6],
+    plain:"The run is headed as a proposal. A person approves it, and the bank or the accounting system pays it.",
+    backed:"Different people should hold the authority, the custody of assets and the accounting.{6}" },
+  { id:"10", title:"New bank details wait", r:Q.q14, cites:[2,3],
+    plain:"At the start, the skill asks if a vendor asked to change bank details. It flags each vendor you name on the proposed run. You check the change through a channel that the vendor did not supply.",
+    backed:"The FBI says to check a change of payment details through a second channel.{2} In 2024, reported losses to business email compromise were $2,770,151,146.{3}" },
+  { id:"11", title:"A rate with its date", r:Q.q15, cites:[],
+    plain:"For bills in other currencies, the skill converts at the rate you give. It shows the rate, its source and its date." },
+  { id:"12", title:"Asked every run", r:Q.q16, cites:[],
+    plain:"The skill can save tiers, payment methods and holds. It never saves the cash available, because the cash changes every week." },
+];
+
+const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"The aging · Northbrook Trading, as of Friday 6 November 2026" },
+  { n:1, title:"One bill, one bucket",
+    chips:["Open bills","Terms"], src:"Rules 1, 2 and 3", cites:[],
+    situation:"Power Co sent a bill for $3,400 that was due on Friday 30 October. The as-of date is Friday 6 November, so the bill is 7 days late.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Vendor","Open","Due","As of","Days past due","Bucket"],
+      rows:[["Power Co","$3,400","Fri 30 Oct","Fri 6 Nov","7",["1–30","bad"]]]},
+    rules:[Q.q1, Q.q6, Q.q5],
+    math:[["As-of date","Fri 6 Nov"],["− due date","Fri 30 Oct"],["= days past due","7 days",1],["7 is in the band 1 to 30","bucket 1–30",1],["A bill with no due date: Harbor, billed Fri 30 Oct, Net 30","30 Oct + 30 days"],["= derived due date, marked on the sheet","Sun 29 Nov",1]],
+    verdict:["note","Power Co's $3,400 goes in the 1–30 bucket. If a bill has no due date, the skill calculates one from its terms. The sheet then says that the date was derived.","1–30"] },
+
+  { n:2, title:"The whole aging",
+    chips:["Open bills","Aging report"], src:"Rule 2", cites:[],
+    situation:"Northbrook has nine open bills. The skill counts the days past due of each bill from the as-of date and puts each bill in one of six buckets.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Vendor","Open","Due","Days past due","Bucket"],
+      rows:[["Power Co","$3,400","Fri 30 Oct","7","1–30"],["PayrollCo","$1,200","Tue 10 Nov","−4","Not yet due"],["Crestline Logistics","$12,500","Tue 22 Sep","45",["31–60","bad"]],["Lakeside Freight","$7,200","Mon 12 Oct","25","1–30"],["Harbor Office Supply","$8,000","Sun 29 Nov","−23","Not yet due"],["Summit Cleaning","$950","Sun 8 Nov","−2","Not yet due"],["Pinnacle Design","$14,000","Thu 12 Nov","−6","Not yet due"],["Brightline Software","$6,000","Fri 4 Dec","−28","Not yet due"],["Acme Corp","$9,600","Sun 2 Aug","96",["91–120","bad"]]],
+      total:["Nine bills","$62,850","","",""]},
+    rules:[Q.q6],
+    math:[["Not yet due: 1,200 + 8,000 + 950 + 14,000 + 6,000","$30,150"],["1–30: 3,400 + 7,200","$10,600"],["31–60: Crestline","$12,500"],["61–90","$0"],["91–120: Acme","$9,600"],["Over 120","$0"],["Total open: 30,150 + 10,600 + 12,500 + 0 + 9,600 + 0","$62,850",1]],
+    verdict:["ok","The six buckets hold $30,150, $10,600, $12,500, $0, $9,600 and $0, a total of $62,850. The aging here is the report's own, and the skill says so on the sheet.","AGED"] },
+
+  { tier:"What changes the order · discounts and penalties" },
+  { n:3, title:"The discount worth taking",
+    chips:["Open bills","Terms record"], src:"Rule 4", cites:[1],
+    situation:"Harbor Office Supply billed $8,000 on Friday 30 October, on terms of 2/10 Net 30. The discount ends on Monday 9 November. The next run is on Friday 13 November, after the deadline.",
+    facts:["For terms of 2/10, net 30, the OpenStax textbook puts the annual cost of not taking the discount at 36.73 percent "+C(1)+". If you pay late instead of early, you give up the discount.",
+           "The skill divides the discount by the price after the discount and uses a 365-day year. So it gives about 37.2%. The textbook uses a 360-day year, so it gives 36.73% "+C(1)+". Both show a return of more than 36% a year."],
+    visual:{type:"table",
+      head:["Bill","Terms","Billed","Discount deadline","Discount","Cash paid"],
+      rows:[["Harbor, $8,000","2/10 Net 30","Fri 30 Oct","Mon 9 Nov",["$160","good"],"$7,840"]]},
+    rules:[Q.q7, Q.q8, Q.q17],
+    math:[["Discount deadline: 30 Oct + 10 days","Mon 9 Nov"],["Discount: $8,000 × 2%","$160",1],["Cash paid: $8,000 − $160","$7,840"],["Annual return, skill's formula: 2% ÷ 98% × 365 ÷ (30 − 10)","37.2%",1],["Simpler form: 2% × 365 ÷ 20","36.5%"],["Textbook: 2% ÷ 98% × 360 ÷ 20","36.73%"],["Next run, Fri 13 Nov, is after Mon 9 Nov","take it in this run",1]],
+    verdict:["ok","The skill flags the Harbor discount, because its deadline falls before the next run. Paying $7,840 now saves $160. By the skill's formula, that is a return of about 37.2% a year. The skill records the discount with the payment, so the bill closes in full.","DISCOUNT"] },
+
+  { n:4, title:"The bill that costs money to wait on",
+    chips:["Open bills","Terms record"], src:"Rule 5", cites:[4,5],
+    situation:"Crestline Logistics has $12,500 open, 45 days past due. Its terms carry a late fee of 1.5% a month. Pinnacle Design has a larger bill, $14,000, due next week, with no penalty.",
+    facts:["In the UK, if a contract sets no other rate, a supplier can claim statutory interest of 8% plus the Bank of England base rate "+C(4)+". It can also claim fixed compensation of £40, £70 or £100 "+C(4)+".",
+           "A US federal agency that pays a supplier late owes interest automatically. The rate for 1 July to 31 December 2026 is 4.75% "+C(5)+". In these two examples, the law sets the penalty. The supplier's terms do not."],
+    visual:{type:"table",
+      head:["Bill","Open","Days past due","Penalty","A month"],
+      rows:[["Crestline Logistics","$12,500","45","1.5% a month, from the terms",["$187.50","bad"]],["Pinnacle Design","$14,000","−6","none",["$0.00","good"]]]},
+    rules:[Q.q9],
+    math:[["Crestline: $12,500 × 1.5%","$187.50 a month",1],["Source of the rate","the terms record"],["Pinnacle: no penalty","$0.00 a month"],["Rank: Crestline, past due with a penalty","group 2",1],["Rank: Pinnacle, due next week","group 5",1]],
+    verdict:["flag","Crestline costs $187.50 for each month it stays unpaid. So it ranks above the larger Pinnacle bill. The skill reads penalties from the terms. If a clause is only in a contract, it asks you.","PENALTY"] },
+
+  { tier:"The run · $40,000 of cash available" },
+  { n:5, title:"Not enough cash for everything",
+    chips:["Aging","Tiers","Cash available"], src:"Rules 6, 7, 8 and 12", cites:[],
+    situation:"The bills come to $62,850, and the owner gives $40,000 as the cash available. Northbrook has no open vendor credits. The skill ranks the bills in its default order and adds them until the next bill does not fit.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Group","Vendor","Reason","Pay","Running total"],
+      rows:[["1","Power Co","critical","$3,400","$3,400"],["1","PayrollCo","critical","$1,200","$4,600"],["2","Crestline Logistics","past due, penalty","$12,500","$17,100"],["2","Lakeside Freight","past due, final notice","$7,200","$24,300"],["3","Harbor Office Supply","discount ends Mon 9 Nov","$7,840","$32,140"],["4","Summit Cleaning","due this week","$950","$33,090"],["5","Pinnacle Design","due next week",["$14,000 deferred","bad"],["$47,090 > $40,000","bad"]],["6","Brightline Software","discretionary","$6,000 deferred","—"],["held","Acme Corp","credit hold","$9,600 held","—"]]},
+    pair:[["ok","Proposed run","$33,090","six bills, groups 1 to 4"],["note","Cash left","$6,910","$40,000 − $33,090"],["bad","Left unpaid, on the face","$29,600","Pinnacle $14,000, Brightline $6,000, Acme $9,600 held"]],
+    rules:[Q.q10, Q.q11, Q.q2, Q.q3, Q.q16],
+    math:[["3,400 + 1,200 + 12,500 + 7,200 + 7,840 + 950","$33,090",1],["Next bill: $33,090 + $14,000 (Pinnacle)","$47,090"],["$47,090 is more than $40,000","stop",1],["Cash left: $40,000 − $33,090","$6,910",1],["Left unpaid: 14,000 + 6,000 + 9,600","$29,600"],["Check: open $62,850 − bills in the run $33,250","$29,600",1],["The cash test counts Harbor at cash paid","$7,840, not $8,000"]],
+    verdict:["note","The skill proposes $33,090 and leaves $6,910 of cash. Pinnacle waits for the next run, Brightline is deferred and Acme is held. The skill asks for the cash available again next week.","PROPOSAL"] },
+
+  { tier:"The limits · what the run must never do" },
+  { n:6, title:"What the run must never do",
+    chips:["Vendor records","Email","Holds"], src:"Rules 9 and 10", cites:[2,3,6],
+    situation:"On 3 November, an email from Lakeside Freight gave new bank details. The owner names Lakeside when the skill asks about bank-detail changes. Acme Corp's $9,600 bill is in dispute, and the owner has put Acme on credit hold.",
+    facts:["The FBI says to check a request to change payment details through a second channel. For example, use a phone number that is already on file "+C(2)+".",
+           "In 2024, people reported losses of $2,770,151,146 to business email compromise, from 21,442 complaints "+C(3)+".",
+           "Different people should hold the authority, the custody of assets and the accounting. This helps to prevent fraud, waste and abuse "+C(6)+". The skill proposes the run, a person approves it, and the bank or the accounting system pays it."],
+    visual:{type:"table",
+      head:["Check","Result","Detail"],
+      rows:[["Lakeside, bank-detail change",["flagged","bad"],"$7,200 line on the run, held for a phone check"],["Acme Corp, credit hold",["$9,600 held","bad"],"on the Held and disputed sheet, not in the run"],["Header of the run","proposal","Proposal: no payment has been made or scheduled."],["End of the run","blank","Prepared by / date. Approved by / date."],["Fixture data","none","no mock data in the run"],["Who pays","a person","approves, then the bank or accounting system pays"]]},
+    rules:[Q.q12, Q.q13, Q.q14, Q.q18, Q.q4],
+    math:[["Lakeside, in the proposed run","$7,200"],["Bank-detail change, from the owner's answer","flagged, held for a phone check",1],["Check by","a phone number from your own records"],["Acme Corp, held out of the run","$9,600",1],["Payments the skill sends","$0",1]],
+    verdict:["flag","The skill flags the Lakeside payment until the owner checks the change by phone, on a number from the owner's records. It keeps Acme out of the run. It sends nothing, and it heads the run as a proposal.","HELD"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: the aging and the Step 5 ranking for up to 10 bills --- */
+const ROWS = 10;
+const NB = [
+  ["Power Co",3400,"2026-10-30","critical",false,"","",false],
+  ["PayrollCo",1200,"2026-11-10","critical",false,"","",false],
+  ["Crestline Logistics",12500,"2026-09-22","standard",true,"","",false],
+  ["Lakeside Freight",7200,"2026-10-12","standard",true,"","",false],
+  ["Harbor Office Supply",8000,"2026-11-29","standard",false,2,"2026-11-09",false],
+  ["Summit Cleaning",950,"2026-11-08","standard",false,"","",false],
+  ["Pinnacle Design",14000,"2026-11-12","standard",false,"","",false],
+  ["Brightline Software",6000,"2026-12-04","discretionary",false,"","",false],
+  ["Acme Corp",9600,"2026-08-02","standard",false,"","",true],
+];
+const PRESETS = {
+  northbrook:{asof:"2026-11-06", cash:40000, next:"2026-11-13", bills:NB},
+  blank:{asof:"", cash:"", next:"", bills:[]},
+};
+const KEYS=["v","a","d","t","p","dp","dd","h"];
+const tb=document.getElementById("billrows");
+for(let i=1;i<=ROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="v" aria-label="Bill ${i} vendor" style="min-width:150px"></td>
+    <td><input data-c="a" class="n" inputmode="decimal" aria-label="Bill ${i} open amount" style="width:100px"></td>
+    <td><input data-c="d" type="date" aria-label="Bill ${i} due date"></td>
+    <td><select data-c="t" aria-label="Bill ${i} tier"><option value="standard">standard</option><option value="critical">critical</option><option value="discretionary">discretionary</option></select></td>
+    <td style="text-align:center"><input data-c="p" type="checkbox" aria-label="Bill ${i} penalty or collection threat"></td>
+    <td><input data-c="dp" class="n" inputmode="decimal" aria-label="Bill ${i} discount percent" style="width:70px"></td>
+    <td><input data-c="dd" type="date" aria-label="Bill ${i} discount deadline"></td>
+    <td style="text-align:center"><input data-c="h" type="checkbox" aria-label="Bill ${i} on hold"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const allInputs=[...document.querySelectorAll(".calc [data-k], #billrows [data-c]")];
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"")); return isFinite(v)?v:NaN; };
+const dnum = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?Date.UTC(+m[1],+m[2]-1,+m[3])/86400000:NaN; };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n*86400000); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]}`; };
+const BUCKETS=["Not yet due","1–30","31–60","61–90","91–120","Over 120"];
+const bucketOf = dpd => dpd<=0?0: dpd<=30?1: dpd<=60?2: dpd<=90?3: dpd<=120?4: 5;
+const GROUPS={1:"critical",2:"past due, penalty or threat",3:"discount ends before the next run",4:"due this week",5:"due next week",6:"defer"};
+
+function load(p){
+  const P=PRESETS[p];
+  fld("asof").value=P.asof; fld("cash").value=P.cash; fld("next").value=P.next;
+  [...tb.rows].forEach((tr,i)=>{ const b=P.bills[i]||["","","","standard",false,"","",false];
+    KEYS.forEach((k,j)=>{ const inp=tr.querySelector(`[data-c="${k}"]`); if(inp.type==="checkbox") inp.checked=!!b[j]; else inp.value=b[j]; }); });
+  document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s){ return `<div class="res ${cls}"><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results"), ag=document.getElementById("aging");
+  const A=dnum(fld("asof").value), cash=money(fld("cash").value), N=dnum(fld("next").value);
+  const bills=[...tb.rows].map(tr=>{ const g=k=>tr.querySelector(`[data-c="${k}"]`);
+    return {v:g("v").value.trim()||"Bill "+tr.dataset.r, a:money(g("a").value), d:dnum(g("d").value), t:g("t").value, p:g("p").checked, dp:money(g("dp").value), dd:dnum(g("dd").value), h:g("h").checked}; })
+    .filter(b=>!isNaN(b.a) && b.a>0 && !isNaN(b.d));
+  if(isNaN(A) || !bills.length){ steps.innerHTML=""; ag.innerHTML=""; box.innerHTML=res("", "Waiting", "—", "Enter the as-of date and at least one bill with an amount and a due date."); return; }
+  const endThis=A+(7-new Date(A*86400000).getUTCDay())%7, endNext=endThis+7;
+  const tot=[0,0,0,0,0,0];
+  bills.forEach(b=>{ b.dpd=A-b.d; b.bk=bucketOf(b.dpd); tot[b.bk]+=b.a;
+    b.disc = (!isNaN(b.dp) && b.dp>0 && !isNaN(b.dd)) ? Math.round(b.a*b.dp)/100 : 0;
+    b.ret = b.disc && b.d>b.dd && b.dp<100 ? b.dp/(100-b.dp)*100*365/(b.d-b.dd) : NaN;
+    b.live = b.disc>0 && b.dd>=A;
+    b.pay = b.live ? b.a-b.disc : b.a;
+    b.g = b.t==="critical"?1 : (b.dpd>0 && b.p)?2 : (b.live && !isNaN(N) && b.dd<N)?3 : b.t==="discretionary"?6 : b.d<=endThis?4 : b.d<=endNext?5 : 6; });
+  const total=tot.reduce((x,y)=>x+y,0);
+  let h=`<div class="tbl"><table><thead><tr><th>Vendor</th><th class="n">Open</th><th class="n">Due</th><th class="n">Days past due</th><th class="n">Bucket</th></tr></thead><tbody>`;
+  bills.forEach(b=>{ h+=`<tr><td>${esc(b.v)}</td><td class="n">${fmt(b.a)}</td><td class="n">${dshow(b.d)}</td><td class="n">${b.dpd}</td><td class="n">${BUCKETS[b.bk]}</td></tr>`; });
+  h+=`</tbody></table></div><div class="tbl"><table><thead><tr>${BUCKETS.map(x=>`<th class="n">${x}</th>`).join("")}<th class="n">Total open</th></tr></thead><tbody><tr class="total" id="bucket-totals">${tot.map(x=>`<td class="n">${fmt(x)}</td>`).join("")}<td class="n">${fmt(total)}</td></tr></tbody></table></div>`;
+  ag.innerHTML=h;
+  const held=bills.filter(b=>b.h), cand=bills.filter(b=>!b.h).sort((x,y)=>x.g-y.g || (x.g===2?y.dpd-x.dpd:x.d-y.d));
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  let s="", runTot=0, stopped=false; const inRun=[], deferred=[];
+  const haveCash=!isNaN(cash);
+  cand.forEach(b=>{
+    if(!haveCash || stopped || b.g===6){ deferred.push(b); return; }
+    if(runTot+b.pay>cash){ stopped=true; deferred.push(b); s+=line(`Next: ${esc(b.v)}, ${fmt(runTot)} + ${fmt(b.pay)} = ${fmt(runTot+b.pay)} is more than ${fmt(cash)}`,"stop",1); return; }
+    runTot+=b.pay; inRun.push(b);
+    s+=line(`${b.g} · ${esc(b.v)} (${GROUPS[b.g]})${b.live?`, after the ${fmt(b.disc,2)} discount`:""}: ${fmt(b.pay,b.pay%1?2:0)}`, fmt(runTot,runTot%1?2:0));
+  });
+  steps.innerHTML = haveCash ? line("Ranked run, adding until the cash is used","running total",1)+s : line("Enter the cash available to rank the run.","—");
+  let out = res("ok","Bucket totals",fmt(total),tot.map((x,i)=>`${BUCKETS[i]} ${fmt(x)}`).join(" · "));
+  if(haveCash){
+    out += res("ok","Proposed run",fmt(runTot,runTot%1?2:0),`${inRun.length} bills. Proposal: no payment has been made or scheduled.`);
+    out += res("note","Cash left",fmt(cash-runTot,(cash-runTot)%1?2:0),`${fmt(cash)} − ${fmt(runTot,runTot%1?2:0)}`);
+    out += res(deferred.length?"flag":"ok","Deferred",fmt(deferred.reduce((x,b)=>x+b.a,0)),deferred.length?deferred.map(b=>`${esc(b.v)} ${fmt(b.a)}`).join(" · "):"No bill waits.");
+  }
+  out += res(held.length?"note":"ok","Held",fmt(held.reduce((x,b)=>x+b.a,0)),held.length?held.map(b=>`${esc(b.v)} ${fmt(b.a)}`).join(" · ")+". The run never pays a held bill.":"No bill is on hold.");
+  bills.filter(b=>b.disc).forEach(b=>{ out += res(b.live?"ok":"flag",`Discount: ${esc(b.v)}`,fmt(b.disc,b.disc%1?2:0),
+    `${isNaN(b.ret)?"No return: the due date is not after the deadline.":`${(Math.round(b.ret*10)/10).toFixed(1)}% a year by the skill's formula.`} Deadline ${dshow(b.dd)}${b.live?".":", already passed."}`); });
+  box.innerHTML=out;
+}
+allInputs.forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("northbrook");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Invoicing Explained in Plain English | MosoFin</title>
+<meta name="description" content="What a complete customer invoice must show, how the skill prepares one and checks the ones you sent: fields, sums, prices and number gaps. Facts cited.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Customer invoicing</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · customer invoicing, in plain words</span>
+  <h1>Why hasn't this customer paid? Is something missing from the invoice?</h1>
+  <p class="lede">An invoice is a legal document. Most tax systems say what it must show before your customer can claim back the tax. If a field is missing, the customer may refuse to pay until you send a new invoice. This skill <b>prepares new invoices</b> with every field, and it <b>checks the invoices that you sent</b>.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You tell it your tax rules, what to bill and your numbering scheme. It fills most fields from your books. It checks each line, calculates the totals again and finds gaps in your invoice numbers. It gives you a draft for review. It creates, numbers, sends and posts nothing. You or your bookkeeper enter the invoice.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Prepare: what a run gives you</span>
+  <h2>Northbrook Trading bills Harbor Retail</h2>
+  <p>Northbrook Trading is a UK company, registered for VAT. The owner tells the skill that UK VAT applies. The skill never guesses this from the company's country. The UK is one example. The skill asks every owner for their own jurisdiction and its list of invoice fields.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Draft invoice NT-2026-0418 from Northbrook Trading to Harbor Retail: two lines, the subtotal, the VAT and the total, and a flag on the installation price">
+        <thead><tr><th scope="col" style="text-align:left">Line</th><th scope="col">Qty</th><th scope="col">Price</th><th scope="col">Subtotal</th><th scope="col">VAT 20%</th><th scope="col" style="text-align:left">Price check</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Storage racking</th><td>10 units</td><td>£180.00</td><td>£1,800.00</td><td>£360.00</td><td class="t h">Same as the standard price, £180.00</td></tr>
+        <tr class="breach"><th scope="row">Installation</th><td>6 hours</td><td>£65.00</td><td>£390.00</td><td>£78.00</td><td class="t w">Standard price £55.00. Harbor paid £55.00 last time. The skill asks you</td></tr>
+        <tr class="tot"><th scope="row">Total</th><td></td><td></td><td>£2,190.00</td><td>£438.00</td><td class="t">£2,628.00 to pay</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company. 10 × £180.00 = £1,800.00. 6 × £65.00 = £390.00. Subtotal: £1,800.00 + £390.00 = £2,190.00. VAT: £360.00 + £78.00 = £438.00, which is 20% of £2,190.00. Total: £2,190.00 + £438.00 = £2,628.00. Invoice number NT-2026-0418, invoice date 31 October 2026, payment terms Net 30.</figcaption>
+  </figure>
+  <p>The total is more than £250. So in the UK this must be a full VAT invoice<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. A full VAT invoice shows a unique number in one series, the names and addresses of both companies, and the seller's VAT number. It also shows the date of supply, the date of issue, a description, the quantity, the VAT rate and the VAT amount<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+  <p>From the books, the skill fills Harbor's name, address and VAT number. It also fills Northbrook's legal name and address, the items and prices, the VAT code, the Net 30 terms and the next number, NT-2026-0418. The VAT number on file is what a person typed. So the skill asks you to check that it is current.</p>
+  <p>Northbrook delivered the racking and did the installation on 28 October. The invoice date is 31 October. The date of supply, which accountants call the tax point, can decide the tax period. The skill shows both dates and asks you which one is the tax point. The skill also asks for the delivery date of each line. Both lines were complete before the invoice date, so the skill books them as sales. Work that ends after the invoice date goes to deferred revenue (money for work not yet done) instead.</p>
+  <p>The installation price is different from the standard price and from Harbor's last price. That can be a discount that you agreed, or a typing error. The skill asks before the invoice goes out, when a correction costs less.</p>
+  <p>It also shows the accounting entry that the invoice will make. Debit accounts receivable (money that customers owe you) £2,628.00. Credit product sales £1,800.00, service sales £390.00 and VAT payable £438.00. £1,800.00 + £390.00 + £438.00 = £2,628.00. The skill checks that the receivable is equal to the amount due. That is the £2,190.00 subtotal, minus a £0.00 discount, plus £0.00 shipping, plus £438.00 VAT. Most accounting systems make this entry automatically when you enter the invoice. So the skill's entry is a record of what will happen.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>Check the invoices you already sent</h2>
+  <p>Many small firms have a payment problem. Firms that let customers pay after delivery, for example by invoice, report slow payers more often<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. An incomplete invoice gives a customer one more reason to wait. In check mode, the skill applies the same rules to invoices that you already sent.</p>
+  <div class="compare">
+    <div class="book bad">
+      <h3>The invoice list as it looks</h3>
+      <div class="who">The fixed range NT-2026-0390 to NT-2026-0417, voided invoices included</div>
+      <div class="rows">
+        <div class="row"><span>Invoice numbers in the range</span><span class="v num">28</span></div>
+        <div class="row"><span>Documents found</span><span class="v num">28</span></div>
+        <div class="row off"><span>Conclusion</span><span class="v">"All there"</span></div>
+      </div>
+      <div class="verdict">The two counts agree. A person sees no problem.</div>
+    </div>
+    <div class="book">
+      <h3>What the skill reports</h3>
+      <div class="who">Each number and each invoice, checked</div>
+      <div class="rows">
+        <div class="row off"><span>Missing number</span><span class="v num">NT-2026-0402</span></div>
+        <div class="row off"><span>Number on two documents</span><span class="v num">NT-2026-0409</span></div>
+        <div class="row"><span>Count: 28 − 1 + 1</span><span class="v num">28</span></div>
+      </div>
+      <div class="verdict">One gap and one duplicate hide behind a count that agrees. The skill gives each number.</div>
+    </div>
+  </div>
+  <p>The list includes the voided invoices, so a voided number is not a gap. A missing number usually means that a person deleted an invoice. Only the audit log of your accounting system can prove a deletion, and the skill cannot read it. In several jurisdictions, a gap in the sequence is a compliance problem. The skill found three more problems in the same two months:</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Rounding, NT-2026-0396</span><span class="v num hold">£0.02</span><span class="s">6 lines of £33.33 at 20%. Northbrook rounds VAT on each line: 6 × £6.67 = £40.02. The invoice shows £40.00, the VAT on the £199.98 total</span></div>
+    <div class="stat"><span class="label">Missing phrase, NT-2026-0411</span><span class="v wrong">Reverse charge</span><span class="s">An Irish business customer at 0% VAT, with no reverse charge words. Its tax office can refuse the customer's claim</span></div>
+    <div class="stat"><span class="label">Missing field, NT-2026-0414</span><span class="v wrong">Address</span><span class="s">No customer address. A UK invoice must show it<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup></span></div>
+  </div>
+  <p>That is five findings: 1 gap, 1 duplicate, 1 rounding difference, 1 missing phrase and 1 missing field. The skill calculates the totals again with your own rounding method. It reports each difference of more than £0.01 that stays.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Nine questions, in one message</h2>
+  <p>The skill asks these questions first, in one short batch. It asks only for what it cannot already see.</p>
+  <ol class="qs">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the data, and the checks are the same. The skill asks this only if your account has a MosoFin connection.</div></li>
+    <li><div class="q">Prepare new invoices, or check invoices that you already sent?</div><div class="why">Required. They are different jobs.</div></li>
+    <li><div class="q">Which company is selling?</div><div class="why">Required. Its legal name, tax registration and number series go on the invoice. An invoice from the wrong company is legally wrong.</div></li>
+    <li><div class="q">Which customer, and what to bill: the description, quantity, unit price and tax code of each line?</div><div class="why">Required. The books hold your standard prices. What to bill this time is your decision. The skill asks you to check that the customer's tax number is current.</div></li>
+    <li><div class="q">The invoice date, the tax point if it is different, and the delivery date or service period of each line.</div><div class="why">The tax point decides the tax period. The delivery date decides if the line goes to sales or to deferred revenue. The skill never chooses the invoice date for you.</div></li>
+    <li><div class="q">Which jurisdiction controls this sale, its required fields and phrases, and any electronic invoicing rule?</div><div class="why">Required. This decides the fields and the tax. Your place of tax registration and the place of the sale can be different. The skill never guesses this from your company's country.</div></li>
+    <li><div class="q">The tax rate of each line, any exemption certificate or reverse charge, and do your prices include tax? Do you round tax on each line or on each rate total?</div><div class="why">Required if tax applies. The skill can read the tax codes that you use. It cannot know if a rate is right for this sale. It never chooses a rate for you.</div></li>
+    <li><div class="q">Your numbering scheme: prefixes, resets, and a separate series for each company.</div><div class="why">Required. The skill measures gaps and duplicates against it, and never chooses it for you. With MosoFin, it reads the next number from the live series.</div></li>
+    <li><div class="q">Payment terms, currency, the customer's purchase order number and the payment instructions.</div><div class="why">Terms and currency are required. Some customers do not pay without their purchase order number. You check the payment instructions against a trusted source.</div></li>
+  </ol>
+  <p>Then it reads your answers back, and waits for your yes:</p>
+  <blockquote><i>"Preparing one invoice, two lines, from Northbrook Trading to Harbor Retail, read from your Mosofin connection. Jurisdiction UK VAT, standard rate on both lines. Invoice date 31 October. Next number NT-2026-0418, from the existing NT-YYYY- sequence, proposed, not reserved. Terms Net 30. Payment instructions as you confirmed them. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the invoice data</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what the books cannot hold</h3>
+      <ul>
+        <li>It reads the customer's name, address, tax number and usual terms</li>
+        <li>It reads your legal name and address, your items and standard prices, and your tax codes</li>
+        <li>It reads your recent invoices, for the next number, the gap check and what this customer paid last time</li>
+        <li>In a group of companies, it asks which company sells. Each company has its own number series</li>
+        <li>You still give it the <b>jurisdiction</b>, <b>what to bill</b>, the <b>invoice date</b>, any <b>exemption certificate</b> and the <b>payment instructions</b>. You confirm the tax for each line and the numbering scheme</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the details for the job</h3>
+      <ul>
+        <li><b>To prepare:</b> the customer's details, the lines to bill, your legal name and tax registration. Type them in the chat, or a CSV or XLSX. Required</li>
+        <li><b>Numbering scheme</b> and a list of recent invoices, for the next number. CSV or XLSX. Required</li>
+        <li><b>Chart of accounts</b> with the sales, output tax and deferred revenue accounts. CSV or XLSX. Required</li>
+        <li><b>To check:</b> the invoices that you sent, and an invoice list for the full range, voided invoices included. A sample cannot show gaps or duplicates. PDF, image, CSV or XLSX. Required</li>
+        <li>The invoice date, terms, currency, jurisdiction and tax rates, typed in the chat. The customer's purchase order number is recommended. Add an exemption certificate if it applies</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>A draft, the checks, the entry and the sources</h2>
+  <div class="gets">
+    <div class="get"><b>The invoice draft</b><span>Every required field, with a mark that says "draft for review". As a PDF, a web page or data for your system, as you prefer.</span></div>
+    <div class="get"><b>The check results</b><span>For each invoice: missing fields, line errors, totals that do not agree, duplicate numbers and gaps, each by number.</span></div>
+    <div class="get"><b>The proposed entry</b><span>Accounts receivable, sales and tax, with the account names from your chart of accounts. It must agree with the amount due. Work not yet delivered goes to deferred revenue.</span></div>
+    <div class="get"><b>Where each field came from</b><span>Each field says if it came from your books or from you.</span></div>
+  </div>
+  <p>The number on the draft is a proposal. Until a person enters the invoice, someone else can use that number. The skill reads the next number again on every run. The bank details on the invoice need care too. The skill asks you to check them against a trusted source. Payment fraud on invoices works by a change to exactly those details.</p>
+  <p>The skill asks before it makes an Excel file. If your jurisdiction requires electronic invoicing through a government portal, the skill can prepare the data. You must send it through that portal yourself.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Asks before it uses MosoFin.</b> A connected account is not permission to read it.</li>
+      <li><b>Reads nothing until you answer the first questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, changes or deletes anything, in any system.</b> Every entry is a proposal for a person to post.</li>
+      <li><b>Never says that an invoice exists.</b> Every document is a draft for review. The number on it is a proposal until a person enters the invoice.</li>
+      <li><b>Never chooses the jurisdiction, a tax rate, the invoice date or the numbering scheme for you.</b> It never guesses the jurisdiction from your company's country. It uses only the selling company's own records, and never drafts an invoice to a real customer from test data.</li>
+      <li><b>Never copies payment instructions from memory or an old document.</b> You confirm them from a trusted source. It never saves customer tax numbers, bank details or invoice contents.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Six terms, in plain English</h2>
+  <dl>
+    <dt>Full VAT invoice</dt><dd>The UK invoice that lets a VAT-registered customer claim back the VAT. The UK requires one above £250, or below it if the customer asks<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Tax point</dt><dd>The date of supply. It can be different from the invoice date, and it decides the tax period.</dd>
+    <dt>Reverse charge</dt><dd>In many VAT systems, a business customer abroad accounts for the VAT, and the seller charges 0%. The invoice must say so, if the rules of the jurisdiction allow it.</dd>
+    <dt>Sequential numbering</dt><dd>Invoice numbers in one series with no gaps. Every UK invoice needs a unique number<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Accounts receivable</dt><dd>The money that customers owe you. Accountants write AR.</dd>
+    <dt>Net 30</dt><dd>Payment terms. The customer pays within 30 days of the invoice.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an HMRC manual, a US Federal Reserve survey report and a GOV.UK guide. We found each one on 27 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.gov.uk/hmrc-internal-manuals/vat-trader-records/vatrec5010" rel="noopener">HMRC: VATREC5010, Details which must be shown on a full VAT invoice</a><span class="what">A UK full VAT invoice shows a unique number in one series, the seller's name, address and VAT number, and the customer's name and address. It also shows the tax point, the date of issue, a description, the quantity, and the VAT rate and amount. It is necessary above £250, or below it if the customer asks.</span></li>
+    <li id="src2" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.fedsmallbusiness.org/reports/survey/2024/2024-report-on-payments" rel="noopener">Federal Reserve Banks: 2024 Report on Payments, Small Business Credit Survey</a><span class="what">About four in five small firms have a problem with payments. Firms that let customers pay after delivery, for example by invoice, report slow payers more often.</span></li>
+    <li id="src3" data-checked="2026-10-27" data-via="from search results, page not opened"><a href="https://www.gov.uk/invoicing-and-taking-payment-from-customers/invoices-what-they-must-include" rel="noopener">GOV.UK: Invoicing and taking payment from customers: invoices, what they must include</a><span class="what">Every UK invoice shows a unique number, and the names and addresses of the business and the customer. It also shows a description, the dates of supply and of the invoice, the amount and the total.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the six stages, the prepare and check modes, or the price check against the standard price and the customer's history. They are the skill's own rules. We made up every example figure. Sources 1 and 3 are UK sources. Source 2 is a US source.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>customer-invoicing</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">Read the skill on GitHub →</a> This page describes the skill in its card format. That format is on main of MosoFin/mosofin-finance-skills. It was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, Harbor Retail and every figure in the example. They are not your data. The UK rules are one jurisdiction. The skill asks you for yours. Check with your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
