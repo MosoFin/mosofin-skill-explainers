@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash Application Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked cash application examples, from one payment by reference to short pays and the tie-out, with a short-pay calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .field select{font:inherit;font-size:15px;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field{grid-template-columns:1fr 150px}
+  .readback{font-size:16px;padding:12px 14px;border-left:3px solid var(--hold);background:var(--hold-soft);border-radius:0 8px 8px 0;max-width:none}
+  .intake{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}
+  .intake b{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--green);padding-top:2px}
+  .lv-extra{margin-top:12px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Cash application</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · cash-application · learning guide</span>
+  <h1>From one payment to every invoice it settles</h1>
+  <p class="lede">This page shows how the skill applies customer payments to open invoices, <b>one level at a time</b>. It starts with one payment that names its invoice. It ends with the things that the skill must not do. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are a Federal Reserve service page, three sections of an OpenStax textbook, the IFRS standard IAS 21 and an IRS page. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter one short or extra payment of your own. The page shows its treatment and the draft entry, and it runs the tie-out.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading, which keeps its books in US dollars on the accrual basis. The customers and invoices continue from the <a href="../ar-aging-and-collections/learn.html" style="color:inherit">A/R aging page</a>, which uses Wednesday 30 September 2026 as its date.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">The example</span>
+  <h2>Six payments into Northbrook, 1 to 9 October</h2>
+  <p>On Friday 9 October 2026, the owner uploads the bank's deposit listing for Thursday 1 to Friday 9 October. The owner did not enter these payments in the books yet. The owner chooses MosoFin as the data source.</p>
+  <h3>The intake answers, A to G</h3>
+  <div class="intake">
+    <b>A</b><span>MosoFin.</span>
+    <b>B</b><span>A file that is not entered yet. Open invoices as of Friday 9 October.</span>
+    <b>C</b><span>Two remittances: a PDF from Crestline Foods and an email from Lakeside Freight.</span>
+    <b>D</b><span>A tolerance of $5 for each payment. The skill does not say if the tolerance is for each payment or for each invoice, so the unit is this example's choice.</span>
+    <b>E</b><span>Oldest invoice first (FIFO). The owner chooses this order.</span>
+    <b>F</b><span>All payments are in US dollars. No currency differs, so Step 5 does not apply.</span>
+    <b>G</b><span>No customer withholds tax.</span>
+  </div>
+  <p class="muted">Then the skill reads the plan back and waits for a yes. The card's own example uses a 14 October lockbox file with 38 payments. For Northbrook, this page's version reads like this:</p>
+  <p class="readback">Applying the 1 to 9 October deposit listing you uploaded, 6 payments for $58,997.00, to Northbrook Trading's open invoices as of 9 October. The invoices come from your MosoFin connection. Tolerance $5 per payment, oldest invoice first, remittances for 2 of the payments. Shall I go ahead?</p>
+  <h3>The open invoices on Friday 9 October</h3>
+  <p class="muted">The skill reads the full aging, with no date limit, and states that window. Pinnacle Clinics paid INV-1010 on Thursday 8 October, so that invoice is not open. Two invoices are new since 30 September.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Customer</th><th class="n">Item</th><th class="n">Dated</th><th class="n">Due</th><th class="n">Open</th><th class="n">Note</th></tr></thead>
+    <tbody>
+      <tr><td>Harbor Retail</td><td class="n">INV-0950</td><td class="n">—</td><td class="n">Sat 1 Aug</td><td class="n">$8,500.00</td><td class="n">—</td></tr>
+      <tr><td>Harbor Retail</td><td class="n">INV-1001</td><td class="n">—</td><td class="n">Tue 15 Sep</td><td class="n">$12,000.00</td><td class="n">—</td></tr>
+      <tr><td>Crestline Foods</td><td class="n">INV-0901</td><td class="n">Thu 21 May</td><td class="n">Sat 20 Jun</td><td class="n">$6,400.00</td><td class="n">original $10,000.00, terms 2/10, n/30</td></tr>
+      <tr><td>Crestline Foods</td><td class="n">INV-1035</td><td class="n">Mon 5 Oct</td><td class="n">Wed 4 Nov</td><td class="n">$3,300.00</td><td class="n">new, net 30</td></tr>
+      <tr><td>Summit Hotels</td><td class="n">INV-0870</td><td class="n">—</td><td class="n">Fri 1 May</td><td class="n">$15,000.00</td><td class="n">insolvency notice</td></tr>
+      <tr><td>Acme Corp</td><td class="n">INV-0990</td><td class="n">—</td><td class="n">Mon 31 Aug</td><td class="n">$3,300.00</td><td class="n">disputed</td></tr>
+      <tr><td>Lakeside Freight</td><td class="n">INV-1032</td><td class="n">Thu 1 Oct</td><td class="n">Sat 31 Oct</td><td class="n">$5,000.00</td><td class="n">new, net 30</td></tr>
+      <tr><td>Lakeside Freight</td><td class="n">CM-0044</td><td class="n">—</td><td class="n">—</td><td class="n">−$1,200.00</td><td class="n">credit memo, not applied</td></tr>
+      <tr class="total"><td>Net open A/R</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">$52,300.00</td><td class="n">gross $53,500.00</td></tr>
+    </tbody></table></div>
+  <p class="fine">Gross: 8,500 + 12,000 + 6,400 + 3,300 + 15,000 + 3,300 + 5,000 = 53,500. Less CM-0044 of 1,200, net is 52,300. Check from the A/R aging page: 69,400 − 24,200 (Pinnacle, paid) + 5,000 + 3,300 (new) = 53,500.</p>
+  <h3>The deposit listing</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Row</th><th class="n">Date</th><th class="n">Bank string</th><th class="n">Method</th><th class="n">Amount</th><th class="n">Reference or remittance</th></tr></thead>
+    <tbody>
+      <tr><td>P1</td><td class="n">Fri 2 Oct</td><td class="n">HARBOR RETAIL GRP</td><td class="n">ACH</td><td class="n">$20,500.00</td><td class="n">none</td></tr>
+      <tr><td>P2</td><td class="n">Mon 5 Oct</td><td class="n">CRESTLINE FOODS LLC</td><td class="n">cheque</td><td class="n">$6,272.00</td><td class="n">"INV-0901 6,400.00 less 2% prompt-payment discount 128.00"</td></tr>
+      <tr><td>P3</td><td class="n">Tue 6 Oct</td><td class="n">LAKESIDE FRT INC</td><td class="n">wire</td><td class="n">$3,775.00</td><td class="n">ref INV-1032. "INV-1032 5,000.00 less CM-0044 1,200.00 = 3,800.00"</td></tr>
+      <tr><td>P4</td><td class="n">Wed 7 Oct</td><td class="n">ACH CREDIT 4471</td><td class="n">ACH</td><td class="n">$3,300.00</td><td class="n">none</td></tr>
+      <tr><td>P5</td><td class="n">Thu 8 Oct</td><td class="n">PINNACLE CLINICS</td><td class="n">wire</td><td class="n">$24,200.00</td><td class="n">ref INV-1010</td></tr>
+      <tr><td>P6</td><td class="n">Fri 9 Oct</td><td class="n">J MORALES</td><td class="n">ACH</td><td class="n">$950.00</td><td class="n">none</td></tr>
+      <tr class="total"><td>File total</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">$58,997.00</td><td class="n">6 payments</td></tr>
+    </tbody></table></div>
+  <p class="fine">20,500 + 6,272 + 3,775 + 3,300 + 24,200 + 950 = 58,997. The remittance text in quotation marks is the customer's note. MosoFin made it up for this example.</p>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in your own payment</h2>
+  <p class="muted">Part 1 runs Step 3 from <code>references/method.md</code> on one payment and one invoice. Part 2 runs the control tie-out from Step 7. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <h3 class="part">Part 1: Short or over pay: what happens to the difference</h3>
+    <div class="presets" role="group" aria-label="Load an example for part 1">
+      <button type="button" data-p="crest">Crestline, 5 Oct</button>
+      <button type="button" data-p="lake">Lakeside, 6 Oct</button>
+      <button type="button" data-p="crest150">Crestline, $150 tolerance</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The invoice and the payment</legend>
+        <label class="field"><span>Invoice open balance</span><input data-k="open" inputmode="decimal"></label>
+        <label class="field"><span>Amount received</span><input data-k="got" inputmode="decimal"></label>
+        <label class="field"><span>Credit memo applied (optional)</span><input data-k="memo" inputmode="decimal"></label>
+        <label class="field"><span>Amount sent, from the remittance (optional)</span><input data-k="sent" inputmode="decimal"></label>
+        <label class="field"><span>Tolerance, an amount (blank = none)</span><input data-k="tol" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>The reason</legend>
+        <label class="field"><span>Reason the customer gives</span><select data-k="why"><option value="none">None</option><option value="disc">Early-pay discount</option><option value="fee">Bank fee</option><option value="wht">Withholding tax</option><option value="claim">Customer-claimed deduction</option></select></label>
+        <label class="field"><span>Invoice date (discount)</span><input data-k="idate" type="date"></label>
+        <label class="field"><span>Discount, %</span><input data-k="pct" inputmode="decimal"></label>
+        <label class="field"><span>Discount days</span><input data-k="days" inputmode="decimal"></label>
+        <label class="field"><span>Payment date</span><input data-k="pdate" type="date"></label>
+      </fieldset>
+    </div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page takes the credit memo off the open balance first. The residual is that balance minus the amount received. A positive residual is a short pay, and a negative residual is an over pay. Like the skill, the page tests the residual against the tolerance before it looks at the reason. A blank tolerance means that every residual is above it. The page works out an early-pay discount on the open balance after the credit memo. Your terms can use another base. With the $150 tolerance, the Crestline example shows the order of the tests. The $128 is then inside the tolerance, so the page proposes a small-balance adjustment and does not check the late discount. Every entry here is a draft for a person to post.</p>
+
+    <hr>
+    <h3 class="part">Part 2: Control tie-out</h3>
+    <div class="presets" role="group" aria-label="Load an example for part 2">
+      <button type="button" data-v="nb">Northbrook, 1–9 Oct</button>
+      <button type="button" data-v="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The payments</legend>
+        <label class="field"><span>Total payments processed</span><input data-u="pay" inputmode="decimal"></label>
+        <label class="field"><span>Applied to A/R</span><input data-u="ar" inputmode="decimal"></label>
+        <label class="field"><span>Customer credit</span><input data-u="cc" inputmode="decimal"></label>
+        <label class="field"><span>Unidentified or unapplied</span><input data-u="un" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>The parts on their own lines</legend>
+        <label class="field"><span>Discounts</span><input data-u="disc" inputmode="decimal"></label>
+        <label class="field"><span>Bank fees</span><input data-u="fee" inputmode="decimal"></label>
+        <label class="field"><span>Withholding tax</span><input data-u="wht" inputmode="decimal"></label>
+        <label class="field"><span>FX: gain +, loss −</span><input data-u="fx" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="math num" id="tsteps" aria-live="polite"></div>
+    <div class="results" id="tresults" aria-live="polite"></div>
+    <p class="fine">The page uses the skill's tie-out: applied to A/R − discounts − fees − withholding tax ± FX + customer credit + unidentified. The result must equal the total payments. The preset gives a difference of $0.00. The skill shows the difference even when it is zero.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? It asks this only if the MosoFin tools are present. Which payments: ones already in the books, or a file not entered yet? As of which date for the open invoices? Do you have remittance advices, and where are they? What tolerance for short and over pays? Oldest invoice first, or another order? Any payment in another currency, at which rate, from which source? Does any customer withhold tax at source, and where?</div>
+    <div><b>Needs</b>The skill needs the customer payments and the open invoices with their open balances. You type in the company name and the base currency. An FX rate and its source are necessary if the currencies differ. Remittance advices and a customer master make the matches stronger.</div>
+    <div><b>Gives back</b>The skill gives back five sheets: application summary, payment-to-invoice mapping, exceptions, GL posting and coverage. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to any system. It never picks silently or absorbs a short or over pay. It never defaults an FX rate or the entity, and it never invents a tolerance.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are a Federal Reserve service page, three sections of an OpenStax textbook, the IFRS standard IAS 21 and an IRS page. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The skill itself sets the six-level match hierarchy, the 0.85 similarity threshold and the short-pay reason table. It also sets the ±3-day duplicate window, the five sheets and the control tie-out. MosoFin made up Northbrook Trading, its customers and every figure in the examples. The similarity measure, the tolerance unit, the parking of P4 and the handling of Lakeside's bank string are this example's choices. The page marks them where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The Federal Reserve, OpenStax and IRS sources are US sources. IAS 21 is an international standard, and US GAAP has its own rules. Other countries have their own rules. Check with your accountant which rules apply to you. This page explains <code>cash-application</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/cash-application">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"Federal Reserve Financial Services: FedPayments Reporter Service, corporate accounting reports", u:"https://www.frbservices.org/financial-services/ach/fedpayments-reporter/corporate-accounting.html", checked:"2026-10-28", via:"from search results, page not opened", w:"The service turns the remittance data in ACH addenda records, such as invoice numbers, into a readable report. Receivers can use it to match payments to open receivables. This is a US service."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 7.3 Analyze and Journalize Transactions Using Special Journals", u:"https://openstax.org/books/principles-financial-accounting/pages/7-3-analyze-and-journalize-transactions-using-special-journals", at:"accounts receivable subsidiary ledger", checked:"2026-10-28", via:"from search results, page not opened", w:"The accounts receivable subsidiary ledger keeps a record of each customer's account. Its total must equal the Accounts Receivable balance in the general ledger."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 6.4 Analyze and Record Transactions for the Sale of Merchandise Using the Perpetual Inventory System", u:"https://openstax.org/books/principles-financial-accounting/pages/6-4-analyze-and-record-transactions-for-the-sale-of-merchandise-using-the-perpetual-inventory-system", at:"sales discounts, terms 2/10, n/30", checked:"2026-10-28", via:"from search results, page not opened", w:"Under 2/10, n/30, the customer can take a 2% discount if it pays within 10 days of the invoice date. If the customer pays in that window, the seller records the discount on its own line."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 12.1 Identify and Describe Current Liabilities", u:"https://openstax.org/books/principles-financial-accounting/pages/12-1-identify-and-describe-current-liabilities", at:"unearned revenue", checked:"2026-10-28", via:"from search results, page not opened", w:"Accountants record a customer's advance payment for goods or services not yet delivered as unearned revenue, a liability, until the company delivers."},
+  {t:"IFRS Foundation: IAS 21 The Effects of Changes in Foreign Exchange Rates", u:"https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2026/issued/ias21.html", at:"paragraph 28", checked:"2026-10-28", via:"from search results, page not opened", w:"Exchange differences on the settlement of monetary items go to profit or loss in the period in which they arise. Paragraph 32 gives an exception for a net investment in a foreign operation."},
+  {t:"IRS: Foreign Tax Credit", u:"https://www.irs.gov/individuals/international-taxpayers/foreign-tax-credit", checked:"2026-10-28", via:"from search results, page not opened", w:"A US taxpayer can claim a credit only for foreign taxes imposed on it. The amount that qualifies can be less than the amount that the foreign country withheld."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"the name on the bank line is often a truncated bank string, not the customer's name", w:"SKILL.md · Cash application"},
+  q2:{q:"Never writes, updates or deletes anything, in any system.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"No fuzzy name match below the threshold is auto-accepted", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"The single biggest driver of match quality", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q5:{q:"Use the open balance, not the original amount, for matching.", w:"references/method.md · Step 1 — Parse payments and invoices"},
+  q6:{q:"Rows already recorded move to the review population and get no new entry — a second entry would double-credit A/R and double the cash.", w:"references/method.md · Step 1 — Parse payments and invoices"},
+  q7:{q:"Record which level produced each match — a level-1 and a level-5 match are not the same claim.", w:"references/method.md · Step 2 — Match payments to invoices"},
+  q8:{q:"several combinations can sum to the same total", w:"references/method.md · Step 2 — Match payments to invoices"},
+  q9:{q:"Amount matches multiple customers' invoices → ambiguous; request remittance advice from the customer or use bank string clues.", w:"references/method.md · Step 2 — Match payments to invoices"},
+  q10:{q:"With no tolerance supplied, every residual is above it.", w:"references/method.md · Step 3 — Short pay handling"},
+  q11:{q:"a \"discount\" taken outside the window is an unauthorised deduction and belongs in the last row, not the second", w:"references/method.md · Step 3 — Short pay handling"},
+  q12:{q:"a short pay matching a credit is not a deduction at all", w:"references/method.md · Step 3 — Short pay handling"},
+  q13:{q:"Reconcile against the customer's intended amount, not just the entity's gross receipt", w:"references/edge-cases.md · Edge Cases"},
+  q14:{q:"Netting a bank fee into the cash line hides a real cost", w:"references/method.md · Step 6 — Construct the JE (hand off to journal-entry-builder)"},
+  q15:{q:"The difference must be 0, shown even when nil", w:"references/method.md · Step 7 — Output"},
+  q16:{q:"Do not persist bank account numbers, payment-level data, customer balances, or remittance contents.", w:"references/method.md · Step 8 — Evolve the skill (Mosofin-specific, final step)"},
+};
+
+const RULES = [
+  { id:"1", title:"Ask for the remittance", r:Q.q4, cites:[1],
+    plain:"The skill asks for remittance advices at intake. Without them, it matches on references and payer names. Then an amount that fits several customers stays open.",
+    backed:"A Federal Reserve service turns ACH remittance data, such as invoice numbers, into reports. Receivers can use the reports to match payments to open receivables.{1}" },
+  { id:"2", title:"Match the open balance", r:Q.q5, cites:[2],
+    plain:"The skill compares each payment with the amount that is still open on each invoice. An invoice that the customer part-paid last month never matches on its original amount.",
+    backed:"The subsidiary ledger keeps a record for each customer. Its total must equal the A/R balance in the general ledger.{2}" },
+  { id:"3", title:"A bank string is not a name", r:Q.q1, cites:[],
+    plain:"The bank often cuts the payer name short and writes it in capitals. The skill compares that bank string with the customer master." },
+  { id:"4", title:"Never accept a weak name", r:Q.q3, cites:[],
+    plain:"The threshold is a similarity of 0.85. The skill shows the score and the alternatives for every fuzzy match." },
+  { id:"5", title:"Name the level", r:Q.q7, cites:[],
+    plain:"Level 1 is a reference to the invoice. Level 6 is no match. Each row of the mapping sheet shows its level." },
+  { id:"6", title:"Never choose between customers", r:Q.q9, cites:[],
+    plain:"If an amount fits the invoices of two customers, the skill asks for a remittance. It does not choose one." },
+  { id:"7", title:"Tolerance first", r:Q.q10, cites:[],
+    plain:"The skill tests each residual against your tolerance before it looks for a reason. If you give no tolerance, it matches exact and says so." },
+  { id:"8", title:"A late discount is a deduction", r:Q.q11, cites:[3],
+    plain:"The skill reads the invoice terms. It books a discount only if the terms offer one and the customer paid inside the window.",
+    backed:"Under terms of 2/10, n/30, the customer can take the 2% discount only if it pays within 10 days of the invoice date.{3}" },
+  { id:"9", title:"Every part on its own line", r:Q.q14, cites:[],
+    plain:"Cash, receivables, customer credit, discount, bank fee, withheld tax and FX each get a line of their own in the proposed entry." },
+  { id:"10", title:"The difference must be zero", r:Q.q15, cites:[],
+    plain:"The summary ties the payments to their parts. It shows the difference, even when the difference is zero." },
+  { id:"11", title:"Proposals only", r:Q.q2, cites:[],
+    plain:"Every application, credit and write-off is a proposal. A person posts it." },
+  { id:"12", title:"Save rules, not records", r:Q.q16, cites:[],
+    plain:"After you see the results and say yes, the skill can save your aliases, tolerance and order. It never saves the transactions." },
+];
+
+const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"Matching · who paid, and for which invoice" },
+  { n:1, title:"One payment, one invoice",
+    chips:["Deposit listing","Remittance","Open invoices"], src:"Rules 2 and 5", cites:[2],
+    situation:"Crestline Foods sends a cheque for $6,272.00 on Monday 5 October. Its remittance names invoice INV-0901. That invoice was for $10,000, and Crestline paid $3,600 of it before 30 September.",
+    facts:["The accounts receivable subsidiary ledger keeps a record for each customer. Its total must equal the Accounts Receivable balance in the general ledger "+C(2)+".",
+           "So a payment must reach the right customer and the right invoice. An A/R total that agrees does not show that."],
+    visual:{type:"table",
+      head:["Payment","Bank string","Amount","Remittance cites","Original","Open","Level"],
+      rows:[["P2 · Mon 5 Oct","CRESTLINE FOODS LLC","$6,272.00","INV-0901","$10,000.00","$6,400.00",["1, by reference","good"]]]},
+    rules:[Q.q5, Q.q7],
+    math:[["Original amount of INV-0901","$10,000.00"],["Paid before 30 September","−$3,600.00"],["Open balance, the figure the skill matches","$6,400.00",1],["The remittance cites INV-0901","level 1",1],["Payment received","$6,272.00"],["Residual: 6,400.00 − 6,272.00","$128.00",1],["Residual on the original: 10,000.00 − 6,272.00","$3,728.00, a false figure"],["128.00 ÷ 6,400.00","2.0%"]],
+    verdict:["note","The skill applies $6,272.00 to INV-0901 at level 1. It matches on the open $6,400, not on the original $10,000. A match on $10,000 gives a false residual of $3,728. Level 4 explains the $128.","LEVEL 1"] },
+
+  { n:2, title:"Who paid? Bank strings and fuzzy names",
+    chips:["Deposit listing","Customer master","Open invoices"], src:"Rules 1, 3 and 4", cites:[1,2],
+    situation:"Harbor Retail sends $20,500.00 by ACH on Friday 2 October, with no reference and no remittance. Lakeside Freight sends a wire for $3,775.00 on Tuesday 6 October, with the reference INV-1032. The skill sets a 0.85 threshold but names no measure, so this page uses Python's difflib ratio on lower-case text.",
+    facts:["The FedPayments Reporter Service turns the remittance data in ACH addenda records, such as invoice numbers, into a readable report "+C(1)+". Receivers can use that report to match payments to open receivables "+C(1)+".",
+           "Harbor's ACH payment carries no remittance data. So the skill must use the payer name and the amount.",
+           "Each customer has its own account in the subsidiary ledger "+C(2)+". So a lump payment must go to named invoices of the right customer."],
+    visual:{type:"table",
+      head:["Payment","Bank string","Best match","Score","Next best","Name result"],
+      rows:[["P1","HARBOR RETAIL GRP","Harbor Retail","0.867","Crestline Foods 0.312",["accepted, with alternatives","good"]],["P3","LAKESIDE FRT INC","Lakeside Freight","0.750","Crestline Foods 0.387",["below 0.85: not accepted","bad"]]]},
+    visual2:{type:"table",
+      head:["Harbor invoice","Due","Open","Order"],
+      rows:[["INV-0950","Sat 1 Aug","$8,500.00","1, oldest"],["INV-1001","Tue 15 Sep","$12,000.00","2"]],
+      total:["P1, a lump payment","","$20,500.00","level 3"]},
+    rules:[Q.q1, Q.q3, Q.q8, Q.q4],
+    math:[["HARBOR RETAIL GRP against Harbor Retail","0.867"],["0.867 is at or above 0.85","name accepted",1],["LAKESIDE FRT INC against Lakeside Freight","0.750"],["0.750 is below 0.85","name not accepted",1],["One Harbor invoice of $20,500?","none, level 2 fails"],["8,500.00 + 12,000.00","$20,500.00",1],["Other Harbor combinations with this sum","none: Harbor has two invoices"],["Order, chosen at intake E","INV-0950, then INV-1001"],["Choice of the combination","gated: the owner approves"]],
+    verdict:["note","The skill accepts the Harbor name at 0.867 and shows the alternatives. It finds one combination, INV-0950 and INV-1001, and the owner approves it. Lakeside's name scores 0.750, so the skill does not accept the name. Level 4 applies Lakeside's payment by its reference.","LEVEL 3"] },
+
+  { n:3, title:"When it must not choose",
+    chips:["Deposit listing","Recorded payments","Open invoices"], src:"Rule 6", cites:[1],
+    situation:"Three rows need care. P5 is a payment that the books already hold. P4 is $3,300 from a bank string with no name, and P6 is $950 from J MORALES, a name that no customer record holds.",
+    facts:["An ACH payment can carry remittance data that a receiver can use to match the payment to open receivables "+C(1)+".",
+           "P4 and P6 arrived by ACH with no remittance data in this example. So the skill has only an amount and a bank string."],
+    visual:{type:"table",
+      head:["Payment","Bank string","Amount","What the skill finds","Level","Treatment"],
+      rows:[["P5 · Thu 8 Oct","PINNACLE CLINICS","$24,200.00","already recorded, ref INV-1010","—",["removed, no new entry","good"]],["P4 · Wed 7 Oct","ACH CREDIT 4471","$3,300.00","Acme INV-0990 and Crestline INV-1035","5",["ambiguous: ask both customers","bad"]],["P6 · Fri 9 Oct","J MORALES","$950.00","no name, reference or amount fits","6",["unidentified: park and research","bad"]]]},
+    rules:[Q.q6, Q.q9],
+    math:[["P5: same payer, amount and reference, date within ±3 days","already recorded"],["File total","$58,997.00"],["P5, moved to the review population","−$24,200.00"],["Payments processed, 5 rows","$34,797.00",1],["Review of P5: level 1 by INV-1010","agrees"],["P4: open items of exactly $3,300","two customers"],["P4 best name score: Acme Corp","0.417"],["P6 best name score","0.364"],["Held as unapplied cash: 3,300.00 + 950.00","$4,250.00",1]],
+    verdict:["flag","The skill removes P5 and reports 1 row removed. It does not choose between Acme and Crestline for P4. It asks both customers for a remittance. P6 waits as unapplied cash for research, and it is not revenue. The skill gives no entry for a level-5 payment, so this example parks P4 with the level-6 entry.","HOLD"] },
+
+  { tier:"Differences · short pays, the entry and the tie-out" },
+  { n:4, title:"Short pays: what the difference means",
+    chips:["Remittances","Credit memos","Payment terms"], src:"Rules 7 and 8", cites:[3],
+    situation:"Crestline paid $128 less than its open balance. Lakeside paid $1,225 less than INV-1032. The owner set a tolerance of $5 for each payment, so the skill looks for a reason for both.",
+    facts:["Under terms of 2/10, n/30, the customer can take a 2% discount if it pays within 10 days of the invoice date "+C(3)+". If not, the full amount is due in 30 days "+C(3)+".",
+           "Northbrook dated INV-0901 Thursday 21 May. Its discount window closed on Sunday 31 May. Crestline paid on Monday 5 October, 127 days after the window closed."],
+    visual:{type:"table",
+      head:["Payment","Open","Received","Residual","Check","Reason","Treatment"],
+      rows:[["P2 Crestline","$6,400.00","$6,272.00","$128.00","no credit memo, window closed Sun 31 May",["unknown reason","bad"],"apply $6,272.00, $128.00 open for collections"],["P3 Lakeside","$5,000.00","$3,775.00","$1,225.00","CM-0044 explains $1,200.00",["credit memo","good"],"apply the memo, no deduction"],["P3, after the memo","$3,800.00","$3,775.00","$25.00","remittance: $3,800.00 sent",["bank fee","good"],"Bank Fee $25.00 on its own line"]]},
+    rules:[Q.q10, Q.q11, Q.q12, Q.q13],
+    math:[["Crestline residual: 6,400.00 − 6,272.00","$128.00"],["Tolerance test first: 128.00 is more than 5.00","above",1],["Crestline credit memo","none"],["Window: Thu 21 May + 10 days","Sun 31 May"],["Paid Mon 5 Oct, after the window","unauthorised deduction",1],["Lakeside short: 5,000.00 − 3,775.00","$1,225.00"],["CM-0044 explains","−$1,200.00"],["Left: 3,800.00 − 3,775.00","$25.00",1],["25.00 is more than 5.00, the remittance shows $3,800.00 sent","bank fee",1],["Crestline with a $150 tolerance instead","small-balance adjustment"]],
+    verdict:["flag","Crestline's $128 stays open for collections. The skill does not write it off or book it as a sales discount. Lakeside's memo explains $1,200, and the last $25 is an intermediary wire fee. The skill applies P3 by the reference INV-1032 and asks the owner to approve the alias LAKESIDE FRT INC. The skill does not say which test wins here, so that is this example's reading of never picks silently.","$128 OPEN"] },
+
+  { n:5, title:"The entry and the tie-out",
+    chips:["Proposed entry","Application summary"], src:"Rules 9 and 10", cites:[3],
+    situation:"The skill drafts one entry for each processed payment, for the owner to post. It uses the real account names from Northbrook's chart of accounts. Then it ties the processed total back to its parts.",
+    facts:["When a customer pays inside the discount window, the seller debits Cash for the net amount and debits Sales Discounts for the discount "+C(3)+". The seller credits Accounts Receivable for the full invoice amount "+C(3)+".",
+           "So the discount has a line of its own. The skill applies the same idea to the $25 wire fee. Crestline took no valid discount, so this run has no Sales Discount line."],
+    visual:{type:"table",
+      head:["Payment","Account","DR","CR"],
+      rows:[["P1","Business Checking","$20,500.00","—"],["P1","Accounts Receivable (A/R): INV-0950, INV-1001","—","$20,500.00"],["P2","Business Checking","$6,272.00","—"],["P2","Accounts Receivable (A/R): INV-0901","—","$6,272.00"],["P3","Business Checking","$3,775.00","—"],["P3","Bank Service Charges",["$25.00","good"],"—"],["P3","Accounts Receivable (A/R): INV-1032","—","$3,800.00"],["P4","Business Checking","$3,300.00","—"],["P4","Unapplied Cash","—","$3,300.00"],["P6","Business Checking","$950.00","—"],["P6","Unapplied Cash","—","$950.00"]],
+      total:["Total","","$34,822.00","$34,822.00"]},
+    visual2:{type:"table",
+      head:["Application summary","Amount"],
+      rows:[["Payments processed, 5","$34,797.00"],["Applied to invoices: 20,500 + 6,272 + 3,800","$30,572.00"],["Credit memo applied, no cash","$1,200.00"],["Customer credit","$0.00"],["Unidentified or unapplied: 3,300 + 950","$4,250.00"],["Short-pay residual open","$128.00"],["Rows removed as already recorded: 1","$24,200.00"]]},
+    rules:[Q.q14, Q.q15],
+    math:[["Debits to cash: 20,500 + 6,272 + 3,775 + 3,300 + 950","$34,797.00"],["Bank fee","$25.00"],["Total debits","$34,822.00",1],["Credits to A/R: 20,500 + 6,272 + 3,800","$30,572.00"],["Credits to Unapplied Cash: 3,300 + 950","$4,250.00"],["Total credits","$34,822.00",1],["Tie-out: 30,572 − 0 − 25 − 0 ± 0 + 0 + 4,250","$34,797.00"],["Payments processed","$34,797.00"],["Difference","$0.00",1],["CM-0044 applied to INV-1032","no new line"],["Open A/R after posting: 128 + 3,300 + 15,000 + 3,300","$21,728.00"]],
+    verdict:["ok","Debits and credits are both $34,822.00. The tie-out gives $34,797.00 against $34,797.00 processed, so the difference is $0.00, and the sheet shows it. The credit memo already credited A/R, so its application needs no new line. Each line is a proposal for the owner to post.","BALANCED"] },
+
+  { tier:"Boundaries · what the skill does not do" },
+  { n:6, title:"Where the skill stops",
+    chips:["Rules that never bend","Edge cases","Step 8"], src:"Rules 11 and 12", cites:[4,5,6],
+    situation:"The owner asks for four more things. Post it all in QuickBooks, write off Crestline's $128, refund the $950 to whoever sent it, and check October against the bank statement.",
+    facts:["Accountants record a customer's advance payment for something not yet delivered as unearned revenue, a liability, until the company delivers "+C(4)+". That is why the skill holds a payment before its invoice as a customer deposit. The textbook covers advance payments, and it does not speak about overpayments.",
+           "Under IAS 21, exchange differences on the settlement of monetary items go to profit or loss in the period in which they arise "+C(5)+". That is why a foreign-currency receipt gets an FX line of its own. Northbrook's run is all in US dollars, and US GAAP has its own rules.",
+           "A US taxpayer can claim a credit only for foreign taxes imposed on it "+C(6)+". The amount that qualifies can be less than the amount withheld "+C(6)+". That is why the skill holds withheld tax as a receivable pending a tax certificate. This page gives no tax advice."],
+    visual:{type:"table",
+      head:["The owner asks","What the skill does"],
+      rows:[["Just post it all in QuickBooks.",["declines once and gives the drafts","bad"]],["Write off Crestline's $128.",["no: above tolerance, no valid reason, stays open","bad"]],["Refund the $950 to whoever sent it.",["credit-memo-and-refund-handler, after someone identifies the payer","bad"]],["Does October tie to the bank statement?",["bank-reconciliation","bad"]],["Acme's dispute, Summit's insolvency","stay with ar-aging-and-collections"],["A payment in another currency","asks for the rate and its source"],["Tax withheld at source","receivable, pending a tax certificate"]]},
+    visual2:{type:"table",
+      head:["Saved on an explicit yes","Never saved"],
+      rows:[["HARBOR RETAIL GRP = Harbor Retail","amounts"],["LAKESIDE FRT INC = Lakeside Freight","remittance contents"],["Tolerance $5, oldest first","bank account numbers"],["Key: quickbooks / Northbrook Trading","customer balances"]]},
+    rules:[Q.q2, Q.q16],
+    math:[["Entries the skill posts","0",1],["Write-off of Crestline's $128","the owner's decision, in the owner's system"],["Refund of the $950","credit-memo-and-refund-handler"],["Tie to the bank statement","bank-reconciliation"],["FX rate if the currencies differ","asked, never defaulted"],["Aliases saved after an explicit yes","2"],["Amounts, remittances and bank details saved","none",1]],
+    verdict:["note","The skill posts nothing. It declines the request to post once and gives the drafts. After the owner sees the results and says yes, it saves two aliases, the $5 tolerance and the order. It never saves amounts, remittances or bank details.","READ-ONLY"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.visual2) vis += `<div class="lv-extra">${table(L.visual2)}</div>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator, part 1: Step 3 on one payment and one invoice --- */
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const dnum = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?Date.UTC(+m[1],+m[2]-1,+m[3])/86400000:NaN; };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n*86400000); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const r2 = n => Math.round(n*100)/100;
+const m2 = n => fmt(r2(n), 2);
+const CP = {
+  crest:{open:6400, got:6272, memo:0, sent:"", tol:5, why:"disc", idate:"2026-05-21", pct:2, days:10, pdate:"2026-10-05"},
+  lake:{open:5000, got:3775, memo:1200, sent:3800, tol:5, why:"fee", idate:"", pct:"", days:"", pdate:""},
+  crest150:{open:6400, got:6272, memo:0, sent:"", tol:150, why:"disc", idate:"2026-05-21", pct:2, days:10, pdate:"2026-10-05"},
+  blank:{open:"", got:"", memo:"", sent:"", tol:"", why:"none", idate:"", pct:"", days:"", pdate:""},
+};
+const K1=["open","got","memo","sent","tol","why","idate","pct","days","pdate"];
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+function load(p){ const P=CP[p]; K1.forEach(k=>fld(k).value=P[k]);
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p)); run(); }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const O=money(fld("open").value), R=money(fld("got").value), Mi=money(fld("memo").value), S=money(fld("sent").value), T=money(fld("tol").value), why=fld("why").value;
+  const M=isNaN(Mi)?0:Mi;
+  if(isNaN(O) || isNaN(R)){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the open balance and the amount received."); return; }
+  if(M>O){ steps.innerHTML=""; box.innerHTML=res("flag","Check the credit memo","—","The credit memo is more than the open balance."); return; }
+  const base=r2(O-M), rs=r2(base-R);
+  const dr=[], cr=[];
+  let s=line(`Open balance ${m2(O)} − credit memo ${m2(M)}`, m2(base));
+  s+=line(`Residual: ${m2(base)} − received ${m2(R)}`, m2(rs), 1);
+  let tol, tcls, treat, kcls="note";
+  if(rs===0){
+    tol="No residual"; tcls="ok"; treat="Settled in full. Apply the payment."; kcls="ok";
+    dr.push(["DR Bank",R]); cr.push(["CR A/R",R]);
+  } else if(!isNaN(T) && Math.abs(rs)<=T){
+    tol="Within tolerance"; tcls="ok";
+    s+=line(`|${m2(rs)}| is not more than the tolerance ${m2(T)}`,"within tolerance",1);
+    treat="Within tolerance: a small-balance adjustment, account per your policy.";
+    if(why!=="none") s+=line("The tolerance test comes first, so the page does not check the reason","see the note below");
+    dr.push(["DR Bank",R]);
+    if(rs>0){ dr.push(["DR Adjustment: discounts allowed or bad debt, per your policy",rs]); cr.push(["CR A/R",base]); }
+    else { cr.push(["CR A/R",base]); cr.push(["CR Other income or customer credit, per your policy",-rs]); }
+  } else {
+    tol= isNaN(T) ? "No tolerance" : "Above tolerance"; tcls="flag";
+    s+=line(isNaN(T)?"No tolerance: every residual is above it":`|${m2(rs)}| is more than the tolerance ${m2(T)}`,"above",1);
+    if(rs<0){
+      treat=`Over pay: the excess ${m2(-rs)} is customer credit, never revenue. Check for a duplicate payment first.`;
+      dr.push(["DR Bank",R]); cr.push(["CR A/R",base]); cr.push(["CR Customer credit",-rs]);
+    } else if(why==="disc"){
+      const I=dnum(fld("idate").value), P=dnum(fld("pdate").value), pc=money(fld("pct").value), dy=money(fld("days").value);
+      if(isNaN(I)||isNaN(P)||isNaN(pc)||isNaN(dy)){
+        treat="Enter the invoice date, the discount terms and the payment date. The skill checks the terms before it books a discount.";
+        dr.push(["DR Bank",R]); cr.push(["CR A/R",R]);
+      } else {
+        const end=I+dy;
+        s+=line(`Window: ${dshow(I)} + ${dy} days`,`closed ${dshow(end)}`);
+        if(P>end){
+          s+=line(`Paid ${dshow(P)}, ${P-end} days after the window`,"unauthorised deduction",1);
+          treat=`Discount taken outside the window: an unauthorised deduction. Apply ${m2(R)}, leave ${m2(rs)} open and flag it for collections.`;
+          dr.push(["DR Bank",R]); cr.push(["CR A/R",R]);
+        } else {
+          const ex=r2(base*pc/100), d=Math.min(rs,ex), left=r2(rs-d);
+          s+=line(`Discount allowed: ${m2(base)} × ${pc}%`, m2(ex));
+          treat=`Discount inside the window: book ${m2(d)} as a sales discount.`+(left>0?` Leave ${m2(left)} open for collections, reason unknown.`:"");
+          dr.push(["DR Bank",R]); dr.push(["DR Sales discount",d]); cr.push(["CR A/R",r2(R+d)]);
+        }
+      }
+    } else if(why==="fee"){
+      let f = isNaN(S) ? rs : r2(S-R); f=Math.max(0,Math.min(f,rs)); const left=r2(rs-f);
+      if(!isNaN(S)) s+=line(`Remittance shows ${m2(S)} sent, the bank credited ${m2(R)}`, `fee ${m2(f)}`);
+      treat=`Bank fee: book ${m2(f)} as a bank fee on its own line.`+(left>0?` Leave ${m2(left)} open for collections, reason unknown.`:"");
+      dr.push(["DR Bank",R]); if(f>0) dr.push(["DR Bank fee",f]); cr.push(["CR A/R",r2(R+f)]);
+    } else if(why==="wht"){
+      treat=`Withholding tax: book ${m2(rs)} as a receivable, pending a tax certificate.`;
+      dr.push(["DR Bank",R]); dr.push(["DR Withholding tax receivable",rs]); cr.push(["CR A/R",base]);
+    } else if(why==="claim"){
+      treat=`Customer-claimed deduction: apply ${m2(R)} and leave ${m2(rs)} open as Disputed.`;
+      dr.push(["DR Bank",R]); cr.push(["CR A/R",R]);
+    } else {
+      treat=`Unknown reason: apply ${m2(R)}, leave ${m2(rs)} open and flag it for collections.`;
+      dr.push(["DR Bank",R]); cr.push(["CR A/R",R]);
+    }
+  }
+  if(M>0) s+=line(`Credit memo ${m2(M)} applied to the invoice`,"no new line");
+  const td=r2(dr.reduce((a,x)=>a+x[1],0)), tc=r2(cr.reduce((a,x)=>a+x[1],0));
+  s+=line("Proposed entry, for a person to post","",1);
+  dr.concat(cr).forEach(x=>{ s+=line(x[0], m2(x[1])); });
+  s+=line(`DR ${m2(td)} and CR ${m2(tc)}`, td===tc?"balanced":"check", 1);
+  steps.innerHTML=s;
+  box.innerHTML = res(rs===0?"ok":"note","Residual after the credit memo",m2(rs),rs<0?"An over pay.":rs>0?"A short pay.":"Nothing left.","r-res")
+    + res(tcls,"Tolerance",tol,isNaN(T)?"None given, so the page matches exact.":`Tolerance ${m2(T)}`,"r-tol")
+    + res(kcls,"Treatment",rs>0&&tcls==="flag"&&/unauthorised|Unknown|Disputed/.test(treat)?"Open":rs===0?"Settled":tcls==="ok"?"Adjust":"Book",treat,"r-treat")
+    + res(td===tc?"ok":"flag","Entry",td===tc?"DR = CR":"DR ≠ CR",`${m2(td)} and ${m2(tc)}`,"r-je");
+}
+document.querySelectorAll(".calc [data-k]").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+/* --- calculator, part 2: the control tie-out --- */
+const TP = { nb:{pay:34797, ar:30572, disc:0, fee:25, wht:0, fx:0, cc:0, un:4250}, blank:{pay:"", ar:"", disc:"", fee:"", wht:"", fx:"", cc:"", un:""} };
+const K2=["pay","ar","disc","fee","wht","fx","cc","un"];
+const uf = k => document.querySelector(`.calc [data-u="${k}"]`);
+function loadT(p){ const P=TP[p]; K2.forEach(k=>uf(k).value=P[k]);
+  document.querySelectorAll(".presets [data-v]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===p)); runT(); }
+function runT(){
+  const v={}; K2.forEach(k=>{ const x=money(uf(k).value); v[k]=isNaN(x)?0:x; });
+  const st=document.getElementById("tsteps"), box=document.getElementById("tresults");
+  if(isNaN(money(uf("pay").value))){ st.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the total payments processed."); return; }
+  const parts=r2(v.ar-v.disc-v.fee-v.wht+v.fx+v.cc+v.un), diff=r2(v.pay-parts);
+  st.innerHTML = line(`Applied ${m2(v.ar)} − discounts ${m2(v.disc)} − fees ${m2(v.fee)} − WHT ${m2(v.wht)}`, m2(r2(v.ar-v.disc-v.fee-v.wht)))
+    + line(`FX ${m2(v.fx)} + customer credit ${m2(v.cc)} + unapplied ${m2(v.un)}`, m2(r2(v.fx+v.cc+v.un)))
+    + line("Sum of the parts", m2(parts), 1)
+    + line(`Difference: ${m2(v.pay)} − ${m2(parts)}`, m2(diff), 1);
+  box.innerHTML = res(diff===0?"ok":"flag","Difference",m2(diff),diff===0?"The payments tie to their parts. The skill shows it, even when it is zero.":"The payments do not tie. Find the missing part before anyone posts.","r-diff");
+}
+document.querySelectorAll(".calc [data-u]").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-v]").forEach(b=>b.setAttribute("aria-pressed","false"));runT();}));
+document.querySelectorAll(".presets [data-v]").forEach(b=>b.addEventListener("click",()=>loadT(b.dataset.v)));
+
+renderSources(); renderRules(); renderLevels(); load("crest"); loadT("nb");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
