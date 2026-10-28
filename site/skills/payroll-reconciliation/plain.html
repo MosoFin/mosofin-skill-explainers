@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Reconciliation Explained in Plain English | MosoFin</title>
+<meta name="description" content="How payroll reconciliation ties the payroll register to the books, the bank and the tax filings, and why a balanced account can hide a late tax deposit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Payroll reconciliation, in plain words</span>
+  <h1>Does what payroll says we paid match the bank and the books, taxes included?</h1>
+  <p class="lede">Four systems keep a record of each payroll. They are <b>the payroll software</b>, <b>your books</b>, <b>the bank</b>, and <b>what you filed with and paid to the tax authority</b>. This skill compares them. It shows each difference, and the late tax payment first.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a period and the payroll files. It compares the payroll report with your books, the net pay with the bank, and each tax you owe with what you paid. Then it compares the tax filing with the books. It tells you what agrees, what does not, and why. It suggests a correction for each item. It never pays anything and never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Where the money goes</span>
+  <h2>Gross pay splits in two: pay for your staff, and money you hold for others</h2>
+  <p>Each payroll starts with gross pay, the pay before deductions. Some of it goes to your staff as net pay. You keep the rest for a short time and then pay it to the tax authority or a provider. Your own employer costs go to the same place.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 780 330" role="img" aria-label="Northbrook's quarter. Gross pay of 150,000 in the payroll register splits into net pay of 113,700, which goes to the bank, and 36,300 withheld from staff. The withheld 36,300 and employer costs of 14,250 go to payables in the books, 50,550 in total. The payables go to the IRS, the 401(k) provider and the state when Northbrook pays them.">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="2" color="var(--rule-strong)">
+          <path d="M176 140 C 200 140, 200 64, 236 64" marker-end="url(#ar)"/>
+          <path d="M176 160 C 200 160, 200 180, 236 180" marker-end="url(#ar)"/>
+          <line x1="466" y1="64" x2="526" y2="64" marker-end="url(#ar)"/>
+          <line x1="466" y1="180" x2="526" y2="180" marker-end="url(#ar)"/>
+          <path d="M466 284 C 500 284, 500 200, 526 200" marker-end="url(#ar)"/>
+          <line x1="650" y1="232" x2="650" y2="256" marker-end="url(#ar)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="16" y="100" width="160" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="96" y="128" text-anchor="middle" font-size="13" fill="var(--muted)">Payroll register</text>
+          <text x="96" y="160" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)">150,000</text>
+          <text x="96" y="184" text-anchor="middle" font-size="13" fill="var(--muted)">gross pay</text>
+
+          <rect x="238" y="24" width="228" height="80" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="352" y="50" text-anchor="middle" font-size="13" fill="var(--muted)">Net pay to staff</text>
+          <text x="352" y="84" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">113,700</text>
+
+          <rect x="238" y="128" width="228" height="112" rx="12" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="352" y="152" text-anchor="middle" font-size="13" fill="var(--hold)">Withheld from staff</text>
+          <text x="352" y="182" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">36,300</text>
+          <text x="352" y="204" text-anchor="middle" font-size="12.5" fill="var(--muted)">income tax 18,000 · social security</text>
+          <text x="352" y="222" text-anchor="middle" font-size="12.5" fill="var(--muted)">and Medicare 10,800 · 401(k) 7,500</text>
+
+          <rect x="238" y="256" width="228" height="62" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="352" y="280" text-anchor="middle" font-size="13" fill="var(--muted)">Employer costs</text>
+          <text x="352" y="306" text-anchor="middle" font-size="20" font-weight="800" fill="var(--ink)">14,250</text>
+
+          <rect x="528" y="24" width="236" height="80" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="646" y="50" text-anchor="middle" font-size="13" fill="var(--green)">The bank</text>
+          <text x="646" y="84" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">net pay leaves here</text>
+
+          <rect x="528" y="140" width="236" height="92" rx="12" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="646" y="164" text-anchor="middle" font-size="13" fill="var(--hold)">Your books: payables</text>
+          <text x="646" y="196" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">50,550</text>
+          <text x="646" y="220" text-anchor="middle" font-size="12.5" fill="var(--muted)">36,300 + 14,250, owed until paid</text>
+
+          <rect x="528" y="258" width="236" height="60" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="646" y="282" text-anchor="middle" font-size="13" fill="var(--muted)">Filed and paid</text>
+          <text x="646" y="304" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">IRS · 401(k) provider · state</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, Northbrook Trading, for July to September 2026, in dollars. Every tax figure comes from Northbrook's payroll provider report. The page uses no tax rate. When you owe a tax, your books show a payable for it. When you pay, the payable goes down by that amount<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Accountants call these payables payroll liabilities.</figcaption>
+  </figure>
+  <p>Four boxes in the picture are the four records that must agree: the register, the bank, your books, and what you filed and paid. The payroll register is the report from the payroll software. Accountants call your books the general ledger, or GL. The skill compares each pair that can disagree.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>One quarter at Northbrook Trading, five checks</h2>
+  <p>Northbrook pays its staff each month in US dollars. It also paid one bonus run on 15 September. A payroll provider calculates the pay. Northbrook makes its federal tax deposits itself. The owner runs the skill on Monday 19 October for the quarter that ended on Wednesday 30 September 2026.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's five checks for the quarter: register to books, net pay to bank, three payables, the quarterly filing and the wage bases, with each result">
+        <thead><tr><th scope="col" style="text-align:left">Check</th><th scope="col" style="text-align:left">Northbrook's figures</th><th scope="col" style="text-align:left">What the skill says</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Register to books</th><td class="t">Register 150,000. Books 150,300. Bridge: −4,000 wages for software that Northbrook builds, +2,500 wages earned and not yet paid, +1,800 manual entry JE-0912</td><td class="t">The bridge explains all 300. The skill lists JE-0912 separately, because no payroll run is behind it</td></tr>
+        <tr><th scope="row">Employer costs</th><td class="t">Register 14,250. Books 14,250</td><td class="t h">Agrees</td></tr>
+        <tr><th scope="row">Net pay to bank</th><td class="t">Register 113,700. Bank 112,450. Check #2214, 1,250, not cashed by 30 September</td><td class="t">Agrees on the bank statement, with one timing item. A returned deposit for employee EE-07 became that check</td></tr>
+        <tr class="breach"><th scope="row">Federal taxes owed</th><td class="t">12,900 + 39,600 − 25,500 = 27,000. Books 27,000</td><td class="t w">Agrees with the books, and 12,600 for August is 15 days late</td></tr>
+        <tr><th scope="row">401(k) owed</th><td class="t">3,500 + 10,500 − 10,300 = 3,700. Books 3,700</td><td class="t h">Agrees. Not due until 7 October</td></tr>
+        <tr><th scope="row">State unemployment owed</th><td class="t">600 + 450 − 1,200 = −150. Books −150</td><td class="t a">Below zero. Northbrook paid 600 twice, on 30 July and 3 August</td></tr>
+        <tr><th scope="row">Quarterly filing</th><td class="t">Tax on the Q3 Form 941 39,600. Tax in the books 39,600. Federal taxable wages 142,500 on both</td><td class="t h">Agrees</td></tr>
+        <tr><th scope="row">Wage bases</th><td class="t">Each tax against its own base, from the register</td><td class="t h">Agrees. The skill shows totals and counts only</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Form 941 is the quarterly federal payroll tax return in the US. The owner uploaded it. EE-07 is a reference number: the skill never shows an employee's name or pay.</figcaption>
+  </figure>
+  <p>The register shows pay on the day that staff got it. The books show wages in the period when staff earned them. So the books show 2,500 more for wages that staff earned in September and did not get yet. The 4,000 is wages for software that Northbrook builds. The books record it as an asset, so it is not in wage expense. Both differences are correct, and the skill documents them.</p>
+  <p>The net pay check has two levels. The payments in your books prove that the bookkeeping agrees. Only the bank statement proves that the money left. At Northbrook the owner uploaded the statement, so the result says "bank-verified". Without the statement, the skill says that it compared net pay with the payments in the books, and nothing more.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The federal account agrees, and a deposit is still 15 days late</h2>
+  <p>The usual test for a payable is the roll-forward: start balance, plus what you owed, less what you paid. If the result equals the books, the account looks correct. At Northbrook it equals the books exactly. The skill then asks a second question: is any of that balance past its due date?</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">Roll-forward, then the due date of each part</span>
+      <div class="rows num">
+        <div class="row"><span>12,900 + 39,600 − 25,500</span><span class="v">$27,000</span></div>
+        <div class="row same"><span>Books on 30 September</span><span class="v">$27,000</span></div>
+        <div class="row"><span>September, due Thu 15 Oct</span><span class="v">$14,400</span></div>
+        <div class="row off"><span>August, due Tue 15 Sep, not paid</span><span class="v">$12,600</span></div>
+      </div>
+      <div class="verdict">The roll-forward agrees, and the skill raises the overdue flag. On 30 September, the August deposit is 30 − 15 = 15 days late.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Stop when the roll-forward agrees with the books</span>
+      <div class="rows num">
+        <div class="row"><span>12,900 + 39,600 − 25,500</span><span class="v">$27,000</span></div>
+        <div class="row same"><span>Books on 30 September</span><span class="v">$27,000</span></div>
+        <div class="row"><span>Difference</span><span class="v">$0</span></div>
+        <div class="row off"><span>Late deposits</span><span class="v">not checked</span></div>
+      </div>
+      <div class="verdict">The account looks settled. Nothing on this side shows that the August deposit is unpaid.</div>
+    </div>
+  </div>
+  <div class="scale">
+    <div class="stat"><span class="label">Overdue</span><span class="v num wrong">$12,600</span><span class="s">Federal taxes for August, due Tuesday 15 September</span></div>
+    <div class="stat"><span class="label">Days late on 30 September</span><span class="v num wrong">15</span><span class="s">30 − 15. The skill measures it on the last day of the period</span></div>
+    <div class="stat"><span class="label">Not yet due</span><span class="v num hold">$14,400</span><span class="s">September, with the bonus run. Due Thursday 15 October</span></div>
+  </div>
+  <p>The due date came from the owner. Northbrook is a monthly depositor. In the US, a monthly depositor deposits by the 15th of the next month. If the 15th is not a business day, the deadline moves to the next business day<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Under Publication 15 (2026), an employer is a monthly depositor if its taxes for a lookback period were $50,000 or less<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill never guesses a due date. Without one, it cannot raise the overdue flag, and it says so.</p>
+  <p>The late item goes first in the results. The IRS penalty grows the later the deposit is<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Part of the 12,600 is money that Northbrook took from its staff's pay for income tax, social security and Medicare. In the US, a person who must pay that money and willfully does not pay it can be personally liable for a penalty<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill does not calculate a penalty, and this page is not legal advice. Other countries have their own rules.</p>
+</section>
+
+<section>
+  <span class="label">The second mistake</span>
+  <h2>Why it never checks the tax against total pay</h2>
+  <p>A quick test multiplies total pay by a tax rate and compares the result with the tax. That test fails for honest reasons. Each tax has its own base, the pay that the tax applies to. Accountants call it the taxable wage base.</p>
+  <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:64ch">
+    <li>At Northbrook, staff put 7,500 into the 401(k) before tax. That amount makes the base for federal income tax smaller: 150,000 − 7,500 = 142,500. It does not change the base for social security or Medicare.</li>
+    <li>Social security stops at an annual cap for each employee. Two Northbrook employees passed the cap. Their pay above it, 9,000, is not in the base: 150,000 − 9,000 = 141,000.</li>
+    <li>State unemployment has its own cap for each employee. Five employees passed it.</li>
+  </ul>
+  <p>So a check on total pay shows a difference where no error exists. The skill uses the register, which holds each employee's base. It does the per-employee arithmetic in the session and shows only totals and counts, for example "2 employees at the cap". Without the register, the skill writes NOT PERFORMED for this check. It does not put a check on total pay in its place.</p>
+  <p>The same register lets the skill compare the quarterly filing with the books. In the US, the IRS compares the four quarterly Forms 941 with the year-end wage statements, Forms W-2. If they do not agree, the IRS or the Social Security Administration may contact you<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The skill asks you to clear each difference before the wage statements go to your staff.</p>
+</section>
+
+<section>
+  <span class="label">What it puts first</span>
+  <h2>Five items, in order of what they can cost</h2>
+  <p>The skill sorts the exceptions by consequence, not by size. A late tax deposit costs more each day. A wrong filing can mean corrected wage statements for your staff. A difference in timing costs nothing.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's five exceptions in order of consequence: the late federal deposit, the manual entry JE-0912, the duplicate state payment, the uncashed check and two correct differences">
+        <thead><tr><th scope="col" style="text-align:left">Order</th><th scope="col" style="text-align:left">Item</th><th scope="col">Amount</th><th scope="col" style="text-align:left">Why it is in this place</th><th scope="col" style="text-align:left">Suggested next step</th></tr></thead>
+        <tbody>
+        <tr class="breach"><th scope="row">1</th><td class="t">Federal deposit for August</td><td>12,600</td><td class="t">Late since 15 September. Penalty and interest grow from the due date</td><td class="t">The owner makes the deposit</td></tr>
+        <tr><th scope="row">2</th><td class="t">Manual entry JE-0912, 24 September, memo "reclass contractor"</td><td>1,800</td><td class="t a">If it is wages, the register, the Q3 filing and the year-end W-2s are short. People often find this kind of error last</td><td class="t">The owner and the accountant decide. Any entry is a proposal</td></tr>
+        <tr><th scope="row">3</th><td class="t">State unemployment, below zero</td><td>−150</td><td class="t">Northbrook paid 600 twice. A payable below zero is always an exception</td><td class="t">Claim it back, or show it as a prepayment</td></tr>
+        <tr><th scope="row">4</th><td class="t">Check #2214, employee EE-07</td><td>1,250</td><td class="t">Timing only</td><td class="t">Carry it forward. Follow it if nobody cashes it</td></tr>
+        <tr><th scope="row">5</th><td class="t">Software wages and wages earned, not yet paid</td><td>4,000 and 2,500</td><td class="t">Correct differences</td><td class="t">Document them. No correction</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. By size alone, the order would be 12,600, 4,000, 2,500, 1,800, 1,250, 150. By consequence, JE-0912 moves up to second place, and the −150 comes before the 1,250.</figcaption>
+  </figure>
+  <p>The skill does not decide what JE-0912 is. It lists the entry and says what each answer means. If it is not wages, a reversing entry corrects it. The skill can propose that entry through <code>payroll-journal-entry-builder</code>. A person posts it.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Nine items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. Items D, E and F are requests for files.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools.</div></li>
+    <li><div class="q">Which company? In a group, does one payroll service pay staff for several companies?</div><div class="why">The books of each company hold only that company's share. The skill runs once for each company, and never picks one for you.</div></li>
+    <li><div class="q">Which period: a month, a quarter or a year?</div><div class="why">Required. The checks against tax filings and wage bases apply at the end of a quarter and a year.</div></li>
+    <li><div class="q">Please give the payroll register for the period, with every extra run, for example a bonus run.</div><div class="why">Required. It is the other side of the books, and the only record of each tax's base. Without it, the wage-base check is NOT PERFORMED.</div></li>
+    <li><div class="q">Please give the bank statement, or the payment records, for net pay.</div><div class="why">Required. Payment records prove the bookkeeping. Only the statement proves that the money left. The result says which one it used.</div></li>
+    <li><div class="q">Please give the records of each payment to the tax authority and to each provider.</div><div class="why">Required for the payables check. They give the "paid" line of each roll-forward. On the MosoFin path, the skill reads the payments, but not the authority's receipt.</div></li>
+    <li><div class="q">When is each payment due: a day of the month, or a rule?</div><div class="why">Required for the overdue flag. The skill never guesses a date. US federal dates follow the deposit schedule<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. In the UK, for example, an electronic payment to HMRC must arrive by the 22nd of the next month<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>.</div></li>
+    <li><div class="q">What are the taxable wage base rules for each tax: deductions before tax, and caps?</div><div class="why">Required for the wage-base check. Each tax applies to its own base, not to total pay. The skill never guesses a rule.</div></li>
+    <li><div class="q">Does a payroll provider pay the taxes for you?</div><div class="why">Required. If your provider does not pay them, the IRS still holds you responsible<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. So you check each payment with the tax authority yourself.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. The skill's own sample is for a UK company. For this US example, it reads like this:</p>
+  <blockquote><i>"Reconciling payroll for Northbrook Trading for the quarter ended 30 September 2026 — register, GL, bank and filings — from the files you uploaded: the provider register (4 runs), GL detail and trial balances at 30 June and 30 September, the bank statement for July to September, the remittance records and the Q3 Form 941 as filed. Federal deposits due the 15th of the next month; 401(k) the 7th; state unemployment quarterly. Wage bases: as stated by you. Shall I go ahead?"</i></blockquote>
+  <p>It never repeats one person's pay back to you.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect your books, or upload eight items</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>It reads the books side, and you supply the rest</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It checks if a payroll platform is also connected. If yes, it reads the register and the wage bases too</li>
+        <li>It reads every payroll expense and payable account, the balances at both ends of the period, every entry and every manual adjustment</li>
+        <li>It reads the payments for net pay and to each authority, by payee</li>
+        <li>Without a payroll platform connection, you still give it the <b>register</b>. You also give it the <b>bank statement</b>, the <b>due dates</b>, the <b>wage base rules</b>, the <b>provider arrangement</b> and the <b>filing figures</b>. None of them is in the books</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>The checklist that the skill gives you</h3>
+      <ul>
+        <li><b>Payroll register</b> for every run in the period, CSV, XLSX or PDF. Required</li>
+        <li><b>Your books</b>: entries on every payroll expense and payable account, and the balances at both ends, CSV or XLSX. A trial balance works. Required</li>
+        <li><b>Bank statement</b> or payment records for net pay, PDF or CSV. Required</li>
+        <li><b>Payment records</b> for each payable, PDF, CSV or XLSX. Required for the payables check</li>
+        <li>Company name, country, currency, fiscal year, the period, and if a provider pays the taxes, typed in the chat. Required</li>
+        <li><b>Due dates</b> and <b>wage base rules</b>, typed in the chat. Required for the overdue flag and the wage-base check</li>
+        <li><b>Tax filing figures</b> and wage statement totals, PDF, CSV or XLSX. Recommended</li>
+        <li><b>Last period's reconciliation</b>, PDF, CSV or XLSX. Recommended</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Eight sheets, from the summary to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Summary</b><span>Each check with its status and the total that does not agree. It names the sources that it read and the sources that you supplied, and if it did the wage-base check.</span></div>
+    <div class="get"><b>Register to books</b><span>The bridge for gross pay and employer costs, with manual adjustments in a separate list.</span></div>
+    <div class="get"><b>Net pay to bank</b><span>The tie, with the label "bank-verified" or "recorded".</span></div>
+    <div class="get"><b>Payables</b><span>A roll-forward for each payable, with flags for overdue and negative balances.</span></div>
+    <div class="get"><b>Filings</b><span>Wages and taxes in the books, against the filings and the wage statements.</span></div>
+    <div class="get"><b>Wage bases</b><span>The base of each tax, from totals and counts only. Or NOT PERFORMED, with the reason.</span></div>
+    <div class="get"><b>Exceptions</b><span>Each item with its type, amount, cause, correction, owner and status, in order of consequence.</span></div>
+    <div class="get"><b>Coverage</b><span>For each check, where the figures came from and on which date.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The summary has lines for the preparer and the reviewer, and the answer ends with a Data sources line. The skill asks before it makes an Excel file, Payroll_Reconciliation_Q3-2026_Northbrook Trading.xlsx. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your rules for the next run: account map, wage base rules, due dates and provider arrangement. It never saves balances, wage figures, exceptions or anybody's pay.</p>
+  <p class="muted" style="font-size:15px">Two jobs go to other skills. To bring the payroll clearing account to zero in detail, use <code>payroll-clearing-reconciliation</code>. To build a correcting journal entry, use <code>payroll-journal-entry-builder</code>.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the nine items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry it produces is a proposal for a person to post. So it cannot pay a tax or send anything to your provider: a person does that.</li>
+      <li><b>Payroll data is personal.</b> It reports totals and accounts, never one employee at a time. It names a person's item by a reference number only, and never saves anybody's pay.</li>
+      <li><b>Never puts a check on total pay in place of the wage-base check.</b> Without the register, that check is NOT PERFORMED.</li>
+      <li><b>Never reports a tie against a source that it did not get.</b> It never guesses a wage base rule, a due date or the status of a payment.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Eight terms, in plain English</h2>
+  <dl>
+    <dt>Payroll register</dt><dd>The report from your payroll software for each run: gross pay, deductions, employer costs, net pay and the base of each tax.</dd>
+    <dt>Register-to-GL bridge</dt><dd>A short schedule that explains why the payroll total and the total in your books are different.</dd>
+    <dt>Payroll liability</dt><dd>A tax or deduction that you owe and did not pay yet. Your books show it as a payable<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Remittance</dt><dd>A payment of money that you hold to the authority or provider that owns it. The authority sets the due date.</dd>
+    <dt>Taxable wage base</dt><dd>The pay that one tax applies to. It is often different from gross pay, and different for each tax.</dd>
+    <dt>Cap</dt><dd>An annual limit for each employee. Above it, a tax or contribution stops.</dd>
+    <dt>Wage statement</dt><dd>The yearly pay summary for each employee. In the US it is Form W-2, and its totals must agree with the quarterly returns<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>.</dd>
+    <dt>Payroll provider</dt><dd>A company that runs your payroll and can pay the taxes for you. You stay responsible for those taxes<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an accounting textbook, five IRS pages and one UK government page. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="employer payroll taxes"><a href="https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll</a><span class="what">The employer records a payable for each payroll tax and benefit that it owes. When it pays, it reduces each payable and its cash.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="section 11, Depositing Taxes (monthly and semiweekly schedules)"><a href="https://www.irs.gov/publications/p15" rel="noopener">IRS (US): Publication 15 (2026), (Circular E), Employer's Tax Guide</a><span class="what">The deposit schedule comes from a lookback period. In the 2026 edition, $50,000 or less makes a monthly depositor. A monthly depositor deposits by the 15th of the next month, or the next business day.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes-and-the-trust-fund-recovery-penalty-tfrp" rel="noopener">IRS (US): Employment taxes and the Trust Fund Recovery Penalty (TFRP)</a><span class="what">A person who must pay the taxes withheld from employees, and willfully does not pay them, can be personally liable. This is a US rule.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.irs.gov/payments/failure-to-deposit-penalty" rel="noopener">IRS (US): Failure to Deposit Penalty</a><span class="what">The penalty grows with the number of days that a deposit is late, from its due date.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="reconciling Forms 941 and Form W-3"><a href="https://www.irs.gov/pub/irs-pdf/i941.pdf" rel="noopener">IRS (US): Instructions for Form 941 (Rev. March 2026)</a><span class="what">The IRS compares the four quarterly Forms 941 with the yearly W-2 totals. If they do not agree, the IRS or the Social Security Administration may contact the employer.</span></li>
+    <li id="src6" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/outsourcing-payroll-and-third-party-payers" rel="noopener">IRS (US): Outsourcing payroll and third-party payers</a><span class="what">A payroll provider does not take over the employer's duty to file and pay on time. If the provider fails, the employer stays responsible.</span></li>
+    <li id="src7" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="Full Payment Submission"><a href="https://www.gov.uk/guidance/what-payroll-information-to-report-to-hmrc" rel="noopener">HMRC (UK): Running payroll / Payroll information to report to HMRC (gov.uk)</a><span class="what">An employer reports pay on or before each payday. Payment is a separate step: cleared funds by the 22nd of the month after the tax month, if the employer pays electronically.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the four-source frame, the six causes in the bridge, the eight sheets, the NOT PERFORMED rule or the order by consequence. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. Every tax figure in it comes from Northbrook's payroll provider report, and the page states no tax rate and no wage cap.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>payroll-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-reconciliation">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and corrections from a bookkeeping audit followed on 27 October 2026. This page describes that version. The skill works in any country. This example is in the US because the sources are US sources.</p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its staff and every figure in the example. They are not your data. The deposit rules, the penalty rules and the form names are US rules, and other countries have their own. This page is not legal or tax advice. Ask your accountant or payroll adviser what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
