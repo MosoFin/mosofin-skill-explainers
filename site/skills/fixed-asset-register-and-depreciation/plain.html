@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixed Asset Register and Depreciation in Plain English | MosoFin</title>
+<meta name="description" content="What you own, its book value and this month's depreciation, with tax kept apart, and the errors a fixed asset register run catches. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+  ol.qs.lettered li::before{content:attr(data-n);font-size:13px}
+  .book.tax{border-top-color:var(--hold)}
+  .book.tax .verdict{background:var(--hold-soft)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Fixed asset register and depreciation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Assets and depreciation, in plain words</span>
+  <h1>What do we own, what is it worth on the books now, and how much wears out this month?</h1>
+  <p class="lede">A machine, a van or a laptop serves the business for years. This skill keeps the <b>list of those assets</b> and calculates <b>this month's depreciation</b> by your own policy. It also compares the list with <b>your books in both directions</b>.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a period and your policies. The policies are the life of each class of asset, the method, the salvage value, the threshold and the rule for the first month. It reads your ledger, or the files that you upload. It finds the assets that the list or the books do not show. It finds capital items in repairs and errors in sales of assets. It writes draft entries for a person to post. It calculates book depreciation only, and it never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">The idea</span>
+  <h2>You pay for a machine once, and its cost goes to expense a little each month</h2>
+  <p>An asset that lasts for years does not go to expense in the month that you buy it. Its cost goes on the balance sheet. Then, each month, a part of the cost moves to expense. Accountants call this depreciation. With the straight-line method, the cost less the salvage value goes to expense in equal amounts over the useful life<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 760 210" role="img" aria-label="Northbrook's shrink-wrap machine. The invoice shows the machine at 17,550, freight 650 and installation 1,000, so the cost is 19,200. The cost goes on the balance sheet. Each month 19,200 divided by 120 months, 160, goes to depreciation expense. On 30 September the book value is 19,200 minus 160, which is 19,040. Book value is not a sale price.">
+        <g font-family="Archivo, Arial, sans-serif" font-size="13">
+          <rect x="8" y="20" width="168" height="170" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="22" y="46" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--faint)">THE INVOICE</text>
+          <text x="22" y="76" fill="var(--ink)">Machine 17,550</text>
+          <text x="22" y="98" fill="var(--ink)">Freight 650</text>
+          <text x="22" y="120" fill="var(--ink)">Installation 1,000</text>
+          <line x1="22" y1="136" x2="160" y2="136" stroke="var(--rule-strong)"/>
+          <text x="22" y="160" font-weight="700" fill="var(--ink)">Cost 19,200</text>
+
+          <rect x="200" y="20" width="168" height="170" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="214" y="46" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--green)">BALANCE SHEET</text>
+          <text x="214" y="76" fill="var(--ink)">Asset at cost</text>
+          <text x="214" y="104" font-size="20" font-weight="800" fill="var(--ink)">19,200</text>
+          <text x="214" y="136" fill="var(--muted)">In service</text>
+          <text x="214" y="156" fill="var(--muted)">Mon 14 Sep 2026</text>
+
+          <rect x="392" y="20" width="168" height="170" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="406" y="46" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--faint)">EACH MONTH</text>
+          <text x="406" y="76" fill="var(--ink)">19,200 ÷ 120 months</text>
+          <text x="406" y="104" font-size="20" font-weight="800" fill="var(--hold)">160</text>
+          <text x="406" y="136" fill="var(--muted)">to depreciation</text>
+          <text x="406" y="156" fill="var(--muted)">expense (book)</text>
+
+          <rect x="584" y="20" width="168" height="170" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="598" y="46" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--faint)">BOOK VALUE 30 SEP</text>
+          <text x="598" y="76" fill="var(--ink)">19,200 − 160</text>
+          <text x="598" y="104" font-size="20" font-weight="800" fill="var(--ink)">19,040</text>
+          <text x="598" y="136" fill="var(--muted)">Not a sale price</text>
+
+          <g stroke="var(--faint)" stroke-width="2" fill="none">
+            <path d="M178 105 H196"/><path d="M190 99 L197 105 L190 111"/>
+            <path d="M370 105 H388"/><path d="M382 99 L389 105 L382 111"/>
+            <path d="M562 105 H580"/><path d="M574 99 L581 105 L574 111"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The policy is 10 years, straight-line, no salvage value. Accountants call the 19,040 the net book value.</figcaption>
+  </figure>
+  <p>The cost of an asset includes the costs that make it ready for use, for example shipping, taxes and installation<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. So the freight and the installation belong in the 19,200. When you sell an asset, its book value is the cost less the depreciation to that date. The sale price minus the book value gives a gain or a loss<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</p>
+  <p>The machine went into service on 14 September. Northbrook uses the full-month rule, so September gets a full charge of 160. With the half-month rule, the charge is 80. With the pro-rata rule, it is 160 × 17 ÷ 30 = 90.67. The rule changes the number, so the skill always asks for your rule.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Seven assets at Northbrook Trading on 30 September 2026</h2>
+  <p>Northbrook Trading is a made-up company. It works in US dollars and reports under US GAAP. Its list of assets has six assets and a piece of land on 31 August. The skill's own example has 412 assets. This example is small so that you can check every number. After the September run, and after the owner's yes to the drafts, the list looks like this.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's fixed asset register on 30 September 2026 after the proposed entries: seven assets with cost, monthly book depreciation and net book value. Book value 161,705 in total. September depreciation 1,745">
+        <thead><tr><th scope="col" style="text-align:left">ID</th><th scope="col" style="text-align:left">Asset</th><th scope="col" style="text-align:left">Policy</th><th scope="col">Cost</th><th scope="col">Sep charge</th><th scope="col">Book value</th><th scope="col" style="text-align:left">Note</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">M-01</th><td class="t">Packing machine</td><td class="t">10 years</td><td>60,000</td><td>500</td><td>32,500</td><td class="t">In service March 2022</td></tr>
+        <tr><th scope="row">M-02</th><td class="t">Forklift</td><td class="t">10 years</td><td>24,000</td><td>200</td><td>5,400</td><td class="t">In service January 2019</td></tr>
+        <tr class="breach"><th scope="row">M-03</th><td class="t">Shrink-wrap machine</td><td class="t">10 years</td><td>19,200</td><td>160</td><td>19,040</td><td class="t">In the books, but not on the list. The freight and installation were in expense</td></tr>
+        <tr class="breach"><th scope="row">M-04</th><td class="t">Office air conditioner</td><td class="t">10 years</td><td>4,200</td><td>35</td><td>4,165</td><td class="t">Was in repairs. The owner decided that it is capital</td></tr>
+        <tr><th scope="row">V-01</th><td class="t">Delivery van</td><td class="t">5 years, salvage 5,000</td><td>41,000</td><td>600</td><td>17,600</td><td class="t">In service July 2023</td></tr>
+        <tr><th scope="row">C-01</th><td class="t">Laptops</td><td class="t">3 years</td><td>9,000</td><td>250</td><td>3,000</td><td class="t">In service October 2024</td></tr>
+        <tr><th scope="row">L-01</th><td class="t">Land</td><td class="t">No depreciation</td><td>80,000</td><td>0</td><td>80,000</td><td class="t">No accumulated depreciation, so the land check passes</td></tr>
+        <tr class="tot"><th scope="row">Total</th><td></td><td></td><td class="c">237,400</td><td class="c">1,745</td><td class="c">161,705</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Every policy is straight-line with the full-month rule. The old van V-02 left the list on 15 September. The server C-02 left the list after the owner said yes. Both are in the next sections.</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">What we own</span><span class="v num">7 assets</span><span class="s">M-01, M-02, M-03, M-04, V-01, C-01 and the land</span></div>
+    <div class="stat"><span class="label">Worth on the books</span><span class="v num good">$161,705</span><span class="s">Cost 237,400 − accumulated depreciation 75,695. The books showed 126,050 before the drafts</span></div>
+    <div class="stat"><span class="label">Wears out this month</span><span class="v num hold">$1,745</span><span class="s">1,550 already posted + 160 for the new machine + 35 for the air conditioner</span></div>
+  </div>
+  <p>The skill never depreciates land. With some exceptions, land has an unlimited useful life, so nobody depreciates it<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill checks that the land account has no accumulated depreciation. Under IFRS, each part of an asset with a significant cost gets its own depreciation<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. That rule is IFRS. Under US GAAP, the parts are optional, so the skill asks for your framework.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The old van sold for $4,000, and the books show a loss of $26,000</h2>
+  <p>On 15 September Northbrook sold its old van for $4,000 in cash. The van cost $30,000, and its depreciation reached $30,000 in August 2025. So its book value was zero. Somebody recorded the sale and removed the cost. Nobody removed the accumulated depreciation.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>The right entry</h3>
+      <span class="who">Remove the cost and the depreciation together</span>
+      <div class="rows num">
+        <div class="row"><span>Book value: 30,000 − 30,000</span><span class="v">$0</span></div>
+        <div class="row"><span>Sale price − book value</span><span class="v">gain $4,000</span></div>
+        <div class="row"><span>Vehicles book value</span><span class="v">$17,600</span></div>
+      </div>
+      <div class="verdict">The cash is $4,000 and the gain is $4,000. They agree here only because the book value is zero.</div>
+    </div>
+    <div class="book bad">
+      <h3>The entry in the books</h3>
+      <span class="who">Cash 4,000 and a loss of 26,000 against the van cost of 30,000</span>
+      <div class="rows num">
+        <div class="row same"><span>Cash received</span><span class="v">$4,000</span></div>
+        <div class="row off"><span>Profit and loss</span><span class="v">loss $26,000</span></div>
+        <div class="row off"><span>Vehicles book value: 41,000 − 53,400</span><span class="v">−$12,400</span></div>
+      </div>
+      <div class="verdict">An asset class with a negative book value is a clear sign. The $30,000 of depreciation stays on the balance sheet for a van that is gone.</div>
+    </div>
+  </div>
+  <p>The skill reads both sides of each sale. A credit to the asset account with no debit to accumulated depreciation is a half entry. The adjustment moves profit by $30,000. It removes the loss of 26,000 and adds the gain of 4,000. The skill drafts that adjustment for a person to post.</p>
+</section>
+
+<section>
+  <span class="label">The tie-out, both ways</span>
+  <h2>One asset on the list is not in the books, and one asset in the books is not on the list</h2>
+  <p>The skill compares the list of assets with the ledger, which accountants call the general ledger or GL. It makes the comparison in two directions, and it reports two separate lists. The two lists have different causes and different owners.</p>
+  <div class="two">
+    <div class="card">
+      <span class="tag bad">On the list, not in the books</span>
+      <h3>The server, $6,000</h3>
+      <p>The list says 250,000 of cost on 31 August. The books say 244,000. The difference is 6,000, which is the server C-02. Its cost is not in the GL. Accountants call it a phantom asset. It can be an asset that the business disposed of years ago. The skill proposes to remove it after you say yes.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">In the books, not on the list</span>
+      <h3>The shrink-wrap machine, $17,550</h3>
+      <p>On 8 September the books got 17,550 in the machinery account. The list did not get a new line. An asset that is not on the list never gets depreciation. The skill adds it as M-03 at the full cost of 19,200, with the freight and the installation.</p>
+    </div>
+  </div>
+  <p>The skill also asks: did somebody post depreciation this month? Yes. The usual monthly entry posted 1,550. But that entry was out of date. It did not include the new machine or the air conditioner.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Implied life, machinery</span><span class="v num wrong">12.1 years</span><span class="s">700 × 12 = 8,400 a year on a cost of 101,550. The policy is 10 years</span></div>
+    <div class="stat"><span class="label">After the drafts</span><span class="v num good">10.0 years</span><span class="s">(700 + 160 + 35) × 12 = 10,740 on 107,400</span></div>
+    <div class="stat"><span class="label">Vehicles and computers</span><span class="v num good">5.0 and 3.0</span><span class="s">7,200 on 36,000, and 3,000 on 9,000. Both agree with the policy</span></div>
+  </div>
+  <p>The skill divides each class's cost by its yearly charge, and compares the result with your policy life. The check is coarse. A difference is a sign that something may be wrong, and the skill reports it as a sign. At Northbrook, the 12.1 years points to the missing machine.</p>
+</section>
+
+<section>
+  <span class="label">Capital items in repairs</span>
+  <h2>Two repairs bills of $2,500 or more, and two decisions for the owner</h2>
+  <p>Northbrook's threshold is $2,500. An item at or above it goes on the balance sheet. The skill reads repairs and maintenance, small tools and computer expense. It lists each item at or above the threshold, with the vendor, the date, the amount and the account.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's threshold scan for September 2026. The forklift engine rebuild of 6,800 and the office air conditioner of 4,200 are at or above 2,500. The owner decided the rebuild is a repair and the air conditioner is capital">
+        <thead><tr><th scope="col" style="text-align:left">Date</th><th scope="col" style="text-align:left">Vendor</th><th scope="col" style="text-align:left">Account</th><th scope="col">Amount</th><th scope="col" style="text-align:left">Description</th><th scope="col" style="text-align:left">2,500 or more?</th><th scope="col" style="text-align:left">Owner's decision</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Wed 2 Sep</th><td class="t">City Plumbing</td><td class="t">Repairs</td><td>480</td><td class="t">Repair a sink that leaks</td><td class="t">No</td><td class="t">None needed</td></tr>
+        <tr><th scope="row">Tue 8 Sep</th><td class="t">Delta Packaging Machines</td><td class="t">Repairs</td><td>1,000</td><td class="t">Install the shrink-wrap machine</td><td class="t">No</td><td class="t">Capitalize. The invoice check found it, and the scan did not</td></tr>
+        <tr><th scope="row">Thu 17 Sep</th><td class="t">Lift Services</td><td class="t">Repairs</td><td>6,800</td><td class="t">Rebuild the forklift engine</td><td class="t a">Yes</td><td class="t">Repair. It stays in expense</td></tr>
+        <tr class="breach"><th scope="row">Tue 22 Sep</th><td class="t">CoolAir</td><td class="t">Repairs</td><td>4,200</td><td class="t">Supply and install an office air conditioner</td><td class="t a">Yes</td><td class="t">Capital. Machinery, 10 years, in service 22 Sep</td></tr>
+        <tr><th scope="row">Wed 30 Sep</th><td class="t">Tech Depot</td><td class="t">Computer expense</td><td>900</td><td class="t">Two monitors</td><td class="t">No</td><td class="t">None needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The decisions in the last column are the owner's answers. The skill lists candidates. A large repair can be a real repair.</figcaption>
+  </figure>
+  <p>The skill also finds a pattern on the shrink-wrap machine invoice. The machine went to the asset account. The freight of 650 and the installation of 1,000 went to expense. It was the same invoice, from the same vendor, on the same date. So the asset was too low by 1,650.</p>
+  <p>Then the skill checks the other direction: items below $2,500 in an asset account. In September there were none. Small items in the asset accounts make the list larger and create depreciation that nobody tracks.</p>
+</section>
+
+<section>
+  <span class="label">Book and tax</span>
+  <h2>The skill calculates your book figure, and your tax preparer calculates the tax figure</h2>
+  <p>Every number above is book depreciation. It comes from your own policy: life, method, salvage value and first-month rule. Tax depreciation follows different rules, and it is a different number. The skill keeps the two apart.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>Book depreciation</h3>
+      <span class="who">This skill calculates it, by your policy</span>
+      <div class="rows num">
+        <div class="row"><span>New machine, September</span><span class="v">$160</span></div>
+        <div class="row"><span>All assets, September</span><span class="v">$1,745</span></div>
+        <div class="row"><span>Capitalization threshold</span><span class="v">$2,500, your policy</span></div>
+      </div>
+      <div class="verdict">The $2,500 is Northbrook's book threshold. It is the owner's answer to the intake question. The skill never uses a default threshold.</div>
+    </div>
+    <div class="book tax">
+      <h3>Tax depreciation</h3>
+      <span class="who">Your tax preparer calculates it. The skill does not</span>
+      <div class="rows num">
+        <div class="row"><span>MACRS, section 179, bonus</span><span class="v">tax preparer</span></div>
+        <div class="row"><span>De minimis safe harbor</span><span class="v">a tax election</span></div>
+        <div class="row"><span>Northbrook tax amount</span><span class="v">not on this page</span></div>
+      </div>
+      <div class="verdict">The skill marks tax depreciation as manual work, always, and gives it to your tax preparer. It never calculates a tax figure.</div>
+    </div>
+  </div>
+  <p>US federal tax has its own rules. They include an election called section 179. For 2026, its maximum deduction is $2,560,000<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. If the accountant uses that election for the machine, the tax deduction can be much more than the book charge of 160. The skill takes that difference from the accountant's schedule, for the tax-book sheet.</p>
+  <p>The IRS also has a de minimis safe harbor. Its limit is $2,500 for each invoice or item, or $5,000 for a business with an applicable financial statement<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. The business makes that election each year, with its tax return<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>. It is a tax decision for your accountant. It is a separate thing from your book threshold, although both are $2,500 at Northbrook.</p>
+  <p>Some businesses post the depreciation figure from their tax return. If you do that, the skill uses your accountant's schedule as the list of assets. It compares the GL with that schedule and calculates no separate charge.</p>
+</section>
+
+<section>
+  <span class="label">The drafts</span>
+  <h2>Four draft entries, and none of them posted</h2>
+  <ol class="qs">
+    <li><div class="q">Add the freight and installation to the machine: 1,650</div><div class="why">Debit machinery 1,650. Credit freight expense 650 and repairs 1,000. The skill's files describe the warning for this case, but not an entry. This example drafts it as a reclassification.</div></li>
+    <li><div class="q">Depreciation on the new machine: 160</div><div class="why">Debit depreciation expense 160. Credit accumulated depreciation, machinery, 160.</div></li>
+    <li><div class="q">Move the air conditioner from repairs to machinery: 4,200, and its depreciation: 35</div><div class="why">Debit machinery 4,200 and credit repairs 4,200. Then debit depreciation expense 35 and credit accumulated depreciation 35. The skill never credits cash or accounts payable a second time.</div></li>
+    <li><div class="q">Adjust the van sale: 30,000</div><div class="why">Debit accumulated depreciation, vehicles, 30,000. Credit the loss on disposal 26,000 and the gain on disposal 4,000.</div></li>
+  </ol>
+  <p>After these four drafts, the September book depreciation is 1,550 + 160 + 35 = 1,745. No asset has more depreciation than its cost less salvage. For example, the delivery van has 23,400, and its limit is 41,000 − 5,000 = 36,000.</p>
+</section>
+
+<section>
+  <span class="label">What it leaves to you</span>
+  <h2>A website, a request to post and a count from 2023</h2>
+  <div class="three">
+    <div class="card">
+      <span class="tag up">Out of scope</span>
+      <h3>The $12,000 website</h3>
+      <p>The owner asked to add a website build. Software is usually an intangible asset, and the skill does not work on intangibles or leases. The accountant decides the treatment.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">Refused</span>
+      <h3>"Post these in QuickBooks"</h3>
+      <p>The skill says no one time, in plain words. It gives the drafts to the owner, who can post them in QuickBooks. Nothing in the books changes.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">Overdue</span>
+      <h3>The physical count</h3>
+      <p>The operations manager last counted the assets in December 2023, about 2 years and 9 months ago. The method says to count at least once a year. A clean tie-out does not prove that the assets exist. A count can find a missing server.</p>
+    </div>
+  </div>
+  <p>The owner reported no event that can reduce an asset's value. The ledger showed no candidate either. The impairment sheet records "no candidates". The skill never decides impairment from ledger data.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Ten questions, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see.</p>
+  <ol class="qs lettered">
+    <li data-n="A"><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. The skill asks this only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li data-n="B"><div class="q">Which period?</div><div class="why">Required. The period sets the movements, the charge and the roll-forward.</div></li>
+    <li data-n="C"><div class="q">Your list of assets, if you keep one: asset, class, cost, in-service date, life, salvage, method and location.</div><div class="why">Recommended. Depreciation for each asset needs it. Without it, the skill offers a draft list from your ledger, for you to check.</div></li>
+    <li data-n="D"><div class="q">For each class of asset: the useful life, the method and the salvage policy.</div><div class="why">Required. These drive every depreciation figure. A salvage value of nil is a valid answer, but it must be your answer. The skill never assumes a life or a salvage value.</div></li>
+    <li data-n="D2"><div class="q">Do you book depreciation by your own policy, or do you post the figure from your tax return or your accountant?</div><div class="why">Required. If you post the accountant's figure, the accountant's schedule becomes the list of assets. Then the skill calculates no separate charge.</div></li>
+    <li data-n="E"><div class="q">What is your capitalization threshold?</div><div class="why">Required, and the skill never uses a default. The scan of the repairs accounts depends on it, so the skill asks early.</div></li>
+    <li data-n="F"><div class="q">Which rule for the first and the last month: half-month, full month or pro-rata?</div><div class="why">Required, and the skill never uses a default. Accountants call it the convention. It changes every number.</div></li>
+    <li data-n="G"><div class="q">Which reporting framework: US GAAP, IFRS or local GAAP?</div><div class="why">Required. The framework decides how to treat parts of an asset, revaluation, and the reversal of an impairment.</div></li>
+    <li data-n="H"><div class="q">Which tax jurisdiction?</div><div class="why">Recommended. It explains the differences between tax and book. Tax depreciation is always manual work for your tax preparer.</div></li>
+    <li data-n="I"><div class="q">Any event that can reduce an asset's value? When did somebody last count the assets, and who?</div><div class="why">The ledger shows no such event. Only a count proves that the assets exist. The skill records the count as manual work, with its owner and date. If nobody ever counted, that is the finding.</div></li>
+  </ol>
+  <p>Your policies are yours to set and to review. Under IFRS, a business reviews the useful life, the salvage value and the method at least at each year-end<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill does not do that review. It asks for your lives at each run. Then it reads the plan back and waits for your yes. The skill's own example reads like this:</p>
+  <blockquote><i>"Running the fixed asset register for Northbrook Trading for September, with the ledger read from your Mosofin connection and the register from the spreadsheet you uploaded (412 assets). US GAAP; machinery 10 years and vehicles 5 years, straight-line; capitalization threshold $2,500; full-month convention. Last physical count December 2023, by the operations manager. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the ledger and your list</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It checks for a connected asset module or asset platform. Most accounting connections have none, and it tells you which case applies</li>
+        <li>It finds additions and sales from the debits and credits to the asset accounts. It asks you only for the reason for each sale and the money received</li>
+        <li>It reads whether accumulated depreciation is per class or in one account</li>
+        <li>You still give it your <b>list of assets</b>, the <b>class policies</b>, the <b>threshold</b>, the <b>convention</b> and the <b>framework</b>. Your books do not hold them</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the ledger, and your list if you have it</h3>
+      <ul>
+        <li><b>Trial balance or balance sheet</b>: cost and accumulated depreciation by account, at the start and end. CSV or XLSX, required</li>
+        <li><b>GL detail</b> for the asset, accumulated depreciation, depreciation expense, and gain or loss accounts. CSV or XLSX, required</li>
+        <li><b>Your list of assets</b>, or the accountant's depreciation schedule. CSV or XLSX, recommended. Without it, the skill makes a draft from the GL for you to check</li>
+        <li><b>GL detail for repairs, maintenance, small tools, equipment and computer expense</b>. CSV or XLSX, recommended, for the threshold scan</li>
+        <li><b>Purchase invoices</b> for the period's additions. PDF or image, recommended, for freight and installation</li>
+        <li>Typed in the chat, required: period, company name, currency, year-end, framework, class lives and methods, threshold and convention. Recommended: tax jurisdiction, sale reasons and amounts, impairment events, and the last count date and owner</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Eleven sheets, from the asset list to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Asset register</b><span>Each asset, with a Source column: from your list, or from a movement in the GL.</span></div>
+    <div class="get"><b>Depreciation schedule</b><span>Book value at the start, the period's charge and the book value at the end, for each asset.</span></div>
+    <div class="get"><b>Acquisitions</b><span>The period's additions from the GL, with the vendor and the document.</span></div>
+    <div class="get"><b>Disposals</b><span>Each sale, with the gain or loss calculation.</span></div>
+    <div class="get"><b>Roll-forward by class</b><span>Cost and accumulated depreciation, from the start to the end of the period.</span></div>
+    <div class="get"><b>GL tie-out</b><span>The two separate lists: on the list but not in the GL, and in the GL but not on the list.</span></div>
+    <div class="get"><b>Impairment review</b><span>Candidates from the ledger, marked as candidates.</span></div>
+    <div class="get"><b>GL posting</b><span>Every draft entry, marked as a proposal.</span></div>
+    <div class="get"><b>Tax-book differences</b><span>The differences from your accountant's tax figures, if they are material.</span></div>
+    <div class="get"><b>Threshold scan</b><span>Both directions: large items in expense, and small items in assets.</span></div>
+    <div class="get"><b>Coverage</b><span>What the skill read and how, and what you supplied. It has a row for the physical count, with its owner and date.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The skill asks before it makes an Excel file. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your class policies, your threshold with its start date, your convention and the account map. It also offers to save your framework, your salvage policy, and the count cadence and owner. It saves them only on an explicit yes. It never saves the asset list, the cost of each asset, book values, locations or serial numbers.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never uses a default useful life, salvage value, capitalization threshold or convention.</b> The class table in the skill is a range, not a policy.</li>
+      <li><b>Reports candidates, not conclusions.</b> It never says that a large repair is a capital item. It never decides impairment from ledger data. The policy decision is yours.</li>
+      <li><b>Never lets a clean tie-out to the GL stand as proof that the assets exist.</b> The physical count stays manual work, with an owner and a last date. It never saves the asset list, the cost of each asset, book values, locations or serial numbers.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Eight terms, in plain English</h2>
+  <dl>
+    <dt>Fixed asset</dt><dd>Something that the business owns and uses for years, and does not sell. Accountants also say PP&amp;E: property, plant and equipment.</dd>
+    <dt>Capitalize</dt><dd>Put a cost on the balance sheet, and do not charge it all to expense now.</dd>
+    <dt>Capitalization threshold</dt><dd>The amount below which an item goes to expense, however long it lasts. You set it for your books.</dd>
+    <dt>Depreciation</dt><dd>The part of an asset's cost that goes to expense in each period of its useful life<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Useful life and salvage value</dt><dd>How long you expect to use the asset, and what it will be worth at the end. Both are your estimates.</dd>
+    <dt>Accumulated depreciation</dt><dd>The total depreciation to date. It shows as a deduction from cost on the balance sheet.</dd>
+    <dt>Net book value</dt><dd>Cost minus the depreciation to date. It is not what the asset would sell for<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Convention</dt><dd>The rule for the first and last part-month: full month, half-month or pro-rata.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are three sections of two accounting textbooks, an IFRS standard and two IRS pages. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="straight-line, units-of-production and double-declining-balance sections"><a href="https://openstax.org/books/principles-financial-accounting/pages/11-3-explain-and-apply-depreciation-methods-to-allocate-capitalized-costs" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 11.3 Explain and Apply Depreciation Methods to Allocate Capitalized Costs</a><span class="what">Book depreciation. Straight-line spreads the cost less salvage evenly over the useful life. Each method gives different yearly amounts, but the same total over the life.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://openstax.org/books/principles-finance-2e/pages/4-4-when-should-a-company-capitalize-or-expense-an-item" rel="noopener">OpenStax: Principles of Finance 2e, 4.4 When Should a Company Capitalize or Expense an Item?</a><span class="what">Book cost. The recorded cost of an asset includes what makes it ready for use, for example shipping, taxes, installation and changes.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="sale of an asset"><a href="https://openstax.org/books/principles-financial-accounting/pages/11-5-describe-some-special-issues-in-accounting-for-long-term-assets" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 11.5 Describe Some Special Issues in Accounting for Long-Term Assets</a><span class="what">Book sales of assets. First, bring depreciation to the date of sale. Book value is cost less accumulated depreciation. The sale price against book value gives a gain, a loss or neither. The cash is not the same amount as the gain or loss.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="paragraphs 43–45 (parts), 58 (land), 51 and 61 (annual review)"><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2025/issued/ias16.html" rel="noopener">IFRS Foundation: IAS 16 Property, Plant and Equipment (2025 issued HTML)</a><span class="what">Book, under IFRS. Each significant part gets its own depreciation. With some exceptions, land has an unlimited life and gets no depreciation. A business reviews the life, the residual value and the method at least at each year-end. Northbrook uses US GAAP, where parts are optional.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="chapter on the section 179 deduction; MACRS conventions"><a href="https://www.irs.gov/publications/p946" rel="noopener">IRS: Publication 946 (2025), How To Depreciate Property</a><span class="what">Tax side only. The skill does not apply it. For 2026, the maximum section 179 deduction is $2,560,000. The limit falls when qualifying property in service in the year is more than $4,090,000.</span></li>
+    <li id="src6" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="de minimis safe harbor questions"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/tangible-property-final-regulations" rel="noopener">IRS: Tangible property final regulations (FAQ)</a><span class="what">Tax side only. The skill does not apply it. The de minimis safe harbor limit is $2,500 for each invoice or item without an applicable financial statement, and $5,000 with one. It is an annual election with the tax return.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the threshold scan, the implied-life check, the two-way tie-out, the eleven sheets or the manual-work labels. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. The textbooks and the IRS pages are US sources. IAS 16 is an international standard.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>fixed-asset-register-and-depreciation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/fixed-asset-register-and-depreciation">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and changes from a bookkeeping audit followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its assets and every figure in the example. They are not your data. Every depreciation figure on this page is a book figure. The IRS rules are US federal tax rules, and this page gives no tax advice. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
