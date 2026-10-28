@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financial Statement Builder Anatomy | MosoFin</title>
+<meta name="description" content="How the financial statement builder skill works on main: the card, seven reference files, the run stage by stage, its sources and the audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Financial statement builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">financial-statement-builder · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the financial statement builder skill, and what it does</h1>
+  <p class="lede">The skill was one 1,083-line file. On main it is now a 161-line card and seven reference files, 1,340 lines in total. Pull request #1 merged them on 26 October 2026. A bookkeeping-audit commit, 4d143f4, then changed the card and the method on 27 October 2026. Two things set this skill apart. It never takes the platform's own balance sheet as a finished statement, because that report always balances. And it reports seven tie-outs, each with its difference, and posts nothing. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows the audit: three findings fixed on main, one check passed, seven open findings and three open observations.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md on main, down from 1,083</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">829/831</span><span class="s">non-blank lines of the pre-split file, byte for byte. The other two are the description and one link path</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">33 · 11 · 37</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 23 · 6 · 13</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">10</span><span class="s">evidence tools named in 8 rows, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">3 fixed · 7 open</span><span class="s">fixes on main in afabe9b, 6342c41 and 4d143f4. Three observations are open too</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 161 lines instead of 1,083</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 508 lines, then mosofin-protocol.md at 262, gates.md at 145, edge-cases.md at 87, tools-and-glossary.md at 68, overview.md at 57 and output.md at 52.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · what it catches</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, rows A to I</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read and validate the TB</text>
+          <text x="48" y="272">Stage 4 · Build the statements</text>
+          <text x="48" y="312">Stage 5 · Seven tie-outs, deliver</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="160" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="89" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">145</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">508</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="53" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">87</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="32" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">52</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="35" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">57</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="41" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">68</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–12</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 12 and both entity scenarios. It has no section of validation scenarios. <b>edge-cases.md</b> holds 23 edge cases: 12 original and 11 Mosofin-specific. <b>output.md</b> holds 30 quality standards: 10 original and 20 Mosofin additions. <b>gates.md</b> holds Gates 0 to 3 and names the 7 workflow tools. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. A sync from the repository's single copy keeps it the same in each skill. <b>tools-and-glossary.md</b> names the 10 evidence tools and holds the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1318" role="img" aria-label="Stage 1 asks nine things in one message: Mosofin or upload, the framework and legal form, the period and columns, consolidated or separate for a group, the prior-year statements as issued, the debt schedules for the current portion, the rounding basis, by function or by nature, and special items such as EPS. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company files, settle the entity scenario, build the capability map and read the company profile. Otherwise the user uploads the trial balance at both period ends, the opening balance sheet and the general ledger detail for cash flows, the prior-year statements and the schedules. Both paths read back and wait for a yes. Stage 3: step 0 reads both periods in one batch on the same accounting method and checks the mock flag. Step 1 validates the trial balance and lists clearing and suspense balances as exceptions before mapping. Stage 4: steps 2 to 7 build the balance sheet with every account on exactly one line, the income statement, the comparatives, comprehensive income, the cash flow statement by the indirect method and the changes in equity. Stage 5: step 8 runs seven tie-outs, each with its difference, and tie-out 6 is manual. Steps 9 to 11 apply rounding and a footer, run quality checks and deliver nine sheets, after the skill asks before it makes a file. Stage 6: step 12 offers to save the framework, the mapping and the presentation choices, never balances, on an explicit yes.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+          <polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,430 230,474 400,474" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,430 690,474 520,474" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="498" x2="460" y2="534" marker-end="url(#a2)"/>
+          <line x1="460" y1="768" x2="460" y2="798" marker-end="url(#a2)"/>
+          <line x1="460" y1="1038" x2="460" y2="1068" marker-end="url(#a2)"/>
+          <line x1="460" y1="1202" x2="460" y2="1232" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · NINE ROWS IN ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="340" y="74"><tspan font-weight="600">B</tspan> Framework, legal form</text>
+            <text x="600" y="74"><tspan font-weight="600">C</tspan> Period and columns</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> Group: consolidated or separate</text>
+            <text x="340" y="100"><tspan font-weight="600">E</tspan> Prior year as issued, a file</text>
+            <text x="600" y="100"><tspan font-weight="600">F</tspan> Debt schedules</text>
+            <text x="80" y="126"><tspan font-weight="600">G</tspan> Rounding, never defaulted</text>
+            <text x="340" y="126"><tspan font-weight="600">H</tspan> By function or by nature</text>
+            <text x="600" y="126"><tspan font-weight="600">I</tspan> Special items, EPS</text>
+          </g>
+          <polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="292" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="342">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="366">G1  company files · entity scenario</text>
+            <text x="98" y="390">G2  tools · capability map</text>
+            <text x="98" y="414">G3  legal name, currency, year-end</text>
+          </g>
+          <rect x="540" y="292" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · 9 ROWS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="342">TB at both period ends, required</text>
+            <text x="558" y="366">Opening balance sheet, for cash flows</text>
+            <text x="558" y="390">GL for assets, loans and equity</text>
+            <text x="558" y="414">Prior year as issued, schedules</text>
+          </g>
+          <rect x="400" y="450" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="479" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="536" width="800" height="232" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="562" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–1 · READ BOTH PERIODS, THEN VALIDATE THE TB</text>
+          <text x="80" y="588" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="610">get_trial_balance · both period ends, same method</text>
+            <text x="80" y="630">search_accounts · names, numbers, types</text>
+            <text x="80" y="650">get_balance_sheet · get_profit_and_loss</text>
+            <text x="80" y="670">get_cash_flow_statement: cross-check only</text>
+            <text x="80" y="690">get_general_ledger · get_company_info</text>
+          </g>
+          <text x="80" y="720" font-size="13" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan> · debits = credits · every account typed · no type mismatch</text>
+          <text x="80" y="744" font-size="13" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan> · clearing and suspense balances listed as exceptions before mapping</text>
+          <rect x="620" y="582" width="222" height="58" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="731" y="604" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="731" y="624" text-anchor="middle" font-size="12" fill="var(--ink)">say so on every statement</text>
+          <rect x="620" y="650" width="222" height="58" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="731" y="672" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">TB does not balance?</text>
+          <text x="731" y="692" text-anchor="middle" font-size="12" fill="var(--ink)">fix it in another skill first</text>
+
+          <rect x="60" y="800" width="800" height="238" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="826" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–7 · BUILD THE STATEMENTS · + EDGE-CASES.MD</text>
+          <text x="80" y="854" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 2</tspan>  current or non-current · each account on exactly one line · re-prove the balance</text>
+          <text x="80" y="880" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 3</tspan>  income statement by function or by nature · check function tracking first</text>
+          <text x="80" y="906" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 4</tspan>  comparatives on the same basis · ledger prior year against the year as issued</text>
+          <text x="80" y="932" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 5</tspan>  comprehensive income · name the analysis for an AOCI balance</text>
+          <text x="80" y="958" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  cash flows, indirect method · loan flows gross · no plug</text>
+          <text x="80" y="984" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 7</tspan>  changes in equity · roll-forward of each component</text>
+          <text x="80" y="1010" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Edge cases</tspan>  discontinued operations · EPS · restated comparatives · going concern</text>
+
+          <rect x="60" y="1070" width="800" height="132" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="1096" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 8–11 · TIE OUT, PRESENT, DELIVER · + OUTPUT.MD</text>
+          <text x="80" y="1124" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 8</tspan>  seven tie-outs, each pass or fail with its difference · tie-out 6 is [manual]</text>
+          <text x="80" y="1150" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 9</tspan>  rounding · footer: entity, source, currency, rounding, mock status</text>
+          <text x="80" y="1176" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 10–11</tspan>  quality checks · nine sheets · ask before .xlsx or PDF</text>
+
+          <rect x="60" y="1234" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1260" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 12</tspan>: only after the results are shown, and only on an explicit yes</text>
+          <text x="80" y="1284" font-size="13.5" fill="var(--muted)">save the framework, the mapping, the rules and the rounding · never balances or figures</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="216" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. Row E asks for a file. Row D applies only to a group. The two red boxes show the mock rule and the unbalanced trial balance. The skill sends an unbalanced TB to <code>closing-entries-and-trial-balance</code>. Stage 4 also reads edge-cases.md, for example for a restated comparative. Step 12 runs only after the user saw the results.</figcaption>
+  </figure>
+  <p style="color:var(--muted);font-size:15px">The public pages use one worked example: Northbrook Trading, IFRS, USD, $000, year to 30 June 2026. The figures are the example's own, not real. The table shows the seven tie-outs from Step 8 on that example. The plain and learn pages use the same figures.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Tie-out</th><th>Northbrook, $000</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>The balance sheet balances, on the built statement</td><td>Assets 516 = liabilities 224 + equity 292</td><td>Pass, difference 0</td></tr>
+      <tr><td>2</td><td>Profit on the income statement = profit at the top of the cash flow</td><td>38 = 38</td><td>Pass, difference 0</td></tr>
+      <tr><td>3</td><td>Profit = profit in the RE column of the equity statement · OCI = AOCI movement</td><td>38 = 38 · 0 = 0</td><td>Pass, difference 0</td></tr>
+      <tr><td>4</td><td>Opening cash + three sections = balance-sheet cash</td><td>134 + 35 − 40 − 45 = 84</td><td>Pass, difference 0</td></tr>
+      <tr><td>5</td><td>Closing RE on the equity statement = RE line + current-year profit</td><td>242 = 204 + 38</td><td>Pass, difference 0</td></tr>
+      <tr><td>6</td><td>Comparatives = the FY2025 statements as issued</td><td>Compared line by line with the uploaded PDF</td><td>[manual], difference 0</td></tr>
+      <tr><td>7</td><td>Every statement in one currency</td><td>All five say USD, $000</td><td>Pass, 0 in another currency</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The platform's own balance sheet also totals 516 = 516. It shows the loan as one 120 line. The split from the schedule puts 40 in current liabilities, so they go from 104 to 144. Then the skill proves the balance again on the built statement. A variant on the learn page shows tie-out 6 as a fail. The ledger shows accrued expenses of 18 and the issued statements show 24, so the difference is 6.</p>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The sources are [1] OpenStax, Principles of Accounting 4.5. [2] IFRS Foundation, IAS 1. [3] IFRS Foundation, IAS 1 (2024 issued text). [4] SEC, Beginners' Guide to Financial Statements. [5] OpenStax, Principles of Accounting 16.3. [6] AICPA &amp; CIMA, Guide to financial statement services. [7] SBA, 7(a) Loan Application Checklist. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks rows A to I. Checks the workspace, the company files, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol, synced from one copy. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · row B</td><td>Asks for the framework and the legal form. Never defaults the framework</td><td>None. The user supplies them</td><td>[2] A complete set under IFRS holds four statements plus comprehensive income and notes, with comparatives. The example uses IFRS because the card's read-back does. A US company may choose US GAAP</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · rows E, F and G</td><td>Asks for the prior year as issued, the debt schedules and the rounding basis. Never defaults the split or the rounding</td><td>None. The user supplies them</td><td>[3] Paragraphs 69 and 71: a liability due within twelve months is current, and that includes the current portion of a long-term loan. The schedule says which part is due</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads both periods in one batch on the same accounting method. Checks the <code>mock</code> flag</td><td><code>get_trial_balance</code> <code>search_accounts</code> <code>get_balance_sheet</code> <code>get_profit_and_loss</code> <code>get_cash_flow_statement</code> <code>get_general_ledger</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue. The mock rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Checks that debits equal credits, every account has a type and no type mismatches. Lists clearing and suspense balances as exceptions before mapping</td><td>None beyond the reads</td><td>[1] The statements come from the adjusted trial balance. The exception list and the treatment of Ask My Accountant are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Classifies current and non-current. Maps each account to exactly one line. Proves the balance on the built statement</td><td><code>search_accounts</code></td><td>[2] Current and non-current items appear separately unless a liquidity order is more reliable. [3] The current portion of a loan is current. The mapping rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3</td><td>Builds the income statement by function or by nature. Checks function tracking before it promises by function</td><td><code>search_departments</code> <code>search_classes</code> <code>get_profit_and_loss</code></td><td>No outside authority on the pages. The rule is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4</td><td>Adds comparatives on the same basis. Compares the ledger's prior year with the statements as issued, and asks which governs if they differ</td><td><code>get_trial_balance</code></td><td>[2] IAS 1 requires comparatives for the preceding period. The check against the year as issued is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Adds comprehensive income. Names the analysis for an AOCI balance that it cannot explain</td><td>None beyond the reads</td><td>[2] The statement of profit or loss and other comprehensive income is part of a complete set</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Builds the cash flow statement by the indirect method. Shows loan flows gross. Uses no plug</td><td><code>get_general_ledger</code> <code>get_balance_sheet</code> <code>get_cash_flow_statement</code></td><td>[5] The indirect method starts with net income and adds back depreciation. Opening cash plus the net flow gives closing cash. [4] Profit and cash differ. The gross rule is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Rolls each equity component forward and agrees it to the balance sheet</td><td><code>get_general_ledger</code></td><td>[1] Net income goes into retained earnings</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Runs seven tie-outs, each pass or fail with its difference. Marks tie-out 6 [manual]</td><td>None beyond the reads</td><td>[4] The statements link to each other. [1] [5] The links behind tie-outs 3, 4 and 5. The seven tie-outs as a set are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 9</td><td>Applies one rounding basis. Puts a footer with entity, source, currency, rounding and mock status on each statement</td><td>None</td><td>[6] A compilation, a review and an audit give different levels of assurance. The footer names none of them (A7). The footer itself is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 10–11</td><td>Runs quality checks. Delivers nine sheets, each reclassification marked presentation only or a proposed entry. Asks before it makes a file. Writes no notes</td><td>None</td><td>[2] A complete set includes notes, and the skill writes none. [7] One lender's checklist also asks for a projection and tax returns, and the skill makes neither. The sheets are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 12</td><td>Offers to save the framework, the mapping, the rules, the rounding and the method. Never balances or figures</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/4-5-prepare-financial-statements-using-the-adjusted-trial-balance" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 4.5 Prepare Financial Statements Using the Adjusted Trial Balance</a></td><td>Net income goes into retained earnings (tie-outs 3 and 5)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://www.ifrs.org/issued-standards/list-of-standards/ias-1-presentation-of-financial-statements/" style="color:var(--mosofin)">IFRS Foundation: IAS 1 Presentation of Financial Statements</a></td><td>What a complete set holds, notes included. Comparatives. Current and non-current shown apart</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2024/issued/ias1.html" style="color:var(--mosofin)">IFRS Foundation: IAS 1 (2024 issued text, HTML)</a></td><td>Paragraphs 69 and 71: the current portion of a long-term loan is current</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.sec.gov/files/investor/pubs/begfinstmtguide.htm" style="color:var(--mosofin)">U.S. Securities and Exchange Commission: Beginners' Guide to Financial Statements</a></td><td>What each statement shows, and how the statements link</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/16-3-prepare-the-statement-of-cash-flows-using-the-indirect-method" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 16.3 Prepare the Statement of Cash Flows Using the Indirect Method</a></td><td>The indirect method, and opening cash plus net flow = closing cash (tie-outs 2 and 4)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://www.aicpa-cima.com/resources/download/guide-to-financial-statement-services-compilation-audit-and-review" style="color:var(--mosofin)">AICPA &amp; CIMA: Guide to financial statement services: compilation, review and audit</a></td><td>The three levels of CPA service, and why the package is management's own</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>7</td><td><a href="https://www.sba.gov/loans-grants/see-what-sba-offers/sba-loan-programs/general-small-business-loans-7a/7a-loan-application-checklist" style="color:var(--mosofin)">U.S. Small Business Administration: 7(a) Loan Application Checklist</a></td><td>Profit and Loss (P&amp;L) Statement: what one lender asks for</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the seven sources on 28 Oct 2026 through search results. Nobody opened the pages. Sources 2 and 3 are international. The other five are US. Some items have no outside authority behind them. They are the seven tie-outs, the nine sheets, the verdict tags, the footer, the mapping rule and every example figure. The worked example uses made-up figures. The public pages present these as the skill's rules or as the example's choices. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Three findings fixed on main, one check passed, seven findings open, and three observations</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>1,083 lines in one file</h3>
+      <p>F1. The split on main makes a card of 159 lines, now 161. The card holds the six rules that never bend, intake rows A to I, the upload checklist and six stages. The original text moved into <code>references/</code>. 829 of the 831 non-blank lines of the pre-split file are present byte for byte. The other two are the description and the link to <code>shared/onboarding.md</code>. The new description has 998 characters, against the limit of 1,024. The commit message counts "644 of 644 content lines" by its own rule.</p>
+      <span class="where">SKILL.md + references/ · fixed on main in 6342c41</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Seventeen lines named skills that are not in the library</h3>
+      <p>F2. The file named eight skills that are queued and not shipped, for example <code>notes-to-financial-statements</code> and <code>cash-flow-statement-indirect-method</code>. Commit afabe9b made each sentence stand on its own.</p>
+      <span class="where">SKILL.md, before the split · fixed on main in afabe9b</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The bookkeeping audit changed the run</h3>
+      <p>F3. An independent bookkeeper audit raised findings. Its commit, 4d143f4, reports 9 fixed, 0 partly fixed and 0 rejected. Before it, the cash flow and equity statements pointed to "a full procedure of its own" that did not exist. Steps 6 and 7 now write them out. Tie-outs 3, 4 and 5 changed. Intake asks for the columns, special-purpose bases and the legal form. Clearing and suspense balances are exceptions before mapping. Each reclassification now says presentation only or proposed entry.</p>
+      <span class="where">SKILL.md, method.md, overview.md · fixed on main in 4d143f4</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter reports 50 findings on SKILL.md on main, and 39 of them are hard. The hard findings are 18 long sentences, 19 semicolons and 2 actions with two different verbs. The longest sentences are in Stages 4 to 6, with 62, 52 and 41 words. The other 11 are advice: 9 possible passives and 2 compound tenses. This site did not change the skill.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. One skill named, and it is in the library</h3>
+      <p>The only skill that the files name is <code>closing-entries-and-trial-balance</code>, in the description and twice in method.md Step 1. That skill is in the library on main. No file names a skill outside the library.</p>
+      <span class="where">SKILL.md · front matter · method.md · Step 1 · no change needed</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A3. Leftovers from the bookkeeping-audit commit</h3>
+      <p>overview.md item 4 still says that the tie-outs "turn three reports into a statement package". The same file now lists five statements. In method.md Step 5, the new sentence on special-purpose bases sits between "Can be:" and its list. In Step 1, a blank line splits the new clearing-account bullet from the validation list. Intake B now offers special-purpose bases and asks the legal form. But the description, overview.md line 14 and the Gate 3 framework row still say only US GAAP, IFRS or local GAAP. Gate 3 does not ask the legal form. The read-back example does not echo the legal form or the columns.</p>
+      <span class="where">overview.md · method.md Steps 1 and 5 · gates.md Gate 3 · SKILL.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. The intake never asks the accounting method</h3>
+      <p>Neither Stage 1 nor Gate 3 asks for cash or accrual. But the read-back states "on the accrual basis". Steps 0 and 4 require the same method for both periods, and Step 12 saves it. Gate 3 also does not ask for the columns, row H or the legal form. The chat row of the upload checklist names the framework, period, rounding, scope, legal name and currency. It does not name the legal form, the columns, row H, the accounting method or the year-end.</p>
+      <span class="where">SKILL.md · Stage 1 · gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A5. Tie-out 5 does not name a dividends account</h3>
+      <p>Tie-out 5 compares closing retained earnings with the RE line plus current-year net income on the balance sheet. It does not name a dividends or distributions account that the books keep apart before closing, as QuickBooks often does. It also does not name owner's capital for an LLC or a partnership, although Step 2 gives that equity form. The worked example maps Dividends paid to the RE line, so the tie works: 204 + 38 = 242.</p>
+      <span class="where">references/method.md · Step 8 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A6. One file requires comprehensive income, and other files make it conditional</h3>
+      <p>Step 5 says that US GAAP and IFRS require it. overview.md adds "(where OCI exists)". Sheet 4 appears "if material OCI items exist". The description lists the statement with no condition. The worked example has no OCI, so it produces 8 of the 9 sheets.</p>
+      <span class="where">method.md Steps 5 and 11 · overview.md · SKILL.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A8. Comparative cash flows need a balance sheet that nobody asks for</h3>
+      <p>[2] IAS 1 wants comparatives for all statements. The comparative cash flow needs the balance sheet at the start of the comparative year. The intake and the upload checklist ask only for the start of the current period. The worked example takes the FY2025 cash flow and equity columns from the statements as issued.</p>
+      <span class="where">SKILL.md · upload checklist · method.md · Step 0 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. Step 11 contradicts itself, and the file name can hold a space</h3>
+      <p>Step 11 opens with "Deliver an .xlsx workpaper". Later it says to ask first and to make the file only on a yes. The name pattern inserts the <code>display_name</code> as it is. So "Northbrook Trading" gives <code>Financial_Statements_2026-06_Northbrook Trading.xlsx</code>, with a space.</p>
+      <span class="where">references/method.md · Step 11 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A7. Nothing labels the package as unaudited</h3>
+      <p>The footer from Step 9 names the entity, period, currency, rounding, source and mock status. It names no level of assurance. [6] A CPA can compile, review or audit statements, and each gives a different level of assurance. An owner who gives the package to a bank may want a label such as "prepared by management, unaudited". This is an observation. No source makes it a rule.</p>
+      <span class="where">references/method.md · Step 9 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A10. IFRS 18 follows IAS 1</h3>
+      <p>For presentation the skill names IAS 1 (Step 5). [2] The search results show IFRS 18 as the standard that follows IAS 1. The skill owner can check the effective date. This page states no date.</p>
+      <span class="where">references/method.md · Step 5 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A11. The description says "proves" all seven tie-outs</h3>
+      <p>The description says that the skill "proves the seven cross-statement tie-outs". Tie-out 6 is [manual] by the skill's own rule. So the skill cannot prove it alone. A word such as "reports" fits the rule.</p>
+      <span class="where">SKILL.md · front matter · open</span>
+    </div></div>
+  </div>
+  <p style="color:var(--muted);font-size:14.5px">History note for reviewers: 3daf0b2 and 8c5edb6 repeat afabe9b and 6342c41 on a second line of history. 3daf0b2 puts the 1,083-line file back, and 8c5edb6 splits it again. After 8c5edb6 the skill folder is the same as after 6342c41, so the result on main does not change. The message of 3daf0b2 says "109 line(s)" and gives an empty list of skill names.</p>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on a copy of main (31 skills, 0 failures), run on 28 Oct 2026. The shared-block sync check reports 31 skills in sync.</span></li>
+    <li><span class="ok">PASS</span><span>829 of the 831 non-blank lines of the pre-split file are present byte for byte. The two differences are the description and a relative link path.</span></li>
+    <li><span class="ok">PASS</span><span>All 21 relative links in the eight files on main resolve.</span></li>
+    <li><span class="ok">PASS</span><span>method.md has 13 Step headings, Steps 0 to 12, and each Step that the card names is there. Step 8 lists 7 tie-outs and Step 11 lists 9 sheets.</span></li>
+    <li><span class="ok">PASS</span><span>The card has 9 intake rows and a 9-row upload checklist. edge-cases.md has 23 edge cases and output.md has 30 standards.</span></li>
+    <li><span class="ok">PASS</span><span>"Never writes, updates or deletes anything" is in the card. The hard stop in mosofin-protocol.md lists four ways a write could slip through, and output.md checks that nothing was written.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 33 [auto], 11 [gated] and 37 [manual] in the eight files.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with a real trial balance. The audit did not read the tool catalogue. So nothing here shows which of the 10 evidence tool names Gate 2 would find. Nobody tested the <code>accounting_method</code> argument on both periods against a live platform. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/financial-statement-builder">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The commits for this skill on main are afabe9b (no reference to a skill outside the library) and 6342c41 (the split). Then come 3daf0b2 and 8c5edb6 (the same two changes again) and 14f616a (the Gates pointer names its file). Last is 4d143f4, the bookkeeping-audit changes of 27 Oct 2026. A live run, a catalogue read and fixes for A1, A3 to A6, A8, A9 and the observations are still to do.</footer>
+
+</div>

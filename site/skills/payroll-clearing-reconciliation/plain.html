@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Clearing Reconciliation in Plain English | MosoFin</title>
+<meta name="description" content="Why a payroll clearing account does not return to zero, how the skill ages what is stuck in it, and why unclaimed pay is never written off.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+  .chart text{font-family:Archivo,sans-serif}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll clearing reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Payroll clearing reconciliation, in plain words</span>
+  <h1>Why does the payroll clearing account not return to zero, and what is stuck in it?</h1>
+  <p class="lede">Each payroll creates amounts that you owe to <b>your staff</b>, <b>the tax authority</b>, <b>the 401(k) or pension provider</b> and sometimes <b>a court</b>. Each amount waits in its own account until you pay it. This skill finds what stays in those accounts, how old it is, and what it probably is.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a month and the payroll files. It ages every balance in your payroll accounts and tests if each account behaves as it should. It finds the old amounts that never left, and says what each one probably is. It suggests a correction for each item. It never pays anything, never writes off money that a person owns, and never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Where the money goes</span>
+  <h2>A waiting room for net pay, and a separate account for each amount you hold</h2>
+  <p>When you record a payroll, the net pay for your staff goes into a waiting room in your books. When the bank pays your staff, the same amount leaves the waiting room. So after each pay run, the waiting room is empty again. Accountants call it the payroll clearing account.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 780 330" role="img" aria-label="Northbrook's 30 September pay run. Net pay of 36,600 goes into payroll clearing account 2200 when the payroll is recorded. The bank pays 36,600 to staff on the same day, so 2200 returns to nil. The amounts that Northbrook holds for others in September go to their own accounts: federal taxes 14,400 in 2210, 401(k) 3,700 in 2230 and state unemployment 150 in 2240. They stay there until Northbrook pays the IRS, the 401(k) provider and the state.">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="2" color="var(--rule-strong)">
+          <line x1="176" y1="70" x2="236" y2="70" marker-end="url(#ar)"/>
+          <line x1="466" y1="70" x2="526" y2="70" marker-end="url(#ar)"/>
+          <path d="M96 120 C 96 200, 180 230, 236 230" marker-end="url(#ar)"/>
+          <line x1="466" y1="230" x2="526" y2="230" marker-end="url(#ar)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="16" y="20" width="160" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="96" y="48" text-anchor="middle" font-size="13" fill="var(--muted)">Payroll recorded</text>
+          <text x="96" y="80" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">36,600</text>
+          <text x="96" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">net pay, 30 September</text>
+
+          <rect x="238" y="20" width="228" height="100" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="352" y="46" text-anchor="middle" font-size="13" fill="var(--green)">Waiting room: clearing 2200</text>
+          <text x="352" y="78" text-anchor="middle" font-size="22" font-weight="800" fill="var(--ink)">+36,600 −36,600</text>
+          <text x="352" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">= nil after the run</text>
+
+          <rect x="528" y="20" width="236" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="646" y="48" text-anchor="middle" font-size="13" fill="var(--muted)">The bank</text>
+          <text x="646" y="80" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">pays staff 36,600</text>
+          <text x="646" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">on the same day</text>
+
+          <rect x="238" y="160" width="228" height="140" rx="12" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="352" y="186" text-anchor="middle" font-size="13" fill="var(--hold)">Held for others, September</text>
+          <text x="352" y="216" text-anchor="middle" font-size="15" fill="var(--ink)">2210 federal taxes 14,400</text>
+          <text x="352" y="242" text-anchor="middle" font-size="15" fill="var(--ink)">2230 401(k) 3,700</text>
+          <text x="352" y="268" text-anchor="middle" font-size="15" fill="var(--ink)">2240 state unemployment 150</text>
+          <text x="352" y="290" text-anchor="middle" font-size="12" fill="var(--muted)">owed until paid</text>
+
+          <rect x="528" y="180" width="236" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="646" y="208" text-anchor="middle" font-size="13" fill="var(--muted)">Paid on each due date</text>
+          <text x="646" y="240" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">IRS, 401(k) provider</text>
+          <text x="646" y="262" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">and the state</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, Northbrook Trading, in dollars. The September figures include the bonus run of 15 September. Every tax figure comes from Northbrook's payroll provider report, and the page uses no tax rate. When you pay an amount that you owe, the payable in your books goes down by that amount<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Accountants call these accounts payroll control accounts.</figcaption>
+  </figure>
+  <p>So each payroll account has a correct shape. The clearing account must return to nil after each run. A tax account must hold about one month of taxes if you pay monthly. If an amount stays when it should leave, a payment did not occur, or an entry is wrong.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>4,023.40 in Northbrook's clearing account, from five items</h2>
+  <p>Northbrook pays its staff on the last business day of each month. A payroll provider calculates the pay. On Monday 19 October, the owner runs the skill for September 2026. The skill reads twelve months of entries on the clearing account, 2200, to Wednesday 30 September. Normal pay runs leave nothing. These movements did not net to nil:</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The movements in Northbrook's clearing account 2200 that did not net to nil in the twelve months to 30 September 2026, with the balance after each">
+        <thead><tr><th scope="col" style="text-align:left">Date</th><th scope="col" style="text-align:left">What happened</th><th scope="col" style="text-align:left">Reference</th><th scope="col">Amount</th><th scope="col">Balance after</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Before 1 Oct 2025</th><td class="t">An old balance from earlier books. The twelve months show no detail for it</td><td class="t">none</td><td>23.40</td><td>23.40</td></tr>
+        <tr><th scope="row">3 Feb 2026</th><td class="t">A direct deposit from the 30 January run came back because the account no longer existed. Nobody paid it again</td><td class="t">EE-03</td><td>640.00</td><td>663.40</td></tr>
+        <tr><th scope="row">30 Apr 2026</th><td class="t">Final pay in the April run, held because of a dispute about the final settlement</td><td class="t">EE-05</td><td>1,150.00</td><td>1,813.40</td></tr>
+        <tr><th scope="row">30 Jun 2026</th><td class="t">Payroll check #1987 from the 31 October 2025 run. Nobody cashed it, and it became void as stale</td><td class="t">EE-11</td><td>410.00</td><td>2,223.40</td></tr>
+        <tr><th scope="row">4 Aug 2026</th><td class="t">A direct deposit from the 31 July run came back</td><td class="t">EE-07</td><td>1,250.00</td><td>3,473.40</td></tr>
+        <tr><th scope="row">6 Aug 2026</th><td class="t">Northbrook paid it again as check #2214</td><td class="t">EE-07</td><td>−1,250.00</td><td>2,223.40</td></tr>
+        <tr class="breach"><th scope="row">24 Sep 2026</th><td class="t">Manual entry JE-0912, memo "reclass contractor". No payroll run is behind it</td><td class="t">JE-0912</td><td>1,800.00</td><td>4,023.40</td></tr>
+        <tr class="tot"><th scope="row">30 Sep 2026</th><td class="t">Balance in the books</td><td class="t"></td><td></td><td>4,023.40</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. 23.40 + 640 + 1,150 + 410 + 1,250 − 1,250 + 1,800 = 4,023.40. EE-03, EE-05, EE-07 and EE-11 are reference numbers. The skill never shows a name, and it shows a person's item only by its reference.</figcaption>
+  </figure>
+  <figure>
+    <div class="canvas chart">
+      <svg viewBox="0 0 780 300" role="img" aria-label="Balance of clearing account 2200 from 1 October 2025 to 30 September 2026. It starts at 23.40 and never falls below it. It rises to 663.40 on 3 February, 1,813.40 on 30 April and 2,223.40 on 30 June. It rises to 3,473.40 on 4 August and falls back to 2,223.40 on 6 August. It ends at 4,023.40 after JE-0912 on 24 September. It never returns to nil.">
+        <g stroke="var(--rule)" stroke-width="1">
+          <line x1="70" y1="250" x2="750" y2="250"/>
+          <line x1="70" y1="205.6" x2="750" y2="205.6"/>
+          <line x1="70" y1="161.1" x2="750" y2="161.1"/>
+          <line x1="70" y1="116.7" x2="750" y2="116.7"/>
+          <line x1="70" y1="72.2" x2="750" y2="72.2"/>
+        </g>
+        <g font-size="12" fill="var(--faint)" text-anchor="end">
+          <text x="62" y="254">0</text><text x="62" y="209.6">1,000</text><text x="62" y="165.1">2,000</text><text x="62" y="120.7">3,000</text><text x="62" y="76.2">4,000</text>
+        </g>
+        <g font-size="12" fill="var(--faint)" text-anchor="middle">
+          <text x="70" y="272">Oct</text><text x="184" y="272">Dec</text><text x="299.8" y="272">Feb</text><text x="410" y="272">Apr</text><text x="524" y="272">Jun</text><text x="637.9" y="272">Aug</text><text x="750" y="272">30 Sep</text>
+        </g>
+        <path d="M70 249 H303.5 V220.5 H464.2 V169.4 H578.1 V151.2 H643.5 V95.6 H647.3 V151.2 H738.8 V71.2 H750" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round"/>
+        <g fill="var(--green)" stroke="var(--panel)" stroke-width="2">
+          <circle cx="303.5" cy="220.5" r="4.5"><title>3 Feb 2026, EE-03: balance 663.40</title></circle>
+          <circle cx="464.2" cy="169.4" r="4.5"><title>30 Apr 2026, EE-05: balance 1,813.40</title></circle>
+          <circle cx="578.1" cy="151.2" r="4.5"><title>30 Jun 2026, EE-11: balance 2,223.40</title></circle>
+          <circle cx="643.5" cy="95.6" r="4.5"><title>4 Aug 2026, EE-07 deposit came back: balance 3,473.40</title></circle>
+          <circle cx="738.8" cy="71.2" r="4.5" fill="var(--wrong)"><title>24 Sep 2026, JE-0912: balance 4,023.40</title></circle>
+        </g>
+        <g font-size="12.5" fill="var(--muted)">
+          <text x="80" y="238">Lowest point 23.40: it never cleared</text>
+          <text x="310" y="212">EE-03</text>
+          <text x="470" y="161">EE-05</text>
+          <text x="520" y="142">EE-11</text>
+          <text x="560" y="88">EE-07 out and back</text>
+          <text x="626" y="60" fill="var(--wrong)">JE-0912</text>
+          <text x="742" y="60" text-anchor="end" font-weight="700" fill="var(--ink)">4,023.40</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The clearing account balance at the end of each day. Pay runs that net to nil do not show. The line never touches nil in twelve months, so the account fails the behaviour test.</figcaption>
+  </figure>
+  <p>The skill then sorts the 4,023.40 by age, in months before September. It ages each item from the run or entry that its memo names. Where a memo names nothing, it uses the oldest first, and it states which method it used.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">This month</span><span class="v num wrong">1,800.00</span><span class="s">JE-0912, 6 days old</span></div>
+    <div class="stat"><span class="label">1 to 2 months</span><span class="v num good">0.00</span><span class="s">Nothing in this band</span></div>
+    <div class="stat"><span class="label">3 to 6 months</span><span class="v num hold">1,560.00</span><span class="s">410 from June + 1,150 from April</span></div>
+    <div class="stat"><span class="label">Over 6 months</span><span class="v num hold">663.40</span><span class="s">640 from February + 23.40 from before October 2025</span></div>
+  </div>
+  <p>1,800 + 0 + 1,560 + 663.40 = 4,023.40. Four items are older than 60 days, the skill's limit for a clearing account. The skill reports them as a total first: 2,223.40 in four items, more than 60 days in payroll clearing. The oldest is from before October 2025. JE-0912 is only 6 days old. The skill still lists it, because a manual entry with no payroll run behind it does not belong in this account.</p>
+  <p class="muted" style="font-size:15px">The owner's question, in one line: 2200 does not return to zero because 4,023.40 of five items never left it. Two are unpaid wages that people own (1,050.00). One is a disputed final pay (1,150.00). One is an entry with no pay run behind it (1,800.00). The last 23.40 has no known origin.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>A month that looks explained, on top of 2,223.40 that nobody explained</h2>
+  <p>The usual monthly check compares the account with last month. The balance went from 2,223.40 to 4,023.40, and JE-0912 explains the 1,800. The skill uses a different test. A clearing account must be nil after the run, so it compares the balance with nil.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">Expected balance for a clearing account: nil</span>
+      <div class="rows num">
+        <div class="row same"><span>Books on 30 September</span><span class="v">4,023.40</span></div>
+        <div class="row"><span>Expected</span><span class="v">0.00</span></div>
+        <div class="row off"><span>Difference to explain</span><span class="v">4,023.40</span></div>
+        <div class="row"><span>Items found</span><span class="v">5</span></div>
+      </div>
+      <div class="verdict">All 4,023.40 is in the list of items: 23.40 + 640 + 1,150 + 410 + 1,800. The status is "investigating".</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Start balance, plus pay recorded, less pay paid</span>
+      <div class="rows num">
+        <div class="row"><span>2,223.40 + 40,800 − 40,800</span><span class="v">2,223.40</span></div>
+        <div class="row same"><span>Books on 30 September</span><span class="v">4,023.40</span></div>
+        <div class="row"><span>Difference to explain</span><span class="v">1,800.00</span></div>
+        <div class="row off"><span>Old items</span><span class="v">not checked</span></div>
+      </div>
+      <div class="verdict">JE-0912 explains the month. The 2,223.40 from earlier months looks normal, because the calculation started with it.</div>
+    </div>
+  </div>
+  <p>The skill also finds the lowest point of the balance in twelve months. At Northbrook that is 23.40. It is the part that never cleared at any time. The other 4,000.00 came into the account inside the twelve months, so the lowest point cannot show it. The age bands and the 60-day test show it. The skill reports all three results before any other work.</p>
+</section>
+
+<section>
+  <span class="label">The second mistake</span>
+  <h2>The federal tax account agrees with the books, and it holds two months</h2>
+  <p>The same tests apply to each account for amounts that you hold for others. A tax account that you pay monthly must hold about one month of taxes at a month end. Northbrook deposits federal taxes monthly, by the 15th of the next month. If the 15th is not a business day, the deadline moves to the next business day<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Under Publication 15 (2026), an employer is a monthly depositor if its taxes for a lookback period were $50,000 or less<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's three liability accounts for September 2026: start balance, amount owed, amount paid, books and the result of the behaviour test">
+        <thead><tr><th scope="col" style="text-align:left">Account</th><th scope="col">Start</th><th scope="col">+ Owed</th><th scope="col">− Paid</th><th scope="col">Books</th><th scope="col" style="text-align:left">What the skill says</th></tr></thead>
+        <tbody>
+        <tr class="breach"><th scope="row">2210 Federal payroll taxes</th><td>12,600</td><td>14,400</td><td>0</td><td>27,000</td><td class="t w">Agrees with the books. It should hold one month, 14,400. It holds 12,600 more, and no payment left in September</td></tr>
+        <tr><th scope="row">2230 401(k)</th><td>3,400</td><td>3,700</td><td>3,400</td><td>3,700</td><td class="t h">Agrees, and holds one month. Due 7 October</td></tr>
+        <tr><th scope="row">2240 State unemployment</th><td>−300</td><td>150</td><td>0</td><td>−150</td><td class="t a">Agrees, and is below zero. Northbrook paid 600 twice, on 30 July and 3 August</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. 12,600 + 14,400 − 0 = 27,000. 27,000 − 14,400 = 12,600, the August taxes, due 15 September and not paid.</figcaption>
+  </figure>
+  <p>The roll-forward of 2210 gives a difference of zero, so the account looks reconciled. The skill does not accept a zero difference as proof. The expected figure came from the same entries as the books, so the zero proves only the arithmetic. The behaviour test shows the problem: the account grew, and it did not drop in September. The September 14,400 is not due until Thursday 15 October. The skill documents it as timing and proposes no correction for it.</p>
+  <p>The 12,600 is only 30 days old on 30 September, so the age test does not catch it yet. The behaviour test does. The days past due and the filings belong to a different skill, <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a>. Part of the 12,600 is money that Northbrook took from its staff's pay. In the US, a person who must pay that money and willfully does not pay it can be personally liable<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. This page is not legal advice.</p>
+</section>
+
+<section>
+  <span class="label">What it suggests</span>
+  <h2>Unclaimed pay stays a debt to a person</h2>
+  <p>An easy correction is to write off the whole 4,023.40 so that the account shows zero. The skill refuses that. 1,050.00 of it is pay that two people own: the deposit that came back (640) and the check that nobody cashed (410). That money belongs to the employee until it belongs to the state. For example, in California, payroll and wages become unclaimed property after one year, and a business that holds unclaimed property must report it each year<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Other states have different periods and rules. Before a report, California expects the holder to send a letter to the owner's last address<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="The proposals for Northbrook in September 2026: what each one does, the amount, and who decides">
+        <thead><tr><th scope="col" style="text-align:left">Item</th><th scope="col">Amount</th><th scope="col" style="text-align:left">Suggested treatment</th><th scope="col" style="text-align:left">Who acts</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">EE-03 and EE-11, unclaimed pay</th><td>1,050.00</td><td class="t">Move it out of clearing to a separate account for unclaimed wages, 2260. Never to income. The skill flags the unclaimed property duty as a compliance matter</td><td class="t">The owner tries to contact each person, and decides on unclaimed property with an adviser</td></tr>
+        <tr><th scope="row">Origin unknown</th><td>23.40</td><td class="t">Write it off to other income, under the 50.00 limit of the owner. Only after a request for older records, and only if nobody can identify a person</td><td class="t">The owner approves</td></tr>
+        <tr class="breach"><th scope="row">JE-0912</th><td>1,800.00</td><td class="t">If it is a contractor's bill, move it to accounts payable, 2000. If it is wages, the payroll records and filings are short</td><td class="t">The owner and the accountant decide</td></tr>
+        <tr><th scope="row">EE-05, disputed final pay</th><td>1,150.00</td><td class="t">No entry. It stays under investigation until the dispute ends</td><td class="t">The owner</td></tr>
+        <tr class="breach"><th scope="row">2210, August taxes</th><td>12,600</td><td class="t">A payment to make. No entry</td><td class="t">The owner pays the IRS</td></tr>
+        <tr><th scope="row">2240, below zero</th><td>−150</td><td class="t">A refund to claim from the state, or a prepayment. First get the state's statement of account</td><td class="t">The owner</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Every line is a proposal. Account numbers 2260, 2000 and 7900 (other income) are the example's choice. If the owner posts the first three: 4,023.40 − 1,050.00 − 23.40 − 1,800.00 = 1,150.00 stays in 2200, the disputed final pay only.</figcaption>
+  </figure>
+  <p>An account for amounts you owe goes down only when you pay them, or when the creditor releases you. So the skill never writes off a tax or benefit balance without a statement from the authority or provider. A small write-off is a one-time step. If the same small write-off occurs each month, the skill reports it as a fault in the process.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Eight items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. Items E, F and H are requests for files.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools.</div></li>
+    <li><div class="q">Which company, and which payroll accounts: clearing, suspense, and each account for amounts that you hold or owe?</div><div class="why">It does one reconciliation for each account, and each company has its own clearing account. On the MosoFin path, it shows the payroll accounts from your chart, and you approve the list. It never picks a company for you.</div></li>
+    <li><div class="q">Which period?</div><div class="why">Required. Every read and every roll-forward uses it.</div></li>
+    <li><div class="q">How often do you pay each amount that you hold: monthly, twice a week, each quarter?</div><div class="why">Required. The correct balance of each account depends on it. The skill never guesses it. Without it, the behaviour test has nothing to compare with.</div></li>
+    <li><div class="q">Please give the payroll register for the period.</div><div class="why">Required. The register is the report from your payroll software, and it shows what each run owed. If you cannot give it, the skill uses your payroll entries in its place and says so. Then the result proves only that the account moved as the entries say.</div></li>
+    <li><div class="q">Please give the bank statement for the period.</div><div class="why">The statement proves that the money left. Without it, the skill compares with the payments in your books and says so.</div></li>
+    <li><div class="q">What is your limit for a write-off, and who approves one?</div><div class="why">The limit separates a small leftover from one that needs a correction. The skill never sets a write-off for you.</div></li>
+    <li><div class="q">If you want a balance cleared, please give the statement of account from the tax authority, pension or benefit provider.</div><div class="why">Recommended, and required before any write-off on those accounts. A leftover on them is usually a payment to make or a refund to claim.</div></li>
+  </ol>
+  <p>Northbrook's owner uploaded the files. The owner gave a limit of 50.00 and approves each write-off. The skill found one more account with payroll entries, 2250 Accrued payroll, and asked about it. The owner reviews 2250 with the month-end accruals, so the workpaper names it as excluded, with that reason. Then the skill reads the plan back and waits for a yes. The skill's own sample is for a UK company. For this US example, it reads like this:</p>
+  <blockquote><i>"Reconciling the payroll control accounts of Northbrook Trading for September 2026 (payroll clearing 2200, federal payroll taxes 2210, 401(k) 2230 and state unemployment 2240) from the files you uploaded: GL detail for the last twelve months, trial balances at 31 August and 30 September, the September payroll register, the remittance records and the September bank statement. The accrual side uses the register. Federal taxes remitted monthly by the 15th, 401(k) monthly by the 7th, state unemployment quarterly. The bank tie-out is to the bank statement. Shall I go ahead?"</i></blockquote>
+  <p>It never repeats one person's line back to you.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect your books, or upload seven items</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>It reads the books, and you supply the rest</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It checks if a payroll platform is also connected. If yes, it reads the register too. If no, it says so</li>
+        <li>It shows the payroll accounts from your chart, and you approve the list</li>
+        <li>It reads the balances of each account at both ends of the period. It also reads every entry and its age, the payroll entries, and the payments by payee and date</li>
+        <li>It reads the payments, but not the authority's receipt. You still give it the <b>payment schedules</b>, the <b>register</b> if you have no payroll platform connection, the <b>bank statement</b> and the <b>statements of account</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>The checklist that the skill gives you</h3>
+      <ul>
+        <li><b>Entries on each payroll account</b> for the period and the twelve months before it, CSV or XLSX. Also the balances at this and the last period end. A trial balance works. Required</li>
+        <li><b>Payroll register</b> for the period, CSV, XLSX or PDF. Required. Without it, your payroll entries are the stated substitute</li>
+        <li><b>Payment records</b>: payee, date, amount, CSV or XLSX. Required</li>
+        <li>Company name, country or region, currency, the period, the account list and how often you pay each account, typed in the chat. Required</li>
+        <li><b>Bank statement</b> for the period, PDF or CSV. Recommended</li>
+        <li><b>Benefit provider statements</b> and <b>last period's reconciliation</b>, PDF, CSV or XLSX. Recommended</li>
+        <li><b>Write-off limit</b>, typed in the chat. Recommended</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="font-size:15px">This was Northbrook's first run, so no earlier reconciliation existed. The workpaper says so and takes the start balance from the trial balance at 31 August. Net pay agreed with the bank statement on both September pay dates: 4,200.00 on 15 September and 36,600.00 on 30 September.</p>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>A workpaper with nine sheets</h2>
+  <div class="gets">
+    <div class="get"><b>One sheet for each account</b><span>Four at Northbrook. Each has the books, the expected balance and its basis, the difference, the status, the age bands and the lowest point.</span></div>
+    <div class="get"><b>Master summary</b><span>Each account with its books, expected balance, difference, status and if an item is over your limit.</span></div>
+    <div class="get"><b>Bank tie-out</b><span>Net pay for each pay date, and each tax and benefit payment for its deposit period. It says if it used the bank statement or your books.</span></div>
+    <div class="get"><b>Stale balances</b><span>Each old amount with its age, item count, probable cause, suggested treatment and if unclaimed property rules can apply.</span></div>
+    <div class="get"><b>Proposed entries</b><span>Corrections as proposals only, for a person to post.</span></div>
+    <div class="get"><b>Coverage</b><span>For each task, where the figures came from and on which date.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The summary has lines for the preparer and the reviewer, and the answer ends with a Data sources line. The skill asks before it makes an Excel file, Payroll_Recs_2026-09_Northbrook Trading.xlsx. If you say no, you get the same sheets as tables in the chat. After you approve the results, it offers to save your rules for the next run: account list, payment schedules, payroll calendar, write-off limit and payees. It never saves balances, ages, open items or anybody's pay.</p>
+  <p class="muted" style="font-size:15px">Other jobs go to other skills. <code>payroll-reconciliation</code> checks days past due, penalties and the filings. <code>journal-entry-builder</code> builds the proposed entries. <code>payroll-journal-entry-builder</code> builds the payroll entry itself.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the eight items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry it produces is a proposal for a person to post. It cannot pay a tax, send a letter to an employee or decide about unclaimed property.</li>
+      <li><b>Payroll data is personal.</b> It reconciles the balance, not the people. It reports totals and counts, names a person's item by a reference number only, and never saves anybody's pay.</li>
+      <li><b>Never writes off what a person owns.</b> Unclaimed pay never goes to income, and the skill flags unclaimed property as a compliance duty. It never sets a payment schedule, a write-off or an unclaimed property treatment for you.</li>
+      <li><b>A nil balance is not a reconciled account.</b> It always states the basis of each expected balance, and if it compared with the bank statement or with the payments in your books.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Payroll clearing account</dt><dd>A waiting room in your books between "payroll recorded" and "payroll paid". It must return to nil after each pay run.</dd>
+    <dt>Payroll control account</dt><dd>Any account that holds a payroll amount until you pay it: clearing, taxes, 401(k) or pension, and court orders. Your books show each one as a payable<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Withholding</dt><dd>Money that you take from pay for somebody else, for example tax or a 401(k). It is never the employer's money<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Remittance schedule</dt><dd>How often you must pay a withholding to its owner. The authority sets it, and it decides the correct balance of the account<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Stale balance</dt><dd>An amount that stays in a payroll account long after it should leave. For a clearing account, the skill uses 60 days.</dd>
+    <dt>Never-clearing residual</dt><dd>The lowest point that the balance reached in twelve months. It is the part that never left at any time.</dd>
+    <dt>Unclaimed pay, and escheatment</dt><dd>Pay that a person did not collect stays theirs. After a period in the law of the state, the holder reports it and gives it to the state<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an accounting textbook, two IRS pages and two pages from the California State Controller's Office. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="paying salaries payable; employer payroll taxes and benefits"><a href="https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll</a><span class="what">When a company pays wages that it owes, the payable goes down and so does cash. Payroll taxes, benefits and deductions follow the same pattern: they stay payables until the company pays them.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="section 11, Depositing Taxes (monthly schedule)"><a href="https://www.irs.gov/publications/p15" rel="noopener">IRS (US): Publication 15 (2026), (Circular E), Employer's Tax Guide</a><span class="what">The deposit schedule comes from a lookback period. In the 2026 edition, $50,000 or less makes a monthly depositor. A monthly depositor deposits by the 15th of the next month, or the next business day.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes-and-the-trust-fund-recovery-penalty-tfrp" rel="noopener">IRS (US): Employment taxes and the Trust Fund Recovery Penalty (TFRP)</a><span class="what">A person who must pay the taxes withheld from employees, and willfully does not pay them, can be personally liable. This is a US rule.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="dormancy periods"><a href="https://sco.ca.gov/upd_reporting_portal_faq.html" rel="noopener">California State Controller's Office (US, one state): Unclaimed Property, Holder Reporting, Frequently Asked Questions</a><span class="what">In California, payroll, wages and commissions become unclaimed after one year, and most other property after three years. A business that holds unclaimed property reports it each year. Other states have different periods and rules.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://sco.ca.gov/Files-UPD/upd_duediligence.pdf" rel="noopener">California State Controller's Office (US, one state): Holder Due Diligence</a><span class="what">Before a report, the holder sends a letter to the owner's address on record for property of $50 or more. If the owner replies, the holder pays the owner and does not give the property to the state.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the age bands, the 60-day limit, the lowest-point test, the nine causes, the workpaper sheets or the order of the work. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. Every tax figure in it comes from Northbrook's payroll provider report. The page states no tax rate, no wage cap and no unclaimed property period for Northbrook.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>payroll-clearing-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-clearing-reconciliation">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and corrections from a bookkeeping audit followed on 27 October 2026. This page describes that version. The skill works in any country. This example is in the US, and it continues the <a href="../payroll-reconciliation/plain.html">payroll reconciliation example</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its staff and every figure in the example. They are not your data. The deposit rules are US rules, and the unclaimed property rules are an example from one state. Other states and countries have their own. This page is not legal or tax advice. Ask your accountant, your payroll adviser or your state's unclaimed property office what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

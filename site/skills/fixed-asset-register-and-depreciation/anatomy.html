@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixed Asset Register and Depreciation Anatomy | MosoFin</title>
+<meta name="description" content="How the fixed asset register and depreciation skill is built on main: the card, seven reference files, the run, its sources and the audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Fixed asset register and depreciation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">fixed-asset-register-and-depreciation · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the fixed asset register and depreciation skill, and what it does</h1>
+  <p class="lede">The skill was one 1,102-line file. On main it is now a 161-line card and seven reference files. Commit ad090c2 made the split on 25 October 2026, and pull request #1 merged it on 26 October 2026. A bookkeeping-audit commit, 2d1ec7d, then changed the method on 27 October 2026. The skill computes book depreciation only, from the owner's own lives, salvage, method and convention. Tax depreciation is <code>[manual]</code> and goes to the tax preparer. It also reconciles in two directions and posts nothing. This page shows how the files connect, the run stage by stage, and the source behind each step. It also shows the audit: four commits with fixes on main, one check that main passes, and twelve open findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md on main, down from 1,102</span></div>
+    <div class="stat"><span class="k">Content kept</span><span class="v">826/828</span><span class="s">non-blank lines of the pre-split file, byte for byte, at ad090c2. The other two are the description and one link path</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">37 · 9 · 34</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 25 · 5 · 12</span></div>
+    <div class="stat"><span class="k">Description</span><span class="v">1,004</span><span class="s">characters of the limit of 1,024, so 20 to spare. Before the split it had 1,033</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">4 fixed · 12 open</span><span class="s">fixes on main in ad090c2, bed401b, 14f616a and 2d1ec7d. One more check passed</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 161 lines instead of 1,102</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. Each stage points to one reference file: rules to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md, stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 529 lines, then mosofin-protocol.md at 262, gates.md at 142, edge-cases.md at 101, tools-and-glossary.md at 66, overview.md at 56 and output.md at 51.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · what it cannot read</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, A to I with D2</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read ledger, map classes</text>
+          <text x="48" y="272">Stage 4 · Capitalize, depreciate</text>
+          <text x="48" y="312">Stage 5 · Tie out both ways</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="154" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="83" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">142</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">529</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="59" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">101</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="30" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">51</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="33" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">56</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="39" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">66</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="440" y="300">Steps 0–13, 2b</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries 15 step sections (Steps 0 to 13 plus Step 2b), the 11 output sheets and both entity scenarios. <b>edge-cases.md</b> holds 29 edge cases, 14 of them Mosofin-specific. <b>gates.md</b> holds Gates 0 to 3 and the 14-row Gate 3 interview. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. <b>output.md</b> lists 9 original quality standards and 21 Mosofin standards. <b>tools-and-glossary.md</b> names 7 Mosofin workflow tools and 8 rows of typical evidence tools, and holds the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1262" role="img" aria-label="Stage 1 asks ten things in one message: A, Mosofin or upload. B, the period. C, the existing register. D, the life, method and salvage policy per class. D2, own book policy or the tax figure. E, the capitalization threshold. F, the convention. G, the framework. H, the tax jurisdiction. I, impairment triggers and the last physical count with its owner. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, check for a fixed-asset module, build the capability map and interview the user. Otherwise the user uploads from a seven-row checklist: the trial balance and GL detail are required, the register, the expense GL and the invoices are recommended, and the policies are typed in. Both paths read back and wait for a yes. Stage 3: step 0 reads the evidence in one batch from the cost accounts only, and stops on mock data. Step 1 maps classes to accounts and checks that land carries no accumulated depreciation. Stage 4: steps 2 to 8 test capitalization, run the threshold scan both ways, apply the owner's book method and convention, cap the charge at cost less salvage, compare the implied rate, draft proposals and check disposals for the half-entry error. Tax depreciation is manual and goes to the tax preparer. Stage 5: step 9 rolls forward by class and ties out in both directions as separate lists, steps 10 and 11 raise impairment candidates and record the count, step 12 delivers 11 sheets. Stage 6: step 13 offers to save the policies, never the register, net book values or serial numbers.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="170" x2="460" y2="200" marker-end="url(#a2)"/>
+          <polyline points="330,252 230,252 230,316" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,252 690,252 690,316" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,456 230,500 400,500" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,456 690,500 520,500" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="524" x2="460" y2="560" marker-end="url(#a2)"/>
+          <line x1="460" y1="712" x2="460" y2="742" marker-end="url(#a2)"/>
+          <line x1="460" y1="984" x2="460" y2="1014" marker-end="url(#a2)"/>
+          <line x1="460" y1="1146" x2="460" y2="1176" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · TEN ROWS IN ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> Which period? Required</text>
+            <text x="590" y="74"><tspan font-weight="600">C</tspan> The register, recommended</text>
+            <text x="80" y="98"><tspan font-weight="600">D</tspan> Life, method, salvage</text>
+            <text x="330" y="98"><tspan font-weight="600">D2</tspan> Own policy or tax figure?</text>
+            <text x="590" y="98"><tspan font-weight="600">E</tspan> Threshold, never defaulted</text>
+            <text x="80" y="122"><tspan font-weight="600">F</tspan> Convention, never defaulted</text>
+            <text x="330" y="122"><tspan font-weight="600">G</tspan> Framework, required</text>
+            <text x="590" y="122"><tspan font-weight="600">H</tspan> Tax jurisdiction</text>
+            <text x="80" y="146"><tspan font-weight="600">I</tspan> Impairment triggers · last physical count, its date and owner</text>
+          </g>
+          <polygon points="460,202 590,252 460,302 330,252" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="248" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="318" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="368">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="392">G1  company file · fixed-asset module?</text>
+            <text x="98" y="416">G2  tools · the capability map</text>
+            <text x="98" y="440">G3  profile · a 14-row interview</text>
+          </g>
+          <rect x="540" y="318" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="342" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · 7 ROWS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="368">Trial balance, GL detail: required</text>
+            <text x="558" y="392">Register or schedule: recommended</text>
+            <text x="558" y="416">Expense GL, invoices: recommended</text>
+            <text x="558" y="440">Lives, threshold, convention: typed</text>
+          </g>
+          <rect x="400" y="476" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="505" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="562" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="588" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–1 · READ THE LEDGER, MAP THE CLASSES</text>
+          <text x="80" y="614" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="636">search_accounts · get_balance_sheet</text>
+            <text x="80" y="656">get_general_ledger: cost accounts only</text>
+            <text x="80" y="676">search_purchases · get_profit_and_loss</text>
+          </g>
+          <text x="80" y="700" font-size="13" fill="var(--ink)"><tspan font-weight="600">Step 1</tspan> · map classes to accounts · land must carry no accumulated depreciation</text>
+          <rect x="640" y="600" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="624" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="644" text-anchor="middle" font-size="12" fill="var(--ink)">stop. Propose nothing</text>
+          <text x="741" y="662" text-anchor="middle" font-size="12" fill="var(--ink)">from it for posting</text>
+
+          <rect x="60" y="744" width="800" height="240" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="770" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–8 · BOOK FIGURES ONLY · + EDGE-CASES.MD</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="798"><tspan font-weight="600">Step 2</tspan>  capitalize test · freight or installation expensed</text>
+            <text x="80" y="824"><tspan font-weight="600">Step 2b</tspan>  threshold scan both ways · candidates only</text>
+            <text x="80" y="850"><tspan font-weight="600">Steps 3–4</tspan>  the owner's book method and convention</text>
+            <text x="80" y="876"><tspan font-weight="600">Step 5</tspan>  cap at cost less salvage · implied rate · posted?</text>
+            <text x="80" y="902"><tspan font-weight="600">Steps 6–7</tspan>  depreciation and reclass entries, proposals</text>
+            <text x="80" y="928"><tspan font-weight="600">Step 8</tspan>  disposals · gain or loss · the half-entry check</text>
+            <text x="80" y="954"><tspan font-weight="600">Edge cases</tspan>  land, CIP, trade-ins, software · 29 in all</text>
+          </g>
+          <rect x="620" y="786" width="222" height="160" rx="8" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="638" y="810" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.1" fill="var(--manual)">TAX · [MANUAL], ALWAYS</text>
+          <g font-size="12.5" fill="var(--ink)">
+            <text x="638" y="834">MACRS, section 179, bonus,</text>
+            <text x="638" y="852">the de minimis election:</text>
+            <text x="638" y="870">to the tax preparer</text>
+            <text x="638" y="896">D2 = tax figure: the</text>
+            <text x="638" y="914">accountant's schedule is</text>
+            <text x="638" y="932">the register source</text>
+          </g>
+
+          <rect x="60" y="1016" width="800" height="130" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="1042" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 9–12 · TIE OUT, FLAG, PRESENT · + OUTPUT.MD</text>
+          <text x="80" y="1070" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 9</tspan>  roll forward by class · register → GL and GL → register, two separate lists</text>
+          <text x="80" y="1096" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Steps 10–11</tspan>  impairment candidates only · the count is [manual], with owner and date</text>
+          <text x="80" y="1122" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 12</tspan>  11 sheets · ask before the .xlsx · one Data sources line · check output.md</text>
+
+          <rect x="60" y="1178" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1204" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 13</tspan>: only after the results are shown, and only on an explicit yes</text>
+          <text x="80" y="1228" font-size="13.5" fill="var(--muted)">save policies, threshold, convention, account map, framework · never the register, NBVs or serials</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="242" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="242" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. On the Mosofin path the skill does not ask for additions or disposals. It derives them from the debits and credits to the asset cost accounts, and asks only for the disposal reason and proceeds. The red box shows the mock rule from Stage 3. The amber box in Stage 4 keeps tax apart: the skill computes book depreciation only. Step 13 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The sources are [1] OpenStax, Principles of Accounting 11.3. [2] OpenStax, Principles of Finance 2e 4.4. [3] OpenStax, Principles of Accounting 11.5. [4] IFRS Foundation, IAS 16. [5] IRS, Publication 946. [6] IRS, Tangible property final regulations. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so. Sources 5 and 6 explain the tax side only. The skill does not apply them.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks rows A to I with D2. Checks the workspace, the company file, a fixed-asset module, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · rows D, E and F</td><td>Asks for the life, method and salvage policy per class, the capitalization threshold and the convention. Never defaults one of them</td><td>None. The user supplies them</td><td>[4] Under IFRS, a business reviews the residual value, the useful life and the method at least at each financial year-end. So the policy belongs to the owner. The skill asks for it on each run and does not do the annual review</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · row G</td><td>Asks for the framework, because it decides componentization, revaluation and impairment reversal</td><td>None. The user supplies it</td><td>[4] IAS 16 depreciates each significant part on its own. edge-cases.md says that US GAAP makes this optional. Northbrook, the made-up example business, uses US GAAP</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Stage 1 · rows D2 and H · Step 3</td><td>Asks if the books carry the owner's policy or the tax figure. Hands tax depreciation to the tax preparer. With the tax figure, takes the accountant's schedule as the register source and computes no charge</td><td>None</td><td>[5] MACRS uses the half-year convention by default, and section 179 has its own yearly limit. Tax side only: the skill does not apply them and computes no tax figure</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the evidence in one batch. Takes additions and disposals from the cost accounts only, net of transfers and reversals. Stops on <code>mock: true</code></td><td><code>search_accounts</code> <code>get_balance_sheet</code> <code>get_trial_balance</code> <code>get_general_ledger</code> <code>search_purchases</code> <code>search_bills</code> <code>get_profit_and_loss</code> <code>search_fixed_assets</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Maps each class to the accounts that exist. Reports a class with no account and an account with no policy. Checks that land carries no accumulated depreciation</td><td><code>search_accounts</code></td><td>[4] Land and buildings are separate assets, and land, with some exceptions, has an unlimited life and gets no depreciation. The class table of life ranges is the skill's own, and it is a range, not a policy</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Tests each addition against the policy. Flags an invoice with one line to the asset account and freight or installation to an expense account</td><td><code>search_purchases</code> <code>search_bills</code></td><td>[2] The recorded cost includes what makes the asset ready for use, for example shipping and installation</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2b</td><td>Scans repairs, small tools, equipment and computer expense for items at or above the threshold. Scans asset accounts for items below it. Reports candidates</td><td><code>get_general_ledger</code> <code>search_purchases</code></td><td>No outside authority for the scan. [6] The IRS de minimis safe harbor is a separate tax election, $2,500 or $5,000 an item. Tax side only: the skill does not apply it, and the book threshold is the owner's answer to E</td><td><span class="kind prac">Practice</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 3–4</td><td>Applies the owner's book method and the first and last period convention</td><td>None beyond the reads</td><td>[1] Straight-line, units of production and double-declining balance give different yearly amounts and the same total over the life. The convention choices are the skill's own list</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Computes the period's charge and caps it at cost less salvage. Offers a draft register from the GL. Compares the implied rate with the policy life. Says if anyone posted depreciation at all</td><td><code>get_general_ledger</code></td><td>[1] The depreciable amount is cost less salvage, and double-declining balance cannot take book value below salvage. The implied-rate check is the skill's own indicator</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 6–7</td><td>Drafts the depreciation entry for <code>journal-entry-builder</code>. Drafts a reclassification from the expense account, never a second credit to Cash or AP. Flags a closed prior year for the accountant</td><td><code>search_accounts</code></td><td>No outside authority. The entry formats are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Computes gain or loss against net book value. Checks both sides of each disposal for the half-entry error, and cash in with no disposal entry</td><td><code>get_general_ledger</code></td><td>[3] First bring depreciation up to the sale date. Then compare the price with book value to get a gain or a loss. The cash is not the same amount as the gain or loss</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 9</td><td>Rolls forward cost and accumulated depreciation by class and ties them to the GL. Reports register → GL and GL → register as two separate lists</td><td><code>get_balance_sheet</code> <code>get_general_ledger</code></td><td>No outside authority. The two-way tie-out is the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 10–11</td><td>Raises impairment candidates only. Records the physical count as <code>[manual]</code>, with its owner and last date</td><td>None. The user supplies them</td><td>No outside authority. The candidate rule and the count rule are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 12</td><td>Delivers 11 sheets, with all entries marked as proposals. Asks before it makes <code>FA_Register_and_Depreciation_[YYYY-MM].xlsx</code></td><td>None</td><td>No outside authority. The sheets are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 13</td><td>Offers to save the policies, the threshold with its date, the convention, the account map, the framework and the salvage policy. Never the register, costs, NBVs, locations or serial numbers</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/11-3-explain-and-apply-depreciation-methods-to-allocate-capitalized-costs" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 11.3 Explain and Apply Depreciation Methods to Allocate Capitalized Costs</a></td><td>Book methods: straight-line, units of production, double-declining balance, and the salvage floor</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://openstax.org/books/principles-finance-2e/pages/4-4-when-should-a-company-capitalize-or-expense-an-item" style="color:var(--mosofin)">OpenStax: Principles of Finance 2e, 4.4 When Should a Company Capitalize or Expense an Item?</a></td><td>Book cost: why freight and installation belong in the asset's cost</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/11-5-describe-some-special-issues-in-accounting-for-long-term-assets" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 11.5 Describe Some Special Issues in Accounting for Long-Term Assets</a></td><td>Book disposals: gain or loss against book value, and the half-entry error</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2025/issued/ias16.html" style="color:var(--mosofin)">IFRS Foundation: IAS 16 Property, Plant and Equipment (2025 issued HTML)</a></td><td>Book, under IFRS: parts, land, and the yearly review of life, residual value and method</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://www.irs.gov/publications/p946" style="color:var(--mosofin)">IRS: Publication 946 (2025), How To Depreciate Property</a></td><td>Tax side only, and the skill does not apply it: section 179 and the MACRS conventions</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://www.irs.gov/businesses/small-businesses-self-employed/tangible-property-final-regulations" style="color:var(--mosofin)">IRS: Tangible property final regulations (FAQ)</a></td><td>Tax side only, and the skill does not apply it: the de minimis safe harbor</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the six sources on 28 Oct 2026 through search results. Nobody opened the pages. Sources 1, 2, 3, 5 and 6 are US. Source 4 is the international IFRS standard. Some items have no outside authority behind them. They are the 29 edge cases, the threshold scan, the implied-rate check, the two-way tie-out, the 11 sheets, the <code>[auto]</code>, <code>[gated]</code> and <code>[manual]</code> verdicts and every example figure. The worked example uses made-up figures. The public pages present these as the skill's rules or as the example's choices. Ask your accountant what applies to you. This page is not tax advice.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Four commits with fixes on main, one check passed, and twelve open findings</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>1,102 lines in one file, against a 500-line guide</h3>
+      <p>F1. The split makes a card of 160 lines at ad090c2, and 161 on main. The card holds the six rules that never bend, the intake rows, the upload checklist and six stages. The original text moved into <code>references/</code>. 826 of the 828 non-blank lines of the pre-split file are present byte for byte at ad090c2. The other two are the description and the link to <code>shared/onboarding.md</code>. Before the split, the description had 1,033 characters, over the limit of 1,024. On main it has 1,004.</p>
+      <blockquote>“Keep SKILL.md body under 500 lines for optimal performance.”<cite><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Anthropic · Skill authoring best practices</a></cite></blockquote>
+      <span class="where">SKILL.md + references/ · fixed on main in ad090c2</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>The text named three skills that are not in the library</h3>
+      <p>F2. The text sent readers to <code>intangibles-and-amortization</code>, <code>corporate-tax-provision-asc740</code> and <code>consolidation-and-eliminations</code>. No skill of these names is in the library. The text now says what to consider, for example "whether it is an intangible" and "the tax provision".</p>
+      <span class="where">SKILL.md, before the split · fixed on main in bed401b</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>A pointer did not name its file</h3>
+      <p>F3. Gate 1 said "See the cross-entity step". After the split, that step is in a different file. The pointer now names <code>method.md</code> and the section <i>Both entity scenarios</i>.</p>
+      <span class="where">references/gates.md · Gate 1 · fixed on main in 14f616a</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The bookkeeping audit changed how the run works</h3>
+      <p>F4. An independent bookkeeper audit raised findings. Its commit, 2d1ec7d, reports 10 fixed, 0 partly fixed and 0 rejected. A repair found to be capital now moves out of the expense account that carried it, with catch-up depreciation. Before, the entry credited Cash or AP a second time. A prior-year item goes to the accountant as a prior-period correction. Additions and disposals now come from cost accounts only, net of transfers and reversals. The fix also added a draft register from the GL, proposals for missed depreciation, salvage in the implied-rate check and a balanced disposal entry. It also added intake row D2, and it asks for salvage and the disposal-month convention.</p>
+      <span class="where">SKILL.md, gates.md, method.md, overview.md · fixed on main in 2d1ec7d</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter reports 53 findings on SKILL.md on main, in 1,821 words, which is 2.9 for each 100 words. 40 of them are hard: 19 semicolons, 18 long sentences and 3 actions with two different verbs. The other 13 are advice: 11 possible passives and 2 compound tenses. Nobody applied the house rule to the card when the split made it. This site did not change the skill. The skill owner can fix the card in a later pass.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. One skill named in the card</h3>
+      <p>Stage 4 and method Step 6 send the depreciation entry to <code>journal-entry-builder</code>. That skill is in the library on main, so the name needs no change. The card names no other skill.</p>
+      <span class="where">SKILL.md · Stage 4 · no change needed</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A3. Gate 3 still says that no register means no asset-level depreciation</h3>
+      <p>The Gate 3 row "Existing FA register" says that without it you can "not compute asset-level depreciation". But intake row C and method Step 5 now offer a draft register from the GL, and Step 5 computes depreciation from it. 2d1ec7d added the draft register and did not change this row.</p>
+      <span class="where">references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. The Gate 3 interview misses three questions that the card asks</h3>
+      <p>The card marks row D2 (own policy or tax figure) as Required. Gate 3 does not ask it. Gate 3 asks for "useful life and method per class", without the salvage policy. It also does not ask for the date and owner of the physical count, which is row I. On the Mosofin path, Gate 3 is the interview, so a run can miss these answers.</p>
+      <span class="where">references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A5. The upload checklist misses the salvage policy and D2</h3>
+      <p>The required typed-in row lists "class lives and methods" and not the salvage policy or the D2 answer. The last count date and owner are in the Recommended row only, but row I treats a missing count as the finding.</p>
+      <span class="where">SKILL.md · Stage 1, upload checklist · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A6. The read-back does not say salvage or the D2 answer</h3>
+      <p>The read-back template gives the lives, the method, the threshold, the convention and the count. It does not give the salvage policy or the D2 answer. So a user can say yes to the read-back and not see a required answer.</p>
+      <span class="where">SKILL.md · Stage 1, read-back · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A7. Two names for the example business</h3>
+      <p>The read-back says "Northbrook Trading". The Step 13 example key says "Northbrook Manufacturing". The pages use Northbrook Trading.</p>
+      <span class="where">SKILL.md · read-back · references/method.md · Step 13 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A8. Two rules for mock data</h3>
+      <p>SKILL.md Stage 3 says "if a read returns <code>mock: true</code>, stop". Method Step 0 and edge-cases.md say only that the skill reconciles nothing from it and proposes nothing from it for posting. The skill does not say which rule wins.</p>
+      <span class="where">SKILL.md · Stage 3 · references/method.md · Step 0 · references/edge-cases.md · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. Two formulas for the implied rate</h3>
+      <p>Method Step 5 deducts salvage and leaves out land, CIP and fully depreciated assets. overview.md item 4 still divides recorded depreciation by "the cost of depreciable assets in service", with no salvage deduction. 2d1ec7d changed Step 5 and did not change this item.</p>
+      <span class="where">references/overview.md · item 4 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A10. The freight check flags, but no entry follows</h3>
+      <p>The Step 2 check flags an asset that may be understated when freight or installation goes to expense. But Stage 4 drafts a reclassification only "for items the scan found wrongly expensed". The skill describes no entry for the freight case. The worked example found this. Its proposal P1 drafts the same reclassification, and the pages call it the example's choice.</p>
+      <span class="where">SKILL.md · Stage 4 · references/method.md · Step 2 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A11. One name, two answers for the disposal month</h3>
+      <p>Step 4 says "full month — no depreciation in the month of disposal (or a full month, as elected)". This gives two opposite answers under one name. Intake row F already asks for the last-period convention, so the separate question in Step 4 can repeat it.</p>
+      <span class="where">references/method.md · Step 4 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A12. Software is in the class table, but intangibles are out of scope</h3>
+      <p>The Step 1 table lists "Computer software (capitalized)" as a class. The description says "Do not use for intangibles", and edge-cases.md says that software is typically intangible. This is a tension, not an error.</p>
+      <span class="where">references/method.md · Step 1 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A13. Nothing flags an overdue count</h3>
+      <p>Step 11 says to count "at least annually". But row I and the coverage sheet treat only a count that never happened as the finding. Neither says to flag an overdue count. In the worked example, the last count was in December 2023, so it is overdue.</p>
+      <span class="where">SKILL.md · row I · references/method.md · Steps 11–12 · open</span>
+    </div></div>
+  </div>
+  <p style="color:var(--muted);font-size:14.5px">History note for reviewers: d86fa27 and 4d5637c changed every skill in the library before the split. The first limits each <code>approved=true</code> instruction to reads. The second makes spreadsheet output ask first and name its file.</p>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The repository's validator passes on a copy of main (31 skills, 0 failures), run on 28 Oct 2026.</span></li>
+    <li><span class="ok">PASS</span><span>826 of the 828 non-blank lines of the pre-split file are present byte for byte at ad090c2. The two differences are the description and a relative link path.</span></li>
+    <li><span class="ok">PASS</span><span>All 21 relative links in the eight files on main resolve.</span></li>
+    <li><span class="ok">PASS</span><span>Each Step that the card names exists in method.md on main. method.md has 15 step sections: Steps 0 to 13 and Step 2b.</span></li>
+    <li><span class="ok">PASS</span><span>"Never writes, updates or deletes anything, in any system" is in the card. The protocol has a hard stop for writes, and output.md checks that nothing went back to any system.</span></li>
+    <li><span class="ok">PASS</span><span>The card has 10 intake rows, A to I with D2, and a 7-row upload checklist. Gate 3 has 14 rows. method.md lists 11 output sheets.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 37 [auto], 9 [gated] and 34 [manual] in the eight files.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with real assets. The audit did not read the tool catalogue. So nothing here shows which of the typical evidence tools Gate 2 would find, or if a connection has a fixed-asset module. Nobody tested the draft register from the GL or the cost-account filter on a real QuickBooks Online chart. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/fixed-asset-register-and-depreciation">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The first commits for this skill on main are dcb86d0 (1 Oct 2026, Wave 3) and d86fa27 (20 Oct, <code>approved=true</code> for reads only). Then comes 4d5637c (21 Oct, spreadsheet output asks first). On 25 Oct come bed401b (no reference to a skill outside the library), ad090c2 (the split) and 14f616a (the Gate 1 pointer). Last is 2d1ec7d, the bookkeeping-audit changes of 27 Oct 2026. The last four came after fde2da3. A live run, a catalogue read and fixes for A1 and A3 to A13 are still to do.</footer>
+
+</div>

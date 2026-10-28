@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financial Statements Explained in Plain English | MosoFin</title>
+<meta name="description" content="How a trial balance becomes a balance sheet, income statement and cash flow, the seven checks that prove they agree, and what your bank can still ask for.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+  table.grid tr.sub th{color:var(--faint);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding-top:16px}
+  .tag.man{background:var(--hold-soft);color:var(--hold)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Financial statement builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Financial statements, in plain words</span>
+  <h1>Can you give these statements to your bank, and do they agree with each other?</h1>
+  <p class="lede">Your books hold a long list of account balances. This skill turns that list into <b>the statements that a bank or an investor reads</b>. Then it <b>proves with seven checks</b> that the statements agree with each other.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You tell it the framework, the period and the rounding. It reads your trial balance from your books or from your files. It builds the balance sheet, the income statement, the cash flow statement and the change in equity, with last year beside this year. It runs seven checks and shows the difference for each, even when the difference is zero. It never posts an entry. The statements are your own statements: not audited, not reviewed, not compiled, and without notes.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>One list of 21 balances becomes four statements at Northbrook Trading</h2>
+  <p>Northbrook Trading is a wholesale company that we made up. It works in US dollars and reports under IFRS. Its year ends on Tuesday 30 June 2026, and the skill runs on Wednesday 15 July 2026. Every figure on this page is in thousands of dollars ($000).</p>
+  <p>The input is the trial balance: each account and its balance at the year end. Northbrook has 21 accounts. The debits are 1,551 and the credits are 1,551, so the difference is 0. The skill puts each account on exactly one line of a statement.</p>
+  <p>Each statement answers a different question. The balance sheet shows what the business owns and owes on one day. The income statement shows the profit or loss over a period. The cash flow statement shows the cash that came in and went out, in three parts<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Under IFRS, a complete set also has a statement of changes in equity, notes, and last year's figures beside this year's<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Profit for the year</span><span class="v num good">38</span><span class="s">Revenue 960 − goods 585 − wages 210 − depreciation 26 − other 80 − finance 9 − tax 12</span></div>
+    <div class="stat"><span class="label">Change in cash</span><span class="v num wrong">(50)</span><span class="s">Cash went from 134 to 84 in the same year</span></div>
+    <div class="stat"><span class="label">Total assets</span><span class="v num">516</span><span class="s">Liabilities 224 + equity 292</span></div>
+    <div class="stat"><span class="label">Exception before mapping</span><span class="v num hold">2</span><span class="s">An "Ask My Accountant" balance. The skill asks you about it first</span></div>
+  </div>
+  <p>Profit is 38, but cash fell by 50. The statements link to each other, but profit and cash are different figures<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. Two links carry the numbers from one statement to the next. The diagram shows both.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 400" role="img" aria-label="Two links between Northbrook's statements, in thousands of dollars. Link 1: the income statement shows a profit of 38. The statement of changes in equity takes retained earnings of 219, adds the profit of 38 and takes away dividends of 15, to give 242. The balance sheet at 30 June 2026 shows retained earnings of 204 plus current-year profit of 38, which is also 242. Link 2: the balance sheet at 30 June 2025 shows cash of 134. The cash flow statement adds 35 from operating, takes away 40 for investing and 45 for financing, to give 84. The balance sheet at 30 June 2026 shows cash of 84. Every difference is 0.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        </defs>
+        <g font-family="Archivo,sans-serif" font-size="14">
+          <rect x="16" y="20" width="250" height="150" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="34" y="46" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">INCOME STATEMENT</text>
+          <text x="34" y="74" fill="var(--ink)">Revenue</text><text x="248" y="74" text-anchor="end" fill="var(--ink)">960</text>
+          <text x="34" y="98" fill="var(--muted)">All costs and tax</text><text x="248" y="98" text-anchor="end" fill="var(--muted)">(922)</text>
+          <line x1="34" y1="112" x2="248" y2="112" stroke="var(--rule-strong)"/>
+          <text x="34" y="140" font-weight="700" fill="var(--ink)">Profit for the year</text><text x="248" y="140" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">38</text>
+
+          <rect x="315" y="20" width="250" height="150" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="333" y="46" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">CHANGES IN EQUITY</text>
+          <text x="333" y="74" fill="var(--ink)">Retained earnings, opening</text><text x="547" y="74" text-anchor="end" fill="var(--ink)">219</text>
+          <text x="333" y="96" fill="var(--ink)">+ profit</text><text x="547" y="96" text-anchor="end" fill="var(--ink)">38</text>
+          <text x="333" y="118" fill="var(--ink)">− dividends</text><text x="547" y="118" text-anchor="end" fill="var(--ink)">15</text>
+          <line x1="333" y1="128" x2="547" y2="128" stroke="var(--rule-strong)"/>
+          <text x="333" y="152" font-weight="700" fill="var(--ink)">Closing</text><text x="547" y="152" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">242</text>
+
+          <rect x="614" y="20" width="250" height="360" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="632" y="46" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">BALANCE SHEET, 2026</text>
+          <text x="632" y="74" fill="var(--ink)">Retained earnings</text><text x="846" y="74" text-anchor="end" fill="var(--ink)">204</text>
+          <text x="632" y="96" fill="var(--ink)">Current-year profit</text><text x="846" y="96" text-anchor="end" fill="var(--ink)">38</text>
+          <line x1="632" y1="106" x2="846" y2="106" stroke="var(--rule-strong)"/>
+          <text x="632" y="130" font-weight="700" fill="var(--ink)">Together</text><text x="846" y="130" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">242</text>
+          <text x="632" y="156" font-size="12.5" fill="var(--muted)">Checks 3 and 5, difference 0</text>
+          <line x1="632" y1="200" x2="846" y2="200" stroke="var(--rule)" stroke-dasharray="4 4"/>
+          <text x="632" y="250" fill="var(--ink)">Cash and cash equivalents</text>
+          <text x="846" y="290" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">84</text>
+          <text x="632" y="320" font-size="12.5" fill="var(--muted)">Check 4, difference 0</text>
+
+          <rect x="16" y="230" width="250" height="150" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="34" y="256" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">BALANCE SHEET, 2025</text>
+          <text x="34" y="290" fill="var(--ink)">Cash at 30 June 2025</text>
+          <text x="248" y="330" text-anchor="end" font-weight="800" font-size="20" fill="var(--ink)">134</text>
+
+          <rect x="315" y="230" width="250" height="150" rx="14" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="333" y="256" font-size="12" fill="var(--faint)" font-family="'IBM Plex Mono',monospace" letter-spacing="1.2">CASH FLOW, FY2026</text>
+          <text x="333" y="282" fill="var(--ink)">Operating</text><text x="547" y="282" text-anchor="end" fill="var(--ink)">+35</text>
+          <text x="333" y="304" fill="var(--ink)">Investing</text><text x="547" y="304" text-anchor="end" fill="var(--wrong)">(40)</text>
+          <text x="333" y="326" fill="var(--ink)">Financing</text><text x="547" y="326" text-anchor="end" fill="var(--wrong)">(45)</text>
+          <line x1="333" y1="336" x2="547" y2="336" stroke="var(--rule-strong)"/>
+          <text x="333" y="362" font-weight="700" fill="var(--ink)">Closing cash</text><text x="547" y="362" text-anchor="end" font-weight="800" font-size="20" fill="var(--green)">84</text>
+
+          <line x1="268" y1="95" x2="311" y2="95" stroke="var(--green)" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="567" y1="95" x2="610" y2="95" stroke="var(--green)" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="268" y1="305" x2="311" y2="305" stroke="var(--green)" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="567" y1="305" x2="610" y2="305" stroke="var(--green)" stroke-width="2" marker-end="url(#arr)"/>
+          <path d="M200,172 L200,200 L380,200 L380,226" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+          <text x="392" y="196" font-size="12.5" fill="var(--muted)">Profit 38 starts the cash flow: check 2</text>
+          <text x="290" y="86" text-anchor="middle" font-size="11" fill="var(--green)" font-family="'IBM Plex Mono',monospace">LINK 1</text>
+          <text x="290" y="296" text-anchor="middle" font-size="11" fill="var(--green)" font-family="'IBM Plex Mono',monospace">LINK 2</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, in $000. Retained earnings and current-year profit stay on two lines because the year is not closed yet. After the close, they become one figure, 242.</figcaption>
+  </figure>
+  <p>Link 1 follows the profit. Net income from the income statement goes into retained earnings<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Link 2 follows the cash. The cash flow statement starts with the profit and adds back costs that use no cash, for example depreciation. Then it adjusts for the change in each working-capital account. Last year's cash plus the net flow must equal this year's cash<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. At Northbrook, 134 − 50 = 84.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>The report from your software always balances</h2>
+  <p>Your accounting software prints a balance sheet. That report always balances, because double-entry software makes it balance. So the report proves that the software works. It does not prove that your statements are right.</p>
+  <p>Northbrook has one bank loan of 120. Its schedule shows that 40 is due by 30 June 2027. A debt that is due within twelve months after the year end is a current liability. This includes the current part of a long-term loan<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. The ledger does not know the due dates, so the skill needs the schedule.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill builds</h3>
+      <span class="who">The loan split from your schedule, then the balance proved again</span>
+      <div class="rows num">
+        <div class="row"><span>Loan due within 12 months</span><span class="v">40</span></div>
+        <div class="row"><span>Loan due later</span><span class="v">80</span></div>
+        <div class="row"><span>Current liabilities: 74 + 21 + 9 + 40</span><span class="v">144</span></div>
+        <div class="row"><span>Assets 516 = 224 + 292</span><span class="v">difference 0</span></div>
+      </div>
+      <div class="verdict">The skill proves the balance on the statement that it built, after the split. The split is presentation only, so nobody posts an entry for it.</div>
+    </div>
+    <div class="book bad">
+      <h3>The software's own report</h3>
+      <span class="who">The same books at 30 June 2026</span>
+      <div class="rows num">
+        <div class="row off"><span>Bank loan, all long-term</span><span class="v">120</span></div>
+        <div class="row off"><span>"Ask My Accountant"</span><span class="v">in other current assets</span></div>
+        <div class="row off"><span>Current liabilities: 74 + 21 + 9</span><span class="v">104</span></div>
+        <div class="row same"><span>Assets 516 = 516</span><span class="v">balances</span></div>
+      </div>
+      <div class="verdict">It balances, and it still shows 40 of debt in the wrong place. A reader sees bills of 104 due this year, when the real figure is 144.</div>
+    </div>
+  </div>
+  <p>As an illustration only, divide current assets by current liabilities. The result is 354 ÷ 104 = 3.40 on the software's report, and 354 ÷ 144 = 2.46 on the built statement. The skill calculates no ratios. We show this figure to make the difference clear.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's balance sheet as the skill builds it, non-current items first, at 30 June 2026 and 30 June 2025, in thousands of dollars">
+        <thead><tr><th scope="col" style="text-align:left">Balance sheet, $000</th><th scope="col">30 Jun 2026</th><th scope="col">30 Jun 2025</th><th scope="col" style="text-align:left">Where it comes from</th></tr></thead>
+        <tbody>
+        <tr class="sub"><th scope="row" colspan="4">Non-current assets</th></tr>
+        <tr><th scope="row">Property, plant and equipment</th><td>162</td><td>148</td><td class="t">Cost 260 − depreciation 98</td></tr>
+        <tr class="sub"><th scope="row" colspan="4">Current assets</th></tr>
+        <tr><th scope="row">Inventories</th><td>140</td><td>125</td><td class="t"></td></tr>
+        <tr><th scope="row">Trade and other receivables</th><td>118</td><td>96</td><td class="t"></td></tr>
+        <tr><th scope="row">Prepayments</th><td>12</td><td>9</td><td class="t a">10 + the 2 from "Ask My Accountant", on your instruction</td></tr>
+        <tr><th scope="row">Cash and cash equivalents</th><td>84</td><td>134</td><td class="t"></td></tr>
+        <tr class="tot"><th scope="row">Total assets</th><td class="c">516</td><td class="c">512</td><td class="t"></td></tr>
+        <tr class="sub"><th scope="row" colspan="4">Equity</th></tr>
+        <tr><th scope="row">Share capital</th><td>50</td><td>50</td><td class="t"></td></tr>
+        <tr><th scope="row">Retained earnings</th><td>204</td><td>219</td><td class="t">219 − dividends 15</td></tr>
+        <tr><th scope="row">Current-year profit</th><td>38</td><td>—</td><td class="t">The year is not closed yet</td></tr>
+        <tr class="tot"><th scope="row">Total equity</th><td class="c">292</td><td class="c">269</td><td class="t"></td></tr>
+        <tr class="sub"><th scope="row" colspan="4">Non-current liabilities</th></tr>
+        <tr><th scope="row">Bank loan, less the current part</th><td>80</td><td>100</td><td class="t h">From the schedule</td></tr>
+        <tr class="sub"><th scope="row" colspan="4">Current liabilities</th></tr>
+        <tr><th scope="row">Trade and other payables</th><td>95</td><td>86</td><td class="t">74 + 21. Last year 68 + 18</td></tr>
+        <tr><th scope="row">Current part of the bank loan</th><td>40</td><td>50</td><td class="t h">From the schedule</td></tr>
+        <tr><th scope="row">Current tax liability</th><td>9</td><td>7</td><td class="t"></td></tr>
+        <tr class="tot"><th scope="row">Total liabilities</th><td class="c">224</td><td class="c">243</td><td class="t"></td></tr>
+        <tr class="tot"><th scope="row">Liabilities + equity</th><td class="c">516</td><td class="c">512</td><td class="t h">Difference 0 in both years</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in $000. IFRS often shows non-current items first. The 2025 column equals Northbrook's 2025 statements as issued.</figcaption>
+  </figure>
+  <p>The skill also catches a second mistake: last year in the ledger can differ from last year as issued. That happens when someone agreed audit adjustments and nobody posted them. Suppose the issued 2025 statements show accrued expenses of 24, and the ledger shows 18. Check 6 then fails with a difference of 6. The skill reports it and asks which version governs, before it builds the comparatives.</p>
+</section>
+
+<section>
+  <span class="label">The seven checks</span>
+  <h2>Each check shows its difference, even when it is zero</h2>
+  <p>A statement that "balances" with no number is only a claim. A statement that "balances, difference 0" is evidence. So the skill reports all seven checks with their differences. Accountants call these checks tie-outs.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's seven tie-outs: six pass with a difference of 0, and check 6 is a manual comparison with a difference of 0">
+        <thead><tr><th scope="col" style="text-align:left">#</th><th scope="col" style="text-align:left">What must agree</th><th scope="col" style="text-align:left">Northbrook, $000</th><th scope="col" style="text-align:left">Result</th><th scope="col">Difference</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">1</th><td class="t">Assets = liabilities + equity, on the built statement</td><td class="t">516 = 224 + 292</td><td class="t h">Pass</td><td>0</td></tr>
+        <tr><th scope="row">2</th><td class="t">Profit on the income statement = profit at the top of the cash flow</td><td class="t">38 = 38</td><td class="t h">Pass</td><td>0</td></tr>
+        <tr><th scope="row">3</th><td class="t">Profit = profit in the equity statement. Other comprehensive income = its movement in equity</td><td class="t">38 = 38. OCI 0 = 0</td><td class="t h">Pass</td><td>0</td></tr>
+        <tr><th scope="row">4</th><td class="t">Opening cash + the three cash flows = cash on the balance sheet</td><td class="t">134 + 35 − 40 − 45 = 84</td><td class="t h">Pass</td><td>0</td></tr>
+        <tr><th scope="row">5</th><td class="t">Closing retained earnings in the equity statement = retained earnings + current-year profit on the balance sheet</td><td class="t">242 = 204 + 38</td><td class="t h">Pass</td><td>0</td></tr>
+        <tr><th scope="row">6</th><td class="t">Last year's figures = last year's statements as issued</td><td class="t">Each line against your PDF</td><td class="t a">[manual]</td><td>0</td></tr>
+        <tr><th scope="row">7</th><td class="t">Every statement uses the same currency</td><td class="t">All say USD, $000</td><td class="t h">Pass</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in $000. All the balances are round thousands, so rounding makes no difference here. A real trial balance in dollars can make $1 differences, and the skill shows them.</figcaption>
+  </figure>
+  <p>Check 6 is a manual check. The skill compared each line by hand with the 2025 statements that you uploaded. It never shows check 6 as an automatic pass. Without the issued statements, check 6 stays [manual] and does not pass.</p>
+</section>
+
+<section>
+  <span class="label">Can I give it to my bank?</span>
+  <h2>The statements agree, but they are your own statements</h2>
+  <p>Your bank or investor can read the package, and every page says where the numbers came from. But nobody outside the business checked it. In the US, a CPA can give three levels of service<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>:</p>
+  <div class="three">
+    <div class="card"><span class="tag up">Compilation</span><p>No assurance. The CPA does not need to be independent, but must say so. A lender often accepts this for a first or smaller loan<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</p></div>
+    <div class="card"><span class="tag up">Review</span><p>Limited assurance. An independent CPA asks questions and does analysis<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</p></div>
+    <div class="card"><span class="tag up">Audit</span><p>High assurance, but not absolute. The auditor gives an opinion<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</p></div>
+  </div>
+  <p>The skill does none of these. Ask your bank which one it needs. The skill also does not write the notes. Under IFRS, a complete set of statements includes notes<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>, so your accountant must add them. A US company may use US GAAP. The skill asks which framework you use and never chooses one for you.</p>
+  <p>For a US SBA 7(a) loan, the checklist asks for a profit and loss statement that is current within 180 days of the application. It also asks for a one-year projection with a written explanation, and three years of signed tax returns<sup class="c"><a href="#src7" aria-label="source 7">7</a></sup>. Statements at 30 June 2026 stay within 180 days until about the end of December 2026. The skill makes no projection and no tax return. Other lenders and other countries have their own lists.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Nine items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. Northbrook's answers are in brackets.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools. (MosoFin.)</div></li>
+    <li><div class="q">Which framework: US GAAP, IFRS, a local GAAP, or a special-purpose basis? And what legal form is the business?</div><div class="why">A special-purpose basis is, for example, the income tax basis or the cash basis. The framework sets the order, the words and the titles. The legal form sets the equity section. You must answer this item. The skill never chooses it for you. (IFRS, a private company limited by shares.)</div></li>
+    <li><div class="q">Which period, and which columns: month, year to date, prior year, budget?</div><div class="why">You must answer this item. A trial balance at a month end holds the year to date, not the month. Last year's column must use the same basis. (The year to 30 June 2026, with columns for 2026 and 2025.)</div></li>
+    <li><div class="q">For a group: one combined set of statements, or a set for each company?</div><div class="why">Accountants say consolidated or separate. The skill asks this only when more than one company file is in scope. (Does not apply. Northbrook has one company file.)</div></li>
+    <li><div class="q">Please send last year's statements as issued.</div><div class="why">This item is a request for a file. Check 6 compares the ledger with these statements. Without them, check 6 stays [manual] and does not pass. (The 2025 statements, as a PDF.)</div></li>
+    <li><div class="q">How do you know which part of each loan or lease is due within a year?</div><div class="why">No ledger account knows the due dates, so the skill asks for the amortization schedules. It never guesses the split. It names the schedule that it needs. (The loan schedule: 40 due by 30 June 2027.)</div></li>
+    <li><div class="q">Round to whole dollars, thousands or millions?</div><div class="why">The rounding must be the same through the whole package. The skill never chooses it for you. (Thousands.)</div></li>
+    <li><div class="q">Group the costs by function or by nature?</div><div class="why">By function means what the cost was for, for example selling. By nature means what the cost was, for example wages. Both give the same profit. Without an answer, the skill applies your policy or the usual form for the framework. (By nature.)</div></li>
+    <li><div class="q">Anything special: a business you are selling, segments, a different reporting currency, earnings per share?</div><div class="why">The ledger flags none of these, and it holds no share count. They apply only if you have them, and they are [manual]. The skill never guesses a share count. (None.)</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. The skill's own example uses Northbrook:</p>
+  <blockquote><i>"Building IFRS statements for Northbrook Trading for the year to 30 June 2026, with one comparative year, from the trial balance read through your Mosofin connection on the accrual basis. By nature, non-current items first, in thousands; the current portion of the loan from your amortization schedule, and comparatives checked against the FY2025 financials you uploaded. Shall I go ahead?"</i></blockquote>
+  <p>On the MosoFin path, it then reads back the workspace and the company file by name, and waits for your yes. It reads the legal name, the currency and the year end from your company profile. It tells you if one of them disagrees with the period that you asked for.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload the trial balance</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads the trial balance at both year ends, with the same accounting method for both</li>
+        <li>It reads the chart of accounts with the account types, and your company profile</li>
+        <li>It reads the software's balance sheet, profit and loss and cash flow report, but only as a cross-check</li>
+        <li>It reads the general ledger for the movements. If that read needs your approval, it asks you in the chat first</li>
+        <li>You still give it the <b>framework</b>, <b>last year's statements as issued</b> and the <b>loan and lease schedules</b>. It can never read a share register, a schedule, a valuation or last year's audited statements</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the trial balance, and more if you have it</h3>
+      <ul>
+        <li><b>Trial balance</b> at the period end, with account types. CSV or XLSX, required</li>
+        <li><b>Trial balance</b> at each comparative period end, on the same basis. CSV or XLSX, required for comparatives</li>
+        <li><b>Last year's statements as issued</b>, PDF or XLSX, recommended for check 6</li>
+        <li><b>Loan and lease schedules</b>, CSV, XLSX or PDF, recommended for the current part</li>
+        <li><b>Profit and loss or ledger activity</b>, CSV or XLSX, if the trial balance is after the year-end close or you need a month's figures</li>
+        <li><b>Balance sheet or trial balance at the start of the period</b>, CSV or XLSX, required for cash flows</li>
+        <li><b>Ledger detail for fixed asset, loan and equity accounts</b>, CSV or XLSX, required for cash flows and changes in equity</li>
+        <li>Share count, segment data or details of a business you are selling, if they apply. Type them in the chat, or send a file</li>
+        <li>Framework, period, rounding, consolidated or separate, legal name and currency, typed in the chat. You must give all of them, but the rounding is only a recommendation</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>A workpaper of up to nine sheets, with the source on every statement</h2>
+  <div class="gets">
+    <div class="get"><b>1 Trial balance</b><span>Each account with the statement line that it maps to, and where the skill read it.</span></div>
+    <div class="get"><b>2 to 6 The statements</b><span>Balance sheet, income statement, comprehensive income, cash flows and changes in equity, with last year beside this year.</span></div>
+    <div class="get"><b>7 Tie-outs</b><span>The seven checks, each with its difference.</span></div>
+    <div class="get"><b>8 Reclassifications</b><span>Each change says whether it is presentation only or an entry for a person to post.</span></div>
+    <div class="get"><b>9 Coverage</b><span>For each task, what the skill read and with which tool. It has a row for each of the seven checks.</span></div>
+  </div>
+  <p>Northbrook gets 8 of the 9 sheets. It has no other comprehensive income, so profit and comprehensive income share one statement, and sheet 4 is not necessary. Sheet 8 has two rows. The loan split is presentation only. The "Ask My Accountant" balance has a proposed entry for your bookkeeper: debit Prepayments 2, credit Ask My Accountant 2.</p>
+  <p>Every statement carries a footer. At Northbrook it reads: Northbrook Trading · year to 30 June 2026 · USD $000 · source: QuickBooks via Mosofin, company file Northbrook Trading · mock: false. The footer stays with the statements when they leave the conversation. The answer ends with one line that lists the data sources.</p>
+  <p class="muted" style="font-size:15px">The skill asks before it makes the Excel file, and again before a PDF. Here the file is Financial_Statements_2026-06_Northbrook Trading.xlsx. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your framework, choices, account mapping and loan-split rule for the next run. It never saves a balance or a statement figure.</p>
+</section>
+
+<section>
+  <span class="label">What it refuses or sends elsewhere</span>
+  <h2>Five requests that get a different answer</h2>
+  <dl>
+    <dt>"Ask My Accountant" has 2 in it</dt><dd>The skill lists the balance as an exception before it maps any account, and asks you about it. You say that it is a deposit to a supplier, so it shows in Prepayments. It never hides such a balance in an "Other" line.</dd>
+    <dt>"Please post that entry"</dt><dd>The skill says no, once and plainly, and gives you the draft entry. Your bookkeeper posts it in your own system. The answer stays the same if you ask again.</dd>
+    <dt>"Add the notes that the bank wants"</dt><dd>The skill writes no notes. Your accountant adds them. Without notes, the package is not a complete IFRS set<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>No loan schedule</dt><dd>The skill names the schedule that it needs. It never guesses the part that is due within a year.</dd>
+    <dt>The trial balance does not balance</dt><dd>Not the case at Northbrook. The skill tells you to fix it first, with a review in the closing-entries-and-trial-balance skill.</dd>
+  </dl>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never proves the balance on the software's report.</b> It proves it on the statements that it built, after each change. It reports all seven checks with their differences, even zero. Check 6 is [manual], and the skill never shows it as a pass.</li>
+      <li><b>Never chooses for you</b> a framework, the split between current and non-current, a rounding basis or a share count.</li>
+      <li><b>Never adds company packages together for a group.</b> Group statements come from the group trial balance. If it cannot read one company of the group, it stops. If the data is test data (mock), every statement says so.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Eight terms, in plain English</h2>
+  <dl>
+    <dt>Trial balance</dt><dd>The list of every account and its balance. It is the raw material of the statements.</dd>
+    <dt>Balance sheet</dt><dd>What the business owns and owes on one day<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. IFRS calls it the statement of financial position.</dd>
+    <dt>Income statement</dt><dd>The profit or loss over a period<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. IFRS calls it the statement of profit or loss.</dd>
+    <dt>Cash flow statement</dt><dd>The cash that came in and went out, in operating, investing and financing parts<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Current and non-current</dt><dd>Due within twelve months after the year end, or later<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>.</dd>
+    <dt>Comparatives</dt><dd>Last year's figures beside this year's, so that a reader can see the change<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Tie-out</dt><dd>A check that two figures in different places agree. The seven tie-outs are the skill's own list.</dd>
+    <dt>Compilation, review, audit</dt><dd>The three levels of a US CPA's work on statements, from no assurance to high assurance<sup class="c"><a href="#src6" aria-label="source 6">6</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are two IFRS Foundation pages, an SEC guide, two sections of an accounting textbook, an AICPA &amp; CIMA guide and an SBA checklist. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.sec.gov/files/investor/pubs/begfinstmtguide.htm" rel="noopener">U.S. Securities and Exchange Commission: Beginners' Guide to Financial Statements</a><span class="what">The balance sheet shows one moment. The income statement covers a period. The cash flow statement has operating, investing and financing parts. The statements link to each other, and cash flow is a different figure from net income.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.ifrs.org/issued-standards/list-of-standards/ias-1-presentation-of-financial-statements/" rel="noopener">IFRS Foundation: IAS 1 Presentation of Financial Statements</a><span class="what">A complete set has five parts, each with last year's figures. They are a balance sheet and a statement of profit or loss and other comprehensive income. The others are a statement of changes in equity, a cash flow statement and notes. The search results show IFRS 18 as the successor to IAS 1, so check which standard applies to your period.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-5-prepare-financial-statements-using-the-adjusted-trial-balance" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.5 Prepare Financial Statements Using the Adjusted Trial Balance</a><span class="what">The statements come from the adjusted trial balance. Net income from the income statement goes into retained earnings.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://openstax.org/books/principles-financial-accounting/pages/16-3-prepare-the-statement-of-cash-flows-using-the-indirect-method" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 16.3 Prepare the Statement of Cash Flows Using the Indirect Method</a><span class="what">The operating part starts with net income, adds back depreciation and adjusts for each change in working capital. Beginning cash plus the net cash flow gives the ending cash.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="paragraphs 69 and 71"><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2024/issued/ias1.html" rel="noopener">IFRS Foundation: IAS 1 (2024 issued text)</a><span class="what">A liability due within twelve months after the reporting period is current. The current part of a long-term financial liability is an example.</span></li>
+    <li id="src6" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.aicpa-cima.com/resources/download/guide-to-financial-statement-services-compilation-audit-and-review" rel="noopener">AICPA &amp; CIMA: Guide to financial statement services: compilation, review and audit</a><span class="what">A compilation gives no assurance, a review gives limited assurance, and an audit gives high but not absolute assurance. This is a US guide. The search results show it as an older brochure, updated for SSARS No. 21.</span></li>
+    <li id="src7" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="Profit and Loss (P&amp;L) Statement"><a href="https://www.sba.gov/loans-grants/see-what-sba-offers/sba-loan-programs/general-small-business-loans-7a/7a-loan-application-checklist" rel="noopener">U.S. Small Business Administration: 7(a) Loan Application Checklist</a><span class="what">The profit and loss statement must be current within 180 days of the application. The checklist also asks for a one-year projection and three years of signed tax returns. This applies to the US SBA 7(a) program only.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the seven tie-outs, the nine sheets, the [auto], [gated] and [manual] marks, the footer or the mapping rule. They are the skill's own rules. We made up Northbrook Trading and every figure in the example. The example uses IFRS because the skill's own read-back uses it. A US business may choose US GAAP, and this page does not cite the US GAAP standards. Ask your accountant which framework and which footer apply to you.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>financial-statement-builder</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/financial-statement-builder">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading and every figure in the example. They are not your data. The CPA service levels, the SEC guide and the SBA checklist are US sources. The IFRS sources are international. Other countries and other lenders have their own rules. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
