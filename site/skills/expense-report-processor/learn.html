@@ -341,7 +341,7 @@
   <span class="label">Using it</span>
   <h2>What it asks, needs and gives back</h2>
   <div class="ess">
-    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which reports, which employees, which period, and from which tool? What is your expense policy? Where are the receipts? Which mileage rate and per-diem table are in force, and from which date? Which tax jurisdiction and rules apply? For foreign claims, which exchange-rate source do you use? Do you book card charges to a clearing account or to expense? Who approved each report?</div>
+    <div><b>Asks first</b>Do you want to use MosoFin for this run, or upload the data yourself? Which reports, which employees and which period? What is your expense policy? Where are the receipts? Which mileage rate and per-diem table are in force, and from which date? Which tax jurisdiction and rules apply? For foreign claims, which exchange-rate source do you use? Do you book card charges to a clearing account or to expense? Who approved each report?</div>
     <div><b>Needs</b>The skill needs every line of the expense reports. It uses the chart of accounts for coding, and the posted transactions and card activity for the duplicate check. The approved reports not yet paid are for the payable test. You type in the policy, the rates and the exchange-rate source, because no ledger holds them. An employee list makes the result better.</div>
     <div><b>Gives back</b>The skill gives back six sheets: a summary, the line detail, the exceptions, the posting inputs, the ledger checks and a coverage sheet. It asks before it makes an Excel file.</div>
     <div><b>Never</b>The skill never approves, rejects, pays or posts anything. It never supplies a rate, a threshold or an account number from memory. It never reports a receipt as verified. It never saves names, claims or amounts.</div>
@@ -357,7 +357,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format on main of MosoFin/mosofin-finance-skills. The card format was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1 to 6 are US sources. Source 7 is a UK source. Check with your accountant which rules apply to you. This page explains <code>expense-report-processor</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format on main of MosoFin/mosofin-finance-skills. PR #1 merged the card format on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Sources 1 to 6 are US sources. Source 7 is a UK source. Check with your accountant which rules apply to you. This page explains <code>expense-report-processor</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -473,7 +473,7 @@ const LEVELS = [
       rows:[["P4 Priya, Denver","$210.00","3","$70.00","$180.00",["$30.00","bad"]],["L2 Lena, Berlin","$280.80","4","$70.20","$240.00",["$40.80","bad"]]]},
     rules:[Q.q1],
     math:[["Priya: $210.00 ÷ 3","$70.00 a head"],["Allowed: 3 × $60.00","$180.00"],["Over the cap: $210.00 − $180.00","$30.00",1],["Lena: EUR 240.00 × 1.17 (central bank close)","$280.80"],["$280.80 ÷ 4","$70.20 a head"],["Allowed: 4 × $60.00","$240.00"],["Over the cap: $280.80 − $240.00","$40.80",1]],
-    verdict:["note","Both dinners go to a manager as Review. A manager can approve the excess. The skill states the exchange-rate source for Lena's line. It codes Priya's dinner to Meals 6450 and notes that the 50% limit sits with the employer.","REVIEW"] },
+    verdict:["flag","The amount over the cap on each dinner is a policy violation. The skill disallows it per policy. Its severity for a policy violation is Reject. The amount within the cap stays reimbursable. The skill states the exchange-rate source for Lena's line. It codes Priya's dinner to Meals 6450 and notes that the 50% limit sits with the employer.","REJECT"] },
 
   { tier:"What a person rarely checks · the claim against the books" },
   { n:4, title:"Has the company already paid?",
@@ -621,7 +621,7 @@ function run(){
     + line("= amount to pay", fmt(pay), 1);
   let out = res(net<0?"flag":"ok", "Net reimbursable", fmt(net), note || "The skill proposes this figure. A manager approves it, and someone else pays it.");
   out += res(pay<0?"flag":"ok", "Amount to pay", fmt(pay), O ? "After the Due from Employee offset. Your policy must allow netting." : "No offset. The skill never assumes that your policy allows netting.");
-  if(pay<0) out += res("flag", "The employee owes the company", fmt(-pay), "The deductions are more than the claim. The skill would code the balance to Due from Employee.");
+  if(pay<0) out += res("flag", "The employee owes the company", fmt(-pay), "The deductions are more than the claim. The skill does not define this case.");
   if(M>0 && !R) out += res("note", "Rate missing", "—", "You entered miles but no rate. The skill would flag each mileage line as missing its rate.");
   box.innerHTML=out;
 }
