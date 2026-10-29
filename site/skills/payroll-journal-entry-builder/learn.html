@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Journal Entries Worked Step by Step | MosoFin</title>
+<meta name="description" content="Six worked levels on one payroll run: three amounts, two entries tied to the register, the department split, the accrual estimate and a calculator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  details.intake{background:var(--panel)}
+  details.intake ol.abc{margin:0;padding:4px 18px 8px 44px;display:flex;flex-direction:column;gap:8px;font-size:15.5px;list-style:upper-alpha}
+  .readback{margin:4px 14px 14px;padding:12px 14px;border:1px dashed var(--rule-strong);border-radius:10px;display:flex;flex-direction:column;gap:8px;font-size:15.5px}
+  .field input.chk{width:20px;height:20px;justify-self:end;accent-color:var(--green)}
+  code.fn{overflow-wrap:anywhere}
+  .res .s b{color:var(--wrong)}
+  .pair .big{overflow-wrap:anywhere}
+  .level .tbl + .tbl{margin-top:4px}
+  .lvnote a{color:var(--green)}
+  .muted a{color:var(--green)}
+  .calc select{min-width:150px}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll journal entry builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · payroll-journal-entry-builder · learning guide</span>
+  <h1>From one payroll register to entries that you can post</h1>
+  <p class="lede">This page shows how the skill turns a payroll register into journal entries, <b>one level at a time</b>. It starts with the three amounts in one pay run. It ends with the checks that the skill runs before a person posts anything. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are two sections of an OpenStax textbook, two IRS pages and a US Department of Labor page. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter the totals of your own register. The page builds the two entries and the split. It has no tax rate field.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Twelve rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The example is the same made-up Northbrook Trading as the <a href="../payroll-reconciliation/learn.html">payroll reconciliation</a> and <a href="../payroll-clearing-reconciliation/learn.html">payroll clearing reconciliation</a> pages. Those pages check payroll after a person posts it. This skill builds the entries before anybody posts them. Northbrook keeps its books in US dollars on the accrual basis. The owner runs the skill on Wednesday 23 September 2026.</p>
+  <p class="muted">The skill's own read-back pays the September run on Friday 25 September, and this page follows it. The other payroll pages pay the same run on Wednesday 30 September. The amounts are the same. Every tax amount comes from the register of PayrollCo, Northbrook's payroll provider. This page applies no tax rate.</p>
+  <details class="intake">
+    <summary>Northbrook's answers to the eight intake questions</summary>
+    <ol class="abc">
+      <li><b>Use MosoFin, or upload the data?</b> MosoFin for the chart and the books. Gate 1 finds only the QuickBooks company file "Northbrook Trading" and no payroll platform. So the owner uploads the register, and the skill labels it [manual], supplied by the owner.</li>
+      <li><b>Which entity, and which run?</b> Northbrook Trading, one entity. All the people in the run work for it.</li>
+      <li><b>Pay period, pay date and basis.</b> Pay period 1 to 30 September, pay date Friday 25 September. Accrual basis.</li>
+      <li><b>The payroll register.</b> PayrollCo's register for the September monthly run, as a CSV file. It shows 12 employees paid and the totals of each component.</li>
+      <li><b>Employer costs.</b> They are in the register: social security and Medicare $3,450, the 401(k) match $1,000 and state unemployment $150.</li>
+      <li><b>A payroll clearing account?</b> Yes: 2200 Payroll clearing. MosoFin shows that it carries payroll-cycle movement, and the owner agrees.</li>
+      <li><b>The split basis.</b> Headcount. The owner decides this. The department dimension exists, but it does not give a basis.</li>
+      <li><b>Capitalised labour.</b> None in this run. The software project stopped on 31 August. July and August each sent $2,000 of office pay to 1700 Software in development.</li>
+    </ol>
+    <div class="readback">
+      <p class="fine">The skill then reads back the scope and waits for a yes. This is the card's own sample. This page adds only "accrual basis", because the sample does not give the basis.</p>
+      <p>“Building the payroll journal for Northbrook Trading's monthly run for September (pay period 1–30 September, pay date 25 September), from the register you uploaded, against the chart read from your Mosofin connection. Net pay through the payroll clearing account; wages and employer costs split by department on headcount; no capitalised labour. Shall I go ahead?”</p>
+      <p class="fine">Then it names the file and reports the period, the 12 people paid and the totals of each component. It never repeats the line of one employee.</p>
+    </div>
+  </details>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Build your own payroll entries</h2>
+  <p class="muted">Enter the totals of your own register, or load an example. The page runs the arithmetic of Steps 2 to 7 from <code>references/method.md</code>. It has no tax rate field. Every amount comes from your register. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="nb">Northbrook, September 2026 run</button>
+      <button type="button" data-p="draft">The draft that balances</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The register</legend>
+        <label class="field"><span>Gross pay</span><input data-k="gross" inputmode="decimal"></label>
+        <label class="field"><span>Net pay, from the register</span><input data-k="net" inputmode="decimal"></label>
+        <div class="weeks">
+          <span class="label">#</span><span class="label">Employee withholding</span><span class="label">Amount</span>
+          <span class="wk" id="wrows"></span>
+        </div>
+      </fieldset>
+      <fieldset><legend>Employer costs, on top of gross</legend>
+        <div class="weeks">
+          <span class="label">#</span><span class="label">Employer cost</span><span class="label">Amount</span>
+          <span class="wk" id="erows"></span>
+        </div>
+      </fieldset>
+      <fieldset><legend>Split and funding</legend>
+        <div class="weeks">
+          <span class="label">#</span><span class="label">Department</span><span class="label">Headcount</span>
+          <span class="wk" id="drows"></span>
+        </div>
+        <label class="field"><span>Capitalised labour, to an asset account</span><input data-k="cap" inputmode="decimal"></label>
+        <label class="field"><span>Net pay goes to</span><select data-k="fund"><option value="clear">Payroll clearing</option><option value="cash">Cash, on the pay date</option></select></label>
+        <label class="field"><span>A draft's wages debit (optional)</span><input data-k="draft" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>Period-end accrual (optional)</legend>
+        <label class="field"><span>Wages or overtime of the last run for the period</span><input data-k="aamt" inputmode="decimal"></label>
+        <label class="field"><span>Working days in that period</span><input data-k="adays" inputmode="decimal"></label>
+        <label class="field"><span>Working days earned, not paid</span><input data-k="aun" inputmode="decimal"></label>
+        <label class="field"><span>Ratio: employer cost of the last run</span><input data-k="re" inputmode="decimal"></label>
+        <label class="field"><span>Ratio: gross pay of the last run</span><input data-k="rg" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page splits each expense line by headcount and rounds each share to the cent. The department with the largest headcount gets the remaining cent, so the split adds to the total. That cent rule is the example's choice. Capitalised labour leaves the wages expense and goes to the asset account. Everything here is a proposal. A person decides and posts each entry.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Eight things, in one message. Use MosoFin, or upload the data? Which entity and which run? The pay period, the pay date and the basis. Then the register, the employer costs, the clearing account, the split basis and any capitalised labour.</div>
+    <div><b>Needs</b>The payroll register with totals by component, and the chart of accounts. It recommends the prior payroll journals, the liability and clearing balances, and the funding details.</div>
+    <div><b>Gives back</b>The proposed entries and a workpaper with eight sheets. It makes the Excel file only on a yes, for example <code class="fn">Payroll_JE_2026-09-25_Northbrook Trading.xlsx</code>.</div>
+    <div><b>Never</b>The skill never reads your data before your yes to the read-back. It never writes or posts, and never shows the pay of one person. It never invents an account and never chooses a mapping, a split basis or a capitalisation for you. It never saves an amount.</div>
+  </div>
+  <p class="muted">After a person posts the entries, <a href="../payroll-reconciliation/learn.html">payroll reconciliation</a> checks the quarter against the bank and the filings. <a href="../payroll-clearing-reconciliation/learn.html">Payroll clearing reconciliation</a> finds what stays in 2200.</p>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from five outside sources. They are two sections of an OpenStax textbook, a US Department of Labor page and two IRS pages. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The two-entry rule, the line tie, the run comparison and the ESTIMATE rule are the skill's own. So are the eight sheets and the [auto], [gated] and [manual] verdicts. The textbook accrues wages only. The rule that adds the employer costs to the accrual is the skill's rule. MosoFin made up Northbrook Trading, PayrollCo and every figure in the examples. The 5% limit, the cent rule and the cost ratio in the accrual are the example's choices, not a rule or a tax rate.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The skill works in any country. This example is a US one, and the sources are US sources. Payroll tax rules differ between countries and states, and they change. Ask your accountant or payroll adviser what applies to you. This page explains <code>payroll-journal-entry-builder</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-journal-entry-builder">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll", u:"https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll", at:"employee payroll entry; employer payroll liabilities", checked:"2026-10-28", via:"from search results, page not opened", w:"The employee entry debits salaries expense for gross pay. It credits a separate liability for each deduction, and salaries payable holds the take-home pay until a later entry pays it. The employer records its own taxes and benefits as employer payroll tax expense with the related payables. The textbook uses 2017 and 2018 figures, so this page copies no rate from it."},
+  {t:"U.S. Department of Labor, EBSA: ERISA Fiduciary Advisor, depositing participant contributions", u:"https://webapps.dol.gov/elaws/ebsa/fiduciary/q4e.htm", checked:"2026-10-28", via:"from search results, page not opened", w:"Employee 401(k) deferrals become plan assets when the employer can reasonably separate them from its own assets. The latest date is the 15th business day of the month after the payday. For a plan with fewer than 100 participants, a deposit by the 7th business day after the withholding counts as timely."},
+  {t:"IRS: Publication 15 (2026), (Circular E), Employer's Tax Guide", u:"https://www.irs.gov/publications/p15", at:"social security and Medicare taxes (What's New / section 9)", checked:"2026-10-28", via:"from search results, page not opened", w:"Publication 15 (2026) gives social security tax of 6.2% each for the employer and the employee, on wages up to $184,500. It gives Medicare tax of 1.45% each, with no wage limit. The employer's share is its own tax, on top of pay."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 4.3 Record and Post the Common Types of Adjusting Entries", u:"https://openstax.org/books/principles-financial-accounting/pages/4-3-record-and-post-the-common-types-of-adjusting-entries", at:"accrued expenses, salaries", checked:"2026-10-28", via:"from search results, page not opened", w:"An accrued expense belongs to a period, but the business has not recorded or paid it yet. Salaries are one example. The adjusting entry debits salaries expense and credits salaries payable. When the business pays the wages in the next period, salaries payable and cash both decrease."},
+  {t:"IRS: Outsourcing payroll and third-party payers", u:"https://www.irs.gov/businesses/small-businesses-self-employed/outsourcing-payroll-and-third-party-payers", checked:"2026-10-28", via:"from search results, page not opened", w:"A payroll service provider does not take over the employer's employment tax liability, and a contract cannot release the employer. If the provider does not deposit the tax, the IRS can charge penalties and interest to the employer. The employer can use its EFTPS Inquiry PIN to watch its deposits."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"That entry balances perfectly and is wrong.", w:"SKILL.md · Payroll journal entry builder"},
+  q2:{q:"Never invents an account.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"Never defaults an account mapping, an allocation basis or a capitalisation decision.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"One estimate only: a period-end accrual for a run not yet processed, labelled ESTIMATE.", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"A department dimension is not an allocation basis; the basis is a decision", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q6:{q:"gross pay is the expense; withholdings are liabilities owed to third parties; net pay is the liability owed to employees; employer costs are additional expense and additional liabilities.", w:"references/method.md · Step 1 — Understand the payroll register components"},
+  q7:{q:"every component in the register needs an account, and every payroll account in the chart should receive something.", w:"references/method.md · Step 1 — Understand the payroll register components"},
+  q8:{q:"A combined entry hides it; two entries expose it.", w:"references/method.md · Step 3 — Build the employer cost entry"},
+  q9:{q:"only the expense side is allocated", w:"references/method.md · Step 4 — Allocate across departments / cost centers"},
+  q10:{q:"A single bank debit covering net pay, taxes and the provider's fee is not one expense", w:"references/method.md · Step 5 — Handle net pay funding"},
+  q11:{q:"an accrual covering only gross pay understates the liability by the employer's contributions", w:"references/method.md · Step 6 — Period-end accrual (if needed)"},
+  q12:{q:"A balanced entry satisfies gross = net + withholdings by construction, so that identity alone proves nothing about the entry", w:"references/method.md · Step 7 — Validate the entries"},
+  q13:{q:"if employer costs were netted into gross, total expense will be right and the split will be wrong", w:"references/method.md · Step 7 — Validate the entries"},
+  q14:{q:"Payroll is stable; a material movement without a headcount change deserves a question before posting.", w:"references/method.md · Step 7 — Validate the entries"},
+  q15:{q:"Persist the map and the template; never the run.", w:"references/method.md · Step 9 — Evolve the skill (Mosofin-specific, final step)"},
+  q16:{q:"State the limitation", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"Three amounts, not one", r:Q.q6, cites:[1],
+    plain:"Gross pay is the cost of the work. Part of it goes to the staff, and part goes to others for them. The employer then owes its own costs in addition.",
+    backed:"The textbook debits salaries expense for gross pay and credits a separate liability for each deduction.{1}" },
+  { id:"2", title:"Every component gets an account", r:Q.q7, cites:[1,2],
+    plain:"The skill maps each register column to an account before it builds anything. An account that receives nothing is also a gap, until somebody explains it.",
+    backed:"Each deduction is a separate liability in the textbook.{1} Employee 401(k) money becomes a plan asset, so the employer owes it to the plan.{2}" },
+  { id:"3", title:"The employer entry stays separate", r:Q.q8, cites:[3],
+    plain:"The skill builds one entry for the employee side and a second entry for the employer costs. The mixing error then shows on its own line.",
+    backed:"In the US, the employer and the employee each pay a share of social security and Medicare. The employer's share is its own tax.{3}" },
+  { id:"4", title:"Balanced can still be wrong", r:Q.q1, cites:[],
+    plain:"An employer cost that a draft books as pay leaves the entry in balance. Only a comparison with the register finds it." },
+  { id:"5", title:"The identity proves nothing", r:Q.q12, cites:[],
+    plain:"Gross equals net plus withholdings in every balanced entry. So the skill ties each line to its register column instead." },
+  { id:"6", title:"No invented accounts", r:Q.q2, cites:[],
+    plain:"An account that is not in the live chart stops the run. Without a chart, each name carries a placeholder label." },
+  { id:"7", title:"No default decisions", r:Q.q3, cites:[],
+    plain:"The owner states the mapping, the split basis and any capitalised labour. The skill reads none of them from the books." },
+  { id:"8", title:"One estimate, labelled", r:Q.q4, cites:[4],
+    plain:"The skill estimates only the pay that people earn before the period end when the run that pays it is not processed yet.",
+    backed:"Wages that people earn but the business has not paid at the period end are an accrued expense.{4}" },
+  { id:"9", title:"The accrual includes employer costs", r:Q.q11, cites:[4],
+    plain:"Wages earned at the period end bring their employer costs with them. So the accrual includes both, and it reverses in the next period.",
+    backed:"The textbook accrues the wages, and the payable decreases when the business pays them.{4} It accrues wages only. The employer part is the skill's rule." },
+  { id:"10", title:"A lump sum is several amounts", r:Q.q10, cites:[5],
+    plain:"When a provider takes one debit for pay, taxes and its fee, the skill books each part. The composition comes from the provider's statement.",
+    backed:"A payroll provider does not take over the employer's employment tax liability.{5}" },
+  { id:"11", title:"A movement is a question", r:Q.q14, cites:[],
+    plain:"The skill compares the run with the last three runs, by component and per head. It flags a movement for a person to explain." },
+  { id:"12", title:"Save the map, never the money", r:Q.q15, cites:[],
+    plain:"On a yes after the results, the skill saves the account map and the entry layout. It never saves an amount or the pay of a person." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"One run · the September 2026 monthly run" },
+  { n:1, title:"Three amounts, not one",
+    chips:["Payroll register"], src:"Rule 1", cites:[1,3],
+    situation:"PayrollCo's register for the September run shows gross pay of $48,000 for 12 employees. Of that, $11,400 goes to others, and the staff take home the rest. Northbrook then owes $4,600 of its own costs on top.",
+    facts:["The textbook records gross pay as salaries expense and each deduction as a separate liability. Take-home pay stays as salaries payable until the business pays it "+C(1)+".",
+           "In the US, the employer and the employee each pay a share of social security and Medicare "+C(3)+". So Northbrook's share is a cost on top of gross pay. It is not a deduction from pay.",
+           "Every tax amount on this page comes from PayrollCo's register. The page applies no rate. The wages that a tax applies to can differ from gross pay, for example after pre-tax benefit deductions. Ask your accountant how this applies to you."],
+    visual:{type:"table",
+      head:["Component, from the register","Amount","What it is"],
+      rows:[["Gross pay: salaries 41,750 + overtime 6,250","$48,000.00","the expense"],["Federal income tax withheld","−$5,550.00","owed to the IRS"],["Employee social security and Medicare","−$3,450.00","owed to the IRS"],["Employee 401(k), pre-tax","−$2,400.00","owed to the plan"]],
+      total:["Net pay","$36,600.00","owed to the staff"]},
+    visual2:{type:"table",
+      head:["Employer cost, from the register","Amount","Owed to"],
+      rows:[["Employer social security and Medicare","$3,450.00","the IRS"],["401(k) match","$1,000.00","the plan"],["State unemployment","$150.00","the state"]],
+      total:["Employer costs","$4,600.00",""]},
+    rules:[Q.q6],
+    math:[["Withholdings: 5,550 + 3,450 + 2,400","$11,400.00"],["Net pay: 48,000 − 11,400","$36,600.00",1],["Employer costs: 3,450 + 1,000 + 150","$4,600.00",1],["Total cost of the run: 48,000 + 4,600","$52,600.00",1],["Per head: 52,600 ÷ 12","$4,383.33"],["Rates applied by this page","none"]],
+    verdict:["ok","The run has three amounts. The staff take home $36,600, others get $11,400, and the run costs Northbrook $52,600. The register identity holds: 48,000 = 36,600 + 11,400.","3 AMOUNTS"] },
+
+  { n:2, title:"The employee entry",
+    chips:["Payroll register","Chart of accounts"], src:"Rules 2 and 6", cites:[1,2],
+    situation:"Step 1 maps every register column to an account in the live chart. Step 2 then builds the employee entry: gross pay as the expense, one credit for each withholding and net pay to clearing.",
+    facts:["The textbook credits a separate liability for each deduction. Income tax withholding is an involuntary deduction, and a 401(k) contribution is a voluntary one "+C(1)+".",
+           "Employee 401(k) deferrals become plan assets when the employer can reasonably separate them from its own assets "+C(2)+". So the $2,400 is a debt to the plan, not Northbrook's money.",
+           "For a plan with fewer than 100 participants, a deposit by the 7th business day after the withholding counts as timely "+C(2)+". Northbrook's plan rule pays by the 7th of the next month. This page does not say that Northbrook meets the safe harbor."],
+    visual:{type:"table",
+      head:["Fri 25 Sep 2026 · proposed, not posted","Debit","Credit"],
+      rows:[["5100 Direct labour (Warehouse)","$16,000.00",""],["6000 Wages and salaries (Office)","$32,000.00",""],["2210 · memo “federal income tax withheld”","","$5,550.00"],["2210 · memo “employee social security and Medicare”","","$3,450.00"],["2230 · memo “employee 401(k)”","","$2,400.00"],["2200 Payroll clearing (net pay)","","$36,600.00"]],
+      total:["Totals","$48,000.00","$48,000.00"]},
+    visual2:{type:"table",
+      head:["Mapping check","Account","Finding"],
+      rows:[["Every column has an account","5100, 6000, 2210, 2230, 2200, 6010, 2240, 6020",["yes","good"]],["1700 Software in development","receives nothing","dormant: the project stopped on 31 August"],["2250 Accrued payroll","receives nothing in the run","only the period-end accrual, Level 5"],["2210 and 2230","shared by employee and employer amounts",["limitation stated","bad"]]]},
+    note:"6010 Employer payroll taxes and 6020 401(k) match expense are new accounts in this example. The owner adds them to the chart before the run. Each register column keeps its own line with a memo, so the line tie still works on a shared account.",
+    rules:[Q.q7, Q.q2, Q.q16],
+    math:[["Warehouse: 48,000 × 4 ÷ 12","$16,000.00"],["Office: 48,000 × 8 ÷ 12","$32,000.00"],["Debits: 16,000 + 32,000","$48,000.00",1],["Credits: 5,550 + 3,450 + 2,400 + 36,600","$48,000.00",1],["Difference","$0.00"],["Lines with one employee's pay","0"]],
+    verdict:["ok","The entry balances, and each line agrees with its register column. Two accounts receive nothing, and the skill flags both with a reason. The shared accounts 2210 and 2230 get a stated limitation: payroll clearing reconciliation cannot separate them either.","TIED"] },
+
+  { n:3, title:"The employer entry, and the draft that balances",
+    chips:["Payroll register","Last month's template"], src:"Rules 3, 4 and 5", cites:[3],
+    situation:"Step 3 books the employer costs in a second entry. Then the owner shows a one-entry draft from last month's template. It debits wages with $51,450, and it balances.",
+    facts:["The employer pays its own share of social security and Medicare, and the employee pays a separate share "+C(3)+". The employer's share is an expense of the employer. It never comes out of pay.",
+           "This page shows no rate next to Northbrook's figures. The $3,450 is PayrollCo's amount."],
+    visual:{type:"table",
+      head:["Fri 25 Sep 2026 · proposed, not posted","Debit","Credit"],
+      rows:[["6010 Employer payroll taxes, Warehouse (1,150 + 50)","$1,200.00",""],["6010 Employer payroll taxes, Office (2,300 + 100)","$2,400.00",""],["6020 401(k) match expense, Warehouse","$333.33",""],["6020 401(k) match expense, Office","$666.67",""],["2210 · memo “employer social security and Medicare”","","$3,450.00"],["2240 State unemployment payable","","$150.00"],["2230 · memo “employer 401(k) match”","","$1,000.00"]],
+      total:["Totals","$4,600.00","$4,600.00"]},
+    visual2:{type:"table",
+      head:["The one-entry draft","Debit","Credit"],
+      rows:[["Wages",["$51,450.00","bad"],""],["2210 Federal payroll taxes (5,550 + 3,450 + 3,450)","","$12,450.00"],["2230 401(k) payable","","$2,400.00"],["2200 Payroll clearing","","$36,600.00"]],
+      total:["Totals","$51,450.00","$51,450.00"]},
+    pair:[["bad","Wages against register gross","+$3,450.00","51,450 − 48,000. The employer's share, booked as if it were pay."],["note","Total expense in both","$52,600.00","The total is right, so the total alone hides the error."]],
+    note:"In the draft, the bookkeeper books the match and the state unemployment in the right accounts elsewhere. 6010 shows 0 against a register amount of $3,450.",
+    rules:[Q.q8, Q.q1, Q.q12, Q.q13],
+    math:[["Employer debits: 1,200 + 2,400 + 333.33 + 666.67","$4,600.00",1],["Employer credits: 3,450 + 150 + 1,000","$4,600.00",1],["Draft credits: 12,450 + 2,400 + 36,600","$51,450.00"],["Draft balance: 51,450 − 51,450","$0.00"],["Line tie: draft wages 51,450 − register gross 48,000","$3,450.00",1],["Draft total expense: 51,450 + 1,000 + 150","$52,600.00"],["Total expense, two entries: 48,000 + 4,600","$52,600.00"]],
+    verdict:["flag","The draft balances, and the register identity holds. The line tie finds $3,450 too much in wages and nothing in employer payroll taxes. The skill names it a possible mixing error and stops before posting.","MIXING ERROR"] },
+
+  { tier:"Where the cost goes · departments and assets" },
+  { n:4, title:"Departments and capitalised labour",
+    chips:["Owner's basis: headcount","Department dimension"], src:"Rule 7", cites:[],
+    situation:"The owner splits the cost by headcount: 4 in the warehouse and 8 in the office. Step 4 splits only the expense lines. The amounts owed stay as one total for each payable.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Expense line","Warehouse (4)","Office (8)","Total"],
+      rows:[["Wages","$16,000.00","$32,000.00","$48,000.00"],["Employer social security and Medicare","$1,150.00","$2,300.00","$3,450.00"],["State unemployment","$50.00","$100.00","$150.00"],["401(k) match","$333.33","$666.67","$1,000.00"]],
+      total:["Department total","$17,533.33","$35,066.67","$52,600.00"]},
+    visual2:{type:"table",
+      head:["Capitalised to 1700","July","August","September"],
+      rows:[["Office pay sent to Software in development","$2,000.00","$2,000.00",["$0.00","good"]]],
+      total:["Office expense","$30,000.00","$30,000.00","$32,000.00"]},
+    note:"The payroll reconciliation pages book capitalised labour of $4,000 for the quarter. This page follows the skill's read-back: $2,000 in July, $2,000 in August and none in September. The quarter total is the same.",
+    rules:[Q.q5, Q.q3, Q.q9],
+    math:[["Match, Warehouse: 1,000 × 4 ÷ 12 = 333.333…","$333.33"],["Match, Office: 1,000 − 333.33 (the cent goes here)","$666.67"],["Warehouse: 16,000 + 1,200 + 333.33","$17,533.33",1],["Office: 32,000 + 2,400 + 666.67","$35,066.67",1],["Sum: 17,533.33 + 35,066.67","$52,600.00",1],["Office expense change: 32,000 − 30,000","+$2,000.00"]],
+    verdict:["ok","The split adds to the total cost of $52,600. Office expense increases by $2,000 because capitalisation stopped. The skill flags that movement in Level 6, and answer H explains it.","SPLIT"] },
+
+  { tier:"Paying it and closing the month" },
+  { n:5, title:"Funding and the period-end accrual",
+    chips:["Bank","Accrued payroll 2250","Last full run"], src:"Rules 8, 9 and 10", cites:[4,5],
+    situation:"PayrollCo debits only net pay from Northbrook's bank on the pay date and bills its fee through accounts payable. Northbrook pays overtime one month late, with a cut-off on the 20th. So people earn overtime from Monday 21 to Wednesday 30 September that the October run pays.",
+    facts:["A payroll provider does not take over the employer's employment tax liability, and a contract cannot release the employer "+C(5)+". If the provider does not deposit the tax, the IRS can charge penalties and interest to the employer "+C(5)+".",
+           "An accrued expense belongs to the period, but the business has not paid it yet. Wages are one example "+C(4)+". When the business pays them in the next period, the payable and the cash both decrease "+C(4)+".",
+           "The textbook accrues wages only. The employer part of the accrual is the skill's rule."],
+    visual:{type:"table",
+      head:["Proposed, not posted","Debit","Credit"],
+      rows:[["Fri 25 Sep · 2200 Payroll clearing","$36,600.00",""],["Fri 25 Sep · 1000 Operating account","","$36,600.00"],["Wed 30 Sep · 5100 Direct labour (Warehouse), ESTIMATE","$2,500.00",""],["Wed 30 Sep · 6010 Employer payroll taxes (Warehouse), ESTIMATE","$179.69",""],["Wed 30 Sep · 2250 Accrued payroll, reverses Thu 1 Oct","","$2,679.69"]]},
+    pair:[["ok","2200 after the run","$0.00","36,600 in, 36,600 out on the same day."],["note","ESTIMATE, from the September run","$2,679.69","Overtime $2,500.00 and its employer part $179.69."]],
+    note:"The monthly salaries need no accrual: the pay period ends on 30 September, and the pay date is before it. The provider lump sum does not apply here. If one debit paid net pay, taxes and the fee, the skill would book each part from the provider's statement. At 23 September, 2200 already holds $2,223.40 from earlier months, and JE-0912 adds $1,800 on 24 September. Neither is from this run. The skill sends both to <a href=\"../payroll-clearing-reconciliation/learn.html\">payroll clearing reconciliation</a>, where 2200 shows $4,023.40 at 30 September. The <a href=\"../payroll-reconciliation/learn.html\">payroll reconciliation</a> books show $2,500 accrued at 30 September. The bookkeeper posted only the wages line, so the $179.69 is not posted there.",
+    rules:[Q.q10, Q.q4, Q.q11],
+    math:[["Working days, Fri 21 Aug to Sun 20 Sep, without Labor Day","20"],["Overtime a day: 6,250 ÷ 20","$312.50"],["Unpaid days, Mon 21 to Wed 30 Sep","8"],["Gross estimate: 312.50 × 8","$2,500.00",1],["Employer part: 2,500 × 3,450 ÷ 48,000 = 179.6875","$179.69",1],["Accrual: 2,500 + 179.69","$2,679.69",1],["Plausibility: 2,679.69 ÷ 52,600","5.1%"],["31 March accrual reversed on 1 April, 2250 nil since","no double count"],["2200 at 30 Sep: 2,223.40 + 1,800","$4,023.40"]],
+    verdict:["note","Net pay clears 2200 to nil for this run. The one estimate is $2,679.69, labelled ESTIMATE, and it reverses on Thursday 1 October. An accrual of the wages only would be $179.69 too low.","ESTIMATE"] },
+
+  { tier:"Before anybody posts" },
+  { n:6, title:"Compare, flag, refuse and save",
+    chips:["Prior three runs","Owner's 5% limit"], src:"Rules 11 and 12", cites:[5],
+    situation:"Step 7 runs eleven checks and compares the run with June, July and August. Then the skill presents the entries, marked as proposals, and the workpaper. It offers the Excel file only on a yes.",
+    facts:["The employer can use its EFTPS Inquiry PIN to watch the deposits that it or its provider makes "+C(5)+". So the amounts owed stay in Northbrook's own accounts until Northbrook sees them paid."],
+    visual:{type:"table",
+      head:["Component","June","July","August","September"],
+      rows:[["Gross","$48,000","$48,000","$48,000","$48,000"],["Income tax withheld","$6,000","$5,700","$5,700","$5,550"],["Employee social security and Medicare","$3,450","$3,450","$3,450","$3,450"],["Employee 401(k)","$2,500","$2,400","$2,400","$2,400"],["Net","$36,050","$36,450","$36,450","$36,600"],["Employer costs","$4,600","$4,600","$4,600","$4,600"],["Capitalised to 1700","$0","$2,000","$2,000",["$0","bad"]],["Headcount","12","12","12","12"]],
+      total:["Cost per head","$4,383.33","$4,383.33","$4,383.33","$4,383.33"]},
+    visual2:{type:"table",
+      head:["Amount owed","Amount","When"],
+      rows:[["2210 Federal payroll taxes","$12,450.00","by Thu 15 Oct, the owner's monthly rule"],["2230 401(k)","$3,400.00","by the 7th, plan rule: paid Tue 6 Oct"],["2240 State unemployment","$150.00","each quarter"]]},
+    note:"Flags: income tax withheld falls by $150, which is 2.6% and under the 5% limit, so no flag. Office expense increases by $2,000: flagged, explained by answer H. The bonus run of Tuesday 15 September ($6,000 gross) is a separate run with its own entries: flagged, explained, not hidden. The skill refuses to post, to show one person's pay and to choose the split basis. The owner asks for the match in “Employee benefits”. That account is not in the live chart, so the run stops until the owner chooses 6020. After the owner approves, the skill can save the map, keyed “quickbooks / Northbrook Trading”.",
+    rules:[Q.q14, Q.q15],
+    math:[["Income tax: 5,550 − 5,700","−$150"],["As a share: 150 ÷ 5,700","2.6%, under 5%"],["Balances: 48,000, 4,600, 36,600, 2,679.69","each equal",1],["Total expense: 48,000 + 4,600","$52,600",1],["2210: 5,550 + 3,450 + 3,450","$12,450"],["2230: 2,400 + 1,000","$3,400"],["With the bonus run: 2210 12,450 + 1,950","$14,400"],["Workpaper sheets","8"],["Amounts the skill saves","0",1]],
+    verdict:["flag","All eleven checks run. One shows a stated limitation, and two movements need an explanation before posting. The skill proposes. The owner decides and posts.","PROPOSED"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.visual2) vis += table(L.visual2);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    if(L.note) vis += `<p class="fine lvnote">${L.note}</p>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span${/^[−+$\d]/.test(m[1])?' style="white-space:nowrap"':""}>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: Steps 2 to 7 on the register totals. No rate field. --- */
+const WN=4, EN=3, DN=3;
+const P = {
+  nb:{gross:"48000", net:"36600", cap:"0", fund:"clear", draft:"", aamt:"6250", adays:"20", aun:"8", re:"3450", rg:"48000",
+      w:[["Federal income tax","5550"],["Employee social security and Medicare","3450"],["Employee 401(k)","2400"]],
+      e:[["Employer social security and Medicare","3450"],["401(k) match","1000"],["State unemployment","150"]],
+      d:[["Warehouse","4"],["Office","8"]]},
+  draft:null,
+  blank:{gross:"", net:"", cap:"", fund:"clear", draft:"", aamt:"", adays:"", aun:"", re:"", rg:"", w:[], e:[], d:[]},
+};
+P.draft = Object.assign({}, P.nb, {draft:"51450"});
+function rowsInto(id, n, kind, label2){
+  const box=document.getElementById(id);
+  for(let i=1;i<=n;i++){
+    box.insertAdjacentHTML("beforeend",`<span>${i}</span><input data-${kind}="nm" data-i="${i}" aria-label="${label2} ${i} name" style="text-align:left"><input data-${kind}="v" data-i="${i}" inputmode="decimal" aria-label="${label2} ${i} ${kind==="d"?"headcount":"amount"}">`);
+  }
+}
+rowsInto("wrows",WN,"w","Withholding"); rowsInto("erows",EN,"e","Employer cost"); rowsInto("drows",DN,"d","Department");
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const r2 = n => Math.round((n+Number.EPSILON)*100)/100;
+const z = v => isNaN(v)?0:v;
+const m2 = n => fmt(r2(n),2);
+const pairs = k => [...document.querySelectorAll(`.calc [data-${k}="nm"]`)].map(nm=>{ const i=nm.dataset.i, v=money(document.querySelector(`.calc [data-${k}="v"][data-i="${i}"]`).value); return {nm:nm.value.trim(), v}; }).filter(p=>!isNaN(p.v)&&p.v!==0);
+
+function load(p){
+  const X=P[p];
+  ["gross","net","cap","fund","draft","aamt","adays","aun","re","rg"].forEach(k=>{ fld(k).value=X[k]; });
+  [["w",WN],["e",EN],["d",DN]].forEach(([k,n])=>{ for(let i=1;i<=n;i++){ const b=X[k][i-1]||["",""];
+    document.querySelector(`.calc [data-${k}="nm"][data-i="${i}"]`).value=b[0];
+    document.querySelector(`.calc [data-${k}="v"][data-i="${i}"]`).value=b[1]; } });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const box=document.getElementById("results"), steps=document.getElementById("steps");
+  const gross=money(fld("gross").value), net=money(fld("net").value), cap=z(money(fld("cap").value)), draft=money(fld("draft").value), fund=fld("fund").value;
+  const W=pairs("w"), E=pairs("e"), D=pairs("d").filter(d=>d.v>0);
+  if(isNaN(gross)){ box.innerHTML=res("","Waiting","none","Enter the gross pay, or load an example."); steps.innerHTML=""; return; }
+  const wsum=r2(W.reduce((t,x)=>t+x.v,0)), esum=r2(E.reduce((t,x)=>t+x.v,0));
+  const netUsed=isNaN(net)?r2(gross-wsum):net;
+  const idDiff=r2(gross-wsum-netUsed);
+  const dr1=gross, cr1=r2(wsum+netUsed), b1=r2(dr1-cr1);
+  const expense=r2(gross-cap+esum);
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span style="white-space:nowrap">${b}</span></div>`;
+  let o="";
+  o+=res(idDiff===0?"ok":"flag","Register identity",idDiff===0?"holds":m2(idDiff),`Gross ${m2(gross)} − withholdings ${m2(wsum)} = ${m2(r2(gross-wsum))}. Register net ${m2(netUsed)}.`,"r-id");
+  o+=res(b1===0?"ok":"flag","Entry 1, employee side",`${m2(dr1)} = ${m2(cr1)}`,b1===0?"Debits equal credits.":`Out of balance by ${m2(b1)}.`,"r-e1");
+  o+=res("ok","Entry 2, employer costs",`${m2(esum)} = ${m2(esum)}`,E.length?"Debits equal credits. A separate entry.":"No employer costs entered. The cost is then incomplete.","r-e2");
+  if(!isNaN(draft)){ const t=r2(draft-gross);
+    o+=res(t===0?"ok":"flag","Line tie: draft wages − gross",m2(t),t===0?"The wages line agrees with the register.":"<b>Possible mixing error.</b> The wages line does not agree with the register gross.","r-tie"); }
+  o+=res("ok","Total expense",m2(expense),`Gross ${m2(gross)}${cap?` − capitalised ${m2(cap)}`:""} + employer costs ${m2(esum)}.`,"r-exp");
+  // allocation by headcount, line by line, remaining cent to the largest department
+  const lines=[["Wages",r2(gross-cap)]].concat(E.map(x=>[x.nm||"Employer cost",x.v]));
+  const hc=D.reduce((t,d)=>t+d.v,0);
+  let alloc=[];
+  if(D.length && hc>0){
+    let big=0; D.forEach((d,i)=>{ if(d.v>D[big].v) big=i; });
+    alloc=D.map(d=>({nm:d.nm||"Department",hc:d.v,parts:[],tot:0}));
+    lines.forEach(([nm,amt])=>{ let used=0;
+      D.forEach((d,i)=>{ if(i===big) return; const s=r2(amt*d.v/hc); alloc[i].parts.push(s); used=r2(used+s); });
+      alloc[big].parts.push(r2(amt-used)); });
+    // reorder big's parts to align: big's parts were pushed in line order too
+    alloc.forEach(a=>{ a.tot=r2(a.parts.reduce((t,x)=>t+x,0)); });
+    const sum=r2(alloc.reduce((t,a)=>t+a.tot,0));
+    alloc.forEach((a,i)=>{ o+=res("",esc(a.nm)+` (${a.hc})`,m2(a.tot),`Share of the expense by headcount.`,"r-d"+(i+1)); });
+    o+=res(sum===expense?"ok":"flag","Split sum",m2(sum),sum===expense?"The split adds to the total expense.":"The split does not add to the total.","r-dsum");
+  }
+  const aamt=money(fld("aamt").value), adays=money(fld("adays").value), aun=money(fld("aun").value), re=money(fld("re").value), rg=money(fld("rg").value);
+  let acc=null;
+  if(!isNaN(aamt)&&adays>0&&!isNaN(aun)){
+    const g=r2(aamt*aun/adays), e=(rg>0&&!isNaN(re))?r2(g*re/rg):0;
+    acc={g,e,t:r2(g+e),day:aamt/adays};
+    o+=res("note","ESTIMATE, period-end accrual",m2(acc.t),`Gross ${m2(g)} + employer part ${m2(e)}. It reverses in the next period.${rg>0?"":" Enter the ratio to add the employer part."}`,"r-acc");
+  }
+  box.innerHTML=o;
+  let s=line("Every line below is a proposal, not a posted entry","",1);
+  s+=line("Entry 1 · debit wages expense", m2(r2(gross-cap)));
+  if(cap) s+=line("Entry 1 · debit the asset account, capitalised labour", m2(cap));
+  W.forEach(x=>{ s+=line(`Entry 1 · credit ${esc(x.nm||"withholding")} payable`, m2(x.v)); });
+  s+=line(`Entry 1 · credit net pay to ${fund==="cash"?"cash":"payroll clearing"}`, m2(netUsed));
+  E.forEach(x=>{ s+=line(`Entry 2 · debit and credit ${esc(x.nm||"employer cost")}`, m2(x.v)); });
+  if(fund==="clear") s+=line("Funding · debit payroll clearing, credit the bank, on the pay date", m2(netUsed));
+  else s+=line("Funding · entry 1 credits net pay to cash","");
+  s+=line("Total expense", m2(expense), 1);
+  if(alloc.length){ s+=line("Split, line by line","by headcount",1);
+    lines.forEach(([nm,amt],j)=>{ s+=line(`${esc(nm)} ${m2(amt)}: `+alloc.map(a=>`${esc(a.nm)} ${m2(a.parts[j])}`).join(", "),""); }); }
+  if(acc){ s+=line("Accrual, labelled ESTIMATE","",1);
+    s+=line(`A day: ${m2(aamt)} ÷ ${adays}`, m2(acc.day));
+    s+=line(`Gross: ${m2(acc.day)} × ${aun}`, m2(acc.g));
+    if(acc.e) s+=line(`Employer part: ${m2(acc.g)} × ${m2(re)} ÷ ${m2(rg)}`, m2(acc.e));
+    s+=line("Accrual, reverses in the next period", m2(acc.t), 1); }
+  steps.innerHTML=s;
+}
+document.querySelectorAll('.calc input, .calc select').forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("nb");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

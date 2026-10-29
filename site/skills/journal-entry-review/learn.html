@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Entry Review Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked levels of a journal entry review, from 1,284 transactions to one warranty-reserve pattern, with an entry scorer. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .vcap{font-size:14px;color:var(--muted);margin-top:4px}
+  table.wrapcells td{white-space:normal;min-width:110px}
+  table.wrapcells td:first-child{min-width:120px}
+  .hdr{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.06em;background:var(--hold-soft);color:var(--hold);border-radius:8px;padding:8px 12px}
+  .bills select{min-width:130px}
+  .lines-note{display:flex;flex-direction:column;gap:4px}
+  td.p{color:var(--green);font-weight:700;text-align:center}
+  td.f{color:var(--wrong);font-weight:700;background:var(--wrong-soft);text-align:center}
+  td.na{color:var(--faint);text-align:center}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Journal entry review</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · journal-entry-review · learning guide</span>
+  <h1>From 1,284 transactions to the few that deserve a question</h1>
+  <p class="lede">This page shows how the skill reviews the journal of one quarter, <b>one level at a time</b>. It starts with the split between system entries and hand-typed entries. It ends with three reviews, four tests that did not run, and three requests that the skill refuses. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are an OpenStax textbook, the US federal internal-control standard, an ACFE study and two PCAOB publications. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your entry, your score</b><span>At the end, enter one entry and tick its warning signs. The page adds the points with this example's weights.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Eight rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading. It keeps its books in US dollars, on the accrual basis, with a calendar year, in one QuickBooks Online company file. The review covers 1 July to 30 September 2026, and the run is on Wednesday 14 October 2026. Four of the entries are the entries from the <a href="../journal-entry-builder/learn.html">journal entry builder</a> pages. There they are proposals. Here a person posted them on Wednesday 30 September.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Score one entry</h2>
+  <p class="muted">Enter the amount and your limits, then tick the warning signs that the entry shows. The page computes the two amount tests and adds the points. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="a">Warranty reserve release (JE-202609-019)</button>
+      <button type="button" data-p="b">Audit-fee accrual (JE-202609-022)</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The amounts</legend>
+        <label class="field"><span>Amount of the entry</span><input data-k="amt" inputmode="decimal"></label>
+        <label class="field"><span>Authorization threshold</span><input data-k="thr" inputmode="decimal"></label>
+        <label class="field"><span>Materiality (blank: not run)</span><input data-k="mat" inputmode="decimal"></label>
+        <label class="field"><span>Review threshold (score)</span><input data-k="rt" inputmode="decimal"></label>
+        <p class="fine">The page computes two signs from these amounts. "Just below" means from 95% of the threshold up to the threshold, and it gives 2 points. An amount at or above materiality gives 2 points.</p>
+      </fieldset>
+      <fieldset><legend>The warning signs (points)</legend>
+        <div id="ticks" style="display:flex;flex-direction:column;gap:6px"></div>
+      </fieldset>
+    </div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The weights, the 95% band and the review threshold of 6 are this example's choices. The skill tells you to state your weights, but it defines none. The page does not see your books. So it cannot run the pattern tests, the tie-out or the baseline of usual posters. A high score is a reason to ask a question. It is not a finding. Try this on the audit-fee example: change the amount to 9,500. The amount is then just below the threshold, and the score goes from 2 to 4.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin, or upload the data? Which period? What are the authorization thresholds? What is materiality? Does anyone make adjustments outside the books? Who may see the output? Must someone approve a manual entry, and can you export who approved it? Through which date are the books closed, and when was the close done? Which accounts are sensitive?</div>
+    <div><b>Needs</b>The period, the thresholds and the close date from you. Every transaction of the period, of all types, with the transaction date, create date, created by and description. Several earlier periods for the baseline. The approval log, if you have one.</div>
+    <div><b>Gives back</b>Nine sheets, with the patterns first. A header with the population size, the tie-out and the topside status. Each test that did not run, with the reason. An Excel file only on a yes.</div>
+    <div><b>Never</b>The skill never writes, updates or deletes anything. It never says that fraud occurred, and it never names a person. It never chooses a threshold for you. It never saves flagged entries, scores, user names or explanations.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from five outside sources: an OpenStax textbook, the US federal internal-control standard, an ACFE study and two PCAOB publications. MosoFin found each one on 28 October 2026 in search results and did not open the pages. Follow the link for today's wording. The two PCAOB sources apply to audits of public companies only. Northbrook is not a public company, so they do not apply to it.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The 21 indicators and the [auto], [gated] and [manual] verdicts are the skill's own. So are the NOT RUN and "Control not in place" labels and the nine sheets. This example chose the weights for each sign and the 5-day period-end window. It also chose the band from $9,500.00 to $9,999.99 and the review threshold of 6. The skill tells you to state the weights, but it defines none. MosoFin made up Northbrook Trading and every figure in the examples. The skill's files also cite PCAOB AS 2401.58–61 and AU-C 240.32 and A47–A48 for the population proof. The page names them as the skill cites them. MosoFin did not check those paragraphs for this page.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a correction from the bookkeeping audit followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. A flag is a question, and the skill does not detect fraud. The textbook and the standards are US sources. The control standard is for US federal entities, and the PCAOB sources apply to public-company audits only. Ask your accountant or auditor what applies to you. This page explains <code>journal-entry-review</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/journal-entry-review">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 8.3 Describe Internal Controls within an Organization", u:"https://openstax.org/books/principles-financial-accounting/pages/8-3-describe-internal-controls-within-an-organization", at:"separation of duties", checked:"2026-10-28", via:"from search results, page not opened", w:"A good control system makes sure that at least two people take part in most transactions. Then a second person checks the work of the first. Examples are placing and receiving an order, and writing and signing a check. The person who keeps an asset does not keep the accounting records."},
+  {t:"U.S. Government Accountability Office: Standards for Internal Control in the Federal Government (the Green Book), GAO-25-107721", u:"https://www.gao.gov/assets/gao-25-107721.pdf", at:"segregation of duties", checked:"2026-10-28", via:"from search results, page not opened", w:"Segregation of duties separates authority, custody and accounting, and helps to prevent fraud, waste and abuse. A smaller entity has more difficulty with it, because a few people hold the duties. The 2024 exposure draft (GAO-24-106889) lists more review levels and the review of randomly selected transactions as options. Written for US federal entities."},
+  {t:"ACFE: Occupational Fraud 2024: A Report to the Nations", u:"https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf", at:"internal control weaknesses; small organizations", checked:"2026-10-28", via:"from search results, page not opened", w:"A lack of internal controls (32%) or an override of existing controls (19%) contributed to more than half of the cases. Small organizations are much less likely to have anti-fraud controls. Limited staff usually means fewer checks and less segregation of duties."},
+  {t:"PCAOB: AS 2401, Consideration of Fraud in a Financial Statement Audit", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401", at:"journal entries and other adjustments", checked:"2026-10-28", via:"from search results, page not opened", w:"Fraud often involves improper or unauthorized entries, or adjustments made outside formal journal entries, such as consolidating adjustments. The auditor designs procedures to test journal entries and other adjustments, and fraud risk factors help to select them. It applies to public-company audits only."},
+  {t:"PCAOB: Audit Focus: Journal Entries (staff publication)", u:"https://pcaobus.org/resources/staff-publications/audit-focus/audit-focus-journal-entries", checked:"2026-10-28", via:"from search results, page not opened", w:"Auditors must test the accuracy and completeness of the list of entries that they test. A failure to test completeness is a common inspection deficiency. Selection signs include period-end entries with little explanation, unusual accounts, unusual posters and round numbers. Written for auditors of public companies."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"the ones typed in by hand bypass the normal checks, and those are the focus.", w:"SKILL.md · Journal entry review"},
+  q2:{q:"It identifies risk indicators; it never concludes that fraud occurred.", w:"SKILL.md · Journal entry review"},
+  q3:{q:"A flagged list is a list of questions, not of suspects; a user name is not a person; escalation is not an accusation.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Never writes, updates or deletes anything, in any system.", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"The screen is \"complete\" only when this tie-out is nil", w:"references/method.md · Step 1 — Understand the JE population"},
+  q6:{q:"A baseline measured from this entity's own history is better than an expectation someone states", w:"references/method.md · Step 1 — Understand the JE population"},
+  q7:{q:"created date/time later than the transaction date", w:"references/method.md · Timing"},
+  q8:{q:"Ask for it; the test is meaningless without it", w:"references/method.md · Amounts"},
+  q9:{q:"A round-number accrual at period end is a description of most accruals.", w:"references/method.md · Step 3 — Score and flag entries"},
+  q10:{q:"screen every entry, review the top.", w:"references/method.md · Step 3 — Score and flag entries"},
+  q11:{q:"The screen finds candidates; the analysis is where they are resolved", w:"references/method.md · Step 4 — Analyze flagged entries"},
+  q12:{q:"A reserve that reliably moves in the smoothing direction is an indicator worth investigating", w:"references/method.md · Step 5 — Pattern and trend analysis"},
+  q13:{q:"the review cannot answer this without approval data, and saying so is the control observation.", w:"references/method.md · Step 7 — Assess control implications"},
+  q14:{q:"Persist the method; never the results.", w:"references/method.md · Step 9 — Evolve the skill (Mosofin-specific, final step)"},
+  q15:{q:"a source label is a field, not a fact.", w:"references/edge-cases.md · Edge Cases"},
+  q16:{q:"Reversing entries that aren't re-posted", w:"references/method.md · Other"},
+};
+
+const RULES = [
+  { id:"1", title:"Hand-typed entries are the focus", r:Q.q1, cites:[1],
+    plain:"An invoice, a bill or a payroll run goes through the normal checks. An entry that a person types by hand can skip them. So the skill scores those entries first.",
+    backed:"A good control system makes sure that at least two people take part in most transactions. Then a second person checks the work of the first.{1}" },
+  { id:"2", title:"Review after the fact", r:Q.q11, cites:[2],
+    plain:"The screen finds the entries to look at. A person then gets the support and the explanation, and decides about each entry.",
+    backed:"A smaller entity has more difficulty with segregation of duties. The options for that risk include more review levels and the review of randomly selected transactions.{2} GAO wrote this for US federal entities. It is not a rule for Northbrook." },
+  { id:"3", title:"Indicators, never a conclusion", r:Q.q2, cites:[3],
+    plain:"The skill finds entries that deserve a question. It does not detect fraud, and it does not say that fraud occurred.",
+    backed:"In the ACFE's 2024 study, a lack of internal controls or an override of existing controls contributed to more than half of the cases.{3} That is why reviewers look at entries. It does not make a flag a finding." },
+  { id:"4", title:"Prove the population first", r:Q.q5, cites:[4,5],
+    plain:"The skill adds the debits of every entry that it read and compares the total with the ledger movement. Only a difference of 0.00 makes the screen complete.",
+    backed:"Auditors of public companies design procedures to test journal entries and other adjustments.{4} They must also test the completeness of the list of entries.{5} Both apply to public-company audits only." },
+  { id:"5", title:"Questions, not suspects", r:Q.q3, cites:[],
+    plain:"A login such as \"owner\" can be shared or delegated. So the skill names entries and logins, never people, and it asks questions of roles." },
+  { id:"6", title:"Read-only", r:Q.q4, cites:[],
+    plain:"The skill makes no entries. If you ask it to reverse or re-date an entry, it declines once, in plain words." },
+  { id:"7", title:"Screen all, review the top", r:Q.q10, cites:[],
+    plain:"Every entry gets a score. Only the entries at or above the review threshold get a detailed review. The report states both numbers." },
+  { id:"8", title:"Keep the method, never the results", r:Q.q14, cites:[],
+    plain:"On a yes, the skill saves the sensitive accounts, the thresholds, the weights and the rules for patterns that you cleared. It never saves flags, scores, user names or explanations." },
+];
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"The population · Northbrook Trading, 1 July to 30 September 2026" },
+  { n:1, title:"Why the hand-typed entries",
+    chips:["Full transaction journal","Transaction types"], src:"Rule 1", cites:[1],
+    situation:"Northbrook's books hold 1,284 transactions for the quarter. Most come from invoices, bills, payments and payroll. A person typed 48 of them by hand.",
+    facts:["A well-designed control system makes sure that at least two people take part in most transactions. Then another person checks the work of the first "+C(1)+".",
+           "The examples are placing and receiving an order, and writing and signing a check. The person who keeps an asset does not keep the accounting records "+C(1)+".",
+           "An entry that one person types by hand, with no second person, does not get that check. The skill's own files give this as the reason for the focus."],
+    visuals:[{cap:"The Q3 population, split by source (transaction type from the full journal)",
+      head:["Source","Examples","Count","Share"],
+      rows:[["System-generated","Invoices, bills, payments, payroll","1,236","96.3%"],["Manual journal entries","Typed in by hand","48","3.7%"]],
+      total:["Total","","1,284","100.0%"]}],
+    rules:[Q.q1, Q.q15],
+    math:[["System-generated transactions","1,236"],["Manual journal entries","48"],["Total: 1,236 + 48","1,284",1],["Manual share: 48 ÷ 1,284","3.7%",1],["System share: 1,236 ÷ 1,284","96.3%"],["Shares together: 3.7% + 96.3%","100.0%"]],
+    verdict:["ok","The focus is 48 entries, 3.7% of the population. The skill still screens all 1,284. A label such as \"system\" comes from a field, so the skill does not take it as proof.","48 MANUAL"] },
+
+  { n:2, title:"Prove the population first",
+    chips:["General ledger","Journal, all types","October journal"], src:"Rule 4", cites:[4,5],
+    situation:"In QuickBooks Online, a journal-entry search returns only Journal Entry transactions. So the skill reads the full transaction journal, of all types, and also reads October.",
+    facts:["Fraud often involves improper or unauthorized entries, or adjustments outside formal journal entries, such as consolidating adjustments. The auditor designs procedures to test journal entries and other adjustments "+C(4)+".",
+           "Auditors must test the accuracy and completeness of the list of entries that they test. A failure to test completeness is a common inspection deficiency "+C(5)+".",
+           "Both PCAOB sources apply to audits of public companies only. Northbrook is not a public company, so they do not apply to it. They show why a reviewer proves the list first."],
+    visuals:[{cap:"The tie-out, in the header of the report",
+      head:["Item","Amount"],
+      rows:[["Debits of the 1,284 transactions that the skill read","2,486,310.45"],["General ledger movement for the quarter","2,486,310.45"],["Difference",["0.00","good"]]]},
+      {cap:"What is in the population, and what is not",
+      head:["Part","In the population?"],
+      rows:[["All transaction types, 1 July to 30 September",["yes","good"]],["October, for reversal pairs and entries after the close",["read","good"]],["Topside entries in the consolidation workbook",["no: not connected","bad"]]]}],
+    rules:[Q.q5],
+    math:[["Debits of the extracted transactions","2,486,310.45"],["GL movement for the quarter","2,486,310.45"],["Difference: 2,486,310.45 − 2,486,310.45","0.00",1],["Screen status","complete",1],["Topside entries in the population","no"],["The header says","topside entries are NOT in this population",1]],
+    verdict:["ok","The difference is 0.00, so the skill can call the screen complete. The outside accountant keeps year-end adjustments in a consolidation workbook. It is not connected, and the header says so.","TIE-OUT 0.00"] },
+
+  { tier:"The screen · 21 indicators, scored" },
+  { n:3, title:"The 21 indicators and their verdicts",
+    chips:["Transaction date","Create date","Created by","Close date"], src:"the intake answers", cites:[5],
+    situation:"The owner gave the thresholds, the close date and the sensitive accounts. The entry read returns both dates, the login and the description. But nobody keeps an export of the approvals.",
+    facts:["Selection signs for auditors include period-end or post-closing entries with little or no explanation, and entries to unusual accounts "+C(5)+". Entries by people who do not usually post and round numbers are also signs "+C(5)+".",
+           "These signs help to select entries. They prove nothing. PCAOB staff wrote the publication for auditors of public companies."],
+    visuals:[{cap:"The 21 indicators of method Step 2, by group",
+      head:["Group","Indicators","Run","NOT RUN"],
+      rows:[["Timing","4","4","0"],["Account combinations","4","4","0"],["Amounts","4","4","0"],["People and process","6","2","4"],["Other","3","3","0"]],
+      total:["Total","21","17","4"]},
+      {cap:"Three tests that need something from you", cls:"wrapcells",
+      head:["Test","Needs","At Northbrook"],
+      rows:[["Back-dated","Two dates: the transaction date and the create date","Both present: run"],["Just below the threshold","The authorization threshold, from intake C","$10,000: run"],["Lacking approval, self-approved, posted and approved by one person, segregation of duties","An approval log, from intake G","No log: NOT RUN"],["After the close, prior closed period, back-dated","The close date, from intake I","Books closed through 30 September, close done 9 October. The skill's sample read-back has no line for I, so this example adds one"]]}],
+    rules:[Q.q7, Q.q8, Q.q16],
+    math:[["Timing + account + amounts + people + other: 4 + 4 + 4 + 6 + 3","21",1],["People and process run: users who do not normally post, vague descriptions","2"],["Run: 4 + 4 + 4 + 2 + 3","17",1],["NOT RUN: the four approval-based tests","4"],["Run + NOT RUN: 17 + 4","21",1],["Approval step at Northbrook","yes, by email"],["Approval log","none: NOT RUN, not \"Control not in place\""]],
+    verdict:["note","17 indicators run and 4 do not. There is an approval step but no log, so the four tests are NOT RUN. The report lists them in Sheet 8 and does not leave them out.","17 OF 21"] },
+
+  { n:4, title:"Score combinations, not single flags",
+    chips:["Flagged entries","Baseline: six prior quarters"], src:"Rule 7", cites:[],
+    situation:"Seven of the 48 manual entries meet at least one criterion. The skill adds the weights of the criteria and reviews each entry with a score of 6 or more.",
+    facts:[], nofact:NOFACT,
+    visuals:[{cap:"The weights, this example's choices. The skill says to state weights, but it defines none", cls:"wrapcells",
+      head:["Points","Criteria"],
+      rows:[["3","Back-dated · posted after the close cutoff · into a prior closed period"],["2","Straight to revenue, reserves or equity · just below ($9,500.00 to $9,999.99) · at or above materiality · unusual login · reversal not posted"],["1","Vague description · round amount · period end (26 to 30 September) · weekend"]]},
+      {cap:"Sheet 3, flagged entries, sorted by score. Approved By: not available on every row", cls:"wrapcells",
+      head:["Entry","Date","Login","Accounts","Amount","Criteria met","Score"],
+      rows:[["JE-202609-027","Wed 30 Sep, created Mon 12 Oct","bookkeeper","DR 6310 Utilities, CR 2110 Accrued expenses","1,263.40","Back-dated 3, after the close cutoff 3, prior closed period 3, period end 1",["10","bad"]],
+            ["JE-202609-019","Sat 26 Sep","owner","DR 2450 Warranty Reserve, CR 5000 Cost of Goods Sold","9,800.00","Reserves 2, just below 2, unusual login 2, vague (\"adjustment\") 1, weekend 1, period end 1",["9","bad"]],
+            ["JE-202609-023","Wed 30 Sep","bookkeeper","DR 4000 Revenue, CR 2400 Deferred revenue","33,000.00","Revenue 2, at or above materiality 2, round 1, period end 1",["6","bad"]],
+            ["JE-202609-022","Wed 30 Sep","bookkeeper","DR 6410, CR 2110","9,000.00","Round 1, period end 1","2"],
+            ["JE-202608-014","Mon 31 Aug","bookkeeper","DR 6310, CR 2110","2,040.00","Reversal not posted 2","2"],
+            ["JE-202609-024","Wed 30 Sep","bookkeeper","DR 2110, CR 6310","2,040.00","Period end 1","1"],
+            ["JE-202609-026","Wed 30 Sep","bookkeeper","DR 6150, CR 6520","640.00","Period end 1","1"]]}],
+    rules:[Q.q10, Q.q9, Q.q6],
+    math:[["JE-202609-027: 3 + 3 + 3 + 1","10"],["JE-202609-019: 2 + 2 + 2 + 1 + 1 + 1","9"],["JE-202609-023: 2 + 2 + 1 + 1","6"],["JE-202609-022: 1 + 1","2"],["Sum: 10 + 9 + 6 + 2 + 2 + 1 + 1","31",1],["Flagged + not flagged: 7 + 41","48 manual entries"],["System transactions flagged","0 of 1,236"],["Scores of 6 or more","3 reviewed",1],["JE-202609-022 against the band: 9,000 < 9,500","not just below"],["JE-202608-014: marked to reverse on Tue 1 Sep","no reversal found"],["JE-202609-024 clears JE-202608-014","2,040.00 = 2,040.00"],["JE-202609-022 reversal on Thu 1 Oct","found in the October read"]],
+    verdict:["note","All 1,284 transactions screened; 7 flagged; 3 high-risk reviewed. JE-202609-022 is a round accrual at period end, and the baseline shows that such accruals are routine. JE-202608-014 never reversed, and JE-202609-024 already corrects it.","7 FLAGGED"] },
+
+  { tier:"Patterns and follow-up · what the reviewer gets" },
+  { n:5, title:"Patterns first: three quarters at exactly 50,000",
+    chips:["Prior quarters","Profit and loss by quarter","Account 2450"], src:"Sheet 5", cites:[4],
+    situation:"JE-202609-019 alone looks small. Across three quarters, the \"owner\" login released the warranty reserve by hand on a Saturday, each time just below $10,000.",
+    facts:["Fraud often involves improper entries or adjustments in the financial reporting process, and fraud risk factors help an auditor to select which entries to test "+C(4)+".",
+           "AS 2401 applies to audits of public companies only, and it does not apply to Northbrook. The skill's pattern test is its own. A pattern is a question for a person, and not a finding."],
+    visuals:[{cap:"Pattern P1: warranty reserve releases by the \"owner\" login, described \"adjustment\"",
+      head:["Quarter","Date","Release","Operating profit before","After"],
+      rows:[["Q1 2026","Sat 28 Mar 2026","9,500.00","40,500","50,000"],["Q2 2026","Sat 27 Jun 2026","9,700.00","40,300","50,000"],["Q3 2026","Sat 26 Sep 2026","9,800.00","40,200","50,000"]],
+      total:["Total released","","29,000.00","",""]},
+      {cap:"Pattern P2 shows the same three entries another way",
+      head:["Pattern","What the skill sees","Method Step 5"],
+      rows:[["P1","Each release brings the quarter to exactly 50,000","Entries that consistently move results toward a target"],["P2","A manual entry to 2450 at three quarter-ends in a row","A process problem at minimum"]]}],
+    rules:[Q.q12],
+    math:[["Q1: 40,500 + 9,500","50,000"],["Q2: 40,300 + 9,700","50,000"],["Q3: 40,200 + 9,800","50,000",1],["Released: 9,500 + 9,700 + 9,800","29,000",1],["Each release against the $10,000 threshold","below: no approval needed"],["Baseline: manual entries by \"owner\" in six quarters","2, both warranty releases"]],
+    verdict:["flag","Sheet 5 leads the report with this pattern. It is one pattern, seen two ways. The skill asks a question and does not guess the answer. A shared or delegated login also breaks the link to any one person.","PATTERN"] },
+
+  { n:6, title:"Follow-up, controls, and what the skill never keeps",
+    chips:["Sheets 4, 6, 7 and 8","Approval emails"], src:"Rules 2, 3, 5, 6 and 8", cites:[2,3],
+    situation:"Three entries get a detailed review, and each question goes to a role. Then the owner asks the skill to fix two entries, to name a person and to save the flags.",
+    facts:["Segregation of duties helps to prevent fraud, waste and abuse. A smaller entity has more difficulty with it, because a few people hold the duties "+C(2)+".",
+           "The options for that risk include more review levels and the review of randomly selected transactions "+C(2)+". GAO wrote this for US federal entities. Here it states the control idea, and it is not a rule for Northbrook.",
+           "Small organizations are much less likely to have anti-fraud controls. Limited staff usually means fewer checks and less segregation of duties "+C(3)+"."],
+    visuals:[{cap:"Sheets 4 and 6: the three reviews", cls:"wrapcells",
+      head:["Entry","Asked of","What the review found","Result"],
+      rows:[["JE-202609-027 (10)","Bookkeeper","The September utilities bill came late. On Mon 12 Oct the bookkeeper posted a true-up dated 30 Sep, after the close on Fri 9 Oct.",["Error: move the date to the open period","bad"]],
+            ["JE-202609-019 (9)","Outside accountant, due Fri 23 Oct 2026","Support asked for: the warranty claims analysis. With no support, the item goes to the audit committee chair.",["Outstanding","bad"]],
+            ["JE-202609-023 (6)","Bookkeeper","The Pinnacle sales receipt and service contract support a deferral of 11 months of an annual prepayment.",["Legitimate","good"]]]},
+      {cap:"Sheet 7, control observations", cls:"wrapcells",
+      head:["Observation","Measure"],
+      rows:[["Manual share","48 ÷ 1,284 = 3.7%"],["Descriptions of three words or fewer","9 of 48 = 18.8%"],["Lock date overridden","1 entry, JE-202609-027"],["Approval step, owner over $10,000, by email","No log: the four approval tests are NOT RUN"]]},
+      {cap:"Three requests, and what the skill does", cls:"wrapcells",
+      head:["The owner asks","The skill"],
+      rows:[["\"Reverse JE-202609-019 and re-date JE-202609-027 for me.\"","Declines once, plainly. It may point to the journal entry builder, which proposes entries for a person to post."],["\"So is someone fiddling the books? Who?\"","Names nobody. A flag is a question."],["\"Save this quarter's flags so we can check them next quarter.\"","Refuses. On a yes, it saves only the method."]]}],
+    rules:[Q.q11, Q.q13, Q.q3, Q.q2, Q.q4, Q.q14],
+    math:[["Reviewed: 1 error + 1 legitimate + 1 outstanding","3",1],["Short descriptions: 9 ÷ 48","18.75%, shown as 18.8%",1],["JE-202609-019: 9,800 against the $10,000 threshold","no approval needed"],["JE-202609-027 errors","1, about a date, not a person"],["Entries that the skill writes","0",1],["Saved on a yes","quickbooks / Northbrook Trading, sensitive accounts 4000–4999, 2400–2450, 3200, threshold 10,000 from 2025-04-01, baseline 6 prior periods"],["Also saved","the weights, and \"quarter-end accruals to 2110 are routine\""],["Never saved","flags, scores, user names, explanations"]],
+    verdict:["note","The skill offers \"JE_Review_2026-Q3_Northbrook Trading.xlsx\" with nine sheets and makes it only on a yes. A person moves the date of JE-202609-027. A fraud investigation is outside this skill. Escalation is not an accusation.","READ-ONLY"] },
+];
+
+const NOTE_EXAMPLE = "The skill's read-back names \"the CFO and the audit committee\" and a consolidation workbook. Other Northbrook pages describe an owner-run company with one QuickBooks file. This example follows the skill's read-back.";
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){
+  if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`;
+  return `<td class="${num?"n":""}">${esc(c)}</td>`;
+}
+function table(v){
+  let h=(v.cap?`<p class="vcap">${esc(v.cap)}</p>`:"")+`<div class="tbl"><table${v.cls?` class="${v.cls}"`:""}><thead><tr>${v.head.map((x,i)=>`<th class="${i&&!v.cls?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0 && !v.cls)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = L.visuals.map(table).join("");
+    if(L.n===2) vis += `<p class="vcap">${esc(NOTE_EXAMPLE)}</p>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: score one entry with this example's weights --- */
+const TICKS = [
+  ["back","Back-dated",3],["close","Posted after the close cutoff",3],["prior","Into a prior closed period",3],
+  ["acct","Straight to revenue, reserves or equity",2],["user","A login that does not normally post",2],["rev","Reversal not posted",2],
+  ["vague","Vague description",1],["round","Round amount",1],["pend","Period end (last 5 days)",1],["wknd","Weekend",1],
+];
+const PRESETS = {
+  a:{amt:9800, thr:10000, mat:25000, rt:6, on:["acct","user","vague","wknd","pend"]},
+  b:{amt:9000, thr:10000, mat:25000, rt:6, on:["round","pend"]},
+  blank:{amt:"", thr:"", mat:"", rt:6, on:[]},
+};
+const tk=document.getElementById("ticks");
+TICKS.forEach(([k,lab,w])=>tk.insertAdjacentHTML("beforeend",`<label class="field" style="grid-template-columns:1fr auto"><span>${lab} (${w})</span><input data-t="${k}" type="checkbox" style="width:20px;height:20px;accent-color:var(--green)"></label>`));
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const t=String(s).replace(/[$£€,\s]/g,""); if(t==="") return NaN; const v=parseFloat(t); return isFinite(v)?v:NaN; };
+const cents = v => Math.round(v*100);
+const m2 = c => (c<0?"−":"")+(Math.abs(c)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function load(p){
+  const P=PRESETS[p];
+  fld("amt").value=P.amt; fld("thr").value=P.thr; fld("mat").value=P.mat; fld("rt").value=P.rt;
+  document.querySelectorAll("#ticks [data-t]").forEach(i=>i.checked=P.on.includes(i.dataset.t));
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results");
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  const A=money(fld("amt").value), T=money(fld("thr").value), M=money(fld("mat").value), R=money(fld("rt").value);
+  if(isNaN(A)){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the amount of the entry."); return; }
+  const a=cents(Math.abs(A)); const parts=[]; let s="";
+  TICKS.forEach(([k,lab,w])=>{ if(document.querySelector(`#ticks [data-t="${k}"]`).checked){ parts.push(w); s+=line(lab, String(w)); } });
+  let jb;
+  if(isNaN(T)) jb=res("note","Just below the threshold","not run","No threshold given. The skill never assumes one.","r-jb");
+  else { const lo=cents(T*0.95), hi=cents(T);
+    if(a>=lo && a<hi){ parts.push(2); s+=line(`Just below: ${m2(a)} ≥ ${m2(lo)} and < ${m2(hi)}`,"2"); jb=res("flag","Just below the threshold","yes",`${m2(a)} is from ${m2(lo)} up to ${m2(hi)}.`,"r-jb"); }
+    else jb=res("ok","Just below the threshold","no",a<lo?`${m2(a)} is below ${m2(lo)}, 95% of the threshold.`:`${m2(a)} is not below ${m2(hi)}.`,"r-jb"); }
+  let mt;
+  if(isNaN(M)) mt=res("note","Materiality","not run","No materiality given. The skill never assumes one.","r-mat");
+  else if(a>=cents(M)){ parts.push(2); s+=line(`At or above materiality: ${m2(a)} ≥ ${m2(cents(M))}`,"2"); mt=res("flag","Materiality","yes",`${m2(a)} is at or above ${m2(cents(M))}.`,"r-mat"); }
+  else mt=res("ok","Materiality","no",`${m2(a)} is below ${m2(cents(M))}.`,"r-mat");
+  const score=parts.reduce((x,y)=>x+y,0), rt=isNaN(R)?6:R;
+  s+=line(`Score: ${parts.length?parts.join(" + "):"0"}`, String(score), 1);
+  s+=line(`Review threshold`, String(rt));
+  steps.innerHTML=s;
+  const hi = score>=rt;
+  box.innerHTML = jb + mt
+    + res(hi?"flag":"ok","Score",String(score),`${parts.length} sign(s) met, with this example's weights.`,"r-score")
+    + res(hi?"flag":"ok","Result",hi?"high priority, review":"screened, not reviewed",hi?`${score} is at or above ${rt}. A person asks for the support.`:`${score} is below ${rt}. The entry stays in Sheet 3.`,"r-res");
+}
+document.querySelectorAll(".calc [data-k], #ticks [data-t]").forEach(i=>{ const f=()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}; i.addEventListener("input",f); i.addEventListener("change",f); });
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("a");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

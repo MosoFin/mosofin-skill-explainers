@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Journal Entries Explained in Plain English | MosoFin</title>
+<meta name="description" content="How payroll journal entries split gross pay, withholdings, net pay and employer costs, and why an entry that balances can still be wrong.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Payroll journal entry builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Payroll journal entries, in plain words</span>
+  <h1>Payroll costs us more than we pay out on payday. How do we book each dollar?</h1>
+  <p class="lede">Payroll costs a business more than the staff receive. This skill reads your <b>payroll register</b> and builds the <b>journal entries</b> that record the run. Every dollar goes to the correct account, and a person posts the entries.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it the register for one pay run. It finds three amounts: the pay that your staff earn, the part that goes to other people for them, and your own extra costs. It builds two entries and ties every line to the register. It compares the run with the last runs. It never posts an entry and never shows one person's pay.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Where the money goes</span>
+  <h2>Three amounts, and only one of them reaches your staff</h2>
+  <p>Northbrook Trading pays 12 people each month: 4 in the warehouse and 8 in the office. For September 2026, the staff earn $48,000 before deductions. Accountants call this gross pay. Gross pay is the cost of the work. The staff do not receive all of it.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 780 340" role="img" aria-label="Northbrook's September 2026 monthly run. Gross pay is 48,000. Of that, 36,600 is net pay that goes to the staff through payroll clearing account 2200 and the bank. 11,400 is withheld for others: federal income tax 5,550, the employee share of social security and Medicare 3,450, and the employee 401(k) 2,400. On top of gross pay, Northbrook owes its own employer costs of 4,600: its share of social security and Medicare 3,450, the 401(k) match 1,000 and state unemployment 150. The total cost of the run is 52,600.">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="2" color="var(--rule-strong)">
+          <line x1="196" y1="70" x2="276" y2="70" marker-end="url(#ar)"/>
+          <path d="M106 120 C 106 170, 200 190, 276 190" marker-end="url(#ar)"/>
+          <line x1="526" y1="70" x2="566" y2="70" marker-end="url(#ar)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="16" y="20" width="180" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="106" y="48" text-anchor="middle" font-size="13" fill="var(--muted)">Gross pay, the cost</text>
+          <text x="106" y="82" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)">48,000</text>
+          <text x="106" y="106" text-anchor="middle" font-size="13" fill="var(--muted)">what the staff earn</text>
+
+          <rect x="278" y="20" width="248" height="100" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="402" y="46" text-anchor="middle" font-size="13" fill="var(--green)">Net pay, to the staff</text>
+          <text x="402" y="80" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">36,600</text>
+          <text x="402" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">through clearing 2200</text>
+
+          <rect x="568" y="20" width="196" height="100" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="666" y="48" text-anchor="middle" font-size="13" fill="var(--muted)">The bank</text>
+          <text x="666" y="80" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">pays 36,600</text>
+          <text x="666" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">on the pay date</text>
+
+          <rect x="278" y="140" width="248" height="110" rx="12" fill="var(--hold-soft)" stroke="var(--hold)"/>
+          <text x="402" y="164" text-anchor="middle" font-size="13" fill="var(--hold)">Withheld for others: 11,400</text>
+          <text x="402" y="190" text-anchor="middle" font-size="14" fill="var(--ink)">Federal income tax 5,550</text>
+          <text x="402" y="212" text-anchor="middle" font-size="12.5" fill="var(--ink)">Staff social security, Medicare 3,450</text>
+          <text x="402" y="234" text-anchor="middle" font-size="14" fill="var(--ink)">Staff 401(k) 2,400</text>
+
+          <rect x="16" y="200" width="180" height="120" rx="12" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="106" y="226" text-anchor="middle" font-size="13" fill="var(--muted)">On top: employer costs</text>
+          <text x="106" y="258" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">4,600</text>
+          <text x="106" y="282" text-anchor="middle" font-size="12" fill="var(--muted)">3,450 + 1,000 + 150</text>
+          <text x="106" y="302" text-anchor="middle" font-size="12" fill="var(--muted)">not taken from pay</text>
+
+          <rect x="568" y="160" width="196" height="160" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="666" y="188" text-anchor="middle" font-size="13" fill="var(--muted)">Total cost of the run</text>
+          <text x="666" y="226" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)">52,600</text>
+          <text x="666" y="254" text-anchor="middle" font-size="13" fill="var(--muted)">48,000 + 4,600</text>
+          <text x="666" y="280" text-anchor="middle" font-size="13" fill="var(--muted)">4,383.33 a head</text>
+          <text x="666" y="302" text-anchor="middle" font-size="12" fill="var(--muted)">52,600 ÷ 12</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Every tax amount comes from the register of PayrollCo, Northbrook's payroll provider. This page applies no tax rate. The wages that a tax applies to can differ from gross pay, for example after pre-tax benefit deductions. Ask your accountant how this applies to you.</figcaption>
+  </figure>
+  <p>The first part is net pay: 48,000 − 5,550 − 3,450 − 2,400 = 36,600. This is the take-home pay. The bank pays it to the staff.</p>
+  <p>The second part is the withholdings: 11,400 that Northbrook takes from pay for other people. An accounting textbook records each deduction as a separate amount that you owe<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The tax goes to the IRS. The 401(k) money goes to the retirement plan. US rules make the staff's 401(k) money plan assets, and the employer must deposit it within a time limit<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+  <p>The third part is the employer costs: 4,600 that Northbrook owes in addition to gross pay. In the US, the employer pays its own share of social security and Medicare, and the staff pay a separate share<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. So Northbrook's own share is a cost on top of pay. It is not a deduction from pay. The run costs 52,600, and the staff take home 36,600.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>An entry that balances and is wrong</h2>
+  <p>The skill calls this error the most common one: an employer cost booked as an employee deduction, or the reverse. The entry still balances, so the books accept it. The skill uses two separate entries to find it. Then it compares each line with the matching column total in the register.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>Two entries, tied to the register</h3>
+      <span class="who">What the skill proposes for September</span>
+      <div class="rows num">
+        <div class="row"><span>Wages, entry 1</span><span class="v">48,000.00</span></div>
+        <div class="row"><span>Employer costs, entry 2</span><span class="v">4,600.00</span></div>
+        <div class="row"><span>Register gross pay</span><span class="v">48,000.00</span></div>
+        <div class="row"><span>Total expense</span><span class="v">52,600.00</span></div>
+      </div>
+      <div class="verdict">Each entry balances. Wages agree with the register: 48,000 against 48,000. The employer's 3,450 is in the employer payroll tax account.</div>
+    </div>
+    <div class="book bad">
+      <h3>One entry, copied from last month</h3>
+      <span class="who">A draft that adds the employer's share to wages</span>
+      <div class="rows num">
+        <div class="row off"><span>Wages</span><span class="v">51,450.00</span></div>
+        <div class="row off"><span>Employer payroll taxes</span><span class="v">0.00</span></div>
+        <div class="row"><span>Register gross pay</span><span class="v">48,000.00</span></div>
+        <div class="row same"><span>Total expense</span><span class="v">52,600.00</span></div>
+      </div>
+      <div class="verdict">The draft balances, and the total expense is correct. The split is wrong. Wages are 51,450 − 48,000 = 3,450 too high. That 3,450 is the employer's own share of social security and Medicare, booked as if it were pay.</div>
+    </div>
+  </div>
+  <p>A check that the entry balances does not find this error. The draft's debits equal its credits: 12,450 + 2,400 + 36,600 = 51,450. The line tie finds it, because the wages line does not agree with the register's gross pay. The skill names the difference a possible mixing error and stops before you post anything.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Wages too high</span><span class="v num wrong">$3,450</span><span class="s">51,450 − 48,000</span></div>
+    <div class="stat"><span class="label">Employer taxes missing</span><span class="v num wrong">$3,450</span><span class="s">The account shows 0. The register shows 3,450</span></div>
+    <div class="stat"><span class="label">Total expense</span><span class="v num">$52,600</span><span class="s">The same in both. So the total alone hides the error</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Departments and month end</span>
+  <h2>Split the cost, and add the overtime that is not paid yet</h2>
+  <p>Northbrook splits the cost by headcount. That basis is the owner's decision, and the skill never chooses it. Only the cost is split. The amounts owed to others stay as one total.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Warehouse, 4 people</span><span class="v num">$17,533.33</span><span class="s">16,000 wages + 1,200 taxes + 333.33 match</span></div>
+    <div class="stat"><span class="label">Office, 8 people</span><span class="v num">$35,066.67</span><span class="s">32,000 + 2,400 + 666.67. The extra cent goes here, so the split adds to the total</span></div>
+    <div class="stat"><span class="label">Sum</span><span class="v num good">$52,600.00</span><span class="s">17,533.33 + 35,066.67</span></div>
+  </div>
+  <p>Northbrook pays overtime one month late. The staff earn overtime from 21 to 30 September, and Northbrook pays it in the October run. A cost that you owe at the period end but have not paid is an accrued expense. Wages are a common example<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill proposes one estimate for this, labelled ESTIMATE.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Overtime earned, not paid</span><span class="v num hold">$2,500.00</span><span class="s">6,250 ÷ 20 working days = 312.50 a day × 8 days</span></div>
+    <div class="stat"><span class="label">Employer part</span><span class="v num hold">$179.69</span><span class="s">2,500 × 3,450 ÷ 48,000, the ratio in the last run</span></div>
+    <div class="stat"><span class="label">ESTIMATE</span><span class="v num hold">$2,679.69</span><span class="s">Recorded on 30 September, reversed on 1 October</span></div>
+  </div>
+  <p>An accrual for the wages only is too low. It leaves out the employer costs on those wages, here 179.69. The entry reverses on 1 October, so the October run does not count the cost two times.</p>
+  <p>Before you post anything, the skill compares the run with June, July and August. Gross pay is the same, 48,000, in each month. Income tax withheld falls by 150, which is less than Northbrook's 5% limit. Office cost increases by 2,000, because the software project stopped. Until August, 2,000 of office pay each month went to the project as an asset. The skill flags this change, and the bonus run of 15 September, for you to explain.</p>
+</section>
+
+<section>
+  <span class="label">Who pays the bill</span>
+  <h2>Your payroll provider pays the staff, and the debt stays yours</h2>
+  <p>PayrollCo calculates the pay and takes the net pay of 36,600 from Northbrook's bank on the pay date. That amount goes through the payroll clearing account 2200, so the account is at nil after the run. PayrollCo sends its fee as a separate bill. Northbrook deposits the federal taxes itself.</p>
+  <p>A provider does not take over your payroll tax debt. If the provider does not deposit the tax, the IRS can charge penalties and interest to the employer<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. So the skill keeps every amount owed in Northbrook's own accounts. Some providers take one lump sum for pay, taxes and their fee. The skill books that sum one part at a time, never as one expense.</p>
+  <p>The clearing account already held 2,223.40 from earlier months. That balance is not from this run. The skill sends it to the <a href="../payroll-clearing-reconciliation/plain.html" style="color:var(--green)">payroll clearing reconciliation</a>. After you post the entries, the <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a> checks the quarter against the bank and the tax filings.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Eight items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books. With it, the skill reads your accounts from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools.</div></li>
+    <li><div class="q">Which company, and which pay run? In a group, which company pays these people?</div><div class="why">Each company gets its own entries, against its own accounts. The skill never chooses the company for you.</div></li>
+    <li><div class="q">The pay period and the pay date. And do you keep the books on a cash basis or an accrual basis?</div><div class="why">These decide if a month-end estimate is necessary.</div></li>
+    <li><div class="q">The payroll register or report for the run.</div><div class="why">Every amount comes from it. Without a register, the skill has nothing to build from, and it says so.</div></li>
+    <li><div class="q">Your employer costs: your tax share, retirement match and benefit costs.</div><div class="why">They are extra cost and extra debt, not deductions. They are usually in the register. If they are missing, the skill says that the cost is incomplete.</div></li>
+    <li><div class="q">Do you use a payroll clearing account?</div><div class="why">This changes where net pay goes. On the MosoFin path, the skill looks for one and then asks you to agree.</div></li>
+    <li><div class="q">If you split the cost by department: on what basis? Hours, headcount or direct assignment?</div><div class="why">A list of departments in your books does not tell how to split the cost. The basis is your decision.</div></li>
+    <li><div class="q">Is any pay in this run part of an asset, for example software that you build?</div><div class="why">That pay goes to an asset account, not to expense. The register does not show it, so the skill always asks.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. This is the skill's own example, word for word. The skill's example pays the September run on Friday 25 September, and this page follows it. Our other payroll pages pay it on Wednesday 30 September. The amounts are the same.</p>
+  <blockquote><i>"Building the payroll journal for Northbrook Trading's monthly run for September (pay period 1–30 September, pay date 25 September), from the register you uploaded, against the chart read from your Mosofin connection. Net pay through the payroll clearing account; wages and employer costs split by department on headcount; no capitalised labour. Shall I go ahead?"</i></blockquote>
+  <p>Then it names the file and reports what it read: the period, 12 people paid, and the totals for each part of pay. It never repeats one person's line.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect your books, or upload the register and your accounts</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it the register</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads your list of accounts, your departments, the last payroll entries, and the balances of the payroll accounts</li>
+        <li>It reads the register only if a payroll system is also connected. If not, you upload the register, and the skill labels it as supplied by you</li>
+        <li>You still give it the <b>split basis</b> and any <b>pay that goes to an asset</b>. Your books never answer these</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the register and your list of accounts</h3>
+      <ul>
+        <li><b>Payroll register</b> for the run, with totals for gross pay, each withholding and net pay. CSV, XLSX or PDF, required</li>
+        <li><b>Employer costs</b>, if they are not in the register. CSV, XLSX or PDF</li>
+        <li><b>Chart of accounts</b>, CSV or XLSX. Without it, each account name carries a label that says it needs a real account</li>
+        <li>Company name, country, currency, fiscal year, pay period, pay date, cash or accrual basis, and if you use a clearing account. Typed in the chat</li>
+        <li>The split basis and any pay that goes to an asset, typed in the chat, if they apply</li>
+        <li><b>Last payroll entries</b> and the balances of the payroll accounts, recommended, CSV or XLSX</li>
+        <li><b>Bank and timing details</b>, recommended. If a provider takes one lump sum, its statement. PDF, CSV or XLSX</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>The proposed entries, and a workpaper with eight sheets</h2>
+  <p>Every entry carries this mark from the skill:</p>
+  <blockquote><code>PROPOSED — NOT POSTED</code></blockquote>
+  <div class="gets">
+    <div class="get"><b>Journal entries</b><span>The pay entry and the employer entry, kept separate, with the funding and the month-end estimate.</span></div>
+    <div class="get"><b>Gross to net</b><span>Gross pay, each withholding and net pay, with the check that they agree.</span></div>
+    <div class="get"><b>Employer costs</b><span>Each extra cost on top of pay.</span></div>
+    <div class="get"><b>Department split</b><span>Each department's share, with the sum checked against the total.</span></div>
+    <div class="get"><b>Amounts owed</b><span>What you owe to the IRS, the plan and the state, and when.</span></div>
+    <div class="get"><b>Validation</b><span>Each check and its result, from balance to the line tie.</span></div>
+    <div class="get"><b>Run comparison</b><span>This run against the last runs, by part of pay and per head.</span></div>
+    <div class="get"><b>Coverage</b><span>What the skill read, and from where. It also shows what you supplied.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks before it makes the Excel file. After you approve the results, it offers to save your account map and your entry layout for the next run. It never saves an amount or any person's pay.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Seven rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry is a proposal for a person to post.</li>
+      <li><b>Never shows or saves one person's pay.</b> Payroll data is personal. The entries show accounts and departments only.</li>
+      <li><b>Never invents an account.</b> An account that is not in your books stops the run. It never chooses an account, a split basis or an asset decision for you.</li>
+      <li><b>Never accepts an entry only because it balances.</b> It keeps the employer entry separate and ties every line to the register.</li>
+      <li><b>Makes one estimate only:</b> the month-end amount for pay that is not processed yet, labelled ESTIMATE.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>Payroll register</dt><dd>The provider's report of one pay run: gross pay, each deduction, net pay and the employer costs.</dd>
+    <dt>Gross pay</dt><dd>What the staff earn before deductions. It is the cost of their work.</dd>
+    <dt>Net pay</dt><dd>The take-home pay that the bank pays to the staff<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Withholding</dt><dd>Money that you take from pay for somebody else, for example tax or a 401(k). You owe it to them until you pay it.</dd>
+    <dt>Employer costs</dt><dd>Costs that you owe on top of pay, for example your share of social security and Medicare<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+    <dt>Payroll clearing account</dt><dd>A waiting room in your books for net pay. It returns to nil when the bank pays the staff.</dd>
+    <dt>Accrual</dt><dd>An entry for a cost that you owe at the period end but have not paid<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are two sections of an accounting textbook, two IRS pages and a US Department of Labor page. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="employee payroll entry; employer payroll liabilities"><a href="https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll</a><span class="what">The employee entry records gross pay as salaries expense and each deduction as a separate amount owed. Take-home pay stays as salaries payable until it is paid. The employer records its own taxes and benefits in a separate entry.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://webapps.dol.gov/elaws/ebsa/fiduciary/q4e.htm" rel="noopener">U.S. Department of Labor, EBSA: ERISA Fiduciary Advisor, depositing participant contributions</a><span class="what">Employee 401(k) deferrals become plan assets when the employer can reasonably separate them from its own assets. There is a latest deposit date.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="social security and Medicare taxes (What's New / section 9)"><a href="https://www.irs.gov/publications/p15" rel="noopener">IRS: Publication 15 (2026), (Circular E), Employer's Tax Guide</a><span class="what">The employer and the employee each pay a share of social security and Medicare tax. The employer's share is its own tax.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="accrued expenses, salaries"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-3-record-and-post-the-common-types-of-adjusting-entries" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.3 Record and Post the Common Types of Adjusting Entries</a><span class="what">An accrued expense belongs to a period, but the business has not paid it yet. Salaries are one example. When the wages are paid in the next period, the amount owed and the cash both decrease.</span></li>
+    <li id="src5" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.irs.gov/businesses/small-businesses-self-employed/outsourcing-payroll-and-third-party-payers" rel="noopener">IRS: Outsourcing payroll and third-party payers</a><span class="what">A payroll provider does not take over the employer's employment tax debt. If the provider does not deposit the tax, the IRS can charge penalties and interest to the employer.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the two-entry rule, the line tie, the run comparison, the ESTIMATE rule or the eight sheets. They are the skill's own rules. The textbook accrues wages only. The rule that adds the employer costs to the accrual is the skill's rule. We made up Northbrook Trading, PayrollCo and every figure in the example for this page. The 5% limit and the cost ratio in the estimate are the example's choices, not a rule or a tax rate. All five sources are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>payroll-journal-entry-builder</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-journal-entry-builder">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit change followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, PayrollCo, the 12 employees and every figure in the example. They are not your data. The skill works for any country, and the example is a US example. The sources are US sources. Tax and payroll rules differ by country and state. Ask your accountant or payroll adviser what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
