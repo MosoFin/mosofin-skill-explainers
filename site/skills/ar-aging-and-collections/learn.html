@@ -476,7 +476,7 @@ const LEVELS = [
     chips:["Aging detail","Aging summary","Invoice search"], src:"Rules 3 and 4", cites:[2],
     situation:"Northbrook has six open invoices and one credit memo that is not applied to an invoice. The skill reads the aging detail report as the population. A recent-date invoice search could omit the two oldest invoices.",
     facts:["The IRS lets a business deduct a bad debt only if its gross income included the amount owed "+C(2)+". That income can be from the current year or an earlier year "+C(2)+".",
-           "This is one reason why the aging stays on invoices issued, and one reason why a write-off is a separate decision. The skill does not do write-offs. This page gives no tax advice."],
+           "The skill gives its own reason for the accrual basis: on a true cash basis there is no receivable. The skill does not do write-offs. This page gives no tax advice."],
     visual:{type:"table",
       head:["Customer","Invoice","Due","Days past due","Bucket","Open"],
       rows:[["Harbor Retail","INV-1001","Tue 15 Sep","15","1-30","$12,000"],["Harbor Retail","INV-0950","Sat 1 Aug","60","31-60","$8,500"],["Crestline Foods","INV-0901","Sat 20 Jun","102",["91-120","bad"],"$6,400"],["Pinnacle Clinics","INV-1010","Sat 10 Oct","−10","Current","$24,200"],["Summit Hotels","INV-0870","Fri 1 May","152",["Over 120","bad"],"$15,000"],["Acme Corp","INV-0990","Mon 31 Aug","30","1-30","$3,300"],["Lakeside Freight","CM-0044","—","—","credit","−$1,200"]],
