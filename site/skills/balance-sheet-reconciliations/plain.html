@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance Sheet Reconciliations in Plain English | MosoFin</title>
+<meta name="description" content="How a balance sheet reconciliation proves each account: two sides, typed differences, owners, ages and a coverage sheet. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Balance sheet reconciliations</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Balance sheet reconciliations, in plain words</span>
+  <h1>Does each number on my balance sheet have real proof behind it?</h1>
+  <p class="lede">Your balance sheet shows one number for each account. Behind most of those numbers, there must be a <b>detailed list</b> that adds up to the same amount. This skill compares each balance with its list, and it tells you <b>which accounts have proof</b> and which do not.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You name the company, the accounts and the date. For each account, the skill compares the balance in your books with the support for it. It explains each difference, puts an age on it, and suggests corrections. An account without independent support stays "not reconciled". It never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Seven accounts at Northbrook Trading on 30 September</h2>
+  <p>Northbrook Trading works in US dollars and keeps its books on the accrual basis. The owner names seven accounts for this run. The date is Wednesday 30 September 2026. For each account, the skill reads two sides. The first side is the balance in the books. Accountants call it the GL balance (general ledger). The second side is the support: a detailed list, a schedule or a document from outside the books.</p>
+  <p>An accounting textbook gives the basic rule. The total of the customer accounts in the detail must equal the receivables account in the books. If the two totals do not agree, there is a mistake<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook Trading's seven accounts on 30 September 2026. Four are reconciled, two are under investigation and one, fixed assets, is not reconciled because the register was not supplied">
+        <thead><tr><th scope="col" style="text-align:left">Account</th><th scope="col">Books $</th><th scope="col" style="text-align:left">Support</th><th scope="col">Support $</th><th scope="col">Difference $</th><th scope="col" style="text-align:left">Result</th></tr></thead>
+        <tbody>
+        <tr class="breach"><th scope="row">Payroll clearing</th><td>4,023.40</td><td class="t">Must be zero</td><td>0.00</td><td>4,023.40</td><td class="t a">Investigating. Five open lines</td></tr>
+        <tr class="breach"><th scope="row">Accounts receivable</th><td>68,950.00</td><td class="t">Customer aging, in the same books</td><td>68,200.00</td><td>750.00</td><td class="t a">Investigating. Owner and date set</td></tr>
+        <tr><th scope="row">Accounts payable</th><td>58,400.00</td><td class="t">Supplier aging, in the same books, and payments after the date</td><td>58,400.00</td><td>0.00</td><td class="t h">Reconciled</td></tr>
+        <tr><th scope="row">Prepaid expenses</th><td>22,100.00</td><td class="t">Prepaid schedule, uploaded</td><td>14,850.00</td><td>7,250.00</td><td class="t h">Reconciled, with 3 proposed entries</td></tr>
+        <tr><th scope="row">Accrued expenses</th><td>27,790.00</td><td class="t">Accrual schedules</td><td>25,750.00</td><td>2,040.00</td><td class="t h">Reconciled, with 1 proposed entry</td></tr>
+        <tr class="breach"><th scope="row">Fixed assets, net</th><td>126,050.00</td><td class="t">Asset register, not supplied</td><td>—</td><td>—</td><td class="t w">Not reconciled (support not supplied)</td></tr>
+        <tr><th scope="row">Term loan</th><td>300,000.00</td><td class="t">Loan schedule, uploaded</td><td>300,000.00</td><td>0.00</td><td class="t h">Reconciled</td></tr>
+        <tr class="tot"><th scope="row">In scope</th><td class="c">607,313.40</td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The seven named accounts are the example's choice. The skill also accepts "all balance sheet accounts". The bank account goes to the bank reconciliation skill.</figcaption>
+  </figure>
+  <p>Two results need a note. For prepaid expenses and accrued expenses, the skill explains every difference and proposes corrections. "Reconciled" here means "reconciled when a person posts the proposed entries". The books do not agree with the support yet. The skill's status list does not name this case, so this is our reading of it.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Reconciled</span><span class="v num good">4</span><span class="s">Payables, prepaid, accrued and the loan</span></div>
+    <div class="stat"><span class="label">Investigating</span><span class="v num hold">2</span><span class="s">Payroll clearing and receivables</span></div>
+    <div class="stat"><span class="label">Not reconciled</span><span class="v num wrong">1</span><span class="s">Fixed assets: the register is missing</span></div>
+    <div class="stat"><span class="label">Evidenced</span><span class="v num">79.2%</span><span class="s">607,313.40 − 126,050 = 481,263.40, and 481,263.40 ÷ 607,313.40 = 79.2%</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">The skill asks how much of the balance sheet has evidence on its support side. It gives no formula for that figure. This page divides the evidenced balances by all the balances in scope.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>A total that agrees with itself is not proof</h2>
+  <p>The skill exists to stop one mistake: a tie-out that never happened. One version is an account with no support at all. The other version is "support" that comes from the same books. Both can look complete.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">Receivables at Northbrook, with a two-sided result</span>
+      <div class="rows num">
+        <div class="row"><span>Customer aging against itself</span><span class="v">same system</span></div>
+        <div class="row off"><span>Books 68,950 − aging 68,200</span><span class="v">$750</span></div>
+        <div class="row"><span>Customer payments 1 to 9 October</span><span class="v">$31,400</span></div>
+      </div>
+      <div class="verdict">The aging comes from the same books, so its tie is only a mechanical check. The skill tests it against the payments that came in after the date. The $750 stays open, with an owner and a date.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Print the aging and call the account reconciled</span>
+      <div class="rows num">
+        <div class="row"><span>Aging total</span><span class="v">68,200</span></div>
+        <div class="row off"><span>Independent test</span><span class="v">none</span></div>
+        <div class="row off"><span>Fixed assets</span><span class="v">"tied" with no register</span></div>
+      </div>
+      <div class="verdict">The file looks complete, but nothing outside the books supports it. A missing register gives no proof for $126,050 of fixed assets.</div>
+    </div>
+  </div>
+  <p>A federal guide on internal control lists "reconciliations of summary information to supporting detail" as a common control<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. That guide is a US government standard from 2001, and a revised version came in 2025. We use it only for the idea: a reconciliation is a control. A control on made-up data, or with no support, gives you no protection. So the skill never signs off a reconciliation on test data, and it never calls an unsupported account reconciled.</p>
+</section>
+
+<section>
+  <span class="label">What it explains</span>
+  <h2>Every difference gets a type, an owner and an age</h2>
+  <p>The skill puts each difference in one of three types. A <b>timing</b> item clears by itself next period, for example a payment in transit. The skill records it and does not correct it. A <b>permanent</b> item is an error, and the skill proposes an entry to correct it. An <b>investigating</b> item has no explanation yet. That is normal, if a person owns it and has a target date.</p>
+  <div class="three">
+    <div class="card">
+      <span class="tag">Prepaid expenses: $7,250</span>
+      <h3>Three permanent items</h3>
+      <p>September costs not booked: 600 + 400 + 150 = 1,150. August costs not booked: 550 + 400 + 150 = 1,100. A refundable landlord deposit of 5,000 that belongs in a different asset account. 1,150 + 1,100 + 5,000 = 7,250. The skill proposes the move of the deposit as an entry.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Accrued expenses: $2,040</span>
+      <h3>One permanent item</h3>
+      <p>The books show 27,790. The schedules show 14,650 + 2,100 + 9,000 = 25,750. The difference, 27,790 − 25,750 = 2,040, is an August electricity accrual that nobody reversed in September. The proposal reverses it.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">Payroll clearing: $4,023.40</span>
+      <h3>Five open lines</h3>
+      <p>This account must be zero, so the skill does it first. Lines: 23.40, 640, 1,150, 410 and 1,800, which add up to 4,023.40. Each line goes to the payroll lead, with a target date of Friday 16 October 2026.</p>
+    </div>
+  </div>
+  <p>The August items, 1,100 and 2,040, belong to a closed month. The skill flags them for review as possible prior-period adjustments. You and your accountant decide what to do with them.</p>
+  <p>The skill then ranks the items by size and by age. You set the size limit. At Northbrook it is $500 for each account. Items above it need immediate action: three clearing lines (640, 1,150 and 1,800), the $750 in receivables, the three prepaid items and the 2,040 accrual. Items older than three months must go to a manager, whatever their size. In payroll clearing, that is 23.40 (more than a year old), 640 and 1,150. The 410 is 92 days old, at the three-month limit.</p>
+  <p>The US securities regulator's staff says that a percentage limit is acceptable as a first test only. A small item can still matter<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. That is why the skill asks for your limit and does not choose one. The skill adds its own rule: a small item that stays open for a year usually means that nobody owns the account.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Proposed entries</span><span class="v num">4</span><span class="s">1,150 + 1,100 + 5,000 + 2,040 = 9,290</span></div>
+    <div class="stat"><span class="label">Accounts over $500</span><span class="v num wrong">4</span><span class="s">Clearing, receivables, prepaid, accrued</span></div>
+    <div class="stat"><span class="label">Lines over 3 months</span><span class="v num hold">3</span><span class="s">23.40, 640 and 1,150, all in payroll clearing</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What it refuses</span>
+  <h2>"Put the $750 in suspense so it ties"</h2>
+  <p>The owner asks the skill to move the $750 to a suspense account. The skill says no, one time, and gives the reasons. It never forces a difference to agree. Accountants call that a plug. It never writes to your books. The $750 is more than Northbrook's $100 limit for small write-offs. Also, a write-off never goes to a suspense account on the balance sheet. That only moves the difference to another account, which must also reconcile.</p>
+  <p>Instead, the $750 stays open. It is probably a journal entry that someone posted to receivables without a customer. The bookkeeper owns it, with a target date of Friday 9 October 2026. The skill also lists the checks that found nothing: no late entries for September, no foreign currency and no rounding difference.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Eight questions, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload files, and the checks are the same. If your account has no MosoFin tools, the skill says once that the run is manual.</div></li>
+    <li><div class="q">Which company? For a group, which entities?</div><div class="why">The skill reconciles each company by itself. On the MosoFin path, it lists your connected companies by name and asks. It never chooses one for you.</div></li>
+    <li><div class="q">Which accounts: named accounts, or all balance sheet accounts?</div><div class="why">The answer sets the sheets of the workpaper and the support for each account. This answer is necessary.</div></li>
+    <li><div class="q">Which period? What is the period-end date?</div><div class="why">The date sets every balance and every cut-off. The skill never chooses a default date.</div></li>
+    <li><div class="q">For each account with support outside the books, where is the schedule, and can you supply it?</div><div class="why">Examples are prepaid, fixed asset, lease, payroll, loan and tax schedules, and bank statements. Without the schedule, the account stays "not reconciled", with the gap and an owner named.</div></li>
+    <li><div class="q">What size of difference is too large?</div><div class="why">Accountants call this the materiality threshold. The skill suggests a basis and asks. It never assumes a limit.</div></li>
+    <li><div class="q">Do you have last period's reconciliation?</div><div class="why">The skill needs it to check the items that stayed open from last period. Without it, the skill says that it could not do this check.</div></li>
+    <li><div class="q">Who prepares, and who reviews?</div><div class="why">The workpaper names both. They must not be the same person.</div></li>
+  </ol>
+  <p>On the MosoFin path, the skill also asks for your approved limit for small write-offs, and the profit and loss account that receives them. At Northbrook, the limit is $100. Then the skill reads the plan back and waits for your yes. Its own example says "all balance sheet accounts". This page uses seven named accounts.</p>
+  <blockquote><i>"Reconciling all balance sheet accounts of Northbrook Trading at 30 September, with the GL read from your Mosofin connection. ... the fixed asset register is still outstanding, so fixed assets will show as not reconciled. Materiality $500; prepared by the bookkeeper, reviewed by the controller. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect your books, then supply the outside schedules</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>It reads the books side, and asks for the rest</h3>
+      <ul>
+        <li>It reads back the workspace and the company by name, and waits for your yes</li>
+        <li>It reads the trial balance, the balance sheet, the chart of accounts and the detail behind each balance</li>
+        <li>It reads the support for receivables, payables and clearing accounts, because that detail is in the same books</li>
+        <li>You still supply the support from outside the books: <b>prepaid</b>, <b>fixed asset</b>, <b>lease</b> and <b>loan</b> schedules, <b>tax filings</b> and <b>bank statements</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>One checklist</h3>
+      <ul>
+        <li><b>Trial balance</b> at the period end, CSV or XLSX, necessary</li>
+        <li><b>Support for each account</b>: agings, schedules, filings or statements, CSV, XLSX or PDF, necessary for each account</li>
+        <li><b>Chart of accounts</b>, CSV or XLSX, necessary for the proposed entries</li>
+        <li>Accounts, period end, company name and currency, typed in the chat, necessary</li>
+        <li><b>Detail of the books</b> for the accounts, and <b>last period's reconciliation</b>, recommended</li>
+        <li>Size limit, preparer and reviewer, typed in the chat, recommended</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>One sheet for each account, and a coverage sheet</h2>
+  <div class="gets">
+    <div class="get"><b>The two sides</b><span>The balance in the books and the support, each with its source and date, and the difference.</span></div>
+    <div class="get"><b>Each difference explained</b><span>Its type, amount, age, owner and target date. The checks that found nothing are on the sheet too.</span></div>
+    <div class="get"><b>Proposed entries</b><span>Corrections in your real account names, for a person to post. At Northbrook, four entries for 9,290.</span></div>
+    <div class="get"><b>Coverage</b><span>For each account, how the skill got each side, and what nobody could prove, with an owner.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">Each account sheet also has a roll-forward where the account has a lot of activity. The skill leaves the review dates blank for the preparer and the reviewer. The skill asks whether you want an Excel file first. At Northbrook, the name is "BS_Recs_2026-09_Northbrook Trading.xlsx". After you see the results, it offers to save your settings for the next run. These are the source for each account, the $500 limit and the three-month rule. They also include the people, the write-off limit and the accounts that must be zero. It never saves balances or the workpaper.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never calls an account reconciled without independent support.</b> Missing support means "not reconciled". The skill never reconciles an account to another view of itself.</li>
+      <li><b>Never forces a difference to agree, and never corrects a timing difference.</b> It records timing items and watches them. Every open item has an owner and a target date.</li>
+      <li><b>Never chooses the period, the size limit or the company for you.</b> It never signs off a reconciliation on test data.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Six terms, in plain English</h2>
+  <dl>
+    <dt>Reconciliation</dt><dd>A check that the balance in the books agrees with the detail that supports it<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Support</dt><dd>The list, schedule or document that must add up to the balance, for example a loan schedule.</dd>
+    <dt>Reconciling item</dt><dd>One explained part of a difference. The skill uses three types: timing, permanent and investigating.</dd>
+    <dt>Plug</dt><dd>An amount that someone adds only to make two totals agree, with no explanation.</dd>
+    <dt>Clearing account</dt><dd>A waiting room for money on its way somewhere else. Its balance must come back to zero.</dd>
+    <dt>Materiality</dt><dd>The size of a difference that is too large to leave. Size is not the only test<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an accounting textbook, a US government guide and a statement from the staff of the US securities regulator. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="accounts receivable subsidiary ledger"><a href="https://openstax.org/books/principles-financial-accounting/pages/7-2-describe-and-explain-the-purpose-of-special-journals-and-their-importance-to-stakeholders" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 7.2 Describe and Explain the Purpose of Special Journals and Their Importance to Stakeholders</a><span class="what">The total of the customer accounts in the receivables detail must equal the receivables control account. If they do not agree, there is a mistake. The textbook describes a manual detail ledger.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" rel="noopener">GAO: Internal Control Standards (Green Book guidance, GAO-01-1008G)</a><span class="what">Lists "reconciliations of summary information to supporting detail" among common control activities. A US government guide from 2001. The Green Book had a revision in 2025.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.sec.gov/interps/account/sab99.htm" rel="noopener">SEC: Staff Accounting Bulletin No. 99, Materiality</a><span class="what">A percentage limit is acceptable as a first assessment, but the use of a limit alone has no basis in law or accounting literature. Staff guidance, not a Commission rule.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the three item types, the three-month rule, the $500 limit, the $100 write-off limit, the status list or the coverage sheet. They are the skill's own rules, or choices for this example. We made up Northbrook Trading and every figure in the example. All three sources are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>balance-sheet-reconciliations</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/balance-sheet-reconciliations">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit correction followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading and every figure in the example. They are not your data. The textbook, the government guide and the securities regulator's statement are US sources. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

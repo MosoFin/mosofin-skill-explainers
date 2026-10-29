@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Data Extraction Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked invoice extraction examples, from one supplier bill into fields to a batch of 12, with an invoice check calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+  .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px 16px;font-size:15px}
+  .checks label{display:flex;gap:8px;align-items:flex-start}
+  .checks input{width:18px;height:18px;margin-top:3px;accent-color:var(--green);flex:none}
+  .bills td.bad{background:var(--wrong-soft)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Invoice data extractor</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · invoice-data-extractor · learning guide</span>
+  <h1>From one supplier bill to a batch of twelve</h1>
+  <p class="lede">This page shows how the skill reads supplier bills and checks them against your books, <b>one level at a time</b>. It starts with one bill and its fields. It ends with a batch of 12 documents and the bills that the skill holds from payment. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are an IRS page, a GAO report, an FBI notice, an HMRC guide, an EU decision and an OpenStax textbook. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter one bill of your own. The page checks the figures and gives the status that the skill's table gives.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Ten rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading. It works in US dollars and keeps its books in QuickBooks, connected through MosoFin. The run is on Monday 12 October 2026. The owner gives the skill two PDFs, bills_a.pdf and bills_b.pdf.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Put in one bill of your own</h2>
+  <p class="muted">Enter up to 10 lines from one bill, or load an example. Part 1 runs the cross-check from Step 3 and Step 4 of <code>references/method.md</code>. Part 2 applies the status table from Step 6. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <h3 class="part">Part 1: Check one invoice</h3>
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="harbor">Harbor INV-0478</button>
+      <button type="button" data-p="metro">Metro Shred MS-2209</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="tbl"><table class="bills" aria-label="Invoice lines">
+      <thead><tr><th>Line</th><th>Quantity</th><th>Unit price</th><th>Printed amount</th><th>Quantity × price</th></tr></thead>
+      <tbody id="lnrows"></tbody>
+    </table></div>
+    <div class="inputs">
+      <fieldset><legend>The totals as printed</legend>
+        <label class="field"><span>Printed tax</span><input data-k="tax" inputmode="decimal"></label>
+        <label class="field"><span>Shipping</span><input data-k="ship" inputmode="decimal"></label>
+        <label class="field"><span>Discount</span><input data-k="disc" inputmode="decimal"></label>
+        <label class="field"><span>Printed total</span><input data-k="total" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>How the bill shows tax</legend>
+        <label class="field"><span>Prices include tax</span><input data-k="incl" type="checkbox" style="width:20px;height:20px;justify-self:end"></label>
+        <p class="fine">If the prices exclude tax, the page adds Subtotal + Tax + Shipping − Discount. If the prices include tax, the lines add to the total, so the page adds the lines + Shipping − Discount. It then shows Subtotal = Total − Tax. The page never calculates tax from a rate.</p>
+      </fieldset>
+    </div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+
+    <hr>
+    <h3 class="part">Part 2: Status</h3>
+    <p class="fine">Tick each finding from the checks against your books. The first three findings give Stop. Any other finding gives Review. No finding gives Clean.</p>
+    <div class="checks" id="checks"></div>
+    <div class="results" id="sresults" aria-live="polite"></div>
+    <p class="fine">The confidence is a separate grade. This page shows Medium when a line or the total does not add up, and High when everything adds up. That is the example's reading. The skill's status table has no row for a failed cross-check, so the page does not change the status for it. The Harbor preset gives a subtotal of 1,814.00, a total of 1,988.66, a difference of 0.00 and Review. The Metro Shred preset gives 129.90 against 139.90, a difference of 10.00, and Clean with Medium confidence.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? Which bills: PDF, PNG, JPG or a scan of many pages? Which company receives the bills, and in a group, which company does each bill belong to? Which output: xlsx, CSV or JSON? Is any document in the batch not a bill?</div>
+    <div><b>Needs</b>You always give it the bills. On the MosoFin path, it reads the supplier list, the bills and the payments in your books. On the upload path, give it each supplier's bills, open and paid, and the payments. Without that history, the duplicate and already-paid checks cannot run.</div>
+    <div><b>Gives back</b>The skill gives back six sheets: Invoices, Line Items, Tax Detail, Source Reference, Validation Results and Coverage. It can give JSON in place of the sheets. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never posts a bill, pays a bill or changes your books. It never guesses a field. It never reads the bank details of a supplier, so it reports that check as NOT RUN.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are an IRS page, a GAO report, an FBI notice, an HMRC guide, an EU decision and an OpenStax textbook. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The Clean, Review and Stop statuses, the confidence levels, the six sheets, the file name and the batch of 12 documents are the skill's own. MosoFin made up Northbrook Trading, its suppliers and every figure in the examples. The page marks them where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. Four sources are US sources. The HMRC guide is for the UK only, and the EU decision is for the EU. Other countries have their own rules. Ask your accountant which rules apply to you. This page explains <code>invoice-data-extractor</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/invoice-data-extractor">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"IRS: What kind of records should I keep", u:"https://www.irs.gov/businesses/small-businesses-self-employed/what-kind-of-records-should-i-keep", at:"documents for purchases and expenses", checked:"2026-10-28", via:"from search results, page not opened", w:"Invoices are among the papers that support purchases and expenses. These papers should show the payee, the amount, proof of payment, the date and a description of the purchase. Proof of payment alone does not show that the amount was a business expense."},
+  {t:"GAO: Veterans Health Administration, Further Improvements Needed to ... (special mode transportation invoices)", u:"https://www.gao.gov/assets/890/887365.pdf", checked:"2026-10-28", via:"from search results, page not opened", w:"The GAO found 365 possible duplicate invoices in one VA payment system, about $1.7 million, over fiscal years 2018 to 2023. That system archives an exact match of key fields to a paid invoice as a duplicate, and sends near matches to a person for review. The GAO says that its data matching shows possible problems and is not proof of improper payments."},
+  {t:"FBI Internet Crime Complaint Center (IC3): Public Service Announcement on business email compromise, 2023", u:"https://www.ic3.gov/PSA/2023/psa230609", checked:"2026-10-28", via:"from search results, page not opened", w:"Check payment and purchase requests outside email, for example by a call to a number that you already have on file. Never make a payment change before you check it with the intended recipient."},
+  {t:"HMRC: VAT guide (VAT Notice 700)", u:"https://www.gov.uk/guidance/vat-guide-notice-700", at:"section 16.3, full VAT invoice", checked:"2026-10-28", via:"from search results, page not opened", w:"A full VAT invoice shows a sequential number, the supplier's name, address and VAT number, the customer's details and a description. It also shows the VAT rate and net amount for each line, the total without VAT and the total VAT. A simplified invoice, for 250 pounds or less including VAT, can show a total that includes VAT, and the rate. This is a UK rule."},
+  {t:"European Commission: Decision (EU) 2017/1870 on publication of the European standard on electronic invoicing", u:"https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A32017D1870", checked:"2026-10-28", via:"from search results, page not opened", w:"The standard EN 16931-1:2017 defines the semantic data model of the core elements of an electronic invoice. These are the essential elements for legal and fiscal compliance and for interoperability. UBL and UN/CEFACT CII are the syntaxes that the decision names for it."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 7.4 Prepare a Subsidiary Ledger", u:"https://openstax.org/books/principles-financial-accounting/pages/7-4-prepare-a-subsidiary-ledger", at:"accounts payable subsidiary ledger", checked:"2026-10-28", via:"from search results, page not opened", w:"In the accounts payable subsidiary ledger, each supplier has an account. That account shows the details of all transactions with the supplier."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"Never guesses a field.", w:"SKILL.md · Rules that never bend"},
+  q2:{q:"it never defaults a currency — a \"$\" alone is never assumed to be USD", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"Never writes, updates or deletes anything, in any system.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Aged payables alone is not enough — it omits paid bills", w:"SKILL.md · Stage 1 — Intake: ask these first, in one message"},
+  q5:{q:"The current period alone, or aged payables alone (open bills only), cannot show an invoice that was already paid.", w:"references/method.md · Step 0 — Fetch the validation evidence (grounding) — Mosofin addition"},
+  q6:{q:"Stop and ask — never route it to the nearest match.", w:"references/method.md · Both entity scenarios"},
+  q7:{q:"If a field is not visible on the invoice, set to null. Do not guess.", w:"references/method.md · Step 2 — Identify header fields"},
+  q8:{q:"a \"$\" symbol alone is ambiguous — USD, CAD, AUD, NZD, SGD, HKD, and others.", w:"references/method.md · Step 2 — Identify header fields"},
+  q9:{q:"a new vendor with an immediate invoice is the shape of a fictitious-vendor scheme", w:"references/method.md · Step 2 — Identify header fields"},
+  q10:{q:"Three lines on invoice = three lines in output. No merging, no splitting.", w:"references/method.md · Step 3 — Extract line items"},
+  q11:{q:"a failed cross-check usually means a misread figure, not a wrong invoice.", w:"references/method.md · Step 4 — Totals and tax breakdown"},
+  q12:{q:"Never calculate tax from a rate", w:"references/method.md · Step 4 — Totals and tax breakdown"},
+  q13:{q:"a phone call to a known number, never a number on the invoice", w:"references/method.md · Step 5 — Payment instructions"},
+  q14:{q:"it is a clear document with a serious problem", w:"references/method.md · Step 6 — Classify and tag"},
+  q15:{q:"Detect and ask — statements are usually not posted; their underlying invoices are.", w:"references/edge-cases.md · Edge Cases"},
+  q16:{q:"not legal invoices — they're quotes. Flag and exclude from AP unless the user explicitly wants to record them as a commitment.", w:"references/edge-cases.md · Edge Cases"},
+};
+
+const RULES = [
+  { id:"1", title:"Fields from the page, never a guess", r:Q.q7, cites:[1],
+    plain:"The skill writes null for a field that it cannot see. It records the file and the page of each figure, so that you can find the paper again.",
+    backed:"The papers that support a business expense should show the payee, the amount, the date and a description of the purchase.{1}" },
+  { id:"2", title:"Search the paid bills too", r:Q.q5, cites:[2],
+    plain:"The skill matches the same supplier and the same bill number, or the same amount inside an agreed date window. A match gives Stop. If the skill finds no match, it does not call that proof.",
+    backed:"The GAO found 365 possible duplicate invoices in one VA payment system, and it says that a data match is not proof.{2}" },
+  { id:"3", title:"Check a new bank account by phone", r:Q.q13, cites:[3],
+    plain:"The skill cannot read the bank details of a supplier. It reports that check as NOT RUN and tells you how to do it.",
+    backed:"The FBI says: check a payment change by a different channel, for example a call to a number on file.{3}" },
+  { id:"4", title:"Take the tax as printed", r:Q.q12, cites:[4],
+    plain:"The skill copies the tax from the bill. If the bill prints no tax amount, the skill leaves the subtotal and the tax as null and flags the bill.",
+    backed:"In the UK, a full VAT invoice shows the rate, the net amount for each line and the total VAT.{4}" },
+  { id:"5", title:"Each line as the bill shows it", r:Q.q10, cites:[5],
+    plain:"The skill reads the meaning of each figure, for example which figure is the tax and which is the total. The supplier's own labels can differ.",
+    backed:"The EU standard for electronic invoices defines a set of core elements that every invoice has.{5} The skill does not make EN 16931 files." },
+  { id:"6", title:"Search by supplier", r:Q.q4, cites:[6],
+    plain:"On the upload path, the skill needs each supplier's bills, open and paid, and the payments. A list of unpaid bills does not show a paid bill.",
+    backed:"In the accounts payable subsidiary ledger, each supplier has an account with all its transactions.{6}" },
+  { id:"7", title:"No currency by default", r:Q.q2, cites:[],
+    plain:"A \"$\" can mean many currencies. The skill looks for a currency code or other cues, and asks you if the bill does not show the currency." },
+  { id:"8", title:"Read again before a flag", r:Q.q11, cites:[],
+    plain:"If the figures do not add up, the skill reads them again. Then it records them as printed and flags the difference. It never fixes a figure without telling you." },
+  { id:"9", title:"Stop and ask about the company", r:Q.q6, cites:[],
+    plain:"If the Bill-To name matches no connected company, the skill stops and asks you. It never sends the bill to the company with the nearest name." },
+  { id:"10", title:"Read-only", r:Q.q3, cites:[],
+    plain:"Every entry that the skill gives back is a proposal. A person posts it." },
+];
+
+const fmt = (n, d=2) => (n < 0 ? "−" : "") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"Extraction · what the bill says" },
+  { n:1, title:"One bill into fields",
+    chips:["bills_a.pdf, page 1"], src:"Rules 1 and 5", cites:[1,5],
+    situation:"Page 1 of bills_a.pdf is a bill from Ridgeway Wholesale, a known supplier. It has one line, a purchase order number and printed terms of Net 30.",
+    facts:["The IRS lists invoices among the papers that support purchases and expenses. These papers should show the payee, the amount, the date and a description of the purchase "+C(1)+".",
+           "Proof of payment alone does not show that an amount was a business expense "+C(1)+". So the skill keeps a trace from each field to its file and page.",
+           "The EU standard EN 16931-1:2017 defines the core elements of an electronic invoice, whatever labels a supplier uses "+C(5)+". The skill reads the meaning of each label in the same way. It does not make EN 16931 files."],
+    visual:{type:"table",
+      head:["Field","As extracted","Source"],
+      rows:[["Vendor name","Ridgeway Wholesale","bills_a.pdf p1"],["Invoice number","RW-8840","p1"],["Invoice date","2026-10-06","p1"],["Payment terms","Net 30","p1"],["Due date, as printed","2026-11-05","p1"],["PO number","PO-2041","p1"],["Currency","USD, as printed","p1"],["Lines","1","p1"],["Total","4,800.00","p1"]]},
+    rules:[Q.q7, Q.q10],
+    math:[["Line 1: 400 × 12.00","4,800.00"],["Printed line amount","4,800.00"],["Difference","0.00",1],["Lines on the bill","1"],["Lines in the output","1",1],["Fields that the bill does not show","null"],["PO-2041 in the books","found, open",1],["Status","Clean",1]],
+    verdict:["ok","Ridgeway's bill gives one row on the Invoices sheet and one row on the Line Items sheet. Northbrook knows the supplier, the books show the order as open, and the line adds up. The status is Clean.","Clean"] },
+
+  { n:2, title:"The arithmetic check",
+    chips:["bills_a.pdf, pages 7-8","bills_b.pdf, page 2"], src:"Rules 4 and 8", cites:[4],
+    situation:"Harbor Office Supply's bill INV-0478 has three lines, printed sales tax and shipping. Metro Shred's bill MS-2209 has one line and printed tax, and its total does not add up.",
+    facts:["In the UK, a full VAT invoice shows the VAT rate and the net amount for each line "+C(4)+". It also shows the total without VAT and the total VAT "+C(4)+".",
+           "A simplified UK invoice, for 250 pounds or less including VAT, can show only a total that includes VAT, and the rate "+C(4)+". That is why the skill asks whether the prices include tax.",
+           "The HMRC guide is a UK rule. Harbor's bill shows US sales tax, and the skill applies the same arithmetic to it."],
+    visual:{type:"table",
+      head:["Bill","Line","Quantity × price","Printed"],
+      rows:[["Harbor INV-0478","Copy paper","20 × 42.50","850.00"],["Harbor INV-0478","Toner","6 × 89.00","534.00"],["Harbor INV-0478","Filing cabinets","2 × 215.00","430.00"],["Harbor INV-0478","Sales tax, 8.25% printed","—","149.66"],["Harbor INV-0478","Shipping","—","25.00"],["Harbor INV-0478","Total","—","1,988.66"],["Metro Shred MS-2209","Shredding","—","120.00"],["Metro Shred MS-2209","Tax","—","9.90"],["Metro Shred MS-2209","Total","—",["139.90","bad"]]]},
+    rules:[Q.q11, Q.q12],
+    math:[["Harbor subtotal: 850.00 + 534.00 + 430.00","1,814.00"],["+ printed tax 149.66 + shipping 25.00","1,988.66"],["Printed total","1,988.66"],["Harbor difference","0.00",1],["Tax from the rate: 1,814.00 × 8.25%","149.655, not used"],["Metro Shred: 120.00 + 9.90","129.90"],["Printed total","139.90"],["Metro Shred difference: 139.90 − 129.90","10.00",1]],
+    verdict:["note","Harbor's figures add up, and the skill takes the tax as printed, 149.66. Metro Shred's figures are 10.00 apart. The skill reads them again, records them as printed and flags the difference. Its status stays Clean, and this page marks the confidence Medium.","10.00"] },
+
+  { n:3, title:"What it will not guess",
+    chips:["bills_b.pdf, page 3"], src:"Rule 7", cites:[],
+    situation:"Maple Ridge Packaging has a Toronto address and is a new supplier. Its bill shows \"$\" with no currency code, and the date \"03/10/2026\".",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Field","On the bill","As extracted","Why"],
+      rows:[["Currency","$","null","\"$\" alone has many meanings"],["Invoice date","03/10/2026","null","Sat 3 Oct or Tue 10 Mar"],["Line 1","500 × 1.90","950.00","adds up"],["Line 2","40 × 5.00","200.00","adds up"],["HST, 13% printed","149.50","149.50","as printed"],["Total","1,299.50",["1,299.50, currency null","bad"],"not in any USD total"]]},
+    rules:[Q.q1, Q.q2, Q.q8],
+    math:[["Line 1: 500 × 1.90","950.00"],["Line 2: 40 × 5.00","200.00"],["Subtotal: 950.00 + 200.00","1,150.00"],["+ printed HST","149.50"],["= total, same as printed","1,299.50",1],["The Toronto address","a cue, not proof"],["Currency and date","null, ask the owner",1]],
+    verdict:["note","The figures add up, but the skill does not know the currency or the date. It writes null for both and asks the owner. Maple Ridge's 1,299.50 stays out of every US dollar total.","null"] },
+
+  { tier:"Validation · what your books say" },
+  { n:4, title:"Already in the books, already paid",
+    chips:["bills_a.pdf, page 2","Posted bills","Payments"], src:"Rules 2 and 6", cites:[2,6],
+    situation:"Crestline Logistics sent bill INV-7731 for 4,860.00 again, dated Fri 31 Jul and marked \"Reminder\". The owner said yes to the workspace read-back. The owner also agreed to a look-back of 12 months.",
+    facts:["The GAO found 365 possible duplicate invoices in one VA payment system, about $1.7 million, over fiscal years 2018 to 2023 "+C(2)+".",
+           "That system archives an exact match of key fields to a paid invoice as a duplicate, and sends near matches to manual review. The GAO says that a data match is not proof of an improper payment "+C(2)+".",
+           "In the accounts payable subsidiary ledger, each supplier has an account with the details of all its transactions "+C(6)+". So the skill searches by supplier, over paid and open bills."],
+    visual:{type:"table",
+      head:["Check","Result","Evidence"],
+      rows:[["Window searched","12 months","13 Oct 2025 to 12 Oct 2026"],["Same supplier, same number","match","INV-7731 in the books"],["Already paid","yes","cheque, Sat 22 Aug"],["Paid again","yes","ACH, Fri 4 Sep"],["Status","",["Stop","bad"]]]},
+    rules:[Q.q4, Q.q5, Q.q14],
+    math:[["Number on the bill","INV-7731"],["Normalized: case, punctuation, prefix removed","7731"],["Number in the books, normalized","7731",1],["Invoice date Fri 31 Jul is inside the window","yes"],["Unpaid bills only would show","no match"],["Held from payment","4,860.00",1]],
+    verdict:["flag","The reminder copy matches a bill in the books that Northbrook paid already. The skill gives Stop and names the matching bill. The double payment in August and September is a matter for the duplicate invoice detection skill. This skill stops the third copy.","Stop"] },
+
+  { n:5, title:"Supplier, payment address and bank details",
+    chips:["bills_a.pdf, pages 4-5","bills_b.pdf, page 3","Supplier list"], src:"Rule 3", cites:[3],
+    situation:"Pinnacle Design matches two supplier records. Maple Ridge matches none. Lakeside Freight asks for payment to a PO box, and the supplier record shows a different address.",
+    facts:["The FBI tells businesses to check payment and purchase requests outside email "+C(3)+". One example is a call to a number that they already have on file "+C(3)+".",
+           "It also says: never make a payment change before you check it with the intended recipient "+C(3)+"."],
+    visual:{type:"table",
+      head:["Bill","Supplier check","Other finding","Status"],
+      rows:[["Pinnacle PD-305, 2,400.00","two records: duplicate record","no service dates",["Review","bad"]],["Maple Ridge MRP-114, 1,299.50","no match: new supplier","currency and date null",["Review","bad"]],["Lakeside LF-7781, 2,600.00","known","payment address differs, bank check NOT RUN",["Review","bad"]],["Summit SC-0926, 950.00","known","work in September",["Review","bad"]]]},
+    rules:[Q.q9, Q.q13],
+    math:[["Pinnacle: two supplier records","history split, Review"],["Maple Ridge: new supplier","flag, never accuse"],["Lakeside: payment address against the supplier record","differs"],["Lakeside bank details","NOT RUN",1],["Lakeside and Summit: work from 1 to 30 Sep","accrual decision"],["Review total so far: 2,400.00 + 2,600.00 + 950.00","5,950.00",1]],
+    verdict:["note","The skill gives Review to each of these bills. For Lakeside, the skill asks the owner to call a phone number on file. The skill never uses a number from the bill for that call.","Review"] },
+
+  { tier:"The batch · what goes where" },
+  { n:6, title:"The batch result, and what goes elsewhere",
+    chips:["bills_a.pdf","bills_b.pdf","Company profile"], src:"Rules 9 and 10", cites:[],
+    situation:"Keystone's bill KS-1140 is for \"Northbrook Holdings LLC\". No connected company has that name. The last two pages of bills_b.pdf are a Harbor statement, and Oakfield's PF-0007 is a pro forma.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Status","Documents","US dollars"],
+      rows:[["Clean","Ridgeway, Brightline, Harbor CN-0015, Metro Shred","6,043.56"],["Review","Summit, Pinnacle, Lakeside, Harbor INV-0478","7,938.66"],["Review, currency null","Maple Ridge","not added"],["Stop","Crestline, Keystone",["5,210.00","bad"]],["Excluded","Oakfield pro forma","not added"],["Set aside","Harbor statement","not added"]],
+      total:["In the extraction","11 rows","19,192.22"]},
+    rules:[Q.q6, Q.q15, Q.q16, Q.q3],
+    math:[["Clean: 4,800.00 + 1,200.00 + 139.90 − 96.34","6,043.56"],["Review: 950.00 + 2,400.00 + 2,600.00 + 1,988.66","7,938.66"],["Stop: 4,860.00 + 350.00","5,210.00"],["US dollars: 6,043.56 + 7,938.66 + 5,210.00","19,192.22",1],["Count: 4 Clean + 5 Review + 2 Stop + 1 Excluded","12",1],["Rows in the extraction, without the pro forma","11"],["Rows in the US dollar totals, without Maple Ridge","10"],["Line Items: 1+1+1+1+1+1+3+1+1+2+1","14 lines",1],["Entries posted","0",1]],
+    verdict:["flag","The skill holds 5,210.00 from payment, and 4,860.00 of it is the Crestline bill that Northbrook paid already. It offers the vendor statement reconciliation skill for the statement. On a yes, it makes Invoices_Extracted_2026-10-12_12invoices.xlsx. It posts nothing.","Stop"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    const vis = table(L.visual);
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator, part 1: the Step 3 line check and the Step 4 cross-check for one bill --- */
+const ROWS = 10;
+const FLAGS = [
+  ["dup","Same bill number for this supplier is in the books",1],
+  ["paid","The bill is already paid",1],
+  ["billto","The Bill-To is another company, or no connected company",1],
+  ["newv","New supplier",0],
+  ["duprec","Supplier matches two or more supplier records",0],
+  ["terms","Terms differ from the supplier record",0],
+  ["cur","Currency unusual for this supplier, or unknown",0],
+  ["remit","Payment address differs from the supplier record",0],
+  ["po","PO not found, closed, for another supplier, or over its open balance",0],
+  ["svc","Service period outside the invoice month",0],
+];
+const PRESETS = {
+  harbor:{lines:[[20,42.50,850.00],[6,89.00,534.00],[2,215.00,430.00]], tax:149.66, ship:25.00, disc:0, total:1988.66, incl:false, flags:["terms"]},
+  metro:{lines:[[1,120.00,120.00]], tax:9.90, ship:0, disc:0, total:139.90, incl:false, flags:[]},
+  blank:{lines:[], tax:"", ship:"", disc:"", total:"", incl:false, flags:[]},
+};
+const tb=document.getElementById("lnrows");
+for(let i=1;i<=ROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><span class="label">${i}</span></td>
+    <td><input data-c="q" class="n" inputmode="decimal" aria-label="Line ${i} quantity"></td>
+    <td><input data-c="p" class="n" inputmode="decimal" aria-label="Line ${i} unit price"></td>
+    <td><input data-c="a" class="n" inputmode="decimal" aria-label="Line ${i} printed amount"></td>
+    <td class="n" data-c="x">—</td></tr>`);
+}
+const ck=document.getElementById("checks");
+FLAGS.forEach(([k,t,s])=>ck.insertAdjacentHTML("beforeend",`<label><input type="checkbox" data-f="${k}"> <span>${t}${s?" <b>(Stop)</b>":""}</span></label>`));
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const r2 = n => Math.round(n*100)/100;
+const z = n => isNaN(n)?0:n;
+
+function load(p){
+  const P=PRESETS[p];
+  [...tb.rows].forEach((tr,i)=>{ const b=P.lines[i]||["","",""];
+    ["q","p","a"].forEach((k,j)=>{ const v=b[j]; tr.querySelector(`[data-c="${k}"]`).value = v===""?"":(k==="q"?v:Number(v).toFixed(2)); }); });
+  ["tax","ship","disc","total"].forEach(k=>{ const v=P[k]; fld(k).value = v===""?"":Number(v).toFixed(2); });
+  fld("incl").checked=P.incl;
+  document.querySelectorAll("[data-f]").forEach(c=>c.checked=P.flags.includes(c.dataset.f));
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results"), sbox=document.getElementById("sresults");
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  const lines=[...tb.rows].map(tr=>{ const g=k=>tr.querySelector(`[data-c="${k}"]`);
+    const q=money(g("q").value), p=money(g("p").value), a=money(g("a").value), x=g("x");
+    let flag=false;
+    if(!isNaN(q)&&!isNaN(p)){ const m=r2(q*p); x.textContent=fmt(m); if(!isNaN(a)&&Math.abs(m-a)>0.005){ flag=true; x.className="n bad"; } else x.className="n good"; }
+    else { x.textContent="—"; x.className="n"; }
+    return {n:+tr.dataset.r, q, p, a: !isNaN(a)?a:(!isNaN(q)&&!isNaN(p)?r2(q*p):NaN), flag}; }).filter(l=>!isNaN(l.a));
+  const tax=money(fld("tax").value), ship=z(money(fld("ship").value)), disc=z(money(fld("disc").value)), total=money(fld("total").value), incl=fld("incl").checked;
+  let s="", out="", diff=NaN;
+  if(!lines.length || isNaN(total)){ steps.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter at least one line amount and the printed total."); }
+  else {
+    const sum=r2(lines.reduce((x,l)=>x+l.a,0)), flagged=lines.filter(l=>l.flag);
+    flagged.forEach(l=>{ s+=line(`Line ${l.n}: ${l.q} × ${fmt(l.p)} = ${fmt(r2(l.q*l.p))}, printed ${fmt(l.a)}`,"flag"); });
+    let comp;
+    if(!incl){
+      s+=line(`Subtotal: ${lines.map(l=>fmt(l.a)).join(" + ")}`, fmt(sum), 1);
+      comp=r2(sum+z(tax)+ship-disc);
+      s+=line(`Subtotal + Tax + Shipping − Discount: ${fmt(sum)} + ${fmt(z(tax))} + ${fmt(ship)} − ${fmt(disc)}`, fmt(comp), 1);
+    } else {
+      comp=r2(sum+ship-disc);
+      s+=line(`Lines + Shipping − Discount: ${fmt(sum)} + ${fmt(ship)} − ${fmt(disc)}`, fmt(comp), 1);
+      s+=line(`Subtotal = Total − Tax: ${fmt(total)} − ${isNaN(tax)?"null":fmt(tax)}`, isNaN(tax)?"null, flag":fmt(r2(total-tax)), 1);
+    }
+    diff=r2(total-comp);
+    s+=line(`Printed total − computed total: ${fmt(total)} − ${fmt(comp)}`, fmt(diff), 1);
+    steps.innerHTML=s;
+    out+=res("ok", incl?"Lines total":"Subtotal", fmt(sum), `${lines.length} line${lines.length>1?"s":""} as printed`, "r-sub");
+    out+=res("ok","Computed total",fmt(comp), incl?"Lines + Shipping − Discount":"Subtotal + Tax + Shipping − Discount","r-comp");
+    out+=res(Math.abs(diff)>0.005?"flag":"ok","Difference to the printed total",fmt(diff), Math.abs(diff)>0.005?"Flagged. The skill reads the figures again, then records them as printed.":"The cross-check passes.","r-diff");
+    out+=res(flagged.length?"flag":"ok","Line flags",String(flagged.length), flagged.length?"Quantity × price differs from the printed amount.":"Each line adds up, or shows no quantity and price.","r-lines");
+    box.innerHTML=out;
+  }
+  const on=[...document.querySelectorAll("[data-f]")].filter(c=>c.checked).map(c=>c.dataset.f);
+  const stop=on.filter(k=>FLAGS.find(f=>f[0]===k)[2]), rev=on.filter(k=>!FLAGS.find(f=>f[0]===k)[2]);
+  const st=stop.length?"Stop":rev.length?"Review":"Clean";
+  const bad=lines.some(l=>l.flag) || (!isNaN(diff) && Math.abs(diff)>0.005);
+  const why = stop.length? stop.map(k=>FLAGS.find(f=>f[0]===k)[1]).join(" · ") : rev.length? rev.map(k=>FLAGS.find(f=>f[0]===k)[1]).join(" · ") : "Known supplier, no duplicate, Bill-To matches, terms agree, PO found and open, or no PO.";
+  sbox.innerHTML = res(st==="Stop"?"flag":st==="Review"?"note":"ok","Validation status",st,why,"r-status")
+    + res(bad?"note":"ok","Confidence, this page's reading",bad?"Medium":"High",bad?"The figures do not add up. The status table has no row for that.":"The figures add up.","r-conf");
+}
+document.querySelectorAll(".calc [data-k], #lnrows [data-c], [data-f]").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("harbor");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

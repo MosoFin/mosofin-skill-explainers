@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance Sheet Reconciliation Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked balance sheet reconciliation levels, from one account with two sides to a coverage sheet, with a one-account calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Balance sheet reconciliations</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · balance-sheet-reconciliations · learning guide</span>
+  <h1>From one account with two sides to a coverage sheet</h1>
+  <p class="lede">This page shows how the skill proves each balance sheet account, <b>one level at a time</b>. It starts with one account and its two sides. It ends with seven accounts on one coverage sheet. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are two sections of an OpenStax textbook, a GAO guide, an SEC staff bulletin and a PCAOB standard. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter one account of your own with up to 8 reconciling items. The page gives the status.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Eight rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up company, Northbrook Trading, which keeps its books in US dollars on the accrual basis. The period end is Wednesday 30 September 2026. The owner names seven balance sheet accounts for the run.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Reconcile one account</h2>
+  <p class="muted">Enter the two sides of one account and up to 8 reconciling items, or load an example. The page runs the formula from Step 3 and the checks from Steps 5 and 7 of <code>references/method.md</code>. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="prepaid">Northbrook prepaid</button>
+      <button type="button" data-p="ar">Northbrook A/R</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The two sides</legend>
+        <label class="field"><span>GL balance</span><input data-k="gl" inputmode="decimal"></label>
+        <label class="field"><span>Supporting balance</span><input data-k="sup" inputmode="decimal"></label>
+        <label class="field"><span>Support not supplied</span><input data-k="none" type="checkbox" style="width:18px;height:18px;justify-self:end;accent-color:var(--green)"></label>
+      </fieldset>
+      <fieldset><legend>Your limits</legend>
+        <label class="field"><span>As-of date</span><input data-k="asof" type="date"></label>
+        <label class="field"><span>Materiality threshold</span><input data-k="mat" inputmode="decimal"></label>
+        <label class="field"><span>Approved write-off limit</span><input data-k="lim" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <p class="fine">Enter each item as the change it makes to the GL balance. A negative amount makes the GL balance smaller.</p>
+    <div class="tbl"><table class="bills" aria-label="Reconciling items">
+      <thead><tr><th>Description</th><th>Type</th><th>Amount, change to GL</th><th>Date opened</th></tr></thead>
+      <tbody id="itemrows"></tbody>
+    </table></div>
+    <div id="itemout"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page counts the age in calendar days: the as-of date minus the date opened. An item is over 3 months when the as-of date is later than the same day three calendar months after the date opened. The skill does not say if it counts days or calendar months, so that choice is this page's. A residual at or below the write-off limit, with no investigating items, gets a proposed write-off to a P&amp;L account. Every entry is a proposal for a person to post. A status of Reconciled with proposed entries rests on a person posting them.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? Which company or entities? Which accounts? Which period end? Where is the support for each account outside the books? What materiality threshold applies? Do you have last period's reconciliation? Who prepares and who reviews? On the MosoFin path, it also asks for the approved write-off limit and its P&amp;L account.</div>
+    <div><b>Needs</b>The skill needs the trial balance at period end, the support for each account in scope and the chart of accounts. The GL detail and last period's reconciliation make the work stronger. You type in the accounts, the period end, the company name and the base currency.</div>
+    <div><b>Gives back</b>The skill gives back one sheet for each account, with the two sides, the items, a roll-forward, proposed entries and a carry-forward check. A coverage sheet shows how the skill got each side. It asks before it makes an Excel file.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to your books, plugs a difference or corrects a timing item. It never calls an account reconciled without independent support, and never chooses the period, the threshold or the company.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from five outside sources. They are two sections of an OpenStax textbook, a GAO guide, an SEC staff bulletin and a PCAOB auditing standard. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The three item types, the escalation at 3 months and the status list are the skill's own. So are the coverage sheet and the [auto], [gated] and [manual] tags. The $500 threshold and the $100 write-off limit are choices for this example. MosoFin made up Northbrook Trading and every figure in the examples. The page marks them where they appear.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills in the card format. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit change followed on 27 October 2026. This page describes that version. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. All five sources are US sources. Other countries have their own rules. Ask your accountant which rules apply to you. This page explains <code>balance-sheet-reconciliations</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/balance-sheet-reconciliations">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 7.2 Describe and Explain the Purpose of Special Journals and Their Importance to Stakeholders", u:"https://openstax.org/books/principles-financial-accounting/pages/7-2-describe-and-explain-the-purpose-of-special-journals-and-their-importance-to-stakeholders", at:"accounts receivable subsidiary ledger", checked:"2026-10-28", via:"from search results, page not opened", w:"The total of all accounts in the accounts receivable subsidiary ledger must equal the Accounts Receivable control account. If the two do not agree, there is a mistake. The textbook describes a manual subsidiary ledger."},
+  {t:"GAO: Internal Control Standards (Green Book guidance, GAO-01-1008G)", u:"https://www.gao.gov/assets/gao-01-1008g.pdf", checked:"2026-10-28", via:"from search results, page not opened", w:"Lists reconciliations of summary information to supporting detail among common control activities. It is a US federal government guide from 2001. The Green Book had a revision in 2025. This page uses it for the idea only."},
+  {t:"SEC: Staff Accounting Bulletin No. 99, Materiality", u:"https://www.sec.gov/interps/account/sab99.htm", checked:"2026-10-28", via:"from search results, page not opened", w:"A percentage threshold is acceptable as an initial assessment. The use of such a threshold alone has no basis in law or accounting literature. Staff consider misstatements separately and in total. Staff bulletins are staff views, not Commission rules."},
+  {t:"OpenStax: Principles of Accounting, Volume 1, 14.4 Compare and Contrast Owners' Equity versus Retained Earnings", u:"https://openstax.org/books/principles-financial-accounting/pages/14-4-compare-and-contrast-owners-equity-versus-retained-earnings", at:"prior period adjustments", checked:"2026-10-28", via:"from search results, page not opened", w:"Prior period adjustments correct errors in the statements of earlier periods. They change the opening balance of retained earnings and do not go through the net income of the current period."},
+  {t:"PCAOB: AS 2201, An Audit of Internal Control Over Financial Reporting That Is Integrated with An Audit of Financial Statements", u:"https://pcaobus.org/oversight/standards/auditing-standards/details/AS2201", at:"period-end financial reporting process", checked:"2026-10-28", via:"from search results, page not opened", w:"The auditor must evaluate the period-end financial reporting process, including the types of adjusting entries. The standard applies to audits of US public companies."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");   // {3} in a sentence puts source 3 right after it
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"The mistake it exists to stop is a tie-out that never happened", w:"SKILL.md · Balance sheet reconciliations"},
+  q2:{q:"Never calls an account reconciled without independent support.", w:"SKILL.md · Rules that never bend"},
+  q3:{q:"Never plugs a difference, and never adjusts a timing difference — it is documented and monitored.", w:"SKILL.md · Rules that never bend"},
+  q4:{q:"Never defaults the period, the materiality threshold or the entity", w:"SKILL.md · Rules that never bend"},
+  q5:{q:"it is reported as \"agrees to subledger (same system)\" and is not counted as independent support.", w:"references/method.md · Step 1 — Identify the right reconciliation method per account type"},
+  q6:{q:"a reconciliation to the wrong support is worse than none, because it looks complete.", w:"references/method.md · Step 1 — Identify the right reconciliation method per account type"},
+  q7:{q:"Investigating — not yet identified; requires research. Honest and normal, provided it has an owner and a date", w:"references/method.md · Step 3 — Identify reconciling items"},
+  q8:{q:"A reconciliation that lists only what was found does not show what was looked for.", w:"references/method.md · Step 4 — Investigate unreconciled differences"},
+  q9:{q:"Adjusting a timing difference creates a second error next period when the original clears.", w:"references/method.md · Step 5 — Propose corrections"},
+  q10:{q:"An investigating item with no owner is an item nobody is investigating.", w:"references/method.md · Step 5 — Propose corrections"},
+  q11:{q:"the opening balance must equal the GL balance on the prior period's reconciliation.", w:"references/method.md · Step 6 — Roll-forward (for activity-based accounts)"},
+  q12:{q:"Items aged > 3 months should escalate. Items above the materiality threshold require immediate resolution.", w:"references/method.md · Step 7 — Materiality and aging"},
+  q13:{q:"a small item open for a year usually indicates that nobody owns the account", w:"references/method.md · Step 7 — Materiality and aging"},
+  q14:{q:"An account with an [auto] GL side and a [manual] support side that was never supplied is not reconciled", w:"references/method.md · Step 8 — Output"},
+  q15:{q:"Don't roll forward an open clearing balance.", w:"references/edge-cases.md · Edge Cases"},
+  q16:{q:"Do not persist balances, reconciling item detail, or the workpaper itself.", w:"references/method.md · Step 9 — Evolve the skill (Mosofin-specific, final step)"},
+};
+
+const RULES = [
+  { id:"1", title:"Two sides for every account", r:Q.q1, cites:[1],
+    plain:"The skill reads the GL balance and the support for each account. It shows the source and the date of each side.",
+    backed:"A textbook says that the receivables detail must equal the receivables control account. If they do not agree, there is a mistake.{1}" },
+  { id:"2", title:"No independent support, no reconciled", r:Q.q2, cites:[2],
+    plain:"Support that nobody supplied makes the account not reconciled. An aging from the same books is only a mechanical check.",
+    backed:"A federal guide on internal control lists reconciliations of summary information to supporting detail as a common control.{2}" },
+  { id:"3", title:"No plugs, and timing items stay", r:Q.q3, cites:[],
+    plain:"A timing item clears next period by itself. The skill records it and watches it. It corrects only permanent items, with a proposed entry." },
+  { id:"4", title:"You set the threshold", r:Q.q4, cites:[3],
+    plain:"The skill suggests a basis for materiality and asks you. It never chooses the period, the threshold or the company.",
+    backed:"SEC staff accept a percentage threshold as a first assessment only. A threshold alone has no basis in law or accounting literature.{3}" },
+  { id:"5", title:"Every open item has an owner", r:Q.q7, cites:[],
+    plain:"An item without an explanation is normal. The skill gives it an owner and a target date." },
+  { id:"6", title:"The opening balance must agree", r:Q.q11, cites:[4],
+    plain:"A difference in the opening balance means that a closed period changed. The skill flags it as a possible prior-period adjustment.",
+    backed:"A textbook says that prior period adjustments correct errors in earlier statements and change opening retained earnings.{4}" },
+  { id:"7", title:"Size and age both count", r:Q.q12, cites:[3],
+    plain:"An item above the threshold needs immediate resolution. An item older than three months goes to a manager, whatever its size.",
+    backed:"SEC staff consider each misstatement separately and in total. Size alone does not decide.{3}" },
+  { id:"8", title:"The two-sided verdict", r:Q.q14, cites:[5],
+    plain:"The coverage sheet shows how the skill got each side of each account. A missing support side is visible there.",
+    backed:"Auditors of US public companies must evaluate the period-end financial reporting process, including the types of adjusting entries.{5}" },
+];
+
+const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"One account · Northbrook Trading, as of Wednesday 30 September 2026" },
+  { n:1, title:"One account, two sides",
+    chips:["Trial balance","Customer aging"], src:"Rules 1 and 2", cites:[1],
+    situation:"Northbrook's books show $68,950 in accounts receivable at 30 September. The customer aging shows $68,200. The aging comes from the same books, and the skill reads both sides through MosoFin.",
+    facts:["An accounting textbook says that the total of the customer accounts in the receivables detail must equal the receivables control account. If the two totals do not agree, someone made a mistake "+C(1)+".",
+           "The textbook describes a manual detail ledger. In connected books, the aging comes from the same transactions as the control account. That point is the skill's own, and the textbook does not make it."],
+    visual:{type:"table",
+      head:["Side","Source","Tag","Amount"],
+      rows:[["GL side","Trial balance","[auto]","$68,950.00"],["Support side","Customer aging, same books","[auto]","$68,200.00"]],
+      total:["Difference","GL − aging","","$750.00"]},
+    rules:[Q.q1, Q.q5],
+    math:[["GL balance, from the trial balance","$68,950.00"],["Aging total, from the same books","$68,200.00"],["Difference: 68,950 − 68,200","$750.00",1],["Name of the aging tie","agrees to subledger (same system)"],["Independent support from that tie","none",1],["Independent test still necessary","yes"]],
+    verdict:["flag","The two sides differ by $750. With no difference, the aging tie is still only a mechanical check, because the aging comes from the same books. The account needs an independent test before it can be reconciled.","$750"] },
+
+  { n:2, title:"The formula and the three item types",
+    chips:["Trial balance","Prepaid schedule"], src:"Rules 3 and 5", cites:[],
+    situation:"The books show $22,100 in prepaid expenses. The prepaid schedule that the owner uploaded shows $14,850. The skill explains the difference of $7,250 item by item, and it proposes the entry that moves the deposit.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["#","Item","Type","Change to GL"],
+      rows:[["1","September amortization not booked: 600 + 400 + 150","Permanent","−$1,150.00"],["2","August amortization not booked: 550 + 400 + 150","Permanent","−$1,100.00"],["3","Refundable landlord deposit: reclass to a deposits asset","Permanent","−$5,000.00"]],
+      total:["","Total items","","−$7,250.00"]},
+    rules:[Q.q3, Q.q7, Q.q9],
+    math:[["GL balance","$22,100.00"],["Items: 1,150 + 1,100 + 5,000","−$7,250.00"],["Adjusted GL: 22,100 − 7,250","$14,850.00",1],["Schedule: 6,600 + 3,600 + 2,250 + 2,400","$14,850.00"],["Unreconciled: 14,850 − 14,850","$0.00",1],["Timing items, which the skill never adjusts","0"],["Proposed entries, one for each permanent item","3",1],["Roll-forward of the GL: 14,900 + 7,200 − 0","$22,100.00"],["What that roll-forward proves about the support","nothing"]],
+    verdict:["ok","All three items are errors, so each one is permanent and gets a proposed entry. The status Reconciled holds only when a person posts the three entries. The books do not agree with the schedule yet. The status list does not name this case, so this is our reading of it.","RECONCILED"] },
+
+  { tier:"The open items · who owns them, and how old they are" },
+  { n:3, title:"Investigate and document, with an owner and a date",
+    chips:["Customer aging","Receipts after the date","Journal entries"], src:"Rules 2 and 5", cites:[2],
+    situation:"The $750 from Level 1 has no explanation yet. The skill gives it the type investigating, an owner and a target date. Then the owner asks the skill to post the $750 to a suspense account, so that the account ties.",
+    facts:["A US federal guide on internal control lists reconciliations of summary information to supporting detail as a common control activity "+C(2)+".",
+           "The guide is the 2001 guidance, and the Green Book had a revision in 2025. This page uses the guide only for the idea that a reconciliation is a control."],
+    visual:{type:"table",
+      head:["Check","Result"],
+      rows:[["Receipts from 1 to 9 October against 30 September invoices",["$31,400, independent test done","good"]],["Entries made after 30 September with a September date","none found"],["Foreign currency","none, USD only"],["Rounding","none found"],["Journal entries to A/R without a customer",["likely cause of the $750","bad"]],["Owner and target date","bookkeeper, Fri 9 Oct 2026"]]},
+    rules:[Q.q8, Q.q10],
+    math:[["Difference","$750.00"],["Type","investigating"],["Above the $500 threshold","yes: immediate resolution",1],["Above the $100 write-off limit","yes: no write-off",1],["Post it to a suspense account","refused",1],["Owner","bookkeeper"],["Target date","Fri 9 Oct 2026"]],
+    verdict:["flag","The skill refuses the suspense entry one time and gives the reasons. It never plugs a difference, and it never writes to the books. The $750 is above the $100 limit. A write-off never goes to a suspense account on the balance sheet. The account stays Investigating.","REFUSED"] },
+
+  { n:4, title:"Size and age: the payroll clearing lines",
+    chips:["General ledger detail"], src:"Rules 4 and 7", cites:[3],
+    situation:"Payroll clearing 2200 must be zero. It shows $4,023.40 in five open lines, so the skill does this account first. Northbrook set the threshold at $500 for each account.",
+    facts:["SEC staff accept a percentage threshold as an initial assessment only. They say that the use of a threshold alone has no basis in law or accounting literature "+C(3)+".",
+           "The staff consider misstatements separately and in total "+C(3)+". Staff bulletins are staff views, not Commission rules. So the skill asks for the threshold and does not choose one."],
+    visual:{type:"table",
+      head:["Line","Opened","Days at 30 Sep","Over 3 months","Over $500"],
+      rows:[["$23.40","before 1 Oct 2025","over 364",["yes","bad"],"no"],["$640.00 · EE-03","Tue 3 Feb 2026","239",["yes","bad"],["yes","bad"]],["$1,150.00 · EE-05","Thu 30 Apr 2026","153",["yes","bad"],["yes","bad"]],["$410.00 · EE-11","Tue 30 Jun 2026","92","at the limit","no"],["$1,800.00 · JE-0912","Thu 24 Sep 2026","6","no",["yes","bad"]]],
+      total:["$4,023.40","","","",""]},
+    rules:[Q.q4, Q.q12, Q.q13, Q.q15],
+    math:[["Lines: 23.40 + 640 + 1,150 + 410 + 1,800","$4,023.40",1],["Over 3 months: 23.40 + 640 + 1,150","$1,813.40"],["Over $500: 640 + 1,150 + 1,800","$3,590.00"],["30 Jun plus three calendar months","30 Sep: at the limit"],["Roll the balance forward to October","no",1],["Owner of each line","payroll lead"],["Target date of each line","Fri 16 Oct 2026",1]],
+    verdict:["note","Three lines escalate by age, and three lines are above $500. The $23.40 is more than a year old, so probably nobody owns the account. The skill does not define 3 months in days. This page puts the 410 at the limit. The work on each line goes to payroll-clearing-reconciliation.","ESCALATE"] },
+
+  { tier:"Over time · the opening balance and the coverage sheet" },
+  { n:5, title:"Roll-forward and the opening check",
+    chips:["General ledger detail","Accrual schedules"], src:"Rule 6", cites:[4],
+    situation:"Accrued expenses 2110 show $27,790. The schedules support $25,750: AP cutoff 14,650, electricity 2,100 and audit fees 9,000. No prior reconciliation exists, so the skill uses the 31 August balance as read today, and says so.",
+    facts:["A textbook says that prior period adjustments correct errors in the statements of earlier periods "+C(4)+". They change the opening balance of retained earnings and do not go through current net income "+C(4)+".",
+           "This page does not say that Northbrook must restate. The owner and the accountant decide if the 1,100 or the 2,040 is material. The skill only flags them.",
+           "The bonus, the payroll tax and the loan interest accruals sit in other accounts. This example keeps them out of the run."],
+    visual:{type:"table",
+      head:["Roll-forward","Amount"],
+      rows:[["Opening, 31 August","$2,040.00"],["Additions: accruals booked in September","$25,750.00"],["Reductions",["$0.00","bad"]],["Reduction expected on Tue 1 Sep: the August reversal","$2,040.00"]],
+      total:["Closing, ties to the GL","$27,790.00"]},
+    rules:[Q.q11],
+    math:[["Opening + additions − reductions: 2,040 + 25,750 − 0","$27,790.00",1],["GL balance","$27,790.00"],["Schedules: 14,650 + 2,100 + 9,000","$25,750.00"],["Difference: 27,790 − 25,750","$2,040.00",1],["Type","permanent"],["Proposed entry: Dr 2110 Accrued expenses","$2,040.00"],["Cr 6310 Utilities","$2,040.00"],["Possible prior-period items, for review","1,100 prepaid · 2,040 accrued",1]],
+    verdict:["note","The closing balance ties to the GL. The movement test finds no reduction where the August reversal should be. The skill proposes one entry for $2,040. It flags the $2,040 and the prepaid $1,100 for review, because both belong to August.","FLAG"] },
+
+  { n:6, title:"The coverage sheet: seven accounts, two sides each",
+    chips:["All seven accounts"], src:"Rules 2 and 8", cites:[2,5],
+    situation:"The coverage sheet lists each account with a verdict for each side. The seven named accounts are the example's choice. The card's read-back example says all balance sheet accounts.",
+    facts:["Auditors of US public companies must evaluate the period-end financial reporting process, including the types of adjusting entries "+C(5)+".",
+           "Northbrook is a private company. This page uses the standard only to show why the practice exists.",
+           "A reconciliation is a control, and a federal guide lists it among the common control activities "+C(2)+"."],
+    visual:{type:"table",
+      head:["Account","GL $","GL side","Support side","Status"],
+      rows:[["Payroll clearing 2200","4,023.40","[auto]","[auto], must be zero",["Investigating","bad"]],["Accounts receivable","68,950.00","[auto]","[auto], same system",["Investigating","bad"]],["Accounts payable","58,400.00","[auto]","[auto], same system, payments $41,200 after the date",["Reconciled","good"]],["Prepaid expenses","22,100.00","[auto]","[manual], uploaded",["Reconciled, 3 proposed entries","good"]],["Accrued expenses 2110","27,790.00","[auto]","[manual] and [gated]",["Reconciled, 1 proposed entry","good"]],["Fixed assets, net","126,050.00","[auto]","[manual], not supplied",["Not reconciled","bad"]],["Term loan","300,000.00","[auto]","[manual], uploaded, no lender confirmation",["Reconciled","good"]]],
+      total:["In scope","607,313.40","","",""]},
+    rules:[Q.q2, Q.q6, Q.q14, Q.q16],
+    math:[["In scope: 4,023.40 + 68,950 + 58,400 + 22,100","153,473.40"],["+ 27,790 + 126,050 + 300,000","607,313.40",1],["Evidenced: 607,313.40 − 126,050","481,263.40"],["Share evidenced: 481,263.40 ÷ 607,313.40","79.2%",1],["Statuses: 4 reconciled + 2 investigating + 1 not","7"],["Accounts with an item above $500","4"],["Proposed entries: 1,150 + 1,100 + 5,000 + 2,040","$9,290.00",1],["Excel file, made only on a yes","BS_Recs_2026-09_Northbrook Trading.xlsx"],["Saved after the run, on a yes","source map, $500, 3 months, people, $100 limit"],["Never saved","balances, item detail, the workpaper"]],
+    verdict:["note","Four accounts have the status Reconciled, two have Investigating and one has Not reconciled. The register for the fixed assets is missing, and the controller owns that gap. 79.2% of the balances in scope have support with evidence. The skill gives no formula for that figure, so this page divides by the balances in scope.","79.2%"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    let vis = table(L.visual);
+    if(L.pair) vis += `<div class="pair">${L.pair.map(p=>`<div class="${p[0]}"><span class="label">${esc(p[1])}</span><span class="big num">${esc(p[2])}</span><span class="muted" style="font-size:14.5px">${esc(p[3])}</span></div>`).join("")}</div>`;
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: one account, the Step 3 formula, the Step 5 and Step 7 checks --- */
+const ROWS = 8;
+const TYPES = ["timing","permanent","investigating"];
+const PRESETS = {
+  prepaid:{gl:22100, sup:14850, none:false, asof:"2026-09-30", mat:500, lim:100, rows:[
+    ["September amortization not booked","permanent",-1150,"2026-09-30"],
+    ["August amortization not booked","permanent",-1100,"2026-08-31"],
+    ["Landlord deposit, reclass","permanent",-5000,""]]},
+  ar:{gl:68950, sup:68200, none:false, asof:"2026-09-30", mat:500, lim:100, rows:[
+    ["Journal entry to A/R without a customer","investigating",-750,"2026-09-30"]]},
+  blank:{gl:"", sup:"", none:false, asof:"", mat:"", lim:"", rows:[]},
+};
+const tb=document.getElementById("itemrows");
+for(let i=1;i<=ROWS;i++){
+  tb.insertAdjacentHTML("beforeend",`<tr data-r="${i}">
+    <td><input data-c="d" aria-label="Item ${i} description" style="min-width:220px"></td>
+    <td><select data-c="t" aria-label="Item ${i} type">${TYPES.map(t=>`<option value="${t}">${t}</option>`).join("")}</select></td>
+    <td><input data-c="a" class="n" inputmode="decimal" aria-label="Item ${i} amount, change to the GL balance" style="width:120px"></td>
+    <td><input data-c="o" type="date" aria-label="Item ${i} date opened"></td></tr>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const ymd = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?[+m[1],+m[2],+m[3]]:null; };
+const dnum = a => a?Date.UTC(a[0],a[1]-1,a[2])/86400000:NaN;
+const plus3 = a => { let y=a[0], m=a[1]+3; if(m>12){m-=12;y++;} const last=new Date(Date.UTC(y,m,0)).getUTCDate(); return dnum([y,m,Math.min(a[2],last)]); };
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dshow = n => { const d=new Date(n*86400000); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const m2 = n => fmt(Math.round(n*100)/100, 2);
+
+function load(p){
+  const P=PRESETS[p];
+  ["gl","sup","asof","mat","lim"].forEach(k=>fld(k).value=P[k]); fld("none").checked=P.none;
+  [...tb.rows].forEach((tr,i)=>{ const b=P.rows[i]||["","timing","",""];
+    tr.querySelector('[data-c="d"]').value=b[0]; tr.querySelector('[data-c="t"]').value=b[1];
+    tr.querySelector('[data-c="a"]').value=b[2]; tr.querySelector('[data-c="o"]').value=b[3]; });
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function run(){
+  const steps=document.getElementById("steps"), box=document.getElementById("results"), io=document.getElementById("itemout");
+  const gl=money(fld("gl").value), sup=money(fld("sup").value), none=fld("none").checked;
+  const asA=ymd(fld("asof").value), A=dnum(asA), mat=money(fld("mat").value), lim=money(fld("lim").value);
+  if(isNaN(gl)){ steps.innerHTML=""; io.innerHTML=""; box.innerHTML=res("","Waiting","—","Enter the GL balance."); return; }
+  const items=[...tb.rows].map(tr=>{ const g=k=>tr.querySelector(`[data-c="${k}"]`);
+    return {d:g("d").value.trim()||"Item "+tr.dataset.r, t:g("t").value, a:money(g("a").value), o:ymd(g("o").value)}; })
+    .filter(r=>!isNaN(r.a) && r.a!==0);
+  items.forEach(r=>{ const O=dnum(r.o);
+    r.age = (!isNaN(A)&&!isNaN(O)) ? A-O : NaN;
+    r.old = (!isNaN(A)&&r.o) ? (A>plus3(r.o)?"yes":A===plus3(r.o)?"at the limit":"no") : "—";
+    r.big = !isNaN(mat) && Math.abs(r.a)>mat; });
+  const adj = gl + items.reduce((x,r)=>x+r.a,0);
+  const inv = items.filter(r=>r.t==="investigating"), perm = items.filter(r=>r.t==="permanent");
+  const line=(a,b,t)=>`<div class="${t?"t":""}"><span>${a}</span><span>${b}</span></div>`;
+  let s=line("GL balance",m2(gl));
+  items.forEach(r=>{ s+=line(`${r.t}: ${esc(r.d)}`, m2(r.a)); });
+  s+=line("Adjusted GL balance",m2(adj),1);
+  if(items.length){
+    let h=`<div class="tbl"><table><thead><tr><th>Item</th><th class="n">Type</th><th class="n">Amount</th><th class="n">Opened</th><th class="n">Age, days</th><th class="n">Over 3 months</th><th class="n">Over materiality</th></tr></thead><tbody>`;
+    items.forEach(r=>{ h+=`<tr><td>${esc(r.d)}</td><td class="n">${r.t}</td><td class="n">${m2(r.a)}</td><td class="n">${r.o?dshow(dnum(r.o)):"—"}</td><td class="n">${isNaN(r.age)?"—":r.age}</td><td class="n ${r.old==="yes"?"bad":""}">${r.old}</td><td class="n ${r.big?"bad":""}">${isNaN(mat)?"—":r.big?"yes":"no"}</td></tr>`; });
+    io.innerHTML=h+"</tbody></table></div>";
+  } else io.innerHTML="";
+  let out=res("note","Adjusted GL",m2(adj),`${m2(gl)} plus the items`,"r-adj");
+  let status, cls, unrec=NaN, wo=false;
+  if(none || isNaN(sup)){
+    status="Not reconciled: support not supplied"; cls="flag";
+    s+=line("Supporting balance","not supplied",1);
+    out+=res("flag","Unreconciled","—","No support side, so no difference to measure.","r-unrec");
+  } else {
+    unrec=Math.round((adj-sup)*100)/100;
+    s+=line("Supporting balance",m2(sup)); s+=line(`Unreconciled: ${m2(adj)} − ${m2(sup)}`,m2(unrec),1);
+    out+=res(unrec===0?"ok":"flag","Unreconciled",m2(unrec),"Adjusted GL minus the supporting balance.","r-unrec");
+    if(inv.length){ status="Investigating"; cls="flag"; }
+    else if(unrec===0){ status="Reconciled"; cls="ok"; }
+    else if(!isNaN(lim) && Math.abs(unrec)<=lim){ status="Reconciled: immaterial residual, approved write-off proposed"; cls="note"; wo=true; }
+    else { status="Investigating"; cls="flag"; }
+  }
+  const jes=perm.length+(wo?1:0);
+  out+=res(cls,"Status",status,jes&&status.startsWith("Reconciled")?"This status rests on a person posting the proposed entries.":inv.length?"Each investigating item needs an owner and a target date.":"From the status list in Step 8.","r-status");
+  out+=res(jes?"note":"ok","Proposed entries",String(jes),`${perm.length} permanent item${perm.length===1?"":"s"}${wo?" and 1 write-off":""}. A person posts them.`,"r-jes");
+  const nbig=items.filter(r=>r.big).length, nold=items.filter(r=>r.old==="yes").length;
+  out+=res(nbig?"flag":"ok","Over materiality",isNaN(mat)?"—":String(nbig),isNaN(mat)?"Enter your threshold. The skill never chooses one.":`Items above ${m2(mat)} need immediate resolution.`,"r-big");
+  out+=res(nold?"flag":"ok","Over 3 months",String(nold),"These items escalate, whatever their size.","r-old");
+  let wtxt, wcls="ok";
+  const cand = !isNaN(unrec)&&unrec!==0 ? unrec : inv.reduce((x,r)=>x+r.a,0);
+  if(isNaN(lim)){ wtxt="Enter the approved limit. The skill never assumes one."; wcls="note"; }
+  else if(wo){ wtxt=`Proposed: ${m2(unrec)} to a P&L account, with reviewer approval.`; wcls="note"; }
+  else if(!cand){ wtxt="Not needed."; }
+  else if(Math.abs(cand)>lim){ wtxt=`Not allowed: ${m2(Math.abs(cand))} is above the ${m2(lim)} limit.`; wcls="flag"; }
+  else { wtxt="Not yet: finish the investigation first."; wcls="note"; }
+  out+=res(wcls,"Write-off",wcls==="flag"?"not allowed":wo?"proposed":"—",wtxt,"r-wo");
+  steps.innerHTML=s; box.innerHTML=out;
+}
+document.querySelectorAll(".calc [data-k], #itemrows [data-c]").forEach(i=>{ const f=()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}; i.addEventListener("input",f); i.addEventListener("change",f); });
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("prepaid");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

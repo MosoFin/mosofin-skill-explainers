@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Data Extractor Skill Anatomy | MosoFin</title>
+<meta name="description" content="How the invoice data extractor skill is built on main: the card, seven reference files, evidence tools by step, sources and audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Invoice data extractor</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">invoice-data-extractor · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the invoice data extractor skill, and what it does</h1>
+  <p class="lede">The skill was one 970-line file. On main it is now a 150-line card and seven reference files, with 1,200 lines in all. Pull request #1 merged the card format on 26 October 2026. A bookkeeping-audit commit, 2850d13, then changed the card, the method and the edge cases on 27 October 2026. The skill reads supplier invoices into fields and checks each invoice against the books. It posts nothing. This page shows how the files connect, the run stage by stage, the evidence tools by step and the source behind each step. It also gives the audit for the skill owner: one check that passed and nine open findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">150</span><span class="s">lines in SKILL.md on main, down from 970 in one file</span></div>
+    <div class="stat"><span class="k">Reference files</span><span class="v">7</span><span class="s">1,200 lines with the card. method.md is the largest file at 391 lines</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">34 · 13 · 18</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 19 · 5 · 8</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">11</span><span class="s">evidence tools in 6 table rows, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Audit</span><span class="v">1 passed · 9 open</span><span class="s">findings A1 to A10, for the skill owner</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 150 lines instead of 970</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 150-line card with rules and six stages. The rules point to mosofin-protocol.md. Stage 2 points to gates.md. Stages 3 to 6 point to method.md. Stages 3 and 4 also point to edge-cases.md, and stage 5 also points to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 391 lines, then mosofin-protocol.md at 262, gates.md at 138, edge-cases.md at 91, overview.md and tools-and-glossary.md at 57 each and output.md at 54.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 150</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · with or without Mosofin</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to E</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read and extract</text>
+          <text x="48" y="272">Stage 4 · Validate and classify</text>
+          <text x="48" y="312">Stage 5 · Present the extraction</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="208" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="109" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">138</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">391</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="72" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">91</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="43" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">54</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="45" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">57</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="45" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">57</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 148, 574 148" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 230 C 450 230, 450 202, 574 202" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 270 C 450 270, 450 210, 574 210" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="182">Gates 0–3</text>
+          <text x="458" y="300">Steps 0–8</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> carries Steps 0 to 8, which are 9 step sections, and both entity scenarios. <b>edge-cases.md</b> holds 26 edge cases. <b>gates.md</b> holds Gates 0 to 3. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. <b>tools-and-glossary.md</b> lists the 7 workflow tools, 6 rows of typical evidence tools and the glossary. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1120" role="img" aria-label="Stage 1 asks five things in one message: Mosofin or upload, the invoice documents, which entity, which output format, and whether anything in the batch is not an invoice. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, read the tool catalogue and read the company profile. Otherwise the user uploads the invoices and gives the entity name, which are required, plus the vendor transaction history and the vendor list. Both paths read back and wait for a yes. Extraction can start before the gates, but no validation runs before the yes. Stage 3: steps 1 to 5 read each document, extract the header fields, the line items, the totals and tax, and the payment instructions. Stage 4: step 0 reads the vendor master, the posted bills, the payments, the coding history, the purchase orders and the company profile in one batch, and checks the mock flag. Step 6 tags each invoice and gives a status of Clean, Review or Stop. Stage 5: step 7 presents six sheets or JSON. Stage 6: step 8 saves conventions on an explicit yes, never invoice contents.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="118" x2="460" y2="148" marker-end="url(#a2)"/>
+          <polyline points="330,200 230,200 230,264" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,200 690,200 690,264" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,404 230,440 400,440" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,404 690,440 520,440" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="472" x2="460" y2="508" marker-end="url(#a2)"/>
+          <line x1="460" y1="660" x2="460" y2="690" marker-end="url(#a2)"/>
+          <line x1="460" y1="900" x2="460" y2="930" marker-end="url(#a2)"/>
+          <line x1="460" y1="1010" x2="460" y2="1038" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="98" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> The invoice documents</text>
+            <text x="590" y="74"><tspan font-weight="600">C</tspan> Which entity?</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> xlsx, csv or JSON</text>
+            <text x="330" y="100"><tspan font-weight="600">E</tspan> Anything not an invoice?</text>
+          </g>
+          <polygon points="460,150 590,200 460,250 330,200" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="213" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="266" width="300" height="138" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="316">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="340">G1  company file · entity scenario</text>
+            <text x="98" y="364">G2  tools · capability map</text>
+            <text x="98" y="388">G3  legal name, currency, country</text>
+          </g>
+          <rect x="540" y="266" width="300" height="138" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="290" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="316">Invoices, entity name: required</text>
+            <text x="558" y="340">Vendor history, open and paid</text>
+            <text x="558" y="364">Vendor list: name, tax ID, terms</text>
+            <text x="558" y="388">Mapping file, format: optional</text>
+          </g>
+          <rect x="400" y="424" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="510" width="800" height="150" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="536" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 1–5 · READ AND EXTRACT · + EDGE-CASES.MD</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="564"><tspan font-weight="600">Step 1</tspan>  file name, page count · split bundled invoices</text>
+            <text x="80" y="590"><tspan font-weight="600">Step 2</tspan>  header fields · ISO dates · null if not visible · no default currency</text>
+            <text x="80" y="616"><tspan font-weight="600">Step 3–4</tspan>  lines as printed · totals, tax by rate · cross-check, flag</text>
+            <text x="80" y="642"><tspan font-weight="600">Step 5</tspan>  payment instructions · bank-detail check NOT RUN</text>
+          </g>
+
+          <rect x="60" y="692" width="800" height="208" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="718" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 0 AND 6 · VALIDATE AND CLASSIFY</text>
+          <text x="80" y="744" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="766">search_vendors · search_bills · search_payments</text>
+            <text x="80" y="786">get_general_ledger · search_purchase_orders</text>
+            <text x="80" y="806">get_aged_payables · get_company_info</text>
+          </g>
+          <text x="80" y="836" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Step 6</tspan>  type · recurrence · confidence · status Clean, Review or Stop</text>
+          <text x="80" y="862" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Both scenarios</tspan>  route by Bill-To · no match: stop and ask</text>
+          <rect x="640" y="732" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="756" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="776" text-anchor="middle" font-size="12" fill="var(--ink)">a duplicate check</text>
+          <text x="741" y="794" text-anchor="middle" font-size="12" fill="var(--ink)">proves nothing</text>
+
+          <rect x="60" y="932" width="800" height="78" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="958" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEP 7 · THE EXTRACTION · + OUTPUT.MD</text>
+          <text x="80" y="986" font-size="13.5" fill="var(--ink)">Six sheets or JSON · ask before xlsx · Data sources line · checks not run named</text>
+
+          <rect x="60" y="1040" width="800" height="64" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1066" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 8</tspan>: after the results, on an explicit yes</text>
+          <text x="80" y="1090" font-size="13.5" fill="var(--muted)">save conventions and tolerances · never invoice contents, amounts or bank details</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="190" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="190" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back. Extraction can start before the gates, because the user owns the document. No validation runs before the yes. The card lists Stage 3 before Stage 4, but Step 0 runs alongside extraction. The skill needs the vendor name and the invoice number before it can search for them. The highlighted box shows the mock rule from Step 0. Step 8 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Evidence tools</h2>
+  <p class="sec-title">Which step names which tool, from the skill's own files on main</p>
+  <p style="color:var(--muted);font-size:15px">The files name 11 evidence tools. The audit placed each tool at the step that names it in a file on main. One tool has no step: only the tool table in tools-and-glossary.md names it. Gate 2 reads the real names and policies from the live catalogue on each run. The audit did not read a catalogue.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Step</th><th>Tools named there</th><th>File</th></tr></thead>
+    <tbody>
+      <tr><td>Gate 3</td><td><code>get_company_info</code></td><td>references/gates.md · Gate 3</td></tr>
+      <tr><td>Step 0</td><td><code>search_vendors</code> <code>get_vendor</code> <code>search_bills</code> <code>search_purchases</code> <code>search_payments</code> <code>get_general_ledger</code> <code>get_profit_and_loss</code> <code>search_purchase_orders</code> <code>get_aged_payables</code> <code>get_company_info</code></td><td>references/method.md · Step 0</td></tr>
+      <tr><td>Stage 3 · edge case</td><td><code>get_aged_payables</code></td><td>references/edge-cases.md · Statement vs invoice</td></tr>
+      <tr><td>No step</td><td><code>get_bill</code></td><td>references/tools-and-glossary.md · Tool reference only</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">Steps 1 to 8 name no evidence tool. Step 8 names the workflow tool <code>create_skill</code>. Step 0 and the edge cases send a credit memo to "posted vendor credits", but no file names a tool for that read (A5).</p>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, what it touches, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>, with the same numbers. The sources are [1] IRS, What kind of records should I keep. [2] GAO, the report on VA special mode transportation invoices. [3] FBI IC3, the 2023 public service announcement on business email compromise. [4] HMRC, VAT Notice 700, UK only. [5] EU Decision 2017/1870. [6] OpenStax, Principles of Accounting 7.4. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule, labelled as such on the public pages. <b>Practice</b> means no outside authority stands behind it, and the pages say so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks questions A to E. Checks the workspace, the company file, the tools and the profile. Runs no validation before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code></td><td>The skill's shared protocol. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Records the file name and the page count. Splits bundled invoices and asks the user to agree the count</td><td>None. The user supplies the documents</td><td>[1] Supporting documents identify the payee, the amount, the date and what was bought. So every figure keeps a trace to its file and page</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Maps the vendor's labels to standard fields. Sets a field to null if it is not visible. Never defaults a currency or a date reading</td><td>None</td><td>[5] EN 16931-1 defines the core elements of an electronic invoice. The skill does not make EN 16931 files</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Steps 3–4</td><td>Takes lines as printed and flags quantity × price errors. Takes tax as printed and never computes it from a rate. Runs the cross-check and flags a failure</td><td>None</td><td>[4] A full VAT invoice shows the rate, the net amount per line and the total VAT. A simplified invoice can show an inclusive total. UK only</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Reports the bank-detail check as NOT RUN. Compares the remit-to with the vendor master. Asks for out-of-band verification of a change</td><td>None beyond the Step 0 reads</td><td>[3] Check a payment change outside email, with a number already on file</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0 · duplicate look-back</td><td>Searches by vendor over open and paid bills, payments and direct purchases. Matches on vendor and normalized number, or amount and a date window</td><td><code>search_bills</code> <code>search_purchases</code> <code>search_payments</code></td><td>[2] Duplicates occur even with controls, and a data match is not proof. [6] Each vendor has its own account in the payables ledger</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0 · vendor, coding, PO, profile</td><td>Reads the vendor master, the coding history, open POs, the vendor balance and the legal name</td><td><code>search_vendors</code> <code>get_vendor</code> <code>get_general_ledger</code> <code>get_profit_and_loss</code> <code>search_purchase_orders</code> <code>get_aged_payables</code> <code>get_company_info</code></td><td>No outside authority. The three vendor outcomes are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>Tags type, recurrence and confidence. Gives a separate status of Clean, Review or Stop</td><td>None</td><td>No outside authority. The three statuses and the confidence levels are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Both entity scenarios</td><td>Routes by Bill-To and asks the user to agree the routing. Stops and asks on a Bill-To that matches no entity</td><td>The Step 0 reads, per entity</td><td>No outside authority</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Presents six sheets or JSON. Asks before it makes the xlsx file</td><td>None</td><td>No outside authority. The sheets and the file name are the skill's own</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 8</td><td>Saves conventions and tolerances, keyed by datasource and entity. Never invoice contents, amounts or bank details</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://www.irs.gov/businesses/small-businesses-self-employed/what-kind-of-records-should-i-keep" style="color:var(--mosofin)">IRS: What kind of records should I keep</a></td><td>Why each invoice becomes fields and keeps a trace to its file and page</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://www.gao.gov/assets/890/887365.pdf" style="color:var(--mosofin)">GAO: Veterans Health Administration, Further Improvements Needed to ... (special mode transportation invoices)</a></td><td>Duplicates occur with controls. "No match found" is not proof (Gate 2)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.ic3.gov/PSA/2023/psa230609" style="color:var(--mosofin)">FBI Internet Crime Complaint Center (IC3): Public Service Announcement on business email compromise, 2023</a></td><td>Out-of-band verification of a bank-detail or remit-to change</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.gov.uk/guidance/vat-guide-notice-700" style="color:var(--mosofin)">HMRC: VAT guide (VAT Notice 700)</a></td><td>Tax-inclusive and tax-exclusive totals, tax by rate. UK only</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A32017D1870" style="color:var(--mosofin)">European Commission: Decision (EU) 2017/1870 on publication of the European standard on electronic invoicing</a></td><td>An invoice has standard core fields, whatever the vendor's labels</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>6</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/7-4-prepare-a-subsidiary-ledger" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 7.4 Prepare a Subsidiary Ledger</a></td><td>Why the duplicate look-back searches by vendor</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the six sources on 28 Oct 2026 through search results. Nobody opened the pages. Sources 1 to 3 and 6 are US, source 4 is UK and source 5 is EU. Some items have no outside authority behind them. They are the Clean, Review and Stop statuses, the confidence levels, the six sheets and the file name. They are also the 12-document batch and every example figure. The worked example uses made-up figures, and it follows the card's read-back: 12 invoices, two PDFs, Northbrook Trading, xlsx and one statement set aside. The public pages present these as the skill's rules or as the example's choices. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">One check passed and nine findings open</p>
+  <div class="findings">
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The card does not follow the house STE rule</h3>
+      <p>The STE linter reports 46 findings on SKILL.md on main, and 32 of them are hard. Most are long sentences and passives. That is 2.7 findings per 100 words. SKILL.md also holds 45 em dashes on 37 lines. The house rule bans the em dash in public prose. The pages quote the skill word for word, with its em dashes.</p>
+      <span class="where">SKILL.md · whole card · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. Seven skills named in the files</h3>
+      <p>The files name <code>journal-entry-builder</code>, <code>gl-coding-assistant</code>, <code>prepaid-amortization-schedule</code>, <code>accruals-and-deferrals</code>, <code>fixed-asset-register-and-depreciation</code>, <code>three-way-match</code> and <code>duplicate-invoice-detection</code>. All seven skills are on main. The names need no change.</p>
+      <span class="where">SKILL.md, method.md, gates.md, overview.md · no change needed</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A3. The audit fix left old formulas behind</h3>
+      <p>Commit 2850d13 made amounts "as printed" and added a tax-inclusive rule. In that rule, the lines sum to Total, and Subtotal is Total minus Tax. But Step 3 still defines Line total as "Subtotal + tax", a computed figure. Step 4 still defines Subtotal (pre-tax) as "Sum of line subtotals" and Balance due as "Total − paid". For a tax-inclusive invoice, the old Subtotal definition contradicts the new rule.</p>
+      <span class="where">references/method.md · Step 3 and Step 4 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. No question asks for the look-back</h3>
+      <p>Step 0 says "ask the user how far back" for the duplicate look-back. Stage 1 questions A to E do not ask it, and the Gate 3 table does not ask it. The upload checklist also has no row for posted vendor credits, which the credit-memo check needs. It has no row for open POs, which the PO check on the upload path needs. The worked example agrees a 12-month look-back outside Stage 1.</p>
+      <span class="where">SKILL.md · Stage 1 · references/gates.md · Gate 3 · references/method.md · Step 0 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A5. No tool for vendor credits</h3>
+      <p>The edge cases and Step 0 send a credit memo to "posted vendor credits". The tool table in tools-and-glossary.md lists no read for vendor credits. Step 0 says only "resolve the read from your Gate 2 catalog".</p>
+      <span class="where">references/edge-cases.md · Credit memos · references/method.md · Step 0 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A6. The status table has gaps</h3>
+      <p>The worked example shows two gaps. A failed arithmetic cross-check, like Metro Shred, has no Validation Status rule. A null currency or an ambiguous date, like Maple Ridge, has no rule either. The table covers only "currency unusual for this vendor". The pages give Metro Shred Clean with Confidence Medium, and Maple Ridge Review, as the example's reading.</p>
+      <span class="where">references/method.md · Step 6 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A7. overview.md overstates a match with another skill</h3>
+      <p>overview.md calls the bank-detail gap "the same gap named in duplicate-invoice-detection (Rule 7)". Rule 7 in that skill is "same bank account, different vendors", which is a different check. Rule 7 can also run on the upload path when the user uploads bank details.</p>
+      <span class="where">references/overview.md · Extraction is document work · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A8. The read-back says "One file"</h3>
+      <p>The read-back says "two PDFs" and then "One file looks like a supplier statement". With two files, that reads as half the upload. The text means one document. This finding is minor.</p>
+      <span class="where">SKILL.md · Stage 1 read-back · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. Words from before the split</h3>
+      <p>Step 1 still refers to "the original's Sheet 4". Step 5 and Step 6 also say "the original", and Gate 3 refers to "the original Inputs table". That wording comes from the time before the split.</p>
+      <span class="where">references/method.md · Steps 1, 5 and 6 · references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A10. One rule is hard to read</h3>
+      <p>The fourth rule that never bends says that it "never defaults a currency". Next comes an inserted clause about "$", and then "a date interpretation or a vendor identity". The inserted clause breaks the sentence. The description also has 1,010 characters, against the limit of 1,024.</p>
+      <span class="where">SKILL.md · Rules that never bend · open</span>
+    </div></div>
+  </div>
+  <p style="color:var(--muted);font-size:14.5px">Note for the site owner: two published pages disagree about the Harbor credit note CN-0011, $410, 12 Sep. duplicate-invoice-detection says that it is in the books, open and unused. vendor-statement-reconciliation says that nobody recorded it. The pages of this skill do not use CN-0011. They use a new credit memo, CN-0015. The conflict stays open.</p>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>The seven skills that the files name are all on main (A2).</span></li>
+    <li><span class="ok">PASS</span><span>The line counts on main are 150, 91, 138, 391, 262, 54, 57 and 57, which is 1,200 in all.</span></li>
+    <li><span class="ok">PASS</span><span>The verdict tags on main are 34 [auto], 13 [gated] and 18 [manual] in the eight files.</span></li>
+    <li><span class="ok">PASS</span><span>edge-cases.md has 26 edge cases. method.md has 9 step sections, Steps 0 to 8, and the card says "Steps 0–8".</span></li>
+    <li><span class="ok">PASS</span><span>"Never writes, updates or deletes anything, in any system" is in the card. output.md checks that nothing went back to any system.</span></li>
+    <li><span class="ok">PASS</span><span>The description has 1,010 characters by a yaml parse, under the limit of 1,024.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with real invoices. The audit did not read the tool catalogue. So nothing here shows which of the 11 evidence tool names Gate 2 would find. The audit checked the outside sources through search results only, and did not open the pages.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/invoice-data-extractor">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The full path history of the skill on main has 22 commits. The first 17 run from 817b80f on 25 Aug 2026 to 4d5637c on 21 Oct 2026. The last five are the conversion. Four are from 25 Oct 2026. They are e908d5d (no reference to a skill outside the library), b23a893 (the split), 14f616a (the Gates pointer) and 7975b74 (four internal contradictions). The fifth is 2850d13, the bookkeeping-audit fixes of 27 Oct 2026. A live run, a catalogue read and fixes for the open findings are still to do.</footer>
+
+</div>
