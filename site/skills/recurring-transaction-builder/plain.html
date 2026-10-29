@@ -333,7 +333,7 @@
       <div class="verdict">A template that points at a renamed account fails every month and shows no error. A file of 24 rent bills that somebody loads twice pays the landlord twice.</div>
     </div>
   </div>
-  <p>At Northbrook, the skill reads the platform's list of repeating entries. The list has the landlord, the insurer and three software suppliers. It already holds a Riverside template: $8,500, monthly on the 1st, with no end date. Its next date is Sunday 1 November 2026. The counterparty, the amount and the frequency are the same, so the new schedule would duplicate it from January. The skill stops and asks.</p>
+  <p>At Northbrook, the skill reads the platform's list of repeating entries. The list has the landlord, the insurer and three software suppliers. It already holds a Riverside template: $8,500, monthly on the 1st, with no end date. Its next date is Sunday 1 November 2026. The counterparty, the amount and the frequency are the same, so the new schedule would duplicate it from January. The skill reports the possible duplicate and asks the owner.</p>
   <p>The owner says that the lease renews on 1 January 2027. So the specification says this: a person ends the old template after its Tuesday 1 December 2026 bill, before the new one goes in. The skill also flags that the old template had no end date. An open-ended entry needs management approval.</p>
   <p>Then it checks the old template's history. Did a bill post each month? The template posted in each month from January to October 2026, to Rent Expense. That is 10 × 8,500 = 85,000, and no month is missing. A government guide to internal control lists reconciliations among the control activities<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. This monthly check is a reconciliation: what should run against what did run.</p>
   <div class="scale">
@@ -352,7 +352,7 @@
       <table class="grid" aria-label="Four candidates for a repeating template: Summit Cleaning 950, Crestline Logistics 1,500, Keystone Pest Control 350 and Metro Shred 120, a total of 2,920 a month">
         <thead><tr><th scope="col" style="text-align:left">Candidate</th><th scope="col">Per month $</th><th scope="col" style="text-align:left">What the skill sees</th></tr></thead>
         <tbody>
-        <tr><th scope="row">Summit Cleaning</th><td>950</td><td class="t">On the 1st, keyed by hand, and not on the list of repeating entries. A second $950 on 6 September is a possible duplicate. The skill sends it to duplicate-invoice-detection and does not judge it here</td></tr>
+        <tr><th scope="row">Summit Cleaning</th><td>950</td><td class="t">On the 1st, keyed by hand, and not on the list of repeating entries. A second $950 on 6 September is a possible duplicate. The skill names no other skill for it. This page leaves it for the owner to check</td></tr>
         <tr><th scope="row">Crestline Logistics</th><td>1,500</td><td class="t a">$1,000 a month through August, then $1,500 from 1 September, per a contract letter. History is not the contract. Check the letter first</td></tr>
         <tr><th scope="row">Keystone Pest Control</th><td>350</td><td class="t">A candidate</td></tr>
         <tr><th scope="row">Metro Shred</th><td>120</td><td class="t">A candidate. The owner says no: "we check the shred count each month"</td></tr>
@@ -368,7 +368,7 @@
 <section>
   <span class="label">A flag for your accountant</span>
   <h2>A 24-month lease can need lease accounting</h2>
-  <p>Under the US lease standard, a lease of 12 months or less can stay off the balance sheet. Most longer leases need an asset and a liability<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Northbrook's lease is 24 months, and it reports on the accrual basis. So the skill flags "lease accounting may apply, expense is not the billed amount", and it asks the reporting basis. The skill does no lease accounting. Your accountant decides the coding, and the flag stays on the summary sheet and the detail sheet.</p>
+  <p>Under the US lease standard, a lease of 12 months or less can stay off the balance sheet. Most longer leases need an asset and a liability<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Northbrook's lease is 24 months, and it reports on the accrual basis. So the skill flags "lease accounting may apply, expense is not the billed amount", and it asks the reporting basis. The skill does no lease accounting. Your accountant decides the coding. The skill does not say which sheet carries the flag.</p>
 </section>
 
 <section>

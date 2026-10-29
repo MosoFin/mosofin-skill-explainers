@@ -348,7 +348,7 @@
     <div class="results" id="results" aria-live="polite"></div>
     <div class="math num" id="steps" aria-live="polite"></div>
     <div id="sched"></div>
-    <p class="fine">Saturdays and Sundays are always non-business days here. The holiday switch adds the US federal holiday dates for 2027 and 2028 only, on the date itself and not on the observed day. The page rounds each new amount to the cent at each anniversary of the start date, and the increase compounds. A day that a month does not have rolls to the last day of that month. If a business-day roll would leave the month, the page rolls the other way for that row. The memo says so. Step 3 does this for period-end entries. The Northbrook preset gives 7 rolls and a total of $207,060.00. We made up the second preset. It gives 12 rows and a total of $1,440.00, with no row skipped.</p>
+    <p class="fine">Saturdays and Sundays are always non-business days here. The holiday switch adds the US federal holiday dates for 2027 and 2028 only, on the date itself and not on the observed day. The page rounds each new amount to the cent at each anniversary of the start date, and the increase compounds. A day that a month does not have rolls to the last day of that month. If a business-day roll would leave the month, the page rolls the other way for that row. The memo says so. Step 3 rolls back where a forward roll would cross a month end. The page also rolls a backward roll forward. That part is this page's choice. For period-end entries, the skill keeps the calendar month-end date. The Northbrook preset gives 7 rolls and a total of $207,060.00. We made up the second preset. It gives 12 rows and a total of $1,440.00, with no row skipped.</p>
   </div>
 </section>
 
@@ -489,7 +489,7 @@ const LEVELS = [
       rows:[["Rent Expense exists, is active, is an expense account","yes",["pass","good"]],["Riverside Properties on the vendor list, spelled as given","yes",["pass","good"]],["Tax code","not needed","—"],["Old template: same counterparty, amount and cadence","$8,500 on the 1st",["duplicate from January","bad"]],["Old template: end date","none",["needs approval","bad"]]]},
     rules:[Q.q5, Q.q6, Q.q7],
     math:[["Rent Expense, Riverside Properties","pass, pass"],["Sheet 1 header","validated against Northbrook Trading's chart on 29 Oct 2026"],["Old template: same counterparty","yes"],["Same amount: 8,500 = 8,500","yes"],["Same cadence: monthly on the 1st","yes",1],["Old template's last bill, per the owner","Tue 1 Dec 2026"],["Run audit, January to October 2026: 10 × 8,500","$85,000.00"],["Months missing","0",1]],
-    verdict:["flag","The skill stops and asks. The owner says the lease renews on 1 January 2027. So the specification says that a person ends the old template after its Tuesday 1 December 2026 bill, before the new one goes in. The skill flags that the old template had no end date.","STOP"] },
+    verdict:["flag","The skill reports the possible duplicate and asks the owner. The owner says the lease renews on 1 January 2027. So the specification says that a person ends the old template after its Tuesday 1 December 2026 bill, before the new one goes in. The skill flags that the old template had no end date.","STOP"] },
 
   { n:5, title:"Charges keyed by hand: candidates, not a plan",
     chips:["Ledger history, 12 months"], src:"Rule 7", cites:[2],
@@ -498,7 +498,7 @@ const LEVELS = [
            "The term loan of $300,000 has interest on the 15th. The interest changes with the days in each period, so it only looks stable. It is not a candidate."],
     visual:{type:"table",
       head:["Candidate","Per month","What the skill sees"],
-      rows:[["Summit Cleaning","$950","On the 1st, keyed by hand. A second $950 on 6 Sep goes to duplicate-invoice-detection"],["Crestline Logistics","$1,500",["$1,000 to August, $1,500 from 1 Sep: check the letter","bad"]],["Keystone Pest Control","$350","A candidate"],["Metro Shred","$120","The owner says no: \"we check the shred count each month\""]],
+      rows:[["Summit Cleaning","$950","On the 1st, keyed by hand. A second $950 on 6 Sep is a possible duplicate, for the owner to check"],["Crestline Logistics","$1,500",["$1,000 to August, $1,500 from 1 Sep: check the letter","bad"]],["Keystone Pest Control","$350","A candidate"],["Metro Shred","$120","The owner says no: \"we check the shred count each month\""]],
       total:["Total","$2,920",""]},
     rules:[Q.q8, Q.q16],
     math:[["Total: 950 + 1,500 + 350 + 120","$2,920",1],["Order on this page: by amount","the example's choice"],["Skill's rank: frequency × effort","all four monthly"],["Insurance: 7,200 ÷ 12","$600 a month, to prepaid-amortization-schedule"],["Term loan interest","changes each period, not a candidate"],["Declined: Metro Shred","reason saved only on a later yes"]],
@@ -513,7 +513,7 @@ const LEVELS = [
            "A reconciliation is a control activity "+C(3)+". The run audit compares what should run with what did run, each period."],
     visual:{type:"table",
       head:["Item","On the file"],
-      rows:[["Sheet 1 header",["NOT POSTED","bad"]],["Status of all 24 rows","Pending"],["Lease flag","Sheet 1 and Sheet 3"],["Sheet 4, reversal schedule","not needed: a bill, not an accrual"],["File name, on a yes to Excel","Riverside Properties_RecurringSchedule_2026-10-29.xlsx"],["Company name","Northbrook Trading, on every sheet"]]},
+      rows:[["Sheet 1 header",["NOT POSTED","bad"]],["Status of all 24 rows","Pending"],["Lease flag","In the output. The skill names no sheet"],["Sheet 4, reversal schedule","not needed: a bill, not an accrual"],["File name, on a yes to Excel","Riverside Properties_RecurringSchedule_2026-10-29.xlsx"],["Company name","Northbrook Trading, on every sheet"]]},
     rules:[Q.q1, Q.q2, Q.q12, Q.q13, Q.q15],
     math:[["Rows","24, all Pending"],["Total","$207,060.00"],["Posted by the skill","0",1],["Each month: did the bill post?","run audit, one query"],["Status changes from","what actually posted"],["Saved on a yes, after the results","calendar, roll policy, register, Metro Shred"],["Never saved","any rate"]],
     verdict:["flag","A person creates the template and loads the rows. Each month, the skill reads the ledger and checks that the rent posted, at the expected amount and account. If a bill does not appear, the run audit shows the missing month.","NOT POSTED"] },

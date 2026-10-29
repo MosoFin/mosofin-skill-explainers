@@ -313,7 +313,7 @@
       <div class="verdict">The difference is not zero, so the skill investigates it. It finds JE-0918: freight of $600, posted by journal entry straight to 1300 on 18 September. The entry did not go through the items module.</div>
     </div>
   </div>
-  <p>The left card uses example figures to show the shortcut. The right card is Northbrook Trading. The skill calls the $600 an unexplained difference until you decide. You can add the $600 to the item costs, or you can move it out of account 1300. Either way, the stock system needs a matching change. The skill posts nothing.</p>
+  <p>The left card uses example figures to show the shortcut. The right card is Northbrook Trading. The skill lists the $600 as a reconciling item until you decide. You can add the $600 to the item costs, or you can move it out of account 1300. Either way, the stock system needs a matching change. The skill posts nothing.</p>
   <p>The skill also states the date of the last full count in the header. A perfect match with no recent count is a weak result. If there was never a count, that is the headline finding.</p>
 </section>
 
@@ -337,14 +337,14 @@
     </div>
     <figcaption>Example figures for a made-up company, in dollars. Value = difference in units × unit cost.</figcaption>
   </figure>
-  <p>The skill applies the threshold in two tests. Per item, A-100 ($510) and A-120 ($1,600) are above $500, so it investigates them. The two A-130 rows are $900 each, one by one, but their net value effect is nil. In total, $1,890 is below $2,000, so the total test passes. A-110 ($220) stays on the list, but the skill does not investigate it.</p>
+  <p>The skill applies the threshold in two tests. Per item, A-100 ($510) and A-120 ($1,600) are above $500, so it investigates them. The two A-130 rows are $900 each, one by one, but their net value effect is nil. In total, the net $1,890 is below $2,000, so the total test passes. The skill does not define the total test. The net total is this page's reading. A-110 ($220) stays on the list, but the skill does not investigate it.</p>
   <p>For each difference, the skill says if the data supports the cause or if a person must check it. The dates in the books support the A-120 cut-off. A person must check the shipping log, the damaged units and the cause of the A-100 loss.</p>
   <p>The count was on 26 September, but the period ends on 30 September. So the skill rolls the count forward: count, plus goods received, minus goods shipped after the count date. Take care with A-120. The 40 units left before the count, so the skill does not subtract them again. On 30 September the shelves hold 160 and the stock system shows 200 − 40 = 160. A-120 needs no adjustment. It is a timing item inside September, and it is not shrinkage.</p>
 </section>
 
 <section>
   <span class="label">Shrinkage, and what is not shrinkage</span>
-  <h2>$510 of loss that a count supports, and three unexplained differences</h2>
+  <h2>$510 of loss that a count supports, and three differences that are not shrinkage</h2>
   <p>Shrinkage is stock that disappears without an identifiable reason, for example theft<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill uses the word only where a count supports it. At Northbrook, only A-100 qualifies: 6 × 85.00 = $510.00. The skill checked the data and found no missing receipt and no duplicate. Two checks need people: a search of the storage area and questions to the warehouse team. Northbrook's warehouse lead owns them, and they are still open. So the cause is "not yet explained". The skill does not say "theft".</p>
   <div class="scale">
     <div class="stat"><span class="label">Of average inventory</span><span class="v num hold">0.28%</span><span class="s">510 ÷ 184,200. Average = (181,380 on 31 Aug + 187,020 on 30 Sep) ÷ 2</span></div>
@@ -355,12 +355,12 @@
     <div class="card">
       <span class="tag up">Unexplained difference</span>
       <h3>The 3PL: $200</h3>
-      <p>The stock system shows 2,000 C-300 mugs at the Midlands warehouse company (a 3PL). Its statement for 30 September shows 1,950. 50 × 4.00 = $200. The skill sends a query to the 3PL. Northbrook did not count there, so the skill does not call it shrinkage.</p>
+      <p>The stock system shows 2,000 C-300 mugs at the Midlands warehouse company (a 3PL). Its statement for 30 September shows 1,950. 50 × 4.00 = $200. The skill reports the difference against the 3PL's statement. Northbrook did not count there, so the skill does not call it shrinkage.</p>
     </div>
     <div class="card">
       <span class="tag bad">Unexplained difference</span>
       <h3>Below zero: $84</h3>
-      <p>The stock system shows B-215 Filter pack at −24 units. 24 × 3.50 = $84. A quantity below zero is always wrong. A receipt is probably missing. The skill proposes no entry until someone finds it.</p>
+      <p>The stock system shows B-215 Filter pack at −24 units. 24 × 3.50 = $84. A quantity below zero is always wrong. It points to a missing receipt or a duplicate sale. The skill lists it, and every negative quantity, for investigation.</p>
     </div>
     <div class="card">
       <span class="tag up">Unexplained difference</span>
@@ -374,7 +374,7 @@
   <span class="label">Cut-off and damaged stock</span>
   <h2>A bill that came late, and three damaged machines</h2>
   <p>Harlow Supply sent bill BL-5521, dated Tuesday 29 September, for 60 units × 20.00 = $1,200.00. Someone entered it on Friday 2 October, and the goods arrived on Thursday 1 October. The skill found it because it tests entries posted after the period end, as well as entries dated near it.</p>
-  <p>Who owned those goods on 30 September? The shipping terms in the purchase contract decide. Under "FOB shipping point", the buyer owns the goods when they leave the seller. Under "FOB destination", the seller owns them until they reach the buyer<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Northbrook did not give the terms. So the skill does not decide. It holds the bill until you supply the terms. The bill moved the books and the stock system together, so it causes no difference between them.</p>
+  <p>Who owned those goods on 30 September? The shipping terms in the purchase contract decide. Under "FOB shipping point", the buyer owns the goods when they leave the seller. Under "FOB destination", the seller owns them until they reach the buyer<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Northbrook did not give the terms. So the skill does not decide. The bill stays an open item until you supply the terms. The bill moved the books and the stock system together, so it causes no difference between them.</p>
   <p>Northbrook found damage on three A-140 coffee machines. They cost $210.00 each, and the owner thinks that each can sell for $60.00. US accounting rules value stock at FIFO or average cost at the lower of cost and net realizable value. Net realizable value is about the expected selling price less the costs to sell<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill proposes a write-down of 3 × (210 − 60) = $450.00.</p>
   <p>The skill also checks the reserve account (1310 Inventory Reserve): opening 4,000 + additions 700 − write-offs 1,100 − releases 0 = $3,600. Account 1310 shows $3,600, so it ties. After the write-down, the reserve would be 3,600 + 450 = $4,050.</p>
 </section>
@@ -388,7 +388,7 @@
     <li><b>A-130:</b> record a transfer of 6 units from Main to Showroom. Value $0.00.</li>
     <li><b>A-140:</b> journal entry, debit 5160 Inventory Write-Down $450.00, credit 1310 Inventory Reserve $450.00.</li>
     <li><b>JE-0918 and BL-5521:</b> decisions for you. The freight needs your choice, and the bill needs the title terms.</li>
-    <li><b>B-215:</b> find the missing receipt first.</li>
+    <li><b>B-215:</b> investigate first: a missing receipt or a duplicate sale.</li>
   </ul>
   <p>The two count changes have a net effect on account 5150 of −510 + 220 = −$290, a net cost of $290. The count changes go into the stock system. A journal entry changes the books but not the item quantities. Next month, that would show a new difference between the books and the stock system.</p>
 </section>

@@ -340,7 +340,7 @@
       <div class="verdict">The draft balances, and the total expense is correct. The split is wrong. Wages are 51,450 − 48,000 = 3,450 too high. That 3,450 is the employer's own share of social security and Medicare, booked as if it were pay.</div>
     </div>
   </div>
-  <p>A check that the entry balances does not find this error. The draft's debits equal its credits: 12,450 + 2,400 + 36,600 = 51,450. The line tie finds it, because the wages line does not agree with the register's gross pay. The skill names the difference a possible mixing error and stops before you post anything.</p>
+  <p>A check that the entry balances does not find this error. The draft's debits equal its credits: 12,450 + 2,400 + 36,600 = 51,450. The line tie finds it, because the wages line does not agree with the register's gross pay. The skill reports the difference as the mixing error or a mapping error. It reports it before anybody posts the entry.</p>
   <div class="scale">
     <div class="stat"><span class="label">Wages too high</span><span class="v num wrong">$3,450</span><span class="s">51,450 − 48,000</span></div>
     <div class="stat"><span class="label">Employer taxes missing</span><span class="v num wrong">$3,450</span><span class="s">The account shows 0. The register shows 3,450</span></div>
@@ -372,7 +372,7 @@
   <h2>Your payroll provider pays the staff, and the debt stays yours</h2>
   <p>PayrollCo calculates the pay and takes the net pay of 36,600 from Northbrook's bank on the pay date. That amount goes through the payroll clearing account 2200, so the account is at nil after the run. PayrollCo sends its fee as a separate bill. Northbrook deposits the federal taxes itself.</p>
   <p>A provider does not take over your payroll tax debt. If the provider does not deposit the tax, the IRS can charge penalties and interest to the employer<sup class="c"><a href="#src5" aria-label="source 5">5</a></sup>. So the skill keeps every amount owed in Northbrook's own accounts. Some providers take one lump sum for pay, taxes and their fee. The skill books that sum one part at a time, never as one expense.</p>
-  <p>The clearing account already held 2,223.40 from earlier months. That balance is not from this run. The skill sends it to the <a href="../payroll-clearing-reconciliation/plain.html" style="color:var(--green)">payroll clearing reconciliation</a>. After you post the entries, the <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a> checks the quarter against the bank and the tax filings.</p>
+  <p>The clearing account already held 2,223.40 from earlier months. That balance is not from this run. The skill leaves it for the <a href="../payroll-clearing-reconciliation/plain.html" style="color:var(--green)">payroll clearing reconciliation</a>. After you post the entries, the <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a> checks the quarter against the bank and the tax filings.</p>
 </section>
 
 <section>
@@ -382,7 +382,7 @@
   <ol class="qs abc">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books. With it, the skill reads your accounts from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools.</div></li>
     <li><div class="q">Which company, and which pay run? In a group, which company pays these people?</div><div class="why">Each company gets its own entries, against its own accounts. The skill never chooses the company for you.</div></li>
-    <li><div class="q">The pay period and the pay date. And do you keep the books on a cash basis or an accrual basis?</div><div class="why">These decide if a month-end estimate is necessary.</div></li>
+    <li><div class="q">The pay period and the pay date. And do you keep the books on a cash basis or an accrual basis?</div><div class="why">These decide if a month-end accrual is necessary.</div></li>
     <li><div class="q">The payroll register or report for the run.</div><div class="why">Every amount comes from it. Without a register, the skill has nothing to build from, and it says so.</div></li>
     <li><div class="q">Your employer costs: your tax share, retirement match and benefit costs.</div><div class="why">They are extra cost and extra debt, not deductions. They are usually in the register. If they are missing, the skill says that the cost is incomplete.</div></li>
     <li><div class="q">Do you use a payroll clearing account?</div><div class="why">This changes where net pay goes. On the MosoFin path, the skill looks for one and then asks you to agree.</div></li>

@@ -286,7 +286,7 @@
     <div class="stat"><span class="label">Six months to March 2027</span><span class="v num">$402,100 to $441,700</span><span class="s">Conservative to base. Section below</span></div>
     <div class="stat"><span class="label">Entries posted</span><span class="v num good">0</span><span class="s">The skill only reads</span></div>
   </div>
-  <p>Why is the Canada file not in the group? The skill adds the files month by month, and it has no step that changes one currency into another. If it added the Canada file, it would add Canadian dollars to US dollars. So the example leaves that file out and says so in a note. Your accountant can choose an exchange rate and supply figures in US dollars. Then the skill can use them on the manual path. The skill never chooses a rate for you.</p>
+  <p>Why is the Canada file not in the group? The skill adds the files month by month, and it has no step that changes one currency into another. If it added the Canada file, it would add Canadian dollars to US dollars. So the example leaves that file out and says so in a note. Your accountant can choose an exchange rate and supply figures in US dollars. Then the skill can use them on the manual path. The skill has no rule for exchange rates.</p>
   <p class="muted" style="font-size:15px">This example makes four choices. It uses the July to September range, and it leaves out the Canada file. It takes the balances from the balance sheet report. It uses the label "Net cash increase" for the 129,100.</p>
 </section>
 
@@ -372,12 +372,12 @@
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>Four questions, in this order</h2>
+  <h2>Three questions in this order, then a default range</h2>
   <ol class="qs">
     <li><div class="q">Use your MosoFin connection to read the books, or supply the data yourself?</div><div class="why">The skill asks this first. If you say no, or have no connection, it uses the manual path with a file from you.</div></li>
     <li><div class="q">Which workspace?</div><div class="why">If you have more than one, it asks you to choose by name. It never chooses one for you. Northbrook had one, and the owner checked it by name.</div></li>
     <li><div class="q">One company file, each file separately, or consolidated?</div><div class="why">It asks when you connect more than one QuickBooks file. The dashboard always shows each file and the group, so "consolidated" is the usual answer.</div></li>
-    <li><div class="q">Which months?</div><div class="why">The default is 1 January of this year to the end of this month. For Northbrook that is 1 January to 31 October, with an almost empty October last. The projection starts from the last month, so the owner asked for July to September.</div></li>
+    <li><div class="q">The months</div><div class="why">The skill does not ask this. It uses 1 January of this year to the end of this month, unless you ask for another range. For Northbrook that is 1 January to 31 October, with an almost empty October last. The projection starts from the last month, so the owner asked for July to September.</div></li>
   </ol>
   <p>If a read stops partway, the skill tells you what it read. It offers the manual path for the rest. It never fills the gap with figures of its own.</p>
 </section>

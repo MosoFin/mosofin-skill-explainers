@@ -505,7 +505,7 @@ const LEVELS = [
       total:["Net","","","","","","−1,890.00","",""]},
     rules:[Q.q3, Q.q9, Q.q11],
     math:[["A-100: −6 × 85","−510.00"],["A-110: +10 × 22","+220.00"],["A-120: −40 × 40","−1,600.00"],["A-130: −900 + 900","0.00"],["A-140: 0 × 210","0.00"],["Net: −510 + 220 − 1,600 + 0 + 0","−$1,890.00",1],["Items above $500","A-120 1,600 and A-100 510",1],["A-130 rows, one by one","900 each, net value 0"],["A-110 below $500","listed, not investigated"],["Total test: 1,890 against 2,000","below, passes",1],["A-100, Step 6 checks 1 to 4 in the data","no missing receipt, no duplicate"],["A-100, checks 5 and 6: storage area, warehouse team","open, owner: warehouse lead"]],
-    verdict:["flag","The per-item test flags A-120 and A-100. The total test passes. The A-130 rows exceed $500 one by one, but their value effect is nil. The A-100 investigation is still open, so its cause is \"not yet explained\".","2 FLAGGED"] },
+    verdict:["flag","The per-item test flags A-120 and A-100. The total test passes. The skill does not define the total test, and the net total is this page's reading. The A-130 rows exceed $500 one by one, but their value effect is nil. The A-100 investigation is still open, so its cause is \"not yet explained\".","2 FLAGGED"] },
 
   { tier:"The numbers · shrinkage and the ledger checks" },
   { n:5, title:"Shrinkage rate, trend, the 3PL and a negative quantity",
@@ -517,7 +517,7 @@ const LEVELS = [
       rows:[["Shrinkage, confirmed","$510.00","A-100: 6 × 85.00"],["Of average inventory","0.28%","510 ÷ 184,200"],["Of September revenue","0.53%","510 ÷ 96,000"],["Trend in account 5150","380 → 420 → 510","July, August, September (proposed)"],["Midlands 3PL, C-300 Mug",["$200.00 unexplained","bad"],"50 × 4.00"],["B-215 Filter pack",["−$84.00 unexplained","bad"],"−24 × 3.50"]]},
     rules:[Q.q12, Q.q14, Q.q5],
     math:[["Opening GL 1300, Mon 31 Aug","$181,380.00"],["Closing GL 1300, Wed 30 Sep","$187,020.00"],["Average: (181,380 + 187,020) ÷ 2","$184,200.00",1],["Of average inventory: 510 ÷ 184,200","0.28%",1],["Of revenue: 510 ÷ 96,000","0.53%",1],["3PL: 2,000 − 1,950 units","50 units"],["50 × 4.00","$200.00",1],["B-215: −24 × 3.50","−$84.00",1],["Industry rate on this page","none"]],
-    verdict:["note","Shrinkage is $510.00, which is 0.28% of average inventory and 0.53% of revenue. The $200 goes to the 3PL as a query, because Northbrook did not count there. B-215 needs its missing receipt before any entry. Neither of them is shrinkage, and neither is the A-120 $1,600.","$510"] },
+    verdict:["note","Shrinkage is $510.00, which is 0.28% of average inventory and 0.53% of revenue. The skill reports the $200 against the 3PL's statement. Northbrook did not count there. B-215 points to a missing receipt or a duplicate sale, and the skill investigates it. Neither of them is shrinkage, and neither is the A-120 $1,600.","$510"] },
 
   { tier:"The fixes · reserve, write-down and proposals" },
   { n:6, title:"Reserve, write-down and the proposals",
@@ -527,7 +527,7 @@ const LEVELS = [
            "IAS 2 also measures inventories at the lower of cost and net realisable value "+C(6)+". Cost may not be recoverable if goods have damage or are obsolete, or if their selling prices fell "+C(6)+". A write-down is an expense in its period, and a reversal cannot exceed the original write-down "+C(6)+"."],
     visual:{type:"table",
       head:["Proposal","Where","Value $"],
-      rows:[["A-100: quantity to 114, account 5150, count date 26 Sep","item module","−510.00"],["A-110: quantity to 310 after a recount, account 5150","item module","+220.00"],["A-130: transfer 6 units, Main to Showroom","item module","0.00"],["A-140: DR 5160 Inventory Write-Down, CR 1310 Inventory Reserve","journal entry","450.00"],["JE-0918 freight-in","owner's decision","600.00"],["BL-5521 Harlow Supply","after the title terms","1,200.00"],["B-215 Filter pack","find the receipt first","—"]]},
+      rows:[["A-100: quantity to 114, account 5150, count date 26 Sep","item module","−510.00"],["A-110: quantity to 310 after a recount, account 5150","item module","+220.00"],["A-130: transfer 6 units, Main to Showroom","item module","0.00"],["A-140: DR 5160 Inventory Write-Down, CR 1310 Inventory Reserve","journal entry","450.00"],["JE-0918 freight-in","owner's decision","600.00"],["BL-5521 Harlow Supply","after the title terms","1,200.00"],["B-215 Filter pack","investigate: missing receipt or duplicate sale","—"]]},
     rules:[Q.q10, Q.q13, Q.q16],
     math:[["Reserve: 4,000 + 700 − 1,100 − 0","$3,600.00"],["Account 1310 shows","$3,600.00"],["Reserve roll-forward","ties",1],["Carrying value: 187,020 − 3,600","$183,420.00"],["Write-down: 3 × (210 − 60)","$450.00",1],["Reserve after the write-down: 3,600 + 450","$4,050.00"],["Net count changes to 5150: −510 + 220","−$290.00",1],["Entries the skill posts","0",1],["Saved for the next run, on a yes","decisions only, never these figures"]],
     verdict:["ok","The reserve ties at $3,600.00. The skill proposes a $450.00 write-down for A-140 and three item-module changes with a net cost of $290. It posts none of them. The owner decides on JE-0918, and on BL-5521 after the title terms.","PROPOSED"] },
