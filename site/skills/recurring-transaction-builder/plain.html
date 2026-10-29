@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recurring Bills and Entries in Plain English | MosoFin</title>
+<meta name="description" content="What a recurring schedule shows: every date and amount, holiday rolls, a duplicate template, and a monthly check that each bill ran. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Recurring transaction builder</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Recurring transactions, in plain words</span>
+  <h1>We pay the same bills every month. Can we enter them once, and how do we know they keep running?</h1>
+  <p class="lede">Rent, cleaning and software bills come every month. This skill <b>designs and checks the schedule</b> for a repeating bill, invoice or journal entry. Each month after that, it <b>checks that the entry actually ran</b>.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You tell it the amount, the dates and the coding. It calculates every future date and amount. It checks your accounts and suppliers, and it looks for a repeating entry that already exists. It finds charges that you key by hand each month. It gives you a specification, and a person enters it in your accounting system. It never creates the template, never posts and never schedules anything.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run builds</span>
+  <h2>24 rent bills for Northbrook Trading, from January 2027</h2>
+  <p>Northbrook Trading is a made-up company. It works in US dollars, on the accrual basis, with a calendar year. On Thursday 29 October 2026 the owner asks for a schedule of office rent bills to Riverside Properties. The rent is $8,500 a month, due on the 1st, for 24 months from 1 January 2027. The skill's own read-back uses $8,500. Other pages on this site show other rent figures for Northbrook. This page follows the skill's own example. The read-back gives no year, so this page uses 2027.</p>
+  <p>The lease has a 3% increase each year at its anniversary, 1 January 2028. This page treats the increase as compound each year, and the anniversary as the lease date. Those two choices are the example's choices. In 24 months only one increase occurs: 8,500 × 1.03 = 8,755.</p>
+  <p>When the 1st is a weekend or a holiday, Northbrook moves the bill to the next business day. Accountants call this a forward roll. The skill asks for the holiday calendar, because each country publishes its own. Northbrook uses the US federal holiday dates that the Office of Personnel Management publishes<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's 24 rent bills from January 2027 to December 2028, with due date, scheduled date and amount. Seven dates roll forward">
+        <thead><tr><th scope="col" style="text-align:left">#</th><th scope="col" style="text-align:left">Due</th><th scope="col" style="text-align:left">Scheduled</th><th scope="col">Amount $</th><th scope="col" style="text-align:left">Status</th></tr></thead>
+        <tbody>
+        <tr class="breach"><th scope="row">1</th><td class="t">Fri 1 Jan 2027, New Year's Day</td><td class="t a">Mon 4 Jan 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">2</th><td class="t">Mon 1 Feb 2027</td><td class="t">Mon 1 Feb 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">3</th><td class="t">Mon 1 Mar 2027</td><td class="t">Mon 1 Mar 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">4</th><td class="t">Thu 1 Apr 2027</td><td class="t">Thu 1 Apr 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">5</th><td class="t">Sat 1 May 2027</td><td class="t a">Mon 3 May 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">6</th><td class="t">Tue 1 Jun 2027</td><td class="t">Tue 1 Jun 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">7</th><td class="t">Thu 1 Jul 2027</td><td class="t">Thu 1 Jul 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">8</th><td class="t">Sun 1 Aug 2027</td><td class="t a">Mon 2 Aug 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">9</th><td class="t">Wed 1 Sep 2027</td><td class="t">Wed 1 Sep 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">10</th><td class="t">Fri 1 Oct 2027</td><td class="t">Fri 1 Oct 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">11</th><td class="t">Mon 1 Nov 2027</td><td class="t">Mon 1 Nov 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">12</th><td class="t">Wed 1 Dec 2027</td><td class="t">Wed 1 Dec 2027</td><td>8,500.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">13</th><td class="t">Sat 1 Jan 2028, New Year's Day</td><td class="t a">Mon 3 Jan 2028</td><td class="c">8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">14</th><td class="t">Tue 1 Feb 2028</td><td class="t">Tue 1 Feb 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">15</th><td class="t">Wed 1 Mar 2028</td><td class="t">Wed 1 Mar 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">16</th><td class="t">Sat 1 Apr 2028</td><td class="t a">Mon 3 Apr 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">17</th><td class="t">Mon 1 May 2028</td><td class="t">Mon 1 May 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">18</th><td class="t">Thu 1 Jun 2028</td><td class="t">Thu 1 Jun 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">19</th><td class="t">Sat 1 Jul 2028</td><td class="t a">Mon 3 Jul 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">20</th><td class="t">Tue 1 Aug 2028</td><td class="t">Tue 1 Aug 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">21</th><td class="t">Fri 1 Sep 2028</td><td class="t">Fri 1 Sep 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr class="breach"><th scope="row">22</th><td class="t">Sun 1 Oct 2028</td><td class="t a">Mon 2 Oct 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">23</th><td class="t">Wed 1 Nov 2028</td><td class="t">Wed 1 Nov 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr><th scope="row">24</th><td class="t">Fri 1 Dec 2028</td><td class="t">Fri 1 Dec 2028</td><td>8,755.00</td><td class="t">Pending</td></tr>
+        <tr class="tot"><th scope="row">Total</th><td></td><td></td><td class="c">207,060.00</td><td class="t">NOT POSTED</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. The shaded rows are the 7 dates that roll forward: #1, 5, 8, 13, 16, 19 and 22. Every roll stays in its own month. Each row has a memo, for example "Office rent January 2027, Riverside Properties, lease yr 1, $8,500".</figcaption>
+  </figure>
+  <div class="scale">
+    <div class="stat"><span class="label">Rent per month</span><span class="v num">$8,500 → $8,755</span><span class="s">8,500 × 0.03 = 255 more from bill 13</span></div>
+    <div class="stat"><span class="label">Bills</span><span class="v num">24</span><span class="s">12 at 8,500 and 12 at 8,755</span></div>
+    <div class="stat"><span class="label">Total</span><span class="v num good">$207,060</span><span class="s">12 × 8,500 + 12 × 8,755 = 102,000 + 105,060</span></div>
+    <div class="stat"><span class="label">Dates rolled</span><span class="v num hold">7</span><span class="s">Weekends and US federal holidays, always forward</span></div>
+  </div>
+  <p>The skill checks the total with its own formula: occurrences × amount + escalations. That is 24 × 8,500 + 12 × 255 = 204,000 + 3,060 = 207,060. There is no sales tax on the rent, so the total tax is 0.</p>
+  <p>Saturday 1 January 2028 shows how a roll policy works. Federal staff observe that holiday on Friday 31 December 2027<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. That rule is for federal staff. Northbrook's policy is the owner's choice, and it is forward. So the skill uses the holiday date and moves the bill to Monday 3 January. It never moves one bill forward and the next bill backward.</p>
+  <p>Why must a bill stay in its own month? On the accrual basis, you record an expense in the period when you incur it, no matter when the cash moves<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. Rent is a usual example<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. So a roll never moves an occurrence out of its period.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>A schedule is not a template</h2>
+  <p>A spreadsheet of future rows is a plan. The template is a record inside your accounting system, and a person must create it. If nobody creates it, nothing happens, and somebody finds the gap in month two. The skill says this in each output.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">It gives a specification and checks it against your books</span>
+      <div class="rows num">
+        <div class="row"><span>Rows in the file</span><span class="v">24, all Pending</span></div>
+        <div class="row"><span>File header</span><span class="v">NOT POSTED</span></div>
+        <div class="row"><span>Existing Riverside template</span><span class="v">found</span></div>
+      </div>
+      <div class="verdict">A person enters the schedule. Each month, the skill reads the ledger and checks that the bill posted. The Status column changes from what actually posted, never from the plan.</div>
+    </div>
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">Make the rows, load them, and believe it runs</span>
+      <div class="rows num">
+        <div class="row off"><span>Template</span><span class="v">never created</span></div>
+        <div class="row off"><span>Old Riverside template</span><span class="v">still runs</span></div>
+        <div class="row off"><span>Rent from January</span><span class="v">paid twice</span></div>
+      </div>
+      <div class="verdict">A template that points at a renamed account fails every month and shows no error. A file of 24 rent bills that somebody loads twice pays the landlord twice.</div>
+    </div>
+  </div>
+  <p>At Northbrook, the skill reads the platform's list of repeating entries. The list has the landlord, the insurer and three software suppliers. It already holds a Riverside template: $8,500, monthly on the 1st, with no end date. Its next date is Sunday 1 November 2026. The counterparty, the amount and the frequency are the same, so the new schedule would duplicate it from January. The skill stops and asks.</p>
+  <p>The owner says that the lease renews on 1 January 2027. So the specification says this: a person ends the old template after its Tuesday 1 December 2026 bill, before the new one goes in. The skill also flags that the old template had no end date. An open-ended entry needs management approval.</p>
+  <p>Then it checks the old template's history. Did a bill post each month? The template posted in each month from January to October 2026, to Rent Expense. That is 10 × 8,500 = 85,000, and no month is missing. A government guide to internal control lists reconciliations among the control activities<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. This monthly check is a reconciliation: what should run against what did run.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Duplicates found</span><span class="v num wrong">1</span><span class="s">The open-ended Riverside template</span></div>
+    <div class="stat"><span class="label">Months checked</span><span class="v num good">10 of 10</span><span class="s">January to October 2026, 85,000 posted</span></div>
+    <div class="stat"><span class="label">Posted by the skill</span><span class="v num">0</span><span class="s">A person posts. The skill reads</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What else it finds</span>
+  <h2>Four charges that you key by hand each month</h2>
+  <p>The skill looks at 12 months of history for charges that repeat but have no template. It shows them as candidates. It does not show them as a plan, because some people key a charge by hand on purpose.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Four candidates for a repeating template: Summit Cleaning 950, Crestline Logistics 1,500, Keystone Pest Control 350 and Metro Shred 120, a total of 2,920 a month">
+        <thead><tr><th scope="col" style="text-align:left">Candidate</th><th scope="col">Per month $</th><th scope="col" style="text-align:left">What the skill sees</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Summit Cleaning</th><td>950</td><td class="t">On the 1st, keyed by hand, and not on the list of repeating entries. A second $950 on 6 September is a possible duplicate. The skill sends it to duplicate-invoice-detection and does not judge it here</td></tr>
+        <tr><th scope="row">Crestline Logistics</th><td>1,500</td><td class="t a">$1,000 a month through August, then $1,500 from 1 September, per a contract letter. History is not the contract. Check the letter first</td></tr>
+        <tr><th scope="row">Keystone Pest Control</th><td>350</td><td class="t">A candidate</td></tr>
+        <tr><th scope="row">Metro Shred</th><td>120</td><td class="t">A candidate. The owner says no: "we check the shred count each month"</td></tr>
+        <tr class="tot"><th scope="row">Total</th><td class="c">2,920</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. 950 + 1,500 + 350 + 120 = 2,920. The skill ranks candidates by frequency and effort. All four are monthly, so this page lists them by amount. That order is this page's choice.</figcaption>
+  </figure>
+  <p>Two charges look regular but are not candidates. The term loan of $300,000 has interest on the 15th, but the interest changes with the days in each period. The $7,200 insurance policy, paid on 1 September, spreads at 7,200 ÷ 12 = 600 a month. The skill sends that one to prepaid-amortization-schedule.</p>
+</section>
+
+<section>
+  <span class="label">A flag for your accountant</span>
+  <h2>A 24-month lease can need lease accounting</h2>
+  <p>Under the US lease standard, a lease of 12 months or less can stay off the balance sheet. Most longer leases need an asset and a liability<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. Northbrook's lease is 24 months, and it reports on the accrual basis. So the skill flags "lease accounting may apply, expense is not the billed amount", and it asks the reporting basis. The skill does no lease accounting. Your accountant decides the coding, and the flag stays on the summary sheet and the detail sheet.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Ten items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. The skill labels them A to I, with an extra item F2 after F.</p>
+  <ol class="qs">
+    <li><div class="q">A. Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and other linked platforms. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. It asks only if your account has the MosoFin tools.</div></li>
+    <li><div class="q">B. What type: a repeating journal entry, bill, invoice or subscription? With which supplier or customer?</div><div class="why">The template and the risk of a duplicate change with the type. For bills and invoices, the skill finds the name in your supplier or customer list.</div></li>
+    <li><div class="q">C. The amount and the currency of each occurrence.</div><div class="why">Each occurrence stays in the contract currency.</div></li>
+    <li><div class="q">D. The start date, and an end date or a number of occurrences.</div><div class="why">An entry with no end needs management approval. For "until cancelled", the skill builds 12 or 24 months and flags the schedule for a renewal review.</div></li>
+    <li><div class="q">E. The frequency and the day rule, for example "the 1st of the month" or "the last business day".</div><div class="why">"Monthly" alone can mean more than one date. The rule must give one date.</div></li>
+    <li><div class="q">F. The coding: the accounts, the item, and a tax code if tax applies.</div><div class="why">The skill checks each one against your live chart of accounts and item list.</div></li>
+    <li><div class="q">F2. The payment terms, for example Net 30, for bills and invoices.</div><div class="why">The terms set the due date of each occurrence.</div></li>
+    <li><div class="q">G. The holiday calendar, and the roll policy: forward or backward.</div><div class="why">Business-day rolls need both, in one direction for the full schedule. The skill never picks a default. It asks once, and it reads a saved version first.</div></li>
+    <li><div class="q">H. Any increase rule, and any stop or pause conditions.</div><div class="why">These are in the contract, not in the ledger. This item is optional. For an increase tied to a price index, the skill asks for the index source and your assumption. It never assumes a rate.</div></li>
+    <li><div class="q">I. A part period at the start or the end: divide by days, or follow the contract?</div><div class="why">The two methods give different amounts on the first bill. The skill never picks a default. Northbrook's lease starts on the 1st, so it needs no part period.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. The skill's own example is this one:</p>
+  <blockquote><i>"Building a recurring bill for Northbrook Trading: office rent to the landlord you named, $8,500 a month in USD, on the 1st, 24 occurrences from 1 January, rolled forward on the US federal holiday calendar, coded to Rent Expense, a 3% annual increase at the lease anniversary, validated against your Mosofin connection. Nothing will be posted. Shall I go ahead?"</i></blockquote>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload your lists</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It reads the chart of accounts, the supplier and customer lists, the tax codes and the posting history</li>
+        <li>It reads a saved holiday calendar and roll policy before it asks for them</li>
+        <li>You still give it the <b>increase and stop terms</b> and the <b>part-period choice</b>. They are not in the books</li>
+        <li>If no connection works, it still calculates the schedule and says that it checked nothing against your books</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Type the terms, and bring the exports</h3>
+      <ul>
+        <li>The type, counterparty, amount, currency, dates, frequency and day rule, typed in the chat, required</li>
+        <li>The coding and the payment terms, typed in the chat or as CSV or XLSX, required</li>
+        <li><b>Chart of accounts</b>, and the item list for invoices, CSV or XLSX, required for the account check</li>
+        <li><b>Supplier or customer list</b> and <b>tax code list</b>, CSV or XLSX, recommended</li>
+        <li><b>List of repeating templates</b> and <b>12 to 24 months of transactions</b> with this counterparty, CSV or XLSX. The skill recommends both, for the duplicate check and the monthly check</li>
+        <li>The holiday calendar and roll policy, typed in the chat, when the rule uses business days. A memo pattern, the contract as a PDF, and a list of several items, when you have them</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="font-size:15px">On the upload path, the checks run on your files and carry the label user-supplied. A check with no file is NOT VALIDATED, and the header names it.</p>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Six sheets, from the summary to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Schedule summary</b><span>The type, counterparty, dates, totals and increase rule. The header says NOT POSTED and gives the validation status, for example "validated against Northbrook Trading's chart on 29 Oct 2026".</span></div>
+    <div class="get"><b>Occurrence schedule</b><span>One row for each occurrence: date, period, amount, tax, total, memo and a Status column. Every row starts Pending.</span></div>
+    <div class="get"><b>Posting detail</b><span>Each occurrence with its full posting lines, and a Validated column for each line.</span></div>
+    <div class="get"><b>Reversal schedule</b><span>Only for accruals. Northbrook's rent is a bill, so this sheet is not needed.</span></div>
+    <div class="get"><b>Validation and discovery</b><span>The account and supplier checks, the duplicate check, and the candidates.</span></div>
+    <div class="get"><b>Coverage</b><span>What the skill calculated, what it read, and with which tool.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks whether you want an Excel file before it makes one. Northbrook's file name is Riverside Properties_RecurringSchedule_2026-10-29.xlsx, with the company name on every sheet. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save the holiday calendar and the roll policy. It also offers to save the register of repeating arrangements and the declined candidates with their reasons. It never saves a rate.</p>
+  <p>If the owner says "put these in QuickBooks for me", the skill declines. It has no write access. It gives the specification, says that nobody posted anything, and offers the monthly check for next month. If the owner asks about a price-index increase, it asks for the index source and the assumption, and it gives no rate.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never says "posted", "created" or "scheduled".</b> The output is a specification. Every occurrence starts Pending, and the file's header says NOT POSTED.</li>
+      <li><b>Never assumes a rate or uses a default holiday calendar.</b> The skill and a saved version supply no inflation or tax rate. A saved version can keep the index source, never the rate.</li>
+      <li><b>Never builds a schedule before it checks for an existing one.</b> It never lets an unvalidated schedule look validated. The validation status goes in the header of the first sheet.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Six terms, in plain English</h2>
+  <dl>
+    <dt>Recurring template</dt><dd>A record inside your accounting system that makes the same entry on a fixed date. A person creates it.</dd>
+    <dt>Schedule</dt><dd>The list of every future date and amount. The skill makes it as a specification.</dd>
+    <dt>Roll</dt><dd>The move of a date that falls on a weekend or holiday to the next or the previous business day.</dd>
+    <dt>Escalation</dt><dd>A fixed increase in the amount, for example 3% each year at the lease anniversary.</dd>
+    <dt>Accrual basis</dt><dd>You record an expense in the period when you incur it, no matter when the cash moves<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Run audit</dt><dd>The monthly check that each repeating entry posted, at the expected amount and accounts. It is the skill's name for this check.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are a US government holiday list, an accounting textbook, an older US government audit guide and the US lease standard. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/" rel="noopener">U.S. Office of Personnel Management: Federal Holidays</a><span class="what">OPM publishes the federal holiday dates. Most federal staff on a Monday to Friday week observe a Saturday holiday on the Friday before. They observe a Sunday holiday on the Monday after.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="accrual basis accounting; expense recognition (matching) principle"><a href="https://openstax.org/books/principles-financial-accounting/pages/4-1-explain-the-concepts-and-guidelines-affecting-adjusting-entries" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 4.1 Explain the Concepts and Guidelines Affecting Adjusting Entries</a><span class="what">Accrual accounting records revenue and expenses in the period when the business earns or incurs them, no matter when cash moves. Rent and insurance are examples of costs that adjusting entries record at period end.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="control activities"><a href="https://www.gao.gov/assets/gao-01-1008g.pdf" rel="noopener">GAO: Internal Control Standards (Internal Control Management and Evaluation Tool, GAO-01-1008G)</a><span class="what">Control activities include approvals, verifications, reconciliations and records. No one person should control all key parts of a transaction. This is older guidance from 2001.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="short-term lease; lessee recognition"><a href="https://storage.fasb.org/ASU%202016-02_Section%20A.pdf" rel="noopener">FASB: Accounting Standards Update No. 2016-02, Leases (Topic 842)</a><span class="what">A short-term lease has a term of 12 months or less. A lessee can elect to keep it off the balance sheet. Other leases generally need a right-of-use asset and a lease liability.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the six stages, the Pending status, the NOT POSTED header or the six sheets. The same applies to the 12- or 24-month horizon, the duplicate check and the run audit. They are the skill's own rules. We made up Northbrook Trading and every figure in the example for this page. All four sources are US sources. Other countries have their own lease standards, holiday calendars and price indexes.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>recurring-transaction-builder</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/recurring-transaction-builder">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a bookkeeping-audit fix followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its suppliers and every figure in the example. They are not your data. The holiday list, the textbook, the audit guide and the lease standard are US sources. Other countries have their own rules. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
