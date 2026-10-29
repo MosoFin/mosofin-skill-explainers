@@ -477,7 +477,7 @@ const LEVELS = [
     pair:[["bad","Headroom, week 7","−$19,000","$131,000 − $150,000. Northbrook breaches the covenant. Cash stays above zero, so Northbrook still pays payroll."],["note","Lever: Meridian Foods pays 5 days early","$202,500","$131,000 + $71,500 of week 8's receipts moved into week 7."]],
     rules:[Q.q9, Q.q10, Q.q12],
     math:[["Disbursements: $28,900 + $9,300 + $21,000 + $37,200","$96,400",1],["Opening $187,200 + receipts $40,200 − $96,400","$131,000",1],["Headroom: $131,000 − $150,000","−$19,000",1],["Lever 1: ask Meridian to pay $71,500 five days early","$131,000 + $71,500 = $202,500"],["Lever 2: draw on the revolver for one week","$19,000"],["Lever 3: defer software $6,400 + marketing $8,200","$14,600"],["Lever 3 alone: $131,000 + $14,600","$145,600"],["Still below the floor by","$4,400",1]],
-    verdict:["flag","Week 7 is the lowest point at $131,000, $19,000 below the $150,000 covenant. The skill reports the breach and that the floor is a covenant, a promise to the lender. The lever list holds the early payment, the draw and the deferral. It never holds the payroll or the tax deposit.","BREACH"] },
+    verdict:["flag","Week 7 is the lowest point at $131,000, $19,000 below the $150,000 covenant. The skill reports the breach and that the floor is a covenant, a promise to the lender. The lever list holds the early payment, the draw and the deferral. Which payments can wait is your decision, and this example picks the software and the marketing. It never holds the payroll or the tax deposit.","BREACH"] },
 
   { tier:"Harder cases · when the timing moves" },
   { n:5, title:"Collections slip by a week",
@@ -623,7 +623,7 @@ function run(){
   let out = res(low.close<0||(hasFloor&&low.close<F)?"flag":"ok", "Lowest point", fmt(low.close), `Week ${low.w}. ${hasFloor?`Headroom ${fmt(low.close-F)} against a floor of ${fmt(F)}.`:"No floor was tested."}`);
   out += hasFloor
     ? res(below.length?"flag":"ok", "Weeks below the floor", String(below.length), below.length?`Week${below.length>1?"s":""} ${below.join(", ")}.`:"Every week closes at or above the floor.")
-    : res("note", "Weeks below the floor", "—", "No floor entered. The skill would report the lowest point and say that it tested no floor.");
+    : res("note", "Weeks below the floor", "—", "No floor entered. The skill never defaults the floor, and without one it cannot compute the below-floor alerts.");
   out += res(runway?"flag":"ok", "Runway", runway?`Week ${runway}`:"not within the horizon", runway?`Closing cash first goes below zero in week ${runway}.`:"Closing cash stays above zero in all 13 weeks.");
   const diff=Math.round((sumNet-(last-O))*100)/100;
   out += res(Math.abs(diff)<0.005?"ok":"flag", "Chain check", Math.abs(diff)<0.005?"ties":fmt(diff), Math.abs(diff)<0.005?"The sum of the weekly net flows equals closing minus opening.":"The chain does not tie. Check the inputs.");

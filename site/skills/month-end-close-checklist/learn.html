@@ -438,7 +438,7 @@ const RULES = [
   { id:"6", title:"Status and Evidence side by side", r:Q.q6, cites:[],
     plain:"The board has a Status column and an Evidence column. Status is what the owner reports. Evidence is what the skill found in the books, with the test it applied: the account, the side and the dates." },
   { id:"7", title:"A disagreement goes to the top", r:Q.q7, cites:[],
-    plain:"If a task says Complete and the books show no entry, the skill shows that line first." },
+    plain:"If a task says Complete and the books show no entry, the skill flags that line and asks before the books lock." },
   { id:"8", title:"Outside information stands apart", r:Q.q9, cites:[],
     plain:"A missing vendor statement or bank confirmation can delay the close. The skill lists these items in a separate group." },
   { id:"9", title:"Materiality comes from balances", r:Q.q8, cites:[],
@@ -447,7 +447,7 @@ const RULES = [
     plain:"Last month's balances as you reported them must equal the same balances in the books now. The skill checks this for every balance sheet account, and in total. Without the reported trial balance, the check is not performed.",
     backed:"Balance sheet accounts are permanent and carry their balance into the next period.{3}" },
   { id:"11", title:"Measure the slip", r:Q.q13, cites:[],
-    plain:"The time when each entry was created shows when each task really finished. The entry date does not, because close entries carry the last day of the month. The skill uses the created times to find the tasks that are late month after month." },
+    plain:"The time when someone created each entry shows when each task really finished. The entry date does not, because close entries carry the last day of the month. The skill uses the created times to find the tasks that are late month after month." },
   { id:"12", title:"Save the decisions, not the state", r:Q.q14, cites:[],
     plain:"On your yes, the skill saves the task list, the owners, the dependencies, the materiality basis and the scoping decisions. It never saves statuses or results." },
 ];
@@ -491,7 +491,7 @@ const LEVELS = [
       rows:[["Depreciation","—","Posted Tue 3 Nov, $4,210, JE-2611-004"],["Prepaid amortization","—","Posted Tue 3 Nov, $1,250, JE-2611-005"],["Accruals (utilities)","—","Posted Wed 4 Nov, $2,800, JE-2611-009"],["Deferred revenue release","—",["No entry found: open","bad"]],["Payroll cutoff accrual",["Complete","bad"],["No entry posted","bad"]]]},
     rules:[Q.q3, Q.q15, Q.q6, Q.q7],
     math:[["Entries found on Day 3","3"],["$4,210 + $1,250 + $2,800","$8,260",1],["Deferred revenue release, due Day 3","no entry"],["Payroll cutoff accrual: Status says","Complete"],["Payroll cutoff accrual: Evidence shows","no entry",1]],
-    verdict:["flag","Three entries are in the books, for a total of $8,260. Deferred revenue release is still open. The payroll accrual says Complete with no entry, so the skill puts that line at the top. Each owner still owns the task.","CHECK"] },
+    verdict:["flag","Three entries are in the books, for a total of $8,260. Deferred revenue release is still open. The payroll accrual says Complete with no entry, so the skill flags that line and asks before the books lock. Each owner still owns the task.","CHECK"] },
 
   { n:4, title:"What the books cannot show",
     chips:["Open items","Balances"], src:"Rules 8 and 9", cites:[],
@@ -521,10 +521,10 @@ const LEVELS = [
   { tier:"Next month" },
   { n:6, title:"Faster next month",
     chips:["Entry-created times","Saved preferences"], src:"Rules 11 and 12", cites:[1,5],
-    situation:"After the close, the skill reads when each entry of past months was created. Deferred revenue release is a Day 3 task. In August and in September, someone entered it on Day 6. If the books give no created time, the skill marks this measurement as manual.",
+    situation:"After the close, the skill reads when someone created each entry of past months. Deferred revenue release is a Day 3 task. In August and in September, someone entered it on Day 6. If the books give no created time, the skill marks this measurement as manual.",
     facts:["In APQC's open-standards benchmark, the median time is 6 calendar days, weekends included, from the first trial balance to agreed statements. Top performers take about 5 days and the slowest about 10 "+C(1)+".",
            "Most organisations in that benchmark are large. A small business may close faster or slower "+C(1)+". Northbrook's calendar runs 9 calendar days, but APQC measures from a different start, so the two do not compare exactly.",
-           "Different people should hold the authority, the custody of assets and the accounting "+C(5)+". So the skill saves owners by role, and a manager reviews and signs off."],
+           "Different people should hold the authority, the custody of assets and the accounting "+C(5)+". So the skill saves owners by role where it can, and a manager reviews and signs off."],
     visual:{type:"table",
       head:["Month","Due","Entered","Days late"],
       rows:[["August","Day 3","Day 6",["3","bad"]],["September","Day 3","Day 6",["3","bad"]]]},
@@ -624,7 +624,7 @@ function run(){
   s+=line(`Sum of ${rows.length} differences`, sgn(sum), 1);
   steps.innerHTML=s;
   let verdict;
-  if(!diff.length) verdict=res("ok","Verdict","Continues","No account differs. The books still show last period as it was reported.");
+  if(!diff.length) verdict=res("ok","Verdict","Continues","No account differs. The books still show last period as you reported it.");
   else if(sum===0) verdict=res("note","Verdict","Prior-period reclassification","Accounts differ, but the sum is 0. Someone moved an amount between accounts in a prior period. Find out before the statements go out.");
   else verdict=res("flag","Verdict","Prior period changed","The sum is not 0. A prior period changed after someone reported it.");
   box.innerHTML = res(diff.length?"flag":"ok","Accounts that differ",String(diff.length),diff.length?diff.map(r=>`${esc(r.v)} ${sgn(r.d)}`).join(" · "):"None.")
