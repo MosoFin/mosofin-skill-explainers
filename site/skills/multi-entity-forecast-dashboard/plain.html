@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Entity Cash Forecast in Plain English | MosoFin</title>
+<meta name="description" content="How a group cash dashboard adds company files month by month, shows money owed inside the group, and projects six months. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Multi-entity forecast dashboard</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · group cash forecast, in plain words</span>
+  <h1>We run more than one company file. How much cash does the group make, and how much will it have in six months?</h1>
+  <p class="lede">Some owners keep two or three companies, each with its own QuickBooks file. This skill reads <b>the monthly cash flow statement of each file</b>. It adds the files month by month into one group view. Then it projects <b>six months</b> from the last month's figures.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You choose the company files and the months. It reads each file's cash flow statement, or a file that you supply. It adds the files month by month. It shows the money that your own companies owe each other beside the total, and never hides it. It projects six months on three preset rates. It makes one dashboard file and never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Two company files added, one left out, at Northbrook Trading Group</h2>
+  <p>Northbrook Trading Group works in US dollars, on an accrual basis, with a calendar year. Its MosoFin workspace holds three connected QuickBooks files. Northbrook Trading and Northbrook Services LLC keep US dollar books. Northbrook Trading Canada Ltd keeps Canadian dollar books. The run is on Thursday 1 October 2026, and the owner asks for July to September 2026.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Monthly cash flow for Northbrook Trading and Northbrook Services, July to September 2026, and the group total for each month">
+        <thead><tr><th scope="col" style="text-align:left">File</th><th scope="col" style="text-align:left">Month</th><th scope="col">Operating</th><th scope="col">Investing</th><th scope="col">Financing</th><th scope="col">Net cash increase</th><th scope="col">Net income</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Trading</th><td class="t">Jul</td><td>42,000</td><td>0</td><td>0</td><td>42,000</td><td>35,600</td></tr>
+        <tr><th scope="row">Trading</th><td class="t">Aug</td><td>38,500</td><td>−12,000</td><td>0</td><td>26,500</td><td>31,900</td></tr>
+        <tr><th scope="row">Trading</th><td class="t">Sep</td><td>46,200</td><td>0</td><td>−5,000</td><td>41,200</td><td>40,800</td></tr>
+        <tr><th scope="row">Services</th><td class="t">Jul</td><td>6,400</td><td>0</td><td>0</td><td>6,400</td><td>5,200</td></tr>
+        <tr><th scope="row">Services</th><td class="t">Aug</td><td>7,100</td><td>0</td><td>0</td><td>7,100</td><td>6,300</td></tr>
+        <tr><th scope="row">Services</th><td class="t">Sep</td><td>5,900</td><td>0</td><td>0</td><td>5,900</td><td>4,700</td></tr>
+        <tr class="tot"><th scope="row">Group</th><td class="t">Jul</td><td>48,400</td><td>0</td><td>0</td><td class="c">48,400</td><td>40,800</td></tr>
+        <tr><th scope="row">Group</th><td class="t">Aug</td><td>45,600</td><td>−12,000</td><td>0</td><td class="c">33,600</td><td>38,200</td></tr>
+        <tr><th scope="row">Group</th><td class="t">Sep</td><td>52,100</td><td>0</td><td>−5,000</td><td class="c">47,100</td><td>45,500</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up group, in dollars. In August, Trading bought equipment for 12,000. In September, Trading paid back 5,000 of a loan. The skill adds the files month by month: for example, July operating is 42,000 + 6,400 = 48,400.</figcaption>
+  </figure>
+  <p>For each row, the skill checks one rule. Operating plus investing plus financing equals the net cash increase for the month<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. For Trading in August, 38,500 − 12,000 + 0 = 26,500. For Trading in September, 46,200 + 0 − 5,000 = 41,200.</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Files added</span><span class="v num good">2</span><span class="s">Trading and Services. 1 file left out: the Canada file keeps Canadian dollars</span></div>
+    <div class="stat"><span class="label">Net cash increase, Jul to Sep</span><span class="v num">$129,100</span><span class="s">48,400 + 33,600 + 47,100. This is a change in cash, and it is not a bank balance</span></div>
+    <div class="stat"><span class="label">Outside receivables</span><span class="v num hold">$67,300</span><span class="s">Of $76,800 in total. 76,800 − 9,500 owed by Services to Trading</span></div>
+    <div class="stat"><span class="label">Six months to March 2027</span><span class="v num">$402,100 to $441,700</span><span class="s">Conservative to base. Section below</span></div>
+    <div class="stat"><span class="label">Entries posted</span><span class="v num good">0</span><span class="s">The skill only reads</span></div>
+  </div>
+  <p>Why is the Canada file not in the group? The skill adds the files month by month, and it has no step that changes one currency into another. If it added the Canada file, it would add Canadian dollars to US dollars. So the example leaves that file out and says so in a note. Your accountant can choose an exchange rate and supply figures in US dollars. Then the skill can use them on the manual path. The skill never chooses a rate for you.</p>
+  <p class="muted" style="font-size:15px">This example makes four choices. It uses the July to September range, and it leaves out the Canada file. It takes the balances from the balance sheet report. It uses the label "Net cash increase" for the 129,100.</p>
+</section>
+
+<section>
+  <span class="label">The mistake to know about</span>
+  <h2>A total of cash increases is not the money in the bank</h2>
+  <p>The dashboard adds the monthly net cash increases from the first month of the range. It shows the result as "Cash at end of Sep". That figure is the total increase since the range started. It equals the cash balance only when cash was zero at the start of the range<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. The starting cash comes from the balance sheet before the period. Starting cash plus the net cash flow of the period gives the ending cash.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the figure is</h3>
+      <span class="who">The total of the net cash increases, July to September</span>
+      <div class="rows num">
+        <div class="row"><span>Trading</span><span class="v">$109,700</span></div>
+        <div class="row"><span>Services</span><span class="v">$19,400</span></div>
+        <div class="row"><span>Group</span><span class="v">$129,100</span></div>
+      </div>
+      <div class="verdict">This example shows it with the label "Net cash increase, Jul to Sep". It gives no bank balance.</div>
+    </div>
+    <div class="book bad">
+      <h3>What it is easy to read it as</h3>
+      <span class="who">The dashboard label "Cash at end of Sep"</span>
+      <div class="rows num">
+        <div class="row off"><span>Cash in the bank on 30 Sep</span><span class="v">not $129,100</span></div>
+        <div class="row off"><span>Correct only if</span><span class="v">cash was 0 on 1 Jul</span></div>
+        <div class="row"><span>Opening cash field</span><span class="v">none</span></div>
+      </div>
+      <div class="verdict">Northbrook had cash before July. So the bank balance on 30 September is that cash plus 129,100. The dashboard does not ask for the starting cash.</div>
+    </div>
+  </div>
+  <p>The same rule applies to the receivables and payables. The skill can add up their monthly changes only when the year started at zero. This range starts in July, so the example takes the balances from the balance sheet report on 30 September. The skill's method says to do that when the range does not start at zero.</p>
+</section>
+
+<section>
+  <span class="label">Money your companies owe each other</span>
+  <h2>Services owes Trading $9,500 of the receivables</h2>
+  <p>Services owes Trading 9,500. Trading shows it as a receivable. Services shows it as a payable. In the group total, it looks like money from a customer. It is not money that any outside customer owes.</p>
+  <div class="compare">
+    <div class="book">
+      <h3>What the skill shows</h3>
+      <span class="who">Both figures, side by side</span>
+      <div class="rows num">
+        <div class="row"><span>Group receivables</span><span class="v">$76,800</span></div>
+        <div class="row"><span>Of which Services owes Trading</span><span class="v">$9,500</span></div>
+        <div class="row"><span>From outside customers</span><span class="v">$67,300</span></div>
+      </div>
+      <div class="verdict">The skill writes a note with the outside figure. Its rule: "Never silently eliminate; show both."</div>
+    </div>
+    <div class="book bad">
+      <h3>What it does not do</h3>
+      <span class="who">A full group accounts elimination</span>
+      <div class="rows num">
+        <div class="row"><span>Group payables</span><span class="v">$57,000</span></div>
+        <div class="row off"><span>Of which Services owes Trading</span><span class="v">$9,500, still in</span></div>
+        <div class="row"><span>"Intercompany removed" row</span><span class="v">receivables side only</span></div>
+      </div>
+      <div class="verdict">The dashboard has a row with the label "Intercompany removed". It takes 9,500 from the receivables and leaves the same 9,500 in the payables.</div>
+    </div>
+  </div>
+  <p>Group accounts remove all balances and transactions between companies of the same group, on both sides<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. US accounting rules agree on this point<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill does not prepare group accounts. It shows the total and the part inside the group, so that you can see both. If you need group accounts, ask your accountant.</p>
+  <p>The skill also checks for test data. It looks for the same figure to the cent in two files and for customer names from the QuickBooks sample company. It also looks for the word "Sandbox" in a company name. The example found none, and its report says that.</p>
+</section>
+
+<section>
+  <span class="label">The six-month projection</span>
+  <h2>Three rates, from the last month, for six months</h2>
+  <p>The projection starts from the last actual month, September, and runs from October 2026 to March 2027. It starts from the 129,100. The skill takes three monthly rates from the group's figures. The skill names the edges P10 and P90. They are presets of the skill, not percentiles from a statistical model.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Three scenario rates for Northbrook group and the projected total at March 2027">
+        <thead><tr><th scope="col" style="text-align:left">Scenario</th><th scope="col" style="text-align:left">Monthly rate, from</th><th scope="col">Rate</th><th scope="col" style="text-align:left">March 2027</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Conservative (P10 edge)</th><td class="t">September net income</td><td>45,500</td><td class="t">129,100 + 6 × 45,500 = 402,100</td></tr>
+        <tr class="tot"><th scope="row">Base</th><td class="t">September operating cash flow</td><td class="c">52,100</td><td class="t">129,100 + 6 × 52,100 = 441,700</td></tr>
+        <tr><th scope="row">Upside (P90 edge)</th><td class="t">August and September operating cash flow, averaged</td><td>48,850</td><td class="t">(45,600 + 52,100) ÷ 2 = 48,850. Below base, so P90 uses 52,100: 441,700</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures, monthly change 0% and no one-off spend. The skill's own rules set the three rates and the six months. No outside standard sets them.</figcaption>
+  </figure>
+  <p>September was the best month. So the upside rate, 48,850, is below the base rate, 52,100. The dashboard sets the P90 edge to the larger of the upside rate and the base rate. So P90 equals base, at 441,700. The range is $402,100 to $441,700. Neither path goes below zero, so the dashboard names no first negative month.</p>
+  <p>The projection adds no more investing, financing or loan payments. Trading paid back 5,000 of a loan in September, but the projection does not repeat that payment. Why not use an average of all months? The skill's method says that an average mixes in unusual months. In this example, the August equipment purchase is in investing, so it is not in any rate.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Four questions, in this order</h2>
+  <ol class="qs">
+    <li><div class="q">Use your MosoFin connection to read the books, or supply the data yourself?</div><div class="why">The skill asks this first. If you say no, or have no connection, it uses the manual path with a file from you.</div></li>
+    <li><div class="q">Which workspace?</div><div class="why">If you have more than one, it asks you to choose by name. It never chooses one for you. Northbrook had one, and the owner checked it by name.</div></li>
+    <li><div class="q">One company file, each file separately, or consolidated?</div><div class="why">It asks when you connect more than one QuickBooks file. The dashboard always shows each file and the group, so "consolidated" is the usual answer.</div></li>
+    <li><div class="q">Which months?</div><div class="why">The default is 1 January of this year to the end of this month. For Northbrook that is 1 January to 31 October, with an almost empty October last. The projection starts from the last month, so the owner asked for July to September.</div></li>
+  </ol>
+  <p>If a read stops partway, the skill tells you what it read. It offers the manual path for the rest. It never fills the gap with figures of its own.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or supply one CSV file</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then choose by name</h3>
+      <ul>
+        <li>It reads each file's cash flow statement, month by month</li>
+        <li>It reads the receivables aging, if the file has one. Northbrook pulled it for Trading only, so the group view shows no aging bands</li>
+        <li>It takes balances from the balance sheet report when the range does not start at zero</li>
+        <li>It finds money owed between your companies when a customer name matches a sister company</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Supplying the data</span>
+      <h3>One row for each company and month</h3>
+      <ul>
+        <li>Columns: entity, month, year, operating, investing and financing cash flow, net income</li>
+        <li>On the last row of each company: receivables, the part owed by sister companies, payables and inventory</li>
+        <li>All companies cover the same months. The skill gives you a sample file to copy</li>
+        <li>A profit and loss report only gives net income. The skill does not make up the cash flow columns</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>One dashboard file with four tabs</h2>
+  <div class="gets">
+    <div class="get"><b>Overview</b><span>Four headline figures, the monthly table, and a switch between the group and each company file.</span></div>
+    <div class="get"><b>Accounts</b><span>Receivables, payables and the money owed inside the group, with the aging where the skill has it.</span></div>
+    <div class="get"><b>Forecast</b><span>The three presets, sliders for the monthly rate, the monthly change and a one-off spend, and the six-month table.</span></div>
+    <div class="get"><b>Report</b><span>A page in the style of a paper report, with the notes on what the data shows and the checks the skill did.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">On the MosoFin path, the file has a Sync button and an Ask panel. They work only when the file runs inside Claude with the MosoFin connection. In other places they show an amber strip. The skill ends with one line that lists the tools it used and the time it read the data.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Four rules that never bend</h2>
+    <ul>
+      <li><b>No figures of its own.</b> "Every number in the dashboard comes from the tool results or the user's file." No estimates between months, and no typical values.</li>
+      <li><b>Never hides test data or money owed inside the group.</b> It discloses both every time they appear.</li>
+      <li><b>Never writes to your books.</b> "Read-only: this skill never writes to QuickBooks or MosoFin."</li>
+      <li><b>Never changes the look.</b> It adds no chart libraries, no web fonts and no new colours. If you ask for a change that breaks its style rules, it tells you and offers the nearest option.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Six terms, in plain English</h2>
+  <dl>
+    <dt>Company file</dt><dd>One set of books in QuickBooks, for one company.</dd>
+    <dt>Cash flow statement</dt><dd>A report of cash in and out, in three parts: operating, investing and financing. The three parts add up to the net cash increase<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>.</dd>
+    <dt>Operating cash flow</dt><dd>The cash that day-to-day trading brings in, after the cash it uses.</dd>
+    <dt>Intercompany</dt><dd>Money that one company in your group owes another. Group accounts remove it on both sides<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Consolidated</dt><dd>All the companies in the group shown as one. In this skill, it means the files added month by month.</dd>
+    <dt>P10 and P90</dt><dd>In this skill, the names of the conservative and upside edges of the projection. They are presets, not statistical percentiles.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an accounting textbook, an international accounting standard and a release of the US securities regulator. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="total net cash flow"><a href="https://openstax.org/books/principles-financial-accounting/pages/16-4-prepare-the-completed-statement-of-cash-flows-using-the-indirect-method" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 16.4 Prepare the Completed Statement of Cash Flows Using the Indirect Method</a><span class="what">The operating, investing and financing totals add up to the total net cash flow. The beginning cash comes from the balance sheet of the period before. Beginning cash plus the net cash flow gives the ending cash.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="paragraph B86(c)"><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2022/issued/ifrs10.html" rel="noopener">IFRS Foundation: IFRS 10 Consolidated Financial Statements</a><span class="what">Group accounts remove in full the assets, liabilities, equity, income, expenses and cash flows from transactions between companies of the group.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="Rule 3A-04"><a href="https://www.sec.gov/files/rules/final/2018/33-10532.pdf" rel="noopener">SEC: Final Rule, Disclosure Update and Simplification (Release 33-10532, 2018)</a><span class="what">The release lists the SEC rule to remove intercompany items in group accounts beside the matching US GAAP guidance in ASC 810.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the three scenario rates, the six months, the P10 and P90 names or the test-data signs. The same applies to the four tabs and the dashboard style. They are the skill's own rules. We made up Northbrook Trading Group and every figure in the example for this page.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>multi-entity-forecast-dashboard</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/dashboards/multi-entity-forecast-dashboard">Read the skill on GitHub →</a> The skill is on the main branch, in the dashboards folder. It is a dashboard skill, so it does not use the card format of the other skills. This page describes the version on main. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading Group, its companies and every figure in the example. They are not your data. The textbook and the SEC release are US sources. IFRS 10 is an international standard. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
