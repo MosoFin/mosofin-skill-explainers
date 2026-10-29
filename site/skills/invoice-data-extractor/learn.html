@@ -487,7 +487,7 @@ const LEVELS = [
       rows:[["Currency","$","null","\"$\" alone has many meanings"],["Invoice date","03/10/2026","null","Sat 3 Oct or Tue 10 Mar"],["Line 1","500 × 1.90","950.00","adds up"],["Line 2","40 × 5.00","200.00","adds up"],["HST, 13% printed","149.50","149.50","as printed"],["Total","1,299.50",["1,299.50, currency null","bad"],"not in any USD total"]]},
     rules:[Q.q1, Q.q2, Q.q8],
     math:[["Line 1: 500 × 1.90","950.00"],["Line 2: 40 × 5.00","200.00"],["Subtotal: 950.00 + 200.00","1,150.00"],["+ printed HST","149.50"],["= total, same as printed","1,299.50",1],["The Toronto address","a cue, not proof"],["Currency and date","null, ask the owner",1]],
-    verdict:["note","The figures add up, but the skill does not know the currency or the date. It writes null for both and asks the owner. Maple Ridge's 1,299.50 stays out of every US dollar total.","null"] },
+    verdict:["note","The figures add up, but the skill does not know the currency or the date. It flags both and asks the owner. The skill does not say what to write in these fields while they are open. This page shows null. Maple Ridge's 1,299.50 stays out of every US dollar total.","null"] },
 
   { tier:"Validation · what your books say" },
   { n:4, title:"Already in the books, already paid",
@@ -501,7 +501,7 @@ const LEVELS = [
       rows:[["Window searched","12 months","13 Oct 2025 to 12 Oct 2026"],["Same supplier, same number","match","INV-7731 in the books"],["Already paid","yes","cheque, Sat 22 Aug"],["Paid again","yes","ACH, Fri 4 Sep"],["Status","",["Stop","bad"]]]},
     rules:[Q.q4, Q.q5, Q.q14],
     math:[["Number on the bill","INV-7731"],["Normalized: case, punctuation, prefix removed","7731"],["Number in the books, normalized","7731",1],["Invoice date Fri 31 Jul is inside the window","yes"],["Unpaid bills only would show","no match"],["Held from payment","4,860.00",1]],
-    verdict:["flag","The reminder copy matches a bill in the books that Northbrook paid already. The skill gives Stop and names the matching bill. The double payment in August and September is a matter for the duplicate invoice detection skill. This skill stops the third copy.","Stop"] },
+    verdict:["flag","The reminder copy matches a bill in the books that Northbrook paid already. The skill gives Stop and names the matching bill. This skill does not name a skill for the double payment in August and September. This page's reading is that the duplicate invoice detection skill finds it. This skill stops the third copy.","Stop"] },
 
   { n:5, title:"Supplier, payment address and bank details",
     chips:["bills_a.pdf, pages 4-5","bills_b.pdf, page 3","Supplier list"], src:"Rule 3", cites:[3],
@@ -526,7 +526,7 @@ const LEVELS = [
       total:["In the extraction","11 rows","19,192.22"]},
     rules:[Q.q6, Q.q15, Q.q16, Q.q3],
     math:[["Clean: 4,800.00 + 1,200.00 + 139.90 − 96.34","6,043.56"],["Review: 950.00 + 2,400.00 + 2,600.00 + 1,988.66","7,938.66"],["Stop: 4,860.00 + 350.00","5,210.00"],["US dollars: 6,043.56 + 7,938.66 + 5,210.00","19,192.22",1],["Count: 4 Clean + 5 Review + 2 Stop + 1 Excluded","12",1],["Rows in the extraction, without the pro forma","11"],["Rows in the US dollar totals, without Maple Ridge","10"],["Line Items: 1+1+1+1+1+1+3+1+1+2+1","14 lines",1],["Entries posted","0",1]],
-    verdict:["flag","The skill holds 5,210.00 from payment, and 4,860.00 of it is the Crestline bill that Northbrook paid already. It offers the vendor statement reconciliation skill for the statement. On a yes, it makes Invoices_Extracted_2026-10-12_12invoices.xlsx. It posts nothing.","Stop"] },
+    verdict:["flag","The skill holds 5,210.00 from payment, and 4,860.00 of it is the Crestline bill that Northbrook paid already. For the statement, it offers to compare it with the payables balance. On a yes, it makes Invoices_Extracted_2026-10-12_12invoices.xlsx. It posts nothing.","Stop"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }

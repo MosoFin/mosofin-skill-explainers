@@ -277,7 +277,7 @@
         <tr><th scope="row">B, p3</th><td class="t">Maple Ridge Packaging</td><td class="t">MRP-114</td><td class="t">null</td><td>1,299.50</td><td class="t a">Review</td><td class="t">New supplier in Toronto. The bill shows "$" only, and "03/10/2026" has two possible readings</td></tr>
         <tr class="breach"><th scope="row">B, p4</th><td class="t">Keystone</td><td class="t">KS-1140</td><td class="t">Thu 1 Oct</td><td>350.00</td><td class="t w">Stop</td><td class="t">The bill is for "Northbrook Holdings LLC", which is not a connected company</td></tr>
         <tr><th scope="row">B, p5</th><td class="t">Oakfield Signs</td><td class="t">PF-0007</td><td class="t">Wed 7 Oct</td><td>2,750.00</td><td class="t">Excluded</td><td class="t">A pro forma: a quote for a sign, and not a bill</td></tr>
-        <tr><th scope="row">B, p6-7</th><td class="t">Harbor Office Supply</td><td class="t">statement</td><td class="t"></td><td></td><td class="t">Set aside</td><td class="t">A statement of account. The skill offers the vendor statement reconciliation skill for it</td></tr>
+        <tr><th scope="row">B, p6-7</th><td class="t">Harbor Office Supply</td><td class="t">statement</td><td class="t"></td><td></td><td class="t">Set aside</td><td class="t">A statement of account. The skill offers to compare it with your payables balance, and does not post it</td></tr>
         </tbody>
       </table>
     </div>
@@ -320,7 +320,7 @@
   </div>
   <p>The skill matches on the supplier and the bill number, with the number written in one standard form. It also matches on the amount and a window of dates. Duplicate bills occur in large organizations too. The US Government Accountability Office found 365 possible duplicate invoices in one payment system of the Veterans Health Administration. Their value was about $1.7 million, over fiscal years 2018 to 2023<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
   <p>That system compares key fields with bills that it paid already. The GAO says that its own data matching shows possible problems, and that a match is not proof<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill works in the same way. A match gives a Stop for a person to look at. If the skill finds no match, it does not call that proof that the bill is new.</p>
-  <p>The double payment of August and September is a different problem. The duplicate invoice detection skill finds that. This skill stops the third copy.</p>
+  <p>The double payment of August and September is a different problem. This skill does not name a skill for it. This page's reading is that the duplicate invoice detection skill finds it. This skill stops the third copy.</p>
 </section>
 
 <section>
@@ -346,7 +346,7 @@
     <div class="card">
       <span class="tag up">Maple Ridge, MRP-114</span>
       <h3>Which dollar, and which date?</h3>
-      <p>The bill shows "$" only. Many countries use the dollar sign. The Toronto address is a hint, and it is not proof. The date "03/10/2026" can be 3 October or 10 March. The skill writes null for the currency and the date, and asks you.</p>
+      <p>The bill shows "$" only. Many countries use the dollar sign. The Toronto address is a hint, and it is not proof. The date "03/10/2026" can be 3 October or 10 March. The skill flags the currency and the date and asks you. The skill does not say what to write in these fields while they are open. This page shows null.</p>
     </div>
     <div class="card">
       <span class="tag bad">Keystone, KS-1140</span>

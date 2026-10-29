@@ -533,7 +533,7 @@ const LEVELS = [
   { tier:"The answer · what it refuses, and what it keeps" },
   { n:6, title:"What it will not do, and what it keeps",
     chips:["Summary","Excel file","Saved rules"], src:"Rules 9 and 10", cites:[],
-    situation:"The owner reads the coded list and says \"just post them all\". The skill declines once, plainly, and gives the coded list as a draft. After the results, it asks \"Want me to note this as a rule?\"",
+    situation:"The owner reads the coded list and says \"just post them all\". The skill declines once, plainly, and gives the coded list as a draft. After the results, it asks if the owner wants to save a customized version. The owner recoded no item, so the learning-loop question does not come.",
     facts:[], nofact:NOFACT,
     visual:{type:"table",
       head:["Rows","Source","Amount","Band"],
@@ -541,7 +541,7 @@ const LEVELS = [
       total:["1 to 39","all rows","−22,293.35",""]},
     rules:[Q.q16, Q.q15],
     math:[["Rows 1 to 13 added together","−14,668.85"],["Ledger batch: −14,668.85 + −11,486.90","−26,155.75",1],["With the bank file: −26,155.75 + 3,862.40","−22,293.35",1],["High: row 1 + 25 routine = 26 ÷ 39","66.7%"],["Medium: rows 3, 4, 5, 6, 7, 8, 9, 12, 13 = 9 ÷ 39","23.1%"],["Low: rows 2, 10, 11, 39 = 4 ÷ 39","10.3%"],["66.7 + 23.1 + 10.3, from rounding","100.1%"],["Flagged: rows 4, 5, 6, 7, 8, 10, 12, 13, 39","9",1],["Needs Review with no flag","rows 2 and 11"],["Saved, keyed to quickbooks / Northbrook Trading","phone and internet to 6340"],["Never saved","the 39 rows, the amounts, the Lindqvist flag"]],
-    verdict:["ok","The skill posts nothing. It does not choose between 6340 and 6310 from history alone, apply a tax treatment to Klarwerk or call row 10 personal. It offers Northbrook Trading_Coded_Transactions_2026-10-05.xlsx, with the Uncoded Population and Coverage sheets, and makes it only on a yes. On a yes to the rule, it saves phone and internet to 6340.","DRAFT"] },
+    verdict:["ok","The skill posts nothing. It does not choose between 6340 and 6310 from history alone, apply a tax treatment to Klarwerk or call row 10 personal. It offers Northbrook Trading_Coded_Transactions_2026-10-05.xlsx, with the Uncoded Population and Coverage sheets, and makes it only on a yes. On a yes to save, it saves the house rule: phone and internet to 6340.","DRAFT"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }

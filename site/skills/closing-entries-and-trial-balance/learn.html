@@ -460,11 +460,11 @@ const LEVELS = [
       rows:[["Sales","Income","Temporary","Temporary",["closes","good"]],["Customer Deposits","Other Income","Temporary","Liability",["exception","bad"]],["Member Distributions (Hart)","Equity","Permanent","Draws",["closes: draws exception","good"]]]}],
     rules:[Q.q3, Q.q9, Q.q10],
     math:[["Net income from the trial balance, as typed","212,900"],["Net income on the QuickBooks P&L","212,900"],["Difference: 212,900 − 212,900","0",1],["Customer Deposits inside both figures","4,000"],["Correction, dated Wed 31 Dec 2025","DR Customer Deposits (income) 4,000"],["","CR Customer Deposits (liability) 4,000"],["Posted by the owner in QuickBooks","Wed 14 Jan 2026"],["Net income after the correction: 212,900 − 4,000","208,900",1]],
-    verdict:["note","The P&L check passes, because QuickBooks' P&L follows the same account type. Only the review of names against types finds the account. The skill lists it and moves nothing. A type correction is an adjusting entry, so the trial balance was not final. The owner takes the correction to journal-entry-builder.","EXCEPTION"] },
+    verdict:["note","The P&L check passes, because QuickBooks' P&L follows the same account type. Only the review of names against types finds the account. The skill lists it and moves nothing. A type correction is an adjusting entry, so the trial balance was not final. The owner posts the correction in QuickBooks. The skill does not name a skill for this correction.","EXCEPTION"] },
 
-  { n:2, title:"The trial balance must balance first",
+  { n:2, title:"The trial balance must balance",
     chips:["Trial balance at 31 Dec 2025","2024 Form 1065, Schedule K-1"], src:"Rules 1 and 2", cites:[2,5],
-    situation:"The second run is on Thursday 15 January 2026. The skill reads everything again, because the books changed. Then it adds each side of the final trial balance.",
+    situation:"The second run is on Thursday 15 January 2026. The skill reads everything again, because the books changed. It runs the closed-state test first. A later level shows that test. Then it adds each side of the final trial balance.",
     facts:["OpenStax shows the same test at the end of the close: on the post-closing trial balance, debits equal credits "+C(2)+". The skill runs it before the close too.",
            "Each partner's capital analysis on Form 1065 runs from beginning capital to ending capital. The lines above the ending capital must add up to it "+C(5)+".",
            "So the ending capital on last year's return is a check on this year's opening capital. The owner uploads the return, because the books do not hold it."],
@@ -704,7 +704,7 @@ function run(){
     else if(ent==="sole") out+=res("note","Income in Retained Earnings",m2(NI),"The roll moved it there. Ask your accountant if it belongs in Owner Capital.","r-p1");
     out+=res("note","P2 closes distributions",m2(dist),dist?ms.map(m=>`${dn(m)} ${m2(m.dist)}`).join(" · "):"Nothing to close.","r-p2");
   } else {
-    out+=res("ok","Entries proposed","none","An explicit entry already closed the year. The skill verifies it with the Step 8 tie-outs.","r-none");
+    out+=res("ok","Entries proposed","none","An explicit entry already closed the year. The skill checks it with the Step 8 tie-outs.","r-none");
   }
   out+=res("ok","Closing equity",m2(tot),ms.map((m,i)=>`${nm(m)} ${m2(close[i])}`).join(" · ")+". This assumes a person posts every proposal.","r-close");
   out+=res("flag","Double-close error",m2(NI),state==="open"?"The error if the platform also closed the year and a person posts E1 and E2.":"The error if a person also posts closing entries for revenue and expense.","r-dbl");

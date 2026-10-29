@@ -413,7 +413,7 @@ const Q = {
 
 const RULES = [
   { id:"1", title:"Hand-typed entries are the focus", r:Q.q1, cites:[1],
-    plain:"An invoice, a bill or a payroll run goes through the normal checks. An entry that a person types by hand can skip them. So the skill scores those entries first.",
+    plain:"An invoice, a bill or a payroll run goes through the normal checks. An entry that a person types by hand can skip them. So those entries are the focus of the review. The skill still screens every entry.",
     backed:"A good control system makes sure that at least two people take part in most transactions. Then a second person checks the work of the first.{1}" },
   { id:"2", title:"Review after the fact", r:Q.q11, cites:[2],
     plain:"The screen finds the entries to look at. A person then gets the support and the explanation, and decides about each entry.",
@@ -486,7 +486,7 @@ const LEVELS = [
 
   { n:4, title:"Score combinations, not single flags",
     chips:["Flagged entries","Baseline: six prior quarters"], src:"Rule 7", cites:[],
-    situation:"Seven of the 48 manual entries meet at least one criterion. The skill adds the weights of the criteria and reviews each entry with a score of 6 or more.",
+    situation:"Seven of the 48 manual entries meet at least one criterion. The skill adds the weights of the criteria and reviews each entry with a score of 6 or more. That review limit is this example's choice. The skill does not define one.",
     facts:[], nofact:NOFACT,
     visuals:[{cap:"The weights, this example's choices. The skill says to state weights, but it defines none", cls:"wrapcells",
       head:["Points","Criteria"],
