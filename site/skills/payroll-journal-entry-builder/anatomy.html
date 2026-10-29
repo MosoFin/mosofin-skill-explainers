@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Journal Entry Builder Anatomy | MosoFin</title>
+<meta name="description" content="How the payroll journal entry builder skill is built on main: a 161-line card, seven reference files, the run by stage, tools, sources and audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+
+<header>
+  <div class="eyebrow">payroll-journal-entry-builder · card format on main, PR #1, 26 Oct 2026 · bookkeeping-audit fix 27 Oct 2026</div>
+  <h1>The structure of the payroll journal entry builder skill, and what it does</h1>
+  <p class="lede">The skill was one 917-line file. On main it is now a 161-line card and seven reference files, 1,156 lines in all. The split commit d4726ff made the card on 25 October 2026, and pull request #1 merged it on 26 October 2026. The bookkeeping-audit commit 76d1e74 changed the method on 27 October 2026. The skill builds proposed payroll entries before a person posts them. It keeps the employer entry apart from the employee entry and ties each line to the register. This page shows how the files connect, the run stage by stage, the tools and sources behind each step, and the audit.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Card</span><span class="v">161</span><span class="s">lines in SKILL.md on main, down from 917. The eight files hold 1,156 lines</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">42 · 14 · 21</span><span class="s">[auto] · [gated] · [manual] in the eight files on main. method.md alone has 26 · 6 · 6</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">11</span><span class="s">evidence tools in 7 rows, plus 7 Mosofin workflow tools. None checked against a live catalogue</span></div>
+    <div class="stat"><span class="k">Description</span><span class="v">1,022</span><span class="s">characters of the limit of 1,024. Only 2 characters of headroom remain</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">4 fixed · 9 open</span><span class="s">changes on main in 9e618b4, d4726ff, 14f616a and 76d1e74. A1 to A10 for the skill owner, and A2 passed</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One card, seven files behind it, 161 lines instead of 917</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 420" role="img" aria-label="SKILL.md is a 161-line card with rules and six stages. The rules point to mosofin-protocol.md, stage 2 to gates.md, stages 3 to 6 to method.md, stage 4 also to edge-cases.md and stage 5 also to output.md. overview.md and tools-and-glossary.md are read on demand. method.md is the largest file at 332 lines, then mosofin-protocol.md at 262, gates.md at 144, edge-cases.md at 85, tools-and-glossary.md at 65, overview.md at 55 and output.md at 52.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="380" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · THE CARD · 161</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">What it does · with or without Mosofin</text>
+          <text x="48" y="112" font-weight="600">Rules that never bend</text>
+          <text x="48" y="152" font-weight="600">Stage 1 · Intake, questions A to H</text>
+          <text x="48" y="192">Stage 2 · Gates 0–3, Mosofin path</text>
+          <text x="48" y="232">Stage 3 · Read, map the register</text>
+          <text x="48" y="272">Stage 4 · Build the entries</text>
+          <text x="48" y="312">Stage 5 · Check, compare</text>
+          <text x="48" y="352">Stage 6 · Offer to save</text>
+        </g>
+        <line x1="44" y1="132" x2="286" y2="132" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="245" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">mosofin-protocol.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">262</text></g>
+          <g><rect x="580" y="78" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="78" width="134" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="103" fill="var(--ink)">gates.md</text><text x="878" y="103" text-anchor="end" fill="var(--faint)">144</text></g>
+          <g><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="132" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="157" fill="var(--ink)">method.md</text><text x="878" y="157" text-anchor="end" fill="var(--faint)">332</text></g>
+          <g><rect x="580" y="186" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="186" width="79" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="211" fill="var(--ink)">edge-cases.md</text><text x="878" y="211" text-anchor="end" fill="var(--faint)">85</text></g>
+          <g><rect x="580" y="240" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="240" width="49" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="265" fill="var(--ink)">output.md</text><text x="878" y="265" text-anchor="end" fill="var(--faint)">52</text></g>
+          <g><rect x="580" y="294" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="294" width="51" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="319" fill="var(--muted)">overview.md</text><text x="878" y="319" text-anchor="end" fill="var(--faint)">55</text></g>
+          <g><rect x="580" y="348" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="348" width="61" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="373" fill="var(--muted)">tools-and-glossary.md</text><text x="878" y="373" text-anchor="end" fill="var(--faint)">65</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 108 C 440 108, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 188 C 440 188, 440 98, 574 98" marker-end="url(#a1)"/>
+          <path d="M300 228 C 440 228, 440 152, 574 152" marker-end="url(#a1)"/>
+          <path d="M300 268 C 440 268, 440 156, 574 156" marker-end="url(#a1)"/>
+          <path d="M300 308 C 440 308, 440 160, 574 160" marker-end="url(#a1)"/>
+          <path d="M300 348 C 440 348, 440 164, 574 164" marker-end="url(#a1)"/>
+          <path d="M300 270 C 450 270, 450 206, 574 206" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 310 C 450 310, 450 260, 574 260" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="124">before 1st call</text>
+          <text x="318" y="206">Gates 0–3</text>
+          <text x="452" y="300">Steps 0–9</text>
+          <text x="318" y="398" fill="var(--muted)">dashed boxes: read only when asked why, or for a term</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The card loads every time, and each stage points to one file. So the skill reads the method only when it does that stage. <b>method.md</b> has 10 step headings, Step 0 to Step 9, and the section "Both entity scenarios". <b>edge-cases.md</b> holds 23 edge cases, 12 of them Mosofin-specific. <b>gates.md</b> holds 4 gates, Gates 0 to 3, with a 12-row interview at Gate 3. Two of its rows are struck through, because they are now [auto] or [gated]. <b>mosofin-protocol.md</b> is the shared onboarding, scope and write-guardrail text. <b>output.md</b> holds 30 output standards, 9 original and 21 Mosofin additions. <b>tools-and-glossary.md</b> names the 7 workflow tools and the 11 evidence tools. Each bar uses the file's own line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, stage by stage</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 1390" role="img" aria-label="Stage 1 asks eight things in one message: Mosofin or upload, the entity and the run, the pay period with the pay date and the basis, the register, the employer costs, the clearing account, the allocation basis and any capitalised labour. If Mosofin is present and chosen, gates 0 to 3 confirm the workspace and the company file, check for a payroll platform, read the tool catalogue and the profile, and ask a 12-row interview. Otherwise the user uploads the register, the employer costs and the chart, and types the entity, the dates, the basis and the clearing answer. Both paths read back and wait for a yes. Stage 3: step 0 reads in one batch and checks the mock flag. Step 1 maps each register component to an account. Stage 4: step 2 builds the employee entry, step 3 the employer entry kept apart, step 4 the allocation of the expense side, step 5 the funding and step 6 the period-end accrual, the one estimate. Stage 5: step 7 runs eleven checks, among them the line tie and the run-over-run comparison, and step 8 gives eight sheets marked proposed, not posted. Stage 6: step 9 offers to save the map and the template, never the run.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="144" x2="460" y2="174" marker-end="url(#a2)"/>
+          <polyline points="330,226 230,226 230,290" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,226 690,226 690,290" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,454 230,498 400,498" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,454 690,498 520,498" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="522" x2="460" y2="556" marker-end="url(#a2)"/>
+          <line x1="460" y1="830" x2="460" y2="864" marker-end="url(#a2)"/>
+          <line x1="460" y1="1096" x2="460" y2="1130" marker-end="url(#a2)"/>
+          <line x1="460" y1="1264" x2="460" y2="1298" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="124" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 1 · INTAKE · ONE MESSAGE, BEFORE ANY READ</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="74"><tspan font-weight="600">A</tspan> Use Mosofin or upload?</text>
+            <text x="330" y="74"><tspan font-weight="600">B</tspan> Entity and run, who employs</text>
+            <text x="590" y="74"><tspan font-weight="600">C</tspan> Period, pay date, basis</text>
+            <text x="80" y="100"><tspan font-weight="600">D</tspan> Register, required</text>
+            <text x="330" y="100"><tspan font-weight="600">E</tspan> Employer costs</text>
+            <text x="590" y="100"><tspan font-weight="600">F</tspan> Clearing account?</text>
+            <text x="80" y="126"><tspan font-weight="600">G</tspan> Split basis, never defaulted</text>
+            <text x="330" y="126"><tspan font-weight="600">H</tspan> Capitalised labour</text>
+          </g>
+          <polygon points="460,176 590,226 460,276 330,226" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="222" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Mosofin present</text>
+          <text x="460" y="239" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="292" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">STAGE 2 · GATES 0–3</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="342">G0  workspace, by name, explicit yes</text>
+            <text x="98" y="366">G1  company file · payroll platform?</text>
+            <text x="98" y="390">G2  tools · chart read off: placeholder</text>
+            <text x="98" y="414">G3  profile: country sets the types</text>
+            <text x="98" y="438">G3  12-row interview, one batch</text>
+          </g>
+          <rect x="540" y="292" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="316" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">UPLOAD CHECKLIST · 7 ROWS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="342">Register, totals by component</text>
+            <text x="558" y="366">Employer costs · chart of accounts</text>
+            <text x="558" y="390">Entity, dates, basis, clearing: typed</text>
+            <text x="558" y="414">Split basis, capitalised labour</text>
+            <text x="558" y="438">Prior journals, funding: advised</text>
+          </g>
+          <rect x="400" y="474" width="120" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="503" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Read back · yes?</text>
+
+          <rect x="60" y="558" width="800" height="272" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="584" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 3 · STEPS 0–1 · READ THE EVIDENCE, MAP THE REGISTER</text>
+          <text x="80" y="610" font-size="13" font-weight="600" fill="var(--ink)">Step 0 · one batch, data_source_id on every call</text>
+          <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--muted)">
+            <text x="80" y="634">search_accounts · the primary read</text>
+            <text x="80" y="654">search_departments / classes / locations</text>
+            <text x="80" y="674">search_journal_entries · get_general_ledger</text>
+            <text x="80" y="694">get_profit_and_loss · search_employees · get_company_info</text>
+          </g>
+          <rect x="640" y="604" width="202" height="76" rx="8" fill="var(--high-soft)" stroke="var(--high)"/>
+          <text x="741" y="628" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--high)">mock: true?</text>
+          <text x="741" y="648" text-anchor="middle" font-size="12" fill="var(--ink)">fixture accounts may</text>
+          <text x="741" y="666" text-anchor="middle" font-size="12" fill="var(--ink)">not exist in the chart</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="730"><tspan font-weight="600">Step 0</tspan>  prior runs from the GL · headcount = employees paid, from the register</text>
+            <text x="80" y="756"><tspan font-weight="600">Step 1</tspan>  each register component gets an account · each payroll account gets a line</text>
+            <text x="80" y="782"><tspan font-weight="600">Step 1</tspan>  a gap either way is resolved before the build · no account is invented</text>
+            <text x="80" y="808" fill="var(--muted)">no register, rate table or benefit schedule on the books surface</text>
+          </g>
+
+          <rect x="60" y="866" width="800" height="230" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="892" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 4 · STEPS 2–6 · BUILD THE ENTRIES · + EDGE-CASES.MD</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="920"><tspan font-weight="600">Step 2</tspan>  DR gross · CR one payable per withholding · CR net to cash or clearing</text>
+            <text x="80" y="946"><tspan font-weight="600">Step 3</tspan>  employer costs in a second entry, kept apart · expense and liability</text>
+            <text x="80" y="972"><tspan font-weight="600">Step 4</tspan>  split the expense side only, on the stated basis · capitalised labour flagged</text>
+            <text x="80" y="998"><tspan font-weight="600">Step 5</tspan>  cash, clearing, or a provider lump sum booked by component</text>
+            <text x="80" y="1024"><tspan font-weight="600">Step 6</tspan>  accrual basis only · include employer costs · reverse next period</text>
+            <text x="80" y="1050"><tspan font-weight="600">Step 6</tspan>  run not processed: the one ESTIMATE, from the last complete run</text>
+            <text x="80" y="1076"><tspan font-weight="600">Edge cases</tspan>  bonus runs · benefits in kind · garnishments · retro pay · groups</text>
+          </g>
+
+          <rect x="60" y="1132" width="800" height="132" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="1158" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STAGE 5 · STEPS 7–8 · CHECK, COMPARE, PRESENT · + OUTPUT.MD</text>
+          <g font-size="13.5" fill="var(--ink)">
+            <text x="80" y="1186"><tspan font-weight="600">Step 7</tspan>  11 checks · each line tied to the register · total expense = gross + employer</text>
+            <text x="80" y="1212"><tspan font-weight="600">Step 7</tspan>  run against prior runs, per head · prior accrual reversed?</text>
+            <text x="80" y="1238"><tspan font-weight="600">Step 8</tspan>  8 sheets · PROPOSED, NOT POSTED · Data sources line · .xlsx on a yes</text>
+          </g>
+
+          <rect x="60" y="1300" width="800" height="68" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="1326" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Stage 6 · Step 9</tspan>: only after the user saw and approved the results, on an explicit yes</text>
+          <text x="80" y="1350" font-size="13.5" fill="var(--muted)">save the account map, template, basis, calendar, tolerances · never amounts or a person's pay</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="216" text-anchor="end" fill="var(--mosofin)">yes, use my books</text>
+            <text x="684" y="216" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths meet at the read-back, and the skill reads nothing before it. D and E ask for files. The skill never defaults G or H, because the books do not answer them. The highlighted box shows the mock rule from Step 0. On the Mosofin path the skill reads the register only if a payroll platform is also connected. Otherwise the user supplies it, and the skill labels it as supplied. Step 9 runs only after the user saw the results.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, its evidence tools, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>, in the same order. The tools in each row are the tools that the step names in method.md or gates.md on main. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule. <b>Practice</b> means no outside authority stands behind it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Evidence tools</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Stage 1 · Gates 0–3</td><td>Asks A to H. Checks the workspace, the company file, a payroll platform, the tools and the profile. Reads nothing before a yes</td><td><code>list_workspaces</code> <code>get_agent_datasources</code> <code>get_datasource_tools</code> <code>get_company_info</code> (Gate 3)</td><td>The skill's shared protocol. Gate 2 reads the tool names and policies from the live catalogue on each run</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 0</td><td>Reads the chart, the dimensions, prior runs, the liability, clearing and accrued payroll balances, expense by department and the profile in one batch. Checks the mock flag</td><td><code>search_accounts</code> <code>search_departments</code> <code>search_classes</code> <code>search_locations</code> <code>search_journal_entries</code> <code>get_general_ledger</code> <code>get_profit_and_loss</code> <code>search_employees</code> <code>get_company_info</code></td><td>The names are the skill's typical tools. The audit checked none of them against a live catalogue. The headcount comes from the register. <code>search_employees</code> is a cross-check only</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 1</td><td>Maps each register component to an account. Every component needs an account, and every payroll account should receive something</td><td>None beyond the Step 0 reads. The register is [gated], from the register</td><td>[1] The employee entry credits a separate liability for each deduction. [2] Employee 401(k) deferrals become plan assets, so the business owes the withholding to a third party. The two-way mapping test is the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 2</td><td>Builds the gross pay and withholding entry. Net pay goes to cash or to clearing</td><td>None</td><td>[1] Debit salaries expense for gross pay. Credit a payable for each deduction. Salaries payable holds the take-home amount until payment</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 3</td><td>Builds the employer cost entry, kept apart from the employee entry</td><td>None</td><td>[1] The employer records its own taxes and benefit share as expense with the related payables. [3] For 2026 the employer pays its own social security and Medicare share, on top of gross pay. Two entries are the skill's rule</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4</td><td>Allocates the expense side on the stated basis. Routes capitalised labour to the asset account and flags it</td><td>None named. The dimensions come from Step 0</td><td>No outside authority. The basis is the owner's decision, and the skill never defaults it</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5</td><td>Credits cash or clearing, or books a provider lump sum by component</td><td>None named. Step 5 tests for a clearing account with payroll-cycle movement</td><td>[5] A payroll provider does not take on the employer's employment tax liability. So each liability stays the employer's, and the skill books the lump sum by component. [1] A later entry debits salaries payable and credits cash</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 6</td><td>On an accrual basis, accrues wages earned by the period end and paid after it, with employer costs. Sets it to reverse. Makes the one ESTIMATE if the run is not processed</td><td>None named. The reversal check reads <code>get_general_ledger</code> in Step 0</td><td>[4] Wages earned but unpaid at the period end are an accrued expense. The textbook accrues wages only. The employer-cost part and the ESTIMATE rule are the skill's own</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 7</td><td>Runs 11 checks. Among them are the line tie, total expense, the live chart, the run-over-run comparison and the prior accrual</td><td>None beyond the reads</td><td>No outside authority. The line tie and the comparison are the skill's own</td><td><span class="kind">Skill rule</span> <span class="kind prac">Practice</span></td></tr>
+      <tr><td>Step 8</td><td>Gives 8 sheets, each entry marked PROPOSED, NOT POSTED. Asks before it makes an Excel file</td><td>None</td><td>The skill's own rule. Every entry is a proposal for a person to post</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 9</td><td>Offers to save the decisions, keyed by datasource and entity. Never amounts, never a person's pay</td><td><code>create_skill</code></td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px"><b>Tools with no step.</b> <code>get_account</code> and <code>get_journal_entry</code> are in the evidence table of tools-and-glossary.md, but no step names them. The workflow tools <code>get_skills</code> and <code>get_my_skill</code> are in the tool lists of gates.md and tools-and-glossary.md, but no gate or step calls them. <code>invoke_datasource_api_tool</code> carries every read, so the table does not give it a row.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/12-5-record-transactions-incurred-in-preparing-payroll" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 12.5 Record Transactions Incurred in Preparing Payroll</a><br><span style="color:var(--faint);font-size:12.5px">at: employee payroll entry; employer payroll liabilities</span></td><td>Two entries, one payable per deduction, net pay held until payment (Steps 1, 2, 3 and 5)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://webapps.dol.gov/elaws/ebsa/fiduciary/q4e.htm" style="color:var(--mosofin)">U.S. Department of Labor, EBSA: ERISA Fiduciary Advisor, depositing participant contributions</a></td><td>Why the business owes the employee 401(k) withholding to a third party (Step 1)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.irs.gov/publications/p15" style="color:var(--mosofin)">IRS: Publication 15 (2026), (Circular E), Employer&#x27;s Tax Guide</a><br><span style="color:var(--faint);font-size:12.5px">at: social security and Medicare taxes (What&#x27;s New / section 9)</span></td><td>Why the employer's share is a cost on top of gross pay (Step 3 and the mixing error)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/4-3-record-and-post-the-common-types-of-adjusting-entries" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 4.3 Record and Post the Common Types of Adjusting Entries</a><br><span style="color:var(--faint);font-size:12.5px">at: accrued expenses, salaries</span></td><td>The period-end accrual and why it reverses (Step 6)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://www.irs.gov/businesses/small-businesses-self-employed/outsourcing-payroll-and-third-party-payers" style="color:var(--mosofin)">IRS: Outsourcing payroll and third-party payers</a></td><td>Why the liabilities stay the employer's with a provider, and why the skill books a lump sum by component (Step 5)</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the five sources on 28 Oct 2026 through search results. Nobody opened the pages. All five are US sources. The skill is jurisdiction-agnostic, and other countries have their own rules. Some items have no outside authority behind them. They are the two-entry rule, the line tie, the run-over-run comparison, the ESTIMATE rule, the eight sheets and the verdict tags. The worked example on the public pages uses made-up figures. Its tax amounts come from the register of PayrollCo, the example's provider, and the pages apply no rate. Taxable wages can differ from gross pay, for example after pre-tax benefit deductions. Ask your accountant or payroll adviser what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Four changes on main, one check passed, nine findings open</p>
+  <p style="color:var(--muted);font-size:14.5px">This site did not change the skill. The skill owner can fix the open findings in a later pass. The audit checked each finding again against main on 28 Oct 2026.</p>
+  <div class="findings">
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>917 lines in one file, split into a card</h3>
+      <p>F1. The split made a 160-line card with six rules that never bend, questions A to H, the upload checklist and six stages. The original text moved into <code>references/</code>. The commit message counts "504 of 504 content lines present" and a description of 1,018 characters. After 76d1e74 the card has 161 lines and the description 1,022 characters.</p>
+      <span class="where">SKILL.md + references/ · fixed on main in d4726ff</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>Names of skills that are not in the library</h3>
+      <p>F2. Before the split, the file named skills that the library does not have. Each sentence on main now uses a generic name, for example "an FX revaluation task".</p>
+      <span class="where">SKILL.md before the split · fixed on main in 9e618b4</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · fixed</span><div class="body">
+      <h3>The cross-entity pointer in gates.md named no file</h3>
+      <p>F3. The Gate 1 pointer on main names <i>Both entity scenarios</i> in <code>method.md</code> and links there.</p>
+      <span class="where">references/gates.md · Gate 1 · fixed on main in 14f616a</span>
+    </div></div>
+    <div class="f med done"><span class="sev">Medium · fixed</span><div class="body">
+      <h3>The bookkeeping audit changed how the run works</h3>
+      <p>F4. An independent bookkeeper audit raised findings. Its commit reports 8 fixed, 0 partly fixed and 0 rejected. The skill now ties every line to the register's column totals, because the identity gross = net + withholdings holds on any balanced entry. The accrual applies only on an accrual basis, and intake C now asks for the basis. The skill can make one labelled estimate. Prior runs come from the GL, and the headcount from the register count. Entries carry preparer, reviewer and support fields.</p>
+      <span class="where">SKILL.md, method.md, edge-cases.md, gates.md, output.md, tools-and-glossary.md · fixed on main in 76d1e74</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. The skill files do not follow the house STE rule</h3>
+      <p>The STE linter reports 58 findings on SKILL.md on main, and 38 of them are hard. method.md has 64 (47 hard) and mosofin-protocol.md has 47 (22). output.md has 35 (13), gates.md 29 (17) and edge-cases.md 20 (14). overview.md has 13 (10) and tools-and-glossary.md 12 (11). The eight files also hold 320 em dashes on 287 lines, and SKILL.md holds 40 em dashes on 34 lines. The house rule bans the em dash in public prose. The pages quote the skill word for word, with its em dashes.</p>
+      <span class="where">all eight files · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. Every skill that the files name is in the library</h3>
+      <p>The files name <code>payroll-reconciliation</code>, <code>payroll-clearing-reconciliation</code>, <code>journal-entry-builder</code>, <code>month-end-close-checklist</code>, <code>fixed-asset-register-and-depreciation</code> and <code>accruals-and-deferrals</code>. All six are on main. "An intangibles amortization review", "an intercompany reconciliation", "an FX revaluation task" and "payroll tax filing work" are generic names, not skill names.</p>
+      <span class="where">all eight files · no change needed</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A3. Two lines that 76d1e74 did not update</h3>
+      <p>Intake D still says "never estimate an amount". The same commit added the rule "One estimate only" and the Step 6 ESTIMATE. overview.md item 2 still says "Validate the identities". But Step 7 now says that the identity alone proves nothing about the entry.</p>
+      <span class="where">SKILL.md · Stage 1, row D · references/overview.md · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A4. The register has a different verdict in each file</h3>
+      <p>Gate 3 says "Required — [gated]" and then "[auto] if a payroll platform is connected", else "[manual]". method.md Step 1 says "[gated], from the register". overview.md says the register is "[manual] unless a payroll platform is connected".</p>
+      <span class="where">references/gates.md · Gate 3 · references/method.md · Step 1 · references/overview.md · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A5. The Step 9 sample is UK-only and asks for a September accrual</h3>
+      <p>The sample says "PAYE 2210, NI employee 2211, NI employer 2212", "monthly on the 25th" and "accrual required at March and September". The read-back's calendar is a pay period of 1 to 30 September, paid on the 25th. With that calendar, the Step 6 date test gives no accrual for the salaried run. The card does not explain the difference.</p>
+      <span class="where">references/method.md · Step 9 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A6. The read-back sample has no basis and no year</h3>
+      <p>The audit added the cash or accrual basis to intake C, Gate 3 and the upload checklist. It did not add the basis to the read-back sample. The sample also names "September" with no year. The worked example on the public pages adds "accrual basis".</p>
+      <span class="where">SKILL.md · read-back · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A7. The ESTIMATE formula assumes whole wages</h3>
+      <p>Step 6 says "gross and employer costs per working day × unpaid working days". It says nothing about a component that the business pays in arrears, for example Northbrook's overtime. It also does not say how to get the employer part. The worked example uses the employer-cost ratio of the last run. That is the example's own choice.</p>
+      <span class="where">references/method.md · Step 6 · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A8. A shared liability account needs one line per column</h3>
+      <p>For a shared liability account, for example 2210 or 2230, the card says to state the limitation. It does not say to keep one line per register column with a memo. The line tie needs those lines.</p>
+      <span class="where">references/edge-cases.md · references/method.md · Step 7 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A9. The group question has no row on the upload path</h3>
+      <p>Intake B asks which entity is the employer of the people in this run. The upload checklist has "Entity name" only. Gate 3 has no row for it either. Gate 1 asks the question on the Mosofin path only.</p>
+      <span class="where">SKILL.md · upload checklist · references/gates.md · Gate 3 · open</span>
+    </div></div>
+    <div class="f low add"><span class="sev">Observation · open</span><div class="body">
+      <h3>A10. The description has 2 characters of headroom</h3>
+      <p>The description has 1,022 characters, measured with <code>yaml.safe_load</code>. The limit is 1,024. Any edit to the description must first cut words.</p>
+      <span class="where">SKILL.md · front matter · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Site owner</h2>
+  <p class="sec-title">Two open conflicts between the explainer pages</p>
+  <div class="findings">
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>Two pay dates for the same September run</h3>
+      <p>The published payroll pages pay the September run on Wednesday 30 September. The pages of this skill follow the skill's own read-back and pay it on Friday 25 September. The amounts are the same. Net pay is 36,600, and 2200 nets to nil for the run. Each page of this skill states the difference once. The site owner must choose one date.</p>
+      <span class="where">site/skills/payroll-reconciliation · site/skills/payroll-clearing-reconciliation · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The register's employee FICA does not agree with 7.65% of gross</h3>
+      <p>The register shows employee social security and Medicare of 3,450 on a gross of 48,000. At 6.2% plus 1.45%, 48,000 gives 3,672. The published payroll pages use 3,450 too. The pages of this skill apply no rate. They say that the register amounts come from PayrollCo and that taxable wages can differ from gross. They do not give a reason for the difference. The site owner must decide if the shared payroll example figures change.</p>
+      <span class="where">shared Northbrook payroll example · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>Line counts on main: SKILL.md 161, edge-cases 85, gates 144, method 332, mosofin-protocol 262, output 52, overview 55, tools-and-glossary 65. Total 1,156.</span></li>
+    <li><span class="ok">PASS</span><span>Verdict tags on main: method 26 · 6 · 6, gates 6 · 5 · 6, mosofin-protocol 3 · 1 · 6, overview 4 · 0 · 1. Also edge-cases 2 · 1 · 1 and output 1 · 1 · 1. SKILL.md and the glossary have none.</span></li>
+    <li><span class="ok">PASS</span><span>method.md has Step 0 to Step 9 as sections on main. The card names "Steps 0–9", and each one is there.</span></li>
+    <li><span class="ok">PASS</span><span>The card has 8 intake rows, 7 upload rows and 7 rules that never bend. Gate 3 has 12 interview rows, and 2 of them are struck through.</span></li>
+    <li><span class="ok">PASS</span><span>Step 0 lists 7 reads in its batch. Step 7 has 11 checks: 7 original and 4 Mosofin additions.</span></li>
+    <li><span class="ok">PASS</span><span>edge-cases.md has 23 edge cases, 12 of them Mosofin-specific. output.md has 30 standards: 9 original and 21 Mosofin additions. Step 8 has 8 sheets.</span></li>
+    <li><span class="ok">PASS</span><span>The card bans every write, update and delete, in any system. The skill marks every entry PROPOSED, NOT POSTED.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against a company file with real payroll. The audit did not read the tool catalogue. So nothing here shows which of the 11 evidence tool names Gate 2 would find. Nobody tested the skill with a connected payroll platform, so its register tools are unknown. Nobody tested a multi-entity group run or a provider lump sum. The audit checked the outside sources through search results only.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/payroll-journal-entry-builder">MosoFin/mosofin-finance-skills</a> in the card format. It merged in pull request #1 (b200ad9) on 26 Oct 2026. The full path history on main has 7 commits. dcb86d0 (1 Oct 2026) added the skill. d86fa27 (20 Oct) and 4d5637c (21 Oct) changed it. 9e618b4, d4726ff (the split) and 14f616a are from 25 Oct 2026. 76d1e74 (the bookkeeping-audit fixes) is from 27 Oct 2026. A live run, a catalogue read and fixes for A1 and A3 to A10 are still to do.</footer>
+
+</div>
