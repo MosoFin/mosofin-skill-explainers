@@ -419,7 +419,7 @@ const LEVELS = [
 
   { n:2, title:"Receipts: matched, below threshold, missing",
     chips:["Receipts","$75 policy"], src:"Rule 2", cites:[1],
-    situation:"Northbrook's policy requires a receipt above $75. Of the 42 charges, 31 have a receipt that matches date, amount and merchant. Another 6 are under $75. Another 4 have a file attached that does not match the amount. Finally, 1 is a $412 hotel charge with nothing attached.",
+    situation:"Northbrook's policy requires a receipt above $75. Of the 42 charges, 31 have a receipt that matches date, amount and merchant. Another 6 are under $75. Another 4, all above $75, have a file attached that does not match the amount. Finally, 1 is a $412 hotel charge with nothing attached.",
     facts:["The IRS treats evidence as adequate when it shows the amount, date, place and essential character of the expense. The IRS generally does not require evidence below $75, except for lodging "+C(1)+". A hotel charge always needs its receipt."],
     visual:{type:"table",
       head:["Status","Charges","What the skill saw","Exception?"],
@@ -448,8 +448,8 @@ const LEVELS = [
       rows:[["Electronics retailer, 9 Sep","Office Supplies",["$2,900.00","bad"],"$2,500.00",["over the line: asset","bad"]],["Office chair, 14 Sep","Office Supplies","$640.00","$2,500.00","expense"],["Monitor, 22 Sep","Office Supplies","$389.00","$2,500.00","expense"]]},
     rule:{q:"Capitalization-threshold breaches — charges above the entity's capitalisation limit coded to an expense account", w:"references/method.md · Step 6 — Flag exceptions"},
     rule2:{q:"Card used for capital purchases (equipment over the entity's capitalisation threshold): flag for Fixed Asset coding, not expense.", w:"references/edge-cases.md · Edge Cases"},
-    math:[["Charge","$2,900.00"],["Capitalisation threshold","$2,500.00"],["Over by","$400.00",1],["Proposed entry: DR Computer Equipment, CR Office Supplies","$2,900.00",1]],
-    verdict:["flag","The result is one line and one proposed entry. September's expenses were $2,900 too high and the asset register was missing a laptop. The skill runs this test only after you give it the threshold. It never assumes a threshold."] },
+    math:[["Charge","$2,900.00"],["Capitalisation threshold","$2,500.00"],["Over by","$400.00",1],["Flag for fixed-asset coding (this page's reading of the entry: DR Computer Equipment, CR Office Supplies)","$2,900.00",1]],
+    verdict:["flag","The result is one line, flagged for fixed-asset coding. September's expenses were $2,900 too high and the asset register was missing a laptop. The skill runs this test only after you give it the threshold. It never assumes a threshold."] },
 
   { n:5, title:"Subscriptions, annualised",
     chips:["3 months of books"], src:"Three tests", cites:[1],
@@ -475,7 +475,7 @@ const LEVELS = [
     rule:{q:"Tax must be visible on the receipt — some jurisdictions require a valid tax invoice, not just a credit-card slip. This is the point most often missed: the card slip proves payment, not tax", w:"references/method.md · Step 5 — Tax handling"},
     rule2:{q:"A recoverable tax code with no receipt — Mosofin-specific and directly detectable. A tax recovery claim with no supporting invoice is an exposure; list them.", w:"references/edge-cases.md · Edge Cases"},
     math:[["Charges with a recoverable tax code and no receipt","3"],["VAT claimed on them: 30 + 100 + 110","£240.00",1],["Evidence held","card transactions only"],["Action","obtain VAT invoices or reverse the claim"]],
-    verdict:["flag","This level shows £240 of VAT reclaimed with nothing behind it. The skill can see the tax code and the absence of a file from the books alone. For this reason, this test runs even on the upload path once the skill knows the receipts."] },
+    verdict:["flag","This level shows £240 of VAT reclaimed with nothing behind it. The skill can see the tax code and the absence of a file from the books alone. It lists every such charge as an exposure."] },
 
   { n:7, title:"One card, two companies",
     chips:["Northbrook","Southbrook"], src:"Not your expense", cites:[7],
@@ -486,8 +486,8 @@ const LEVELS = [
       rows:[["Venue deposit, 6 Sep · $900","Northbrook card","Southbrook",["Marketing (Northbrook)","bad"],"Due from Southbrook"],["Printing, 20 Sep · $340","Northbrook card","Southbrook",["Marketing (Northbrook)","bad"],"Due from Southbrook"]],
       total:["Intercompany","","","","$1,240.00 owed by Southbrook"]},
     rule:{q:"A card issued to one entity but used for another's expenses is the common cross-entity case. Those charges are not that entity's expense — they create an intercompany balance: entity A paid for entity B's cost.", w:"references/method.md · Both entity scenarios"},
-    math:[["Southbrook costs on the Northbrook card: 900 + 340","$1,240.00",1],["Northbrook marketing expense, overstated by","$1,240.00"],["Proposed: DR Due from Southbrook, CR Marketing (Northbrook)","$1,240.00"],["Proposed: DR Marketing (Southbrook), CR Due to Northbrook","$1,240.00",1]],
-    verdict:["note","The $1,240 is an intercompany balance, with one proposed entry in each company. It is not an error to remove, and it is not Northbrook's expense. Northbrook's September marketing drops by $1,240. Southbrook's rises by the same amount. The two cancel only in the group accounts."] },
+    math:[["Southbrook costs on the Northbrook card: 900 + 340","$1,240.00",1],["Northbrook marketing expense, overstated by","$1,240.00"],["This page's reading of Northbrook's entry: DR Due from Southbrook, CR Marketing (Northbrook)","$1,240.00"],["This page's reading of Southbrook's entry: DR Marketing (Southbrook), CR Due to Northbrook","$1,240.00",1]],
+    verdict:["note","The $1,240 is an intercompany balance. The skill identifies it and routes it to an intercompany reconciliation. It does not code it as Northbrook's expense. The entries above are this page's reading of what each company's books then need. Northbrook's September marketing drops by $1,240. Southbrook's rises by the same amount. The two cancel only in the group accounts."] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -575,13 +575,13 @@ function run(){
   h += Math.abs(diff)<0.005
     ? res("ok","Rule 1 · does it tie?", "Yes", "To the cent. Every reconciling item has a name.")
     : res("flag","Rule 1 · does it tie?", fmt(Math.abs(diff))+" apart", `Adjusted books are ${fmt(Math.abs(diff))} ${diff>0?"above":"below"} the statement after every named item. Start with charges that appear on one side only. Then check the timing of the last payment.`);
-  if(notgl>0) h += res("flag","Rule 3 · charges not in the books", fmt(notgl), "The charge is on the statement and nobody ever entered it. Each needs a receipt, a business purpose and an owner before it is anyone's expense.");
+  if(notgl>0) h += res("flag","Rule 3 · charges not in the books", fmt(notgl), "The charge is on the statement and not in the books. The skill lists it as a reconciling item. A missing receipt or business purpose on it is an exception.");
   const n=num("n"), m=num("matched"), b=num("below");
   if(n>0){ const missing=Math.max(n-m-b,0);
     h += missing===0 ? res("ok","Rule 2 · receipts", `${m} matched · ${b} below threshold`, "No charge above your threshold is missing a receipt.")
                      : res("flag","Rule 2 · receipts", `${missing} missing`, `Matched: ${m}. Below your threshold: ${b}. Above it with no matched receipt: ${missing}. Those are exceptions with the cardholder as owner.`); }
   const cap=num("cap"), big=num("big");
-  if(cap>0 && big>0) h += big>cap ? res("flag","Three tests · capital purchase", fmt(big), `It is over your ${fmt(cap)} capitalisation line by ${fmt(big-cap)}, but it is coded to expense. Propose an entry to move it to fixed assets.`)
+  if(cap>0 && big>0) h += big>cap ? res("flag","Three tests · capital purchase", fmt(big), `It is over your ${fmt(cap)} capitalisation line by ${fmt(big-cap)}, but it is coded to expense. The skill flags it for fixed-asset coding, not expense.`)
                                    : res("ok","Three tests · capital purchase", fmt(big), `It is under your ${fmt(cap)} line, so expense is right.`);
   box.innerHTML=h;
 }

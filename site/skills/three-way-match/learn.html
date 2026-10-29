@@ -428,7 +428,7 @@ const LEVELS = [
     rule:{q:"If no tolerance is provided, default to exact match (zero tolerance) and flag every variance.", w:"references/method.md · Step 3 — Apply tolerances"},
     rule2:{q:"Hold — any Critical or High exception open; approval not confirmed (11 or 12 not run); or goods with no receipt leg (two-way by omission).", w:"references/method.md · Step 5 — Resolution suggestions"},
     math:[["Price variance per unit: 43.50 − 42.00","$1.50"],["As a percentage: 1.50 ÷ 42.00","3.57%"],["Tolerance given","none → exact match"],["Line variance: 1.50 × 100","$150.00",1],["Line within tolerance?","no → exception 1, High"],["Matched amount: no line within tolerance","$0.00"],["Disputed amount: 4,350 − 0","$4,350.00"],["Credit to request: 4,350 − 100 × 42","$150.00"],["Recommendation","Hold",1]],
-    verdict:["flag","The skill flags exception 1, high severity: $150 of price overbilling. A 2% tolerance gives the same result, because 3.57% is outside it. An open High exception means Hold. The line is outside tolerance, so the matched amount is $0 and the disputed amount is the full $4,350. The owner is AP. AP requests a $150 credit note or approves a price change."] },
+    verdict:["flag","The skill flags exception 1, high severity: $150 of price overbilling. A 2% tolerance gives the same result, because 3.57% is outside it. An open High exception means Hold. The line is outside tolerance, so the matched amount is $0 and the disputed amount is the full $4,350. The owner is whoever Northbrook named at intake, AP in this example. AP requests a $150 credit note or approves a price change."] },
 
   { n:3, title:"Fewer arrived than were billed",
     chips:["PO","Receipt","Invoice"], src:"Rules 2 and 3", cites:[1],
@@ -448,11 +448,11 @@ const LEVELS = [
     facts:["The basic control is to separate authority, custody and accounting. Where one person must do several steps, something else has to compensate "+C(4)+"."],
     visual:{type:"table",
       head:["Check","Result","Status"],
-      rows:[["PO reference on invoice","PO-1041","match"],["Quantity and price","100 × $42.00","match"],["PO approval status",["blank","bad"],["exception 11"]],["Approver limit for $4,200",["director required","bad"],["exception 12"]],["Same person raised and would approve",["office manager","bad"],["SoD finding"]]]},
+      rows:[["PO reference on invoice","PO-1041","match"],["Quantity and price","100 × $42.00","match"],["PO approval status",["blank","bad"],["exception 11"]],["Approver limit for $4,200",["director required","bad"],["exception 12 if the office manager signs"]],["Same person raised and would approve",["office manager","bad"],["SoD finding"]]]},
     rule:{q:"Matched is not approved. A perfectly matching invoice from an unapproved PO is still unauthorised spending.", w:"references/overview.md · Three near-substitutes"},
     rule2:{q:"A PO number written on an invoice is not a match.", w:"references/overview.md · Three near-substitutes"},
-    math:[["Arithmetic exceptions","0"],["Authority exceptions: 11 (not approved), 12 (wrong authority)","2, both Critical"],["PO total vs approver limit: 4,200 > 2,500","director needed"],["Recommendation","Hold until approved",1]],
-    verdict:["flag","The numbers are fine. The two critical exceptions are about who said yes, not what it cost. Recommendation: Hold until someone with the authority approves the PO retroactively."] },
+    math:[["Arithmetic exceptions","0"],["Authority exception now: 11 (not approved)","Critical"],["If the office manager signs it: 12 (wrong authority)","Critical"],["PO total vs approver limit: 4,200 > 2,500","director needed"],["Recommendation","Hold until approved",1]],
+    verdict:["flag","The numbers are fine. The critical exception is about who said yes, not what it cost. If the office manager signs the PO, exception 12 follows, because $4,200 is over that limit. Recommendation: Hold until someone with the authority approves the PO retroactively."] },
 
   { n:5, title:"Always just inside tolerance",
     chips:["12 invoices","2% tolerance"], src:"Watch the month", cites:[3],

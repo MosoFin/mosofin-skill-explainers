@@ -279,7 +279,7 @@
         <div class="row off"><span>Laptop coded to office supplies, over the $2,500 line</span><span class="v">$2,900.00</span></div>
         <div class="row same"><span>Receipts missing above your $75 policy</span><span class="v">1 of 42</span></div>
       </div>
-      <div class="verdict">The skill finds four exceptions, each with a severity and the action it needs. It flags the laptop for fixed-asset coding and proposes coding for the missing charge.</div>
+      <div class="verdict">The skill finds four exceptions, each with a severity and the action it needs. It flags the laptop for fixed-asset coding. It lists the missing charge as a reconciling item until a person enters it.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -320,7 +320,7 @@
     <li><div class="q">Your policies: below what amount is no receipt needed, and above what amount is a purchase an asset?</div><div class="why">Your policy decides which missing receipt is acceptable and which laptop belongs in fixed assets. The skill never sets a default value for the thresholds. If you give no threshold, it says which test it could not run.</div></li>
     <li><div class="q">Can you reclaim tax on card spend, and where?</div><div class="why">If you can reclaim tax, a card slip is not enough evidence. The receipt has to show the tax. Without an answer, the skill does not assess tax recovery, and the output says so.</div></li>
   </ol>
-  <p>Then it reads your answers back: <i>"Reconciling the operations manager's card for September, against the statement and receipts you uploaded. Receipt policy $75, capitalisation line $2,500. Go ahead?"</i> It waits for your yes.</p>
+  <p>Then it reads your answers back. The skill's own example: <i>"Reconciling the Amex Business card held by the operations manager at Northbrook Trading for 1–30 September, against the statement and 46 receipts you uploaded, with the books read from your Mosofin connection. Receipt threshold $75, capitalisation threshold $2,500. Shall I go ahead?"</i> It waits for your yes.</p>
 </section>
 
 <section>
