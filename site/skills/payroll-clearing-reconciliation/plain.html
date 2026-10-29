@@ -424,7 +424,7 @@
     <figcaption>Example figures for a made-up company, in dollars. 12,600 + 14,400 − 0 = 27,000. 27,000 − 14,400 = 12,600, the August taxes, due 15 September and not paid.</figcaption>
   </figure>
   <p>The roll-forward of 2210 gives a difference of zero, so the account looks reconciled. The skill does not accept a zero difference as proof. The expected figure came from the same entries as the books, so the zero proves only the arithmetic. The behaviour test shows the problem: the account grew, and it did not drop in September. The September 14,400 is not due until Thursday 15 October. The skill documents it as timing and proposes no correction for it.</p>
-  <p>The 12,600 is only 30 days old on 30 September, so the age test does not catch it yet. The behaviour test does. The days past due and the filings belong to a different skill, <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a>. Part of the 12,600 is money that Northbrook took from its staff's pay. In the US, a person who must pay that money and willfully does not pay it can be personally liable<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. This page is not legal advice.</p>
+  <p>The 12,600 is only 30 days old on 30 September, so the age test does not catch it yet. The behaviour test does. The full tie-out of the register to the books and the bank belongs to a different skill, <a href="../payroll-reconciliation/plain.html" style="color:var(--green)">payroll reconciliation</a>. Part of the 12,600 is money that Northbrook took from its staff's pay. In the US, a person who must pay that money and willfully does not pay it can be personally liable<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. This page is not legal advice.</p>
 </section>
 
 <section>
@@ -513,7 +513,7 @@
     <div class="get"><b>Coverage</b><span>For each task, where the figures came from and on which date.</span></div>
   </div>
   <p class="muted" style="font-size:15px">The summary has lines for the preparer and the reviewer, and the answer ends with a Data sources line. The skill asks before it makes an Excel file, Payroll_Recs_2026-09_Northbrook Trading.xlsx. If you say no, you get the same sheets as tables in the chat. After you approve the results, it offers to save your rules for the next run: account list, payment schedules, payroll calendar, write-off limit and payees. It never saves balances, ages, open items or anybody's pay.</p>
-  <p class="muted" style="font-size:15px">Other jobs go to other skills. <code>payroll-reconciliation</code> checks days past due, penalties and the filings. <code>journal-entry-builder</code> builds the proposed entries. <code>payroll-journal-entry-builder</code> builds the payroll entry itself.</p>
+  <p class="muted" style="font-size:15px">Other jobs go to other skills. <code>payroll-reconciliation</code> does the full tie-out of the register to the books and the bank. <code>journal-entry-builder</code> builds the proposed entries. <code>payroll-journal-entry-builder</code> builds the payroll entry itself.</p>
 </section>
 
 <section>
