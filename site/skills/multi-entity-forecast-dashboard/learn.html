@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Entity Cash Forecast Worked Examples | MosoFin</title>
+<meta name="description" content="Six worked levels for a multi-company cash forecast, from one month of cash flow to a six-month group projection, with a calculator. Rules quoted, facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --sunk:#f1f4f2; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --blue:#3f6d96;  --blue-soft:#e7eff6;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --blue:#8db3d8;  --blue-soft:#15202b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --sunk:#111815; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --blue:#8db3d8;  --blue-soft:#15202b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num,td.n,.amt{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:1.03;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h3{margin:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .muted{color:var(--muted)}
+  section{display:flex;flex-direction:column;gap:20px}
+  header{display:flex;flex-direction:column;gap:18px}
+  .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:56ch}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .trust div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .trust b{font-size:16.5px}
+  .trust span{font-size:15px;color:var(--muted)}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .rule .k{display:flex;gap:10px;align-items:center}
+  .rule .badge{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-soft);color:var(--green);flex:none}
+  .rule h3{font-size:17.5px}
+  .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:10px 12px;line-height:1.55;white-space:pre-wrap}
+  .rule .plain{font-size:15px;color:var(--muted)}
+  .where{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+
+  nav.levels{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px;overflow-x:auto}
+  nav.levels a{flex:none;text-decoration:none;color:var(--ink);font-size:14px;border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;background:var(--panel);white-space:nowrap}
+  nav.levels a span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-right:6px}
+  nav.levels a:hover,nav.levels a:focus-visible{border-color:var(--green);outline:none}
+  .tier{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .tier::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .level{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+  .lv-head{display:flex;flex-direction:column;gap:8px}
+  .lv-num{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--rule);color:var(--muted)}
+  .chip.src{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+  .block{display:flex;flex-direction:column;gap:8px}
+  .block > .label{color:var(--faint)}
+  blockquote{margin:0;padding:12px 14px;border-left:3px solid var(--green);background:var(--sunk);border-radius:0 8px 8px 0;font-size:15.5px}
+  blockquote .where{display:block;margin-top:6px}
+  details{border:1px solid var(--rule);border-radius:10px;background:var(--sunk)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+  details[open] summary::after{content:"−"}
+  summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+  .math{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+  .math div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed var(--rule);padding:4px 0}
+  .math div:last-child{border-bottom:none}
+  .math .t{font-weight:600}
+  .verdict{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:15.5px}
+  .verdict.ok{background:var(--green-soft)} .verdict.flag{background:var(--wrong-soft)} .verdict.note{background:var(--hold-soft)}
+  .verdict .ic{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;padding:2px 7px;border-radius:5px;flex:none;margin-top:2px}
+  .ok .ic{background:var(--green);color:var(--panel)} .flag .ic{background:var(--wrong);color:var(--panel)} .note .ic{background:var(--hold);color:var(--panel)}
+
+  .wf{display:flex;flex-direction:column;gap:6px}
+  .wf-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr minmax(90px,110px);gap:12px;align-items:center;font-size:14.5px}
+  .wf-track{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+  .wf-bar{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .wf-bar.start,.wf-bar.end{background:var(--green)}
+  .wf-bar.minus{background:var(--wrong)}
+  .wf-bar.plus{background:var(--blue)}
+  .wf-bar.end.warn{background:var(--hold)}
+  .wf-row .amt{text-align:right;font-weight:600}
+  .wf-row.total{border-top:1px solid var(--rule-strong);padding-top:6px}
+  @media (max-width:560px){.wf-row{grid-template-columns:1fr auto;}.wf-track{grid-column:1/-1;order:3}}
+
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td.n,th.n{text-align:right}
+  tr.total td{font-weight:700;border-top:1px solid var(--rule-strong)}
+  td.bad{color:var(--wrong);font-weight:700;background:var(--wrong-soft)}
+  td.good{color:var(--green);font-weight:700}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:620px){.pair{grid-template-columns:1fr}}
+  .pair > div{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .pair .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .pair .ok{border-top:4px solid var(--green)} .pair .bad{border-top:4px solid var(--wrong)} .pair .note{border-top:4px solid var(--hold)}
+
+  .calc{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{font:inherit;font-size:14px;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .presets button[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .presets button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:680px){.inputs{grid-template-columns:1fr}}
+  fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+  legend{padding:0 6px;font-weight:700;font-size:15px}
+  .field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;font-size:15px}
+  .field input,.wk input{font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .field input:focus-visible,.wk input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .weeks{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;font-size:14.5px}
+  .weeks .label{font-size:11px}
+  .wk{display:contents}
+  .wk span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--rule-strong)}
+  .res.ok{border-left-color:var(--green)} .res.flag{border-left-color:var(--wrong)} .res.note{border-left-color:var(--hold)}
+  .res .v{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .res .s{font-size:14px;color:var(--muted)}
+  .fine{font-size:14px;color:var(--muted)}
+
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ess div{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+  .ess b{font-size:16px}
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--blue);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:500}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  .backed{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:8px}
+  .backed b{color:var(--blue);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--panel)}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{font-size:15px;padding:9px 12px;border-radius:8px;background:var(--blue-soft);border-left:3px solid var(--blue)}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:70px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  ol.srcs a{color:var(--blue);font-weight:600}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  .rule blockquote{font-size:15px}
+  .fact.none{background:var(--sunk);border-left-color:var(--rule-strong);color:var(--muted)}
+  .calc .math{padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--sunk)}
+  .calc .math div span:first-child{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:14.5px}
+  .bills{min-width:860px}
+  .bills td,.bills th{padding:5px 6px;white-space:nowrap}
+  .bills input,.bills select{font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--sunk);color:var(--ink);width:100%}
+  .bills input[type=checkbox]{width:18px;height:18px;accent-color:var(--green)}
+  .bills input.n{text-align:right;font-variant-numeric:tabular-nums}
+  .bills input:focus-visible,.bills select:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+  .field input[type=date]{text-align:left}
+  .bills{min-width:720px}
+  h3.part{font-size:18px}
+  .bills.mini{min-width:440px}
+  .bills.mini input{min-width:80px}
+  #ents fieldset{min-width:0}
+  .calc hr{border:none;border-top:1px dashed var(--rule-strong);margin:4px 0}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Multi-entity forecast dashboard</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin skill · multi-entity-forecast-dashboard · learning guide</span>
+  <h1>From one company's month to a six-month group projection</h1>
+  <p class="lede">This page shows how the skill builds a group cash view, <b>one level at a time</b>. It starts with one month of one company file. It ends with the report that the owner gets. The page quotes every rule from the skill and works every number in front of you.</p>
+  <div class="trust">
+    <div><b>The rules are the skill's own</b><span>The page quotes each rule word for word, with the file and section it comes from.</span></div>
+    <div><b>Outside sources back the facts</b><span>They are an OpenStax textbook, two IFRS standards, an SEC release and a Federal Reserve page. Each one has a number and a link.</span></div>
+    <div><b>The page shows the math</b><span>Open "Check it yourself" on any level. Follow every line on a calculator.</span></div>
+    <div><b>Your numbers, your check</b><span>At the end, enter up to four companies and six months. The page adds them and projects six months with the skill's rules.</span></div>
+  </div>
+  <div class="legend" aria-label="How to read this page">
+    <span><i style="background:var(--green)"></i>Rule: quoted from the skill</span>
+    <span><i style="background:var(--blue)"></i>Fact: from a cited authority, numbered like <sup class="c"><a href="#src1">1</a></sup></span>
+    <span><i style="background:var(--hold)"></i>Example: made-up figures, calculated in full</span>
+  </div>
+</header>
+
+<section>
+  <span class="label">How it thinks</span>
+  <h2>Nine rules the whole skill runs on</h2>
+  <p class="muted">Every level below applies one or more of these rules. The examples use one made-up group, Northbrook Trading Group. It keeps its books in US dollars on the accrual basis, with a calendar year. Its MosoFin workspace holds three QuickBooks company files. The run is on Thursday 1 October 2026.</p>
+  <div class="rules" id="rules"></div>
+</section>
+
+<section>
+  <span class="label">Learning path</span>
+  <h2>Six levels, from simple to complex</h2>
+  <nav class="levels" id="lvnav" aria-label="Levels"></nav>
+  <div id="levels" style="display:flex;flex-direction:column;gap:22px"></div>
+</section>
+
+<section id="try">
+  <span class="label">Check it yourself</span>
+  <h2>Six-month group projection</h2>
+  <p class="muted">Enter up to four companies and up to six months each, or load an example. The page adds the companies month by month and projects six months with the rules in <code>references/forecast-method.md</code> and the template. The page sends nothing anywhere.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Load an example">
+      <button type="button" data-p="northbrook">Northbrook group, Q3 2026</button>
+      <button type="button" data-p="services">Services only</button>
+      <button type="button" data-p="blank">Start blank</button>
+    </div>
+    <div class="inputs">
+      <fieldset><legend>The range</legend>
+        <label class="field"><span>First month</span><input data-k="start" type="month"></label>
+      </fieldset>
+      <fieldset><legend>The projection</legend>
+        <label class="field"><span>Monthly change, %</span><input data-k="growth" inputmode="decimal"></label>
+        <label class="field"><span>One-off spend in month 1</span><input data-k="capex" inputmode="decimal"></label>
+      </fieldset>
+    </div>
+    <div id="ents" class="inputs"></div>
+    <div class="tbl" id="actual"></div>
+    <div class="results" id="results" aria-live="polite"></div>
+    <div class="tbl" id="fc"></div>
+    <div class="math num" id="steps" aria-live="polite"></div>
+    <p class="fine">The page uses the template's rules. The base rate is the operating cash flow of the last month. P10 uses the lower of the conservative rate and the base rate. P90 uses the higher of the upside rate and the base rate. The monthly change compounds each month, and the one-off spend applies in month 1 only. The page starts the projection from the net cash increase since the range start. That figure is the template's "cash", and it is not a bank balance. If the companies have different numbers of months, the page uses only the common months. The first preset gives 129,100, then 402,100, 441,700 and 441,700 after six months.</p>
+  </div>
+</section>
+
+<section>
+  <span class="label">Using it</span>
+  <h2>What it asks, needs and gives back</h2>
+  <div class="ess">
+    <div><b>Asks first</b>Use your MosoFin connection, or supply the data yourself? Which workspace, by name? One company file, each file, or consolidated? Which months? The default is 1 January of this year to the end of this month.</div>
+    <div><b>Needs</b>On the MosoFin path, it needs the monthly cash flow statement of each file and the receivables aging where it exists. It also needs balances from the balance sheet report when the range does not start at zero. On the manual path, one CSV row for each company and month.</div>
+    <div><b>Gives back</b>One HTML file with four tabs: Overview, Accounts, Forecast and Report. Then a short summary in prose and one "Data sources" line.</div>
+    <div><b>Never</b>The skill never writes to QuickBooks or MosoFin. It never supplies a figure of its own, never hides intercompany balances or test data, and never changes the fixed look.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where every fact on this page comes from</h2>
+  <p class="muted">The rules are the skill's own. The facts below come from five outside sources. They are an OpenStax textbook, two IFRS standards, an SEC release and a Federal Reserve page. MosoFin checked each one on 28 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
+  <ol class="srcs" id="srclist"></ol>
+  <p class="fine"><b>Not backed by an outside authority.</b> The three scenario rates, the six-month horizon and the P10 and P90 names are the skill's own. So are the test-data signs, the four tabs and the "quiet analytics" style. P10 and P90 are presets, not statistical percentiles. MosoFin made up Northbrook Trading Group, its companies and every figure in the examples.</p>
+</section>
+
+<footer>
+  <span>This page quotes the rules from the skill's own files: <code>SKILL.md</code>, <code>references/forecast-method.md</code>, <code>references/mosofin-workflow.md</code> and <code>references/manual-workflow.md</code>. Status: shipped. The skill is on the main branch of MosoFin/mosofin-finance-skills, in the dashboards folder. It is a dashboard skill, so it does not use the card format of the other skills. This page describes the version on main. All figures come from made-up worked examples, not from your data. The textbook, the SEC release and the Federal Reserve page are US sources. IFRS 10 and IAS 21 are international standards. Ask your accountant which rules apply to you. This page explains <code>multi-entity-forecast-dashboard</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/dashboards/multi-entity-forecast-dashboard">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+</footer>
+
+</div>
+
+<script>
+const SOURCES = [
+  {t:"OpenStax: Principles of Accounting, Volume 1, 16.4 Prepare the Completed Statement of Cash Flows Using the Indirect Method", u:"https://openstax.org/books/principles-financial-accounting/pages/16-4-prepare-the-completed-statement-of-cash-flows-using-the-indirect-method", at:"total net cash flow", checked:"2026-10-28", via:"from search results, page not opened", w:"The operating, investing and financing totals add up to the total net cash flow. The beginning cash comes from the balance sheet of the period before. Beginning cash plus the net cash flow gives the ending cash."},
+  {t:"IFRS Foundation: IFRS 10 Consolidated Financial Statements", u:"https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2022/issued/ifrs10.html", at:"paragraph B86(c)", checked:"2026-10-28", via:"from search results, page not opened", w:"Group accounts remove in full the assets, liabilities, equity, income, expenses and cash flows from transactions between companies of the group."},
+  {t:"SEC: Final Rule, Disclosure Update and Simplification (Release 33-10532, 2018)", u:"https://www.sec.gov/files/rules/final/2018/33-10532.pdf", at:"Rule 3A-04", checked:"2026-10-28", via:"from search results, page not opened", w:"The release lists the SEC rule to remove intercompany items in group accounts beside the matching US GAAP guidance in ASC 810. It removes the SEC rule because the two overlap."},
+  {t:"IFRS Foundation: IAS 21 The Effects of Changes in Foreign Exchange Rates", u:"https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2026/issued/ias21.html", at:"translation of a foreign operation (paragraph 39)", checked:"2026-10-28", via:"from search results, page not opened", w:"A foreign operation's assets and liabilities change to the group currency at the closing rate. Income and expenses use the rates on the transaction dates, and an average rate is often an approximation. The differences go to other comprehensive income."},
+  {t:"Federal Reserve Board: Foreign Exchange Rates, H.10 (About)", u:"https://www.federalreserve.gov/releases/H10/about.htm", checked:"2026-10-28", via:"from search results, page not opened", w:"The weekly H.10 release gives daily noon buying rates in New York for cable transfers in the listed currencies. The Federal Reserve Bank of New York certifies them for customs purposes."},
+];
+const C = (...n) => n.map(i=>`<sup class="c"><a href="#src${i}" aria-label="source ${i}">${i}</a></sup>`).join("");
+const placed=(s,n)=>new RegExp("\\{(?:\\d+,)*"+n+"(?:,\\d+)*\\}").test(s||"");
+const citeText=s=>esc(s).replace(/\{(\d+(?:,\d+)*)\}/g,(m,g)=>C(...g.split(",").map(Number)));
+
+/* The sixteen quotes, word for word from the skill's files on main (markdown bold, italic and backticks removed). Section names are written as the files write them. */
+const Q = {
+  q1:{q:"The look is fixed.", w:"SKILL.md · Multi-entity forecast dashboard"},
+  q2:{q:"Never mix: if a MosoFin read fails partway, tell the user what succeeded and offer the manual path for the rest rather than inventing figures.", w:"SKILL.md · 1. Choose the data path"},
+  q3:{q:"Every number in the dashboard comes from the tool results or the user's file.", w:"SKILL.md · Guardrails"},
+  q4:{q:"Read-only: this skill never writes to QuickBooks or MosoFin.", w:"SKILL.md · Guardrails"},
+  q5:{q:"Disclose sandbox signals and intercompany balances every time they appear.", w:"SKILL.md · Guardrails"},
+  q6:{q:"Horizon: 6 months. Opening cash = last actual month-end.", w:"references/forecast-method.md · Scenario rates (per selected entity or group)"},
+  q7:{q:"No further investing, financing, or debt service is assumed — say so.", w:"references/forecast-method.md · Scenario rates (per selected entity or group)"},
+  q8:{q:"Averaging blends those in and produces a nonsense run rate.", w:"references/forecast-method.md · Why the last month, not a trailing average"},
+  q9:{q:"Cumulative net cash increase = cash at month end", w:"references/forecast-method.md · Sanity checks to state in the report"},
+  q10:{q:"If P10 goes below zero, the outlook card names the first negative month.", w:"references/forecast-method.md · Sanity checks to state in the report"},
+  q11:{q:"If more than one, ask which by name — never auto-pick.", w:"references/mosofin-workflow.md · Gates"},
+  q12:{q:"Date range: 1 Jan of the current year → end of the current month, unless the user asks otherwise.", w:"references/mosofin-workflow.md · Gates"},
+  q13:{q:"valid when the year opened at zero, which you should state", w:"references/mosofin-workflow.md · Reading the cash flow report"},
+  q14:{q:"Never silently eliminate; show both.", w:"references/mosofin-workflow.md · Consolidation rules"},
+  q15:{q:"If entity months differ, truncate to the common range and say so.", w:"references/mosofin-workflow.md · Consolidation rules"},
+  q16:{q:"Do not fabricate them.", w:"references/manual-workflow.md · If they give something else"},
+};
+
+const RULES = [
+  { id:"1", title:"A total of increases is cash only from zero", r:Q.q9, cites:[1],
+    plain:"The template adds the monthly net cash increases from the first month of the range. It shows the total as \"Cash at end of Sep\". That total is the increase since the range start, and it is not a bank balance.",
+    backed:"Ending cash is beginning cash plus the net cash flow of the period.{1} So the total equals cash only when cash was zero at the start." },
+  { id:"2", title:"State when a balance needs a zero start", r:Q.q13, cites:[],
+    plain:"The skill can add up the monthly changes in receivables and payables only when the year opened at zero. Otherwise it takes the balances from the balance sheet report." },
+  { id:"3", title:"Show both, never remove in silence", r:Q.q14, cites:[2,3],
+    plain:"The skill shows the group receivables and the part that sister companies owe. It does not prepare group accounts.",
+    backed:"Group accounts remove intercompany balances and cash flows in full, on both sides.{2} US GAAP (ASC 810) also removes intercompany items.{3}" },
+  { id:"4", title:"Disclose every time", r:Q.q5, cites:[],
+    plain:"The skill writes a note for each intercompany balance and each sign of test data. It never drops one to make the dashboard look clean." },
+  { id:"5", title:"Common months only", r:Q.q15, cites:[],
+    plain:"If one company file has fewer months, the skill cuts every file to the months that they all have, and says so." },
+  { id:"6", title:"No figure of its own", r:Q.q3, cites:[4,5],
+    plain:"The skill makes up no figure, no estimate between months and no typical value. That includes an exchange rate.",
+    backed:"IAS 21 changes a foreign operation to the group currency at stated rates.{4} The Federal Reserve publishes dated buying rates.{5} A person must choose the rate and its date." },
+  { id:"7", title:"The last month, for six months", r:Q.q6, cites:[],
+    plain:"The skill projects six months from the last actual month. It takes the three rates from that month, and from the month before for the upside." },
+  { id:"8", title:"Read-only", r:Q.q4, cites:[],
+    plain:"The skill reads reports and writes one HTML file. It posts no entry, and it changes nothing in MosoFin." },
+  { id:"9", title:"Choose by name", r:Q.q11, cites:[],
+    plain:"If you have more than one workspace, the skill asks you to choose one by name. It never chooses one for you." },
+];
+
+const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const NOFACT = "This level needs no outside fact. The rule it applies is the skill's own.";
+const LEVELS = [
+  { tier:"One company file · Northbrook Trading, July to September 2026" },
+  { n:1, title:"One file, one month: three parts make the net increase",
+    chips:["Cash flow statement"], src:"Rule 6", cites:[1],
+    situation:"In August, Northbrook Trading bought equipment for 12,000. The skill reads the August column of Trading's cash flow statement through get_cash_flow.",
+    facts:["A cash flow statement has three parts: operating, investing and financing. The three totals add up to the total net cash flow for the period "+C(1)+".",
+           "A positive net cash flow means that cash went up in the period "+C(1)+"."],
+    visual:{type:"table",
+      head:["File","Month","Operating","Investing","Financing","Net cash increase"],
+      rows:[["Trading","Aug","38,500","−12,000","0",["26,500","good"]]]},
+    rules:[Q.q3],
+    math:[["Operating","38,500"],["Investing: equipment","−12,000"],["Financing","0"],["Net cash increase: 38,500 − 12,000 + 0","26,500",1],["September: 46,200 + 0 − 5,000 loan repayment","41,200"]],
+    verdict:["ok","The three parts add up to the net cash increase, 26,500 for August. The skill states in the report that it checked this for every month.","26,500"] },
+
+  { n:2, title:"One file, a quarter: a total of increases, not a bank balance",
+    chips:["Cash flow statement","Balance sheet"], src:"Rules 1 and 2", cites:[1],
+    situation:"The template adds Trading's monthly net cash increases from July. It shows the total under the label \"Cash at end of Sep\". The KPI subtitle says \"Bank plus undeposited funds\".",
+    facts:["The beginning cash comes from the balance sheet of the period before. Beginning cash plus the net cash flow gives the ending cash "+C(1)+".",
+           "So the total of the increases equals the cash balance only when cash was zero at the start of the range. The template has no field for the opening cash."],
+    visual:{type:"table",
+      head:["Month","Net cash increase","Total since 1 July"],
+      rows:[["Jul","42,000","42,000"],["Aug","26,500","68,500"],["Sep","41,200",["109,700","bad"]]]},
+    rules:[Q.q9, Q.q13],
+    math:[["July","42,000"],["+ August: 42,000 + 26,500","68,500"],["+ September: 68,500 + 41,200","109,700",1],["Trading's cash on 30 June","not in the example"],["Bank balance on 30 September","cash on 30 June + 109,700",1]],
+    verdict:["flag","The 109,700 is Trading's cash increase for July to September. It is not the bank balance, because Trading had cash before July. This example shows it under the label \"Net cash increase, Jul to Sep\" and gives no bank balance. The range starts in July, so the example takes the receivables and payables from the balance sheet report on 30 September.","NOT CASH"] },
+
+  { tier:"The group · two files added, one left out" },
+  { n:3, title:"Two files added month by month, the Canada file left out",
+    chips:["Trading","Services","Canada file"], src:"Rules 5 and 6", cites:[4,5],
+    situation:"The workspace holds three files: Trading and Services keep US dollar books, and Northbrook Trading Canada Ltd keeps Canadian dollar books. The owner asks for July to September, a closed quarter, instead of the default 1 January to 31 October.",
+    facts:["IAS 21 changes a foreign operation's figures to the group currency. It uses the closing rate for assets and liabilities, and the transaction-date rates for income and expenses "+C(4)+". An average rate is often an approximation "+C(4)+".",
+           "The Federal Reserve publishes daily buying rates for many currencies "+C(5)+". A rate is a dated fact that the owner or the accountant must choose. This page gives no rate.",
+           "The skill adds the files month by month and has no currency step. So the example leaves the Canada file out and says so in a note. The skill can use figures in US dollars on the manual path, if the accountant supplies them at a rate that the accountant chooses."],
+    visual:{type:"table",
+      head:["Month","Trading","Services","Group net increase","Total since 1 July"],
+      rows:[["Jul","42,000","6,400","48,400","48,400"],["Aug","26,500","7,100","33,600","82,000"],["Sep","41,200","5,900","47,100",["129,100","good"]],["Canada file","—","—","left out",["CAD books","bad"]]]},
+    rules:[Q.q2, Q.q15],
+    math:[["Group operating: 42,000 + 6,400 / 38,500 + 7,100 / 46,200 + 5,900","48,400 / 45,600 / 52,100"],["Group net: 48,400 / 45,600 − 12,000 / 52,100 − 5,000","48,400 / 33,600 / 47,100"],["Total: 48,400 + 33,600","82,000"],["82,000 + 47,100","129,100",1],["Services alone: 6,400 + 7,100 + 5,900","19,400"],["Group operating cash flow, Q3: 48,400 + 45,600 + 52,100","146,100"],["Group net income, Q3: 40,800 + 38,200 + 45,500","124,500"]],
+    verdict:["note","The group's net cash increase for July to September is 129,100. Both files have three months, so no file is cut. The Canada file stays out, and a report note says why.","129,100"] },
+
+  { n:4, title:"Intercompany: 76,800 shown beside 67,300",
+    chips:["Balance sheet","Aged receivables"], src:"Rules 3 and 4", cites:[2,3],
+    situation:"On 30 September, Services owes Trading 9,500. Trading shows it as a receivable, and Services shows it as a payable. The balances come from get_balance_sheet on 30 September.",
+    facts:["Group accounts remove intragroup assets, liabilities, income, expenses and cash flows in full "+C(2)+". That removes both sides of the 9,500.",
+           "US GAAP agrees: the SEC release puts its own rule beside the matching guidance in ASC 810 "+C(3)+".",
+           "The skill does not prepare group accounts. It shows the total and the intercompany part side by side."],
+    visual:{type:"table",
+      head:["File","Receivables","Of which intercompany","Payables","Receivables − payables"],
+      rows:[["Trading","64,000","9,500","41,300","22,700"],["Services","12,800","0","15,700","−2,900"],["Group","76,800",["9,500","bad"],"57,000","19,800"],["\"Intercompany removed\" row","67,300","—","57,000",["10,300","bad"]]]},
+    rules:[Q.q14, Q.q5],
+    math:[["Group receivables: 64,000 + 12,800","76,800"],["Outside receivables: 76,800 − 9,500","67,300",1],["Group payables: 41,300 + 15,700, with 9,500 owed to Trading","57,000"],["Template row: 67,300 − 57,000","10,300",1],["Both sides removed: 67,300 − (57,000 − 9,500)","19,800"],["Inventory row of the template","not used in this example"],["Test-data check: same cents, sample customers, \"Sandbox\"","checked, none found"]],
+    verdict:["flag","The skill shows 76,800 and notes that 67,300 is from outside customers. The template's \"Intercompany removed\" row takes 9,500 from the receivables only. The same 9,500 stays in the payables, so the row is not a group accounts elimination. Aging came back for Trading only, so the group view shows no aging bands.","9,500"] },
+
+  { tier:"The projection · six months from September" },
+  { n:5, title:"Three scenario rates, six months",
+    chips:["Group, Sep","Group, Aug"], src:"Rule 7", cites:[],
+    situation:"The projection runs from October 2026 to March 2027, with a monthly change of 0% and no one-off spend. It starts from the 129,100. The skill takes three monthly rates from the group's last two months.",
+    facts:[], nofact:"This level needs no outside fact. The three rates, the six months and the P10 and P90 names are the skill's own presets, not statistical percentiles.",
+    visual:{type:"table",
+      head:["Scenario","Rate from","Rate","Used","March 2027"],
+      rows:[["Conservative (P10 edge)","Sep net income","45,500","45,500","402,100"],["Base","Sep operating cash flow","52,100","52,100",["441,700","good"]],["Upside (P90 edge)","Aug and Sep operating, averaged","48,850",["52,100","bad"],"441,700"]]},
+    rules:[Q.q6, Q.q7, Q.q8, Q.q10],
+    math:[["Upside: (45,600 + 52,100) ÷ 2","48,850"],["P10 rate: lower of 45,500 and 52,100","45,500"],["P90 rate: higher of 48,850 and 52,100","52,100"],["P10: 129,100 + 6 × 45,500 = 129,100 + 273,000","402,100",1],["Base: 129,100 + 6 × 52,100 = 129,100 + 312,600","441,700",1],["P90: same as base","441,700",1],["First negative month","none"]],
+    verdict:["note","September was the best month, so the upside rate is below the base rate. The template then sets P90 equal to base. The range is 402,100 to 441,700. The projection adds no further investing, financing or loan payments, although Trading repaid 5,000 of a loan in September. August's 12,000 equipment purchase is in investing, so it is in no rate.","P90 = BASE"] },
+
+  { tier:"The hand-over · what the owner gets, and what the skill refuses" },
+  { n:6, title:"The hand-over: check, notes, refusals",
+    chips:["Dashboard file","Report notes"], src:"Rules 6, 8 and 9", cites:[],
+    situation:"The owner said yes to MosoFin, checked the one workspace by name and chose a consolidated view. The skill checks the file before it presents it. Then the owner asks for three things that the skill refuses.",
+    facts:[], nofact:NOFACT,
+    visual:{type:"table",
+      head:["Request","What the skill does"],
+      rows:[["Post the intercompany elimination in QuickBooks",["refuses: read-only","bad"]],["Use a typical CAD rate for Canada",["refuses: no typical values","bad"]],["Services sent only a P&L for July (a made-up case)",["fills net income only, no cash flow columns","bad"]],["Check before presenting","no JS errors, four KPI values, all tabs"],["Report notes","Canada file left out, 9,500 intercompany, test data: none found"]]},
+    rules:[Q.q1, Q.q3, Q.q4, Q.q11, Q.q12, Q.q16],
+    math:[["Workspaces that match","1, checked by name"],["Company files read","2 of 3"],["Default range","1 Jan to 31 Oct 2026"],["Range the owner asked for","1 Jul to 30 Sep 2026"],["First KPI equals the last total","129,100",1],["Entries posted","0",1]],
+    verdict:["ok","The owner gets one HTML file with four tabs and a summary in prose. The summary gives the 129,100 as the net cash increase for July to September, with the base rate and why. It also names the Canada file and the intercompany 9,500, and the skill posts nothing.","READ-ONLY"] },
+];
+
+function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const quote = r => `<blockquote>“${esc(r.q)}”<span class="where">From the skill: ${esc(r.w)}</span></blockquote>`;
+
+function renderRules(){
+  const box=document.getElementById("rules");
+  RULES.forEach(r=>{
+    const backed = r.cites.length
+      ? `<p class="backed"><b>Backed by</b> ${citeText(r.backed)} ${C(...r.cites.filter(n=>!placed(r.backed,n)))}</p>`
+      : `<p class="backed"><b>Backed by</b> the skill's own rule. No outside authority backs it.</p>`;
+    box.appendChild(el("div",{class:"rule"},
+      `<div class="k"><span class="badge">${r.id}</span><h3>${esc(r.title)}</h3></div>
+       ${quote(r.r)}
+       <p class="plain">${esc(r.plain)}</p>
+       ${backed}`));
+  });
+}
+function renderSources(){
+  const ol=document.getElementById("srclist");
+  SOURCES.forEach((s,i)=>ol.appendChild(el("li",{id:"src"+(i+1)},`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a><span class="what">${esc(s.w)}</span>`)));
+}
+function cell(c, num){ if(Array.isArray(c)) return `<td class="${num?"n ":""}${c[1]||""}">${esc(c[0])}</td>`; return `<td class="${num?"n":""}">${esc(c)}</td>`; }
+function table(v){
+  let h=`<div class="tbl"><table><thead><tr>${v.head.map((x,i)=>`<th class="${i?"n":""}">${esc(x)}</th>`).join("")}</tr></thead><tbody>`;
+  v.rows.forEach(r=>{ h+="<tr>"+r.map((c,i)=>cell(c,i>0)).join("")+"</tr>"; });
+  if(v.total) h+=`<tr class="total">${v.total.map((c,i)=>cell(c,i>0)).join("")}</tr>`;
+  return h+"</tbody></table></div>";
+}
+function renderLevels(){
+  const nav=document.getElementById("lvnav"), box=document.getElementById("levels");
+  LEVELS.forEach(L=>{
+    if(L.tier){ box.appendChild(el("div",{class:"tier"},`<span class="label">${esc(L.tier)}</span>`)); return; }
+    nav.appendChild(el("a",{href:"#lv"+L.n},`<span>${L.n}</span>${esc(L.title)}`));
+    const vis = table(L.visual);
+    const math = L.math.map(m=>`<div class="${m[2]?"t":""}"><span>${esc(m[0])}</span><span>${esc(m[1])}</span></div>`).join("");
+    const facts = L.facts.length ? L.facts.map(f=>`<div class="fact">${f}</div>`).join("") : `<div class="fact none">${esc(L.nofact)}</div>`;
+    const srcs = L.cites.length ? `sources ${[...L.cites].sort((a,b)=>a-b).join(", ")}` : "no outside source";
+    const parts=[
+      `<div class="lv-head"><span class="lv-num">Level ${L.n} · uses ${esc(L.src)} · ${srcs}</span>`,
+      `<h3>${esc(L.title)}</h3>`,
+      `<div class="chips">${L.chips.map(c=>`<span class="chip src">${esc(c)}</span>`).join("")}</div></div>`,
+      `<div class="block"><span class="label">The situation</span>`, `<p>${esc(L.situation)}</p></div>`,
+      `<div class="block"><span class="label">The facts it rests on</span>`, `<div class="facts">${facts}</div></div>`,
+      `<div class="block"><span class="label">What the skill sees</span>`, `${vis}</div>`,
+      `<div class="block"><span class="label">The rule it applies</span>`, `${L.rules.map(quote).join("")}</div>`,
+      `<details><summary>Check it yourself</summary>`, `<div class="math num">${math}</div></details>`,
+      `<div class="verdict ${L.verdict[0]}"><span class="ic">${esc(L.verdict[2])}</span>`, `<span>${esc(L.verdict[1])}</span></div>`];
+    box.appendChild(el("article",{class:"level",id:"lv"+L.n}, parts.join("\n")));
+  });
+}
+
+/* --- calculator: up to 4 companies x 6 months, added month by month, then the template's six-month projection --- */
+const NE=4, NM=6, H=6, COLS=["o","i","f","n"];
+const TR=[[42000,0,0,35600],[38500,-12000,0,31900],[46200,0,-5000,40800]];
+const SV=[[6400,0,0,5200],[7100,0,0,6300],[5900,0,0,4700]];
+const PRESETS = {
+  northbrook:{start:"2026-07", growth:0, capex:0, ents:[["Trading",TR],["Services",SV]]},
+  services:{start:"2026-07", growth:0, capex:0, ents:[["Services",SV]]},
+  blank:{start:"", growth:"", capex:"", ents:[]},
+};
+const MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const box=document.getElementById("ents");
+for(let e=0;e<NE;e++){
+  let rows="";
+  for(let m=0;m<NM;m++) rows+=`<tr><td class="mlab" data-m="${m}">Month ${m+1}</td>${COLS.map(c=>`<td><input class="n" data-e="${e}" data-m="${m}" data-c="${c}" inputmode="decimal" aria-label="Company ${e+1}, month ${m+1}, ${({o:"operating",i:"investing",f:"financing",n:"net income"})[c]}"></td>`).join("")}</tr>`;
+  box.insertAdjacentHTML("beforeend",`<fieldset><legend>Company ${e+1}</legend>
+    <label class="field"><span>Name</span><input data-e="${e}" data-c="name" style="text-align:left"></label>
+    <div class="tbl"><table class="bills mini"><thead><tr><th>Month</th><th class="n">Operating</th><th class="n">Investing</th><th class="n">Financing</th><th class="n">Net income</th></tr></thead><tbody>${rows}</tbody></table></div></fieldset>`);
+}
+const fld = k => document.querySelector(`.calc [data-k="${k}"]`);
+const inp = (e,m,c) => document.querySelector(`#ents [data-e="${e}"][data-c="${c}"]`+(m===null?"":`[data-m="${m}"]`));
+const money = s => { const v=parseFloat(String(s).replace(/[$£€,\s%]/g,"").replace(/^−/,"-")); return isFinite(v)?v:NaN; };
+const n0 = n => (n<0?"−":"")+Math.round(Math.abs(n)).toLocaleString("en-US");
+function monthName(k){ const m=/^(\d{4})-(\d{2})$/.exec(fld("start").value||""); if(!m) return k<0?"":"Month "+(k+1);
+  const i=+m[2]-1+k, y=+m[1]+Math.floor(i/12); return MO[((i%12)+12)%12]+" "+y; }
+
+function load(p){
+  const P=PRESETS[p];
+  fld("start").value=P.start; fld("growth").value=P.growth; fld("capex").value=P.capex;
+  for(let e=0;e<NE;e++){ const E=P.ents[e];
+    inp(e,null,"name").value=E?E[0]:"";
+    for(let m=0;m<NM;m++) COLS.forEach((c,j)=>{ inp(e,m,c).value = E&&E[1][m] ? E[1][m][j] : ""; }); }
+  document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.p===p));
+  run();
+}
+function res(cls, label, v, s, id){ return `<div class="res ${cls}"${id?` id="${id}"`:""}><span class="label">${label}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`; }
+function path(open, rate, g, capex){ let c=open, f=rate; const o=[]; for(let i=0;i<H;i++){ const n=f-(i===0?capex:0); c+=n; o.push(c); f*=1+g; } return o; }
+function run(){
+  document.querySelectorAll("#ents .mlab").forEach(t=>t.textContent=monthName(+t.dataset.m));
+  const out=document.getElementById("results"), st=document.getElementById("steps"), act=document.getElementById("actual"), fc=document.getElementById("fc");
+  const ents=[];
+  for(let e=0;e<NE;e++){
+    const rows=[];
+    for(let m=0;m<NM;m++){ const o=money(inp(e,m,"o").value); if(isNaN(o)) break;
+      const g=c=>{ const v=money(inp(e,m,c).value); return isNaN(v)?0:v; };
+      rows.push({o, i:g("i"), f:g("f"), n:g("n")}); }
+    if(rows.length) ents.push({name:inp(e,null,"name").value.trim()||"Company "+(e+1), rows});
+  }
+  if(!ents.length){ act.innerHTML=""; fc.innerHTML=""; st.innerHTML=""; out.innerHTML=res("","Waiting","—","Enter the operating cash flow of at least one month for one company."); return; }
+  const lens=ents.map(x=>x.rows.length), n=Math.min(...lens), cut=lens.some(l=>l>n);
+  const grp=[]; for(let m=0;m<n;m++){ const s={o:0,i:0,f:0,n:0}; ents.forEach(x=>COLS.forEach(c=>s[c]+=x.rows[m][c])); grp.push(s); }
+  const all=ents.map(x=>({name:x.name, rows:x.rows.slice(0,n)})); if(ents.length>1) all.push({name:"Group", rows:grp});
+  let h=`<table><thead><tr><th>Company</th>${grp.map((_,m)=>`<th class="n">${monthName(m)}</th>`).join("")}<th class="n">Total since range start</th></tr></thead><tbody>`;
+  all.forEach(x=>{ let c=0; const cells=x.rows.map(r=>{ const v=r.o+r.i+r.f; c+=v; return `<td class="n">${n0(v)}</td>`; }).join("");
+    h+=`<tr${x.name==="Group"&&ents.length>1?' class="total"':""}><td>${esc(x.name)}</td>${cells}<td class="n">${n0(c)}</td></tr>`; });
+  act.innerHTML=h+"</tbody></table>";
+  const open=grp.reduce((a,r)=>a+r.o+r.i+r.f,0);
+  const L=grp[n-1], P=n>1?grp[n-2]:null;
+  const cons=L.n, base=L.o, up=P?(P.o+L.o)/2:L.o;
+  let g=money(fld("growth").value); g=isNaN(g)?0:g/100; let capex=money(fld("capex").value); capex=isNaN(capex)?0:capex;
+  const p10=path(open,Math.min(cons,base),g,capex), b=path(open,base,g,capex), p90=path(open,Math.max(up,base),g,capex);
+  const fl=k=>monthName(n+k);
+  fc.innerHTML=`<table><thead><tr><th>Month</th><th class="n">P10</th><th class="n">Base</th><th class="n">P90</th></tr></thead><tbody>${b.map((v,i)=>`<tr><td>${fl(i)}</td><td class="n">${n0(p10[i])}</td><td class="n"><b>${n0(v)}</b></td><td class="n">${n0(p90[i])}</td></tr>`).join("")}</tbody></table>`;
+  const neg=p10.findIndex(v=>v<0), negB=b.findIndex(v=>v<0);
+  const who=ents.length>1?"the group":esc(ents[0].name);
+  let s=`<div class="t"><span>Net cash increase since the range start, ${who}</span><span>${n0(open)}</span></div>`;
+  s+=`<div><span>Conservative rate: net income of ${monthName(n-1)}</span><span>${n0(cons)}</span></div>`;
+  s+=`<div><span>Base rate: operating cash flow of ${monthName(n-1)}</span><span>${n0(base)}</span></div>`;
+  s+=`<div><span>Upside rate: ${P?`(${n0(P.o)} + ${n0(L.o)}) ÷ 2`:"one month only, so the base rate"}</span><span>${n0(up)}</span></div>`;
+  s+=`<div><span>P10 rate: lower of ${n0(cons)} and ${n0(base)}</span><span>${n0(Math.min(cons,base))}</span></div>`;
+  s+=`<div><span>P90 rate: higher of ${n0(up)} and ${n0(base)}</span><span>${n0(Math.max(up,base))}</span></div>`;
+  if(g===0&&capex===0) s+=`<div class="t"><span>Base after six months: ${n0(open)} + 6 × ${n0(base)}</span><span>${n0(b[H-1])}</span></div>`;
+  if(cut) s+=`<div><span>The companies have different numbers of months. The page uses the ${n} months that they all have.</span><span>cut to ${n}</span></div>`;
+  st.innerHTML=s;
+  let r=res("note","Net cash increase since the range start",n0(open),`${who}, ${monthName(0)} to ${monthName(n-1)}. This is not a bank balance.`,"r-cum");
+  r+=res("note","Rates: conservative, base, upside",`${n0(cons)} / ${n0(base)} / ${n0(up)}`,up<base?"The upside rate is below the base rate, so P90 equals base.":"Each rate is a month of the figures above.","r-rates");
+  r+=res(p10[H-1]<0?"flag":"ok",`P10, ${fl(H-1)}`,n0(p10[H-1]),"Conservative edge","r-p10");
+  r+=res(b[H-1]<0?"flag":"ok",`Base, ${fl(H-1)}`,n0(b[H-1]),"The last month repeats","r-base");
+  r+=res("ok",`P90, ${fl(H-1)}`,n0(p90[H-1]),"Upside edge","r-p90");
+  r+=res(neg>=0||negB>=0?"flag":"ok","First negative month",neg>=0?fl(neg):"none",neg>=0?`P10 goes below zero${negB>=0?`, and base in ${fl(negB)}`:""}.`:"P10 and base stay at zero or above.","r-neg");
+  out.innerHTML=r;
+}
+document.querySelectorAll(".calc [data-k], #ents input").forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets [data-p]").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));
+document.querySelectorAll(".presets [data-p]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.p)));
+
+renderSources(); renderRules(); renderLevels(); load("northbrook");
+</script>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>

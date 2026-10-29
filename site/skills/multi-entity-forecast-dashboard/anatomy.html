@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Entity Forecast Dashboard Anatomy | MosoFin</title>
+<meta name="description" content="How the multi-entity forecast dashboard skill is built on main: nine files, 984 lines, a JavaScript forecast, its sources and twelve audit findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f6f8f7; --panel:#ffffff; --ink:#101a16; --muted:#5c6b65; --faint:#84948d;
+    --rule:#dde5e1; --rule-strong:#c3cfc9;
+    --mosofin:#0b8f5a; --mosofin-soft:#e4f3ec;
+    --manual:#a06a12; --manual-soft:#f7eeda;
+    --high:#b3261e; --high-soft:#fbe9e7;
+    --med:#a06a12;  --med-soft:#f7eeda;
+    --low:#4d6a8a;  --low-soft:#e8eef5;
+    --shadow:0 1px 2px rgba(16,26,22,.05), 0 8px 24px -16px rgba(16,26,22,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+      --rule:#25302b; --rule-strong:#33403a;
+      --mosofin:#3fc48b; --mosofin-soft:#122c21;
+      --manual:#d9a34e; --manual-soft:#2c2312;
+      --high:#ef8a80; --high-soft:#311715;
+      --med:#d9a34e;  --med-soft:#2c2312;
+      --low:#8fb0d4;  --low-soft:#16212d;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c110f; --panel:#141b18; --ink:#e7ede9; --muted:#9aa8a2; --faint:#71817a;
+    --rule:#25302b; --rule-strong:#33403a;
+    --mosofin:#3fc48b; --mosofin-soft:#122c21;
+    --manual:#d9a34e; --manual-soft:#2c2312;
+    --high:#ef8a80; --high-soft:#311715;
+    --med:#d9a34e;  --med-soft:#2c2312;
+    --low:#8fb0d4;  --low-soft:#16212d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:56px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  header{display:flex;flex-direction:column;gap:14px;padding-bottom:30px;border-bottom:1px solid var(--rule)}
+  .eyebrow,h2,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mosofin)}
+  h1{margin:0;font-size:clamp(30px,4.4vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  .lede{margin:0;max-width:64ch;color:var(--muted);font-size:17px}
+  h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .sec-title{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  section{display:flex;flex-direction:column;gap:18px}
+  p{margin:0;max-width:66ch}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13.5px;color:var(--muted)}
+  figure{margin:0;display:flex;flex-direction:column;gap:14px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:760px;height:auto}
+  figcaption{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .findings{display:flex;flex-direction:column;gap:12px}
+  .f{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:110px 1fr;gap:6px 16px}
+  .f.high{border-left-color:var(--high)} .f.med{border-left-color:var(--med)} .f.low{border-left-color:var(--low)}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 0;border-radius:4px;text-align:center;align-self:start}
+  .high .sev{background:var(--high-soft);color:var(--high)} .med .sev{background:var(--med-soft);color:var(--med)} .low .sev{background:var(--low-soft);color:var(--low)}
+  .f h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35}
+  .f .body{grid-column:2;display:flex;flex-direction:column;gap:6px}
+  .f p{font-size:14.5px;color:var(--muted)}
+  .f .where{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .f .fix{font-size:14.5px;color:var(--ink)}
+  .f .fix b{color:var(--mosofin);font-weight:600}
+  .f.done{border-left-color:var(--mosofin)}
+  .f.done .sev{background:var(--mosofin-soft);color:var(--mosofin)}
+  .f.done.high .sev{background:var(--high-soft);color:var(--high)}
+  .f.done.med .sev{background:var(--med-soft);color:var(--med)}
+  .f.done.low .sev{background:var(--low-soft);color:var(--low)}
+  .f.add{border-left-color:var(--low)}
+  .f blockquote{margin:2px 0;padding:8px 12px;border-left:2px solid var(--rule-strong);font-size:14.5px;color:var(--ink);font-style:italic;max-width:66ch}
+  .f cite{display:block;margin-top:4px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .f cite a{color:var(--mosofin)}
+  .f .sev{padding:3px 6px;white-space:nowrap}
+  @media (max-width:560px){.f{grid-template-columns:1fr}.f .body{grid-column:1}}
+  .pass{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+  .pass li{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-size:14.5px;display:flex;gap:10px}
+  .pass .ok{color:var(--mosofin);font-family:"IBM Plex Mono",monospace;font-size:12px;padding-top:2px}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--mosofin-soft);color:var(--mosofin);padding:1px 5px;border-radius:4px}
+  .tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+  th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+  th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  td .kind{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--low-soft);color:var(--low)}
+  td .kind.auth{background:var(--mosofin-soft);color:var(--mosofin)} td .kind.prac{background:var(--med-soft);color:var(--med)}
+  td code{white-space:normal}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Multi-entity forecast dashboard</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <div class="eyebrow">multi-entity-forecast-dashboard · shipped on main in dashboards/ · not in the card format · 3 commits, 1 Sep 2026</div>
+  <h1>The structure of the multi-entity forecast dashboard skill</h1>
+  <p class="lede">On main the skill is nine files and 984 lines in <code>dashboards/multi-entity-forecast-dashboard/</code>, outside <code>skills/</code>. It has no card, no verdict tags and no edge-cases file. The 516-line HTML template holds the forecast arithmetic in JavaScript. Three commits on 1 September 2026 added the skill. Pull request #1 did not include it. The skill reads cash flow statements and writes nothing to the books. This page shows how the files connect, the run step by step, the tools and sources behind each step, and the audit findings.</p>
+</header>
+
+<section>
+  <div class="stats">
+    <div class="stat"><span class="k">Files</span><span class="v">9</span><span class="s">984 lines on main. SKILL.md has 86 of them</span></div>
+    <div class="stat"><span class="k">Template</span><span class="v">516</span><span class="s">lines in dashboard-template.html. Its JavaScript computes the cash and the forecast</span></div>
+    <div class="stat"><span class="k">Verdicts</span><span class="v">0</span><span class="s">[auto], [gated] or [manual] tags in all nine files</span></div>
+    <div class="stat"><span class="k">Tool names</span><span class="v">8</span><span class="s">6 read tools, invoke_datasource_api_tool in the template, and present_files. No write tool</span></div>
+    <div class="stat"><span class="k">Findings</span><span class="v">0 fixed · 11 open</span><span class="s">A1 to A12, for the skill owner. A2 is a check that passed, so it is not open</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Construction</h2>
+  <p class="sec-title">One SKILL.md, eight files behind it, 984 lines in all</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 448" role="img" aria-label="SKILL.md is 86 lines with five workflow steps and four guardrails. Its opening rule points to ui-spec.md. Step 1 points to mosofin-workflow.md and manual-workflow.md. Step 2 points to forecast-method.md and example-data.json. Step 3 runs build_dashboard.py, which fills dashboard-template.html. manual-workflow.md offers example-manual.csv. The template is the largest file at 516 lines, then ui-spec.md at 95, build_dashboard.py at 94, mosofin-workflow.md at 79, manual-workflow.md at 42, forecast-method.md at 32, example-data.json at 31 and example-manual.csv at 9.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <rect x="30" y="20" width="270" height="400" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+        <text x="48" y="48" font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="1.3" font-weight="600" fill="var(--mosofin)">SKILL.MD · 86 LINES</text>
+        <g font-family="Archivo,sans-serif" font-size="13.5" fill="var(--ink)">
+          <text x="48" y="78" font-weight="600">The look is fixed · read ui-spec</text>
+          <text x="48" y="128" font-weight="600">Step 1 · Choose the data path</text>
+          <text x="48" y="178">Step 2 · Assemble the data object</text>
+          <text x="48" y="228">Step 3 · Build</text>
+          <text x="48" y="278">Step 4 · Verify, then present</text>
+          <text x="48" y="328">Step 5 · Tell the user</text>
+          <text x="48" y="388" font-weight="600">Guardrails · 4</text>
+        </g>
+        <line x1="44" y1="98" x2="286" y2="98" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <line x1="44" y1="356" x2="286" y2="356" stroke="var(--mosofin)" stroke-opacity=".35"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="12">
+          <g><rect x="580" y="24" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="24" width="57" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="49" fill="var(--ink)">ui-spec.md</text><text x="878" y="49" text-anchor="end" fill="var(--faint)">95</text></g>
+          <g><rect x="580" y="74" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="74" width="47" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="99" fill="var(--ink)">mosofin-workflow.md</text><text x="878" y="99" text-anchor="end" fill="var(--faint)">79</text></g>
+          <g><rect x="580" y="124" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="124" width="25" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="149" fill="var(--ink)">manual-workflow.md</text><text x="878" y="149" text-anchor="end" fill="var(--faint)">42</text></g>
+          <g><rect x="580" y="174" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="174" width="19" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="199" fill="var(--ink)">forecast-method.md</text><text x="878" y="199" text-anchor="end" fill="var(--faint)">32</text></g>
+          <g><rect x="580" y="224" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="224" width="19" height="40" rx="7" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="249" fill="var(--muted)">example-data.json</text><text x="878" y="249" text-anchor="end" fill="var(--faint)">31</text></g>
+          <g><rect x="580" y="274" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="274" width="56" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="299" fill="var(--ink)">build_dashboard.py</text><text x="878" y="299" text-anchor="end" fill="var(--faint)">94</text></g>
+          <g><rect x="580" y="324" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)"/><rect x="580" y="324" width="310" height="40" rx="7" fill="var(--mosofin-soft)"/><text x="594" y="349" fill="var(--ink)">dashboard-template.html</text><text x="878" y="349" text-anchor="end" fill="var(--faint)">516</text></g>
+          <g><rect x="580" y="374" width="310" height="40" rx="7" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="4 3"/><rect x="580" y="374" width="5" height="40" rx="2" fill="var(--mosofin-soft)" fill-opacity=".45"/><text x="594" y="399" fill="var(--muted)">example-manual.csv</text><text x="878" y="399" text-anchor="end" fill="var(--faint)">9</text></g>
+        </g>
+        <g fill="none" stroke-width="1.4" color="var(--mosofin)" stroke="currentColor">
+          <path d="M300 74 C 440 74, 440 44, 574 44" marker-end="url(#a1)"/>
+          <path d="M300 122 C 440 122, 440 94, 574 94" marker-end="url(#a1)"/>
+          <path d="M300 126 C 440 126, 440 144, 574 144" marker-end="url(#a1)"/>
+          <path d="M300 172 C 440 172, 440 194, 574 194" marker-end="url(#a1)"/>
+          <path d="M300 176 C 440 176, 440 244, 574 244" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+          <path d="M300 224 C 440 224, 440 294, 574 294" marker-end="url(#a1)"/>
+          <path d="M600 314 L 600 322" marker-end="url(#a1)"/>
+          <path d="M890 144 C 912 144, 912 394, 894 394" marker-end="url(#a1)" stroke-dasharray="5 3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--faint)">
+          <text x="318" y="112">MosoFin or manual</text>
+          <text x="318" y="262">python3 --data</text>
+          <text x="318" y="438" fill="var(--muted)">dashed: shape references, offered or copied</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>SKILL.md loads every time. The Files table in SKILL.md says when to read each file. The skill reads <b>ui-spec.md</b> before any HTML work. <b>mosofin-workflow.md</b> holds 5 gates and the consolidation rules. <b>forecast-method.md</b> holds the three scenario rates and the sanity checks. <b>build_dashboard.py</b> fills the template, and the template is never edited in place. Each bar uses the file's line count on main from <code>wc -l</code>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The run</h2>
+  <p class="sec-title">What the skill does, step by step</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 920 920" role="img" aria-label="Step 1 asks one question: use the MosoFin connection, or supply the data. On the MosoFin path, five gates confirm consent, the workspace by name and the company files, read the cash flow by month and handle errors. On the manual path the user supplies a CSV with eleven columns. The two paths never mix. Step 2 writes a data object with nine required keys. Step 3 runs the script, which fills the template. The template adds the files month by month, takes cash as the cumulative net increase and projects six months. Step 4 verifies the file and presents it. Step 5 tells the user in prose.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.5" color="var(--rule-strong)">
+          <line x1="460" y1="100" x2="460" y2="128" marker-end="url(#a2)"/>
+          <polyline points="330,180 230,180 230,242" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="590,180 690,180 690,242" marker-end="url(#a2)" color="var(--manual)"/>
+          <polyline points="230,406 230,450 368,450" marker-end="url(#a2)" color="var(--mosofin)"/>
+          <polyline points="690,406 690,450 552,450" marker-end="url(#a2)" color="var(--manual)"/>
+          <line x1="460" y1="474" x2="460" y2="500" marker-end="url(#a2)"/>
+          <line x1="460" y1="588" x2="460" y2="612" marker-end="url(#a2)"/>
+          <line x1="460" y1="724" x2="460" y2="748" marker-end="url(#a2)"/>
+          <line x1="460" y1="812" x2="460" y2="836" marker-end="url(#a2)"/>
+        </g>
+        <g font-family="Archivo,sans-serif">
+          <rect x="60" y="20" width="800" height="80" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="46" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 1 · CHOOSE THE DATA PATH · ONE QUESTION FIRST</text>
+          <text x="80" y="76" font-size="13.5" fill="var(--ink)">Use your MosoFin connection to read the books, or supply the data yourself?</text>
+          <polygon points="460,130 590,180 460,230 330,180" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="460" y="176" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">MosoFin present</text>
+          <text x="460" y="193" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">and chosen?</text>
+          <rect x="80" y="244" width="300" height="162" rx="10" fill="var(--mosofin-soft)" stroke="var(--mosofin)"/>
+          <text x="98" y="268" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--mosofin)">MOSOFIN · GATES 1–5</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="98" y="294">G1  consent asked first</text>
+            <text x="98" y="320">G2  workspace by name, no auto-pick</text>
+            <text x="98" y="346">G3  files: one, each, or group</text>
+            <text x="98" y="372">G4  get_cash_flow by month, aging</text>
+            <text x="98" y="396">G5  errors: reconnect link, one retry</text>
+          </g>
+          <rect x="540" y="244" width="300" height="162" rx="10" fill="var(--manual-soft)" stroke="var(--manual)"/>
+          <text x="558" y="268" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--manual)">MANUAL · CSV, 11 COLUMNS</text>
+          <g font-size="13" fill="var(--ink)">
+            <text x="558" y="294">One row per entity per month</text>
+            <text x="558" y="320">Same months for every entity</text>
+            <text x="558" y="346">Balances from the last row only</text>
+            <text x="558" y="372">P&amp;L only: net income, no cash</text>
+            <text x="558" y="396">flow columns, never invented</text>
+          </g>
+          <rect x="370" y="426" width="180" height="48" rx="24" fill="var(--panel)" stroke="var(--ink)"/>
+          <text x="460" y="455" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">Never mix the paths</text>
+
+          <rect x="60" y="502" width="800" height="86" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="528" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 2 · ASSEMBLE THE DATA OBJECT · 9 REQUIRED KEYS</text>
+          <text x="80" y="554" font-size="13.5" fill="var(--ink)">group · mode · source · fetched · year · months · order · entities · notes</text>
+          <text x="80" y="576" font-size="13.5" fill="var(--ink)">Each entity: ocf, icf, fcf, ni by month · ar, arIc, ap, inv · aging and customers optional</text>
+
+          <rect x="60" y="614" width="800" height="110" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="640" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 3 · BUILD · BUILD_DASHBOARD.PY FILLS THE TEMPLATE</text>
+          <text x="80" y="666" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Group</tspan>  sum of the files, month by month · intercompany receivables shown beside the total</text>
+          <text x="80" y="690" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Cash</tspan>  cumulative net increase from the first month of the range (finding A3)</text>
+          <text x="80" y="714" font-size="13.5" fill="var(--ink)"><tspan font-weight="600">Forecast</tspan>  6 months · rates from the last month · P10 = min(cons, rate) · P90 = max(up, rate)</text>
+
+          <rect x="60" y="750" width="800" height="62" rx="10" fill="var(--panel)" stroke="var(--rule-strong)"/>
+          <text x="80" y="776" font-family="'IBM Plex Mono',monospace" font-size="11" font-weight="600" letter-spacing="1.3" fill="var(--faint)">STEP 4 · VERIFY, THEN PRESENT_FILES</text>
+          <text x="80" y="800" font-size="13.5" fill="var(--ink)">0 JS errors · 4 KPIs · Group and each entity · 4 tabs · first KPI equals the last cumulative cash</text>
+
+          <rect x="60" y="838" width="800" height="62" rx="10" fill="var(--panel)" stroke="var(--rule-strong)" stroke-dasharray="5 4"/>
+          <text x="80" y="864" font-size="13.5" fill="var(--muted)"><tspan font-weight="600" fill="var(--ink)">Step 5 · Tell the user</tspan> in prose: cash position, scenario rate and why, largest caveat</text>
+          <text x="80" y="886" font-size="13.5" fill="var(--muted)">MosoFin path: Sync and Ask work only inside Claude · end with one Data sources line</text>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="11.5">
+            <text x="236" y="170" text-anchor="end" fill="var(--mosofin)">yes, read my books</text>
+            <text x="684" y="170" fill="var(--manual)">no, or not connected</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Both paths end in the same data object. If a MosoFin read fails partway, the skill reports what succeeded and offers the manual path for the rest. Step 3 does the arithmetic in the template's JavaScript, so the pages trace each forecast figure to that code. The skill writes nothing to QuickBooks or MosoFin.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Source backing</h2>
+  <p class="sec-title">Every step, its tools, and what stands behind it</p>
+  <p style="color:var(--muted);font-size:15px">Numbers in brackets are the sources on the <a href="learn.html#sources" style="color:var(--mosofin)">learn page</a>. The tools in each row are the tools that the step names in SKILL.md or mosofin-workflow.md on main. <b>Authority</b> means an outside source backs the point. <b>Skill rule</b> means the skill's own rule. <b>Practice</b> means no outside authority stands behind it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Operations</th><th>What backs it</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Step 1 · Gates 1–3</td><td>Asks for consent first. Asks for the workspace by name and never picks one itself. Collects every connected QuickBooks file and asks: one, each, or consolidated</td><td><code>list_workspaces</code> <code>get_agent_datasources</code></td><td>The skill's own gates</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Gate 4 · Reads</td><td>Reads the cash flow by month for each file, then the aging. Default range: 1 Jan to the end of the current month</td><td><code>get_cash_flow</code> <code>get_aged_receivables</code> <code>get_profit_and_loss</code> (only for detail) <code>get_balance_sheet</code> (in prose only, see A5)</td><td>[1] Operating, investing and financing totals combine into the net cash flow</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Gate 5 · Errors</td><td>Shows the reconnect link and stops. Retries a QuickBooks 500 error once, then continues with the files that succeeded and flags the gap</td><td>None</td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Consolidation rules</td><td>Adds the files month by month. Records intercompany receivables in <code>arIc</code> and shows both totals. Never eliminates in silence. Cuts to the common months</td><td>None beyond the reads</td><td>[2] [3] Group accounts eliminate intragroup items in full, under IFRS and US GAAP. The skill eliminates nothing. See A6</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Currency</td><td>No step. Every connected QuickBooks file goes into the sum as it is</td><td>None</td><td>[4] A foreign operation needs translation at chosen rates. [5] A rate is a published, dated fact. See A8</td><td><span class="kind auth">Authority</span></td></tr>
+      <tr><td>Step 2 · Data object</td><td>Writes the JSON with 9 required keys and the notes for history, accounts and report</td><td>None</td><td>The skill's own shape</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 3 · Build</td><td>Runs the script, which fills the template. The template computes cash, the three scenario rates and six months of forecast</td><td>None</td><td>No outside authority. The rates, the six months and the P10 and P90 names are presets of the skill, not statistical percentiles. See A7</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Sanity checks</td><td>States that operating plus investing plus financing equals the net increase. Takes cumulative net increase as cash at month end</td><td>None</td><td>[1] Beginning cash plus net cash flow gives ending cash. So the cumulative sum equals cash only when the opening cash is zero. See A3</td><td><span class="kind auth">Authority</span> <span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 4 · Verify</td><td>Runs the file headless. Looks at errors, KPIs, entities and tabs. Then presents the file</td><td><code>present_files</code></td><td>The skill's own rule. See A9</td><td><span class="kind">Skill rule</span></td></tr>
+      <tr><td>Step 5 · Tell the user</td><td>Gives the cash position, the scenario rate, the largest caveat and one Data sources line</td><td>None</td><td>The skill's own rule</td><td><span class="kind">Skill rule</span></td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px"><b>Tools with no step.</b> <code>invoke_datasource_api_tool</code> occurs only in the template. The Sync and Ask buttons send it, through a POST to <code>api.anthropic.com/v1/messages</code> with the MosoFin MCP URL. No step of SKILL.md or mosofin-workflow.md names it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Source</th><th>Used for</th><th>Checked</th><th>Via</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="https://openstax.org/books/principles-financial-accounting/pages/16-4-prepare-the-completed-statement-of-cash-flows-using-the-indirect-method" style="color:var(--mosofin)">OpenStax: Principles of Accounting, Volume 1, 16.4 Prepare the Completed Statement of Cash Flows Using the Indirect Method</a></td><td>The three totals and the net cash flow. Why the cumulative sum is not the bank balance</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>2</td><td><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2022/issued/ifrs10.html" style="color:var(--mosofin)">IFRS Foundation: IFRS 10 Consolidated Financial Statements</a></td><td>Paragraph B86(c): intragroup items eliminated in full</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>3</td><td><a href="https://www.sec.gov/files/rules/final/2018/33-10532.pdf" style="color:var(--mosofin)">SEC: Final Rule, Disclosure Update and Simplification (Release 33-10532, 2018)</a></td><td>Rule 3A-04 and ASC 810: US GAAP also eliminates intercompany items</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>4</td><td><a href="https://www.ifrs.org/content/dam/ifrs/publications/html-standards/english/2026/issued/ias21.html" style="color:var(--mosofin)">IFRS Foundation: IAS 21 The Effects of Changes in Foreign Exchange Rates</a></td><td>Paragraph 39: translation of a foreign operation. Why the example leaves the CAD file out</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+      <tr><td>5</td><td><a href="https://www.federalreserve.gov/releases/H10/about.htm" style="color:var(--mosofin)">Federal Reserve Board: Foreign Exchange Rates, H.10 (About)</a></td><td>A rate is a published, dated fact that a person must choose</td><td>2026-10-28</td><td>from search results, page not opened</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:14.5px">The audit checked the five sources on 28 Oct 2026 through search results. Nobody opened the pages. Some items have no outside authority behind them. They are the three scenario rates, the six-month horizon, the P10 and P90 labels, the sandbox signals, the four tabs and the "quiet analytics" style. The pages made up Northbrook Trading Group and every example figure. Ask your accountant what applies to you.</p>
+</section>
+
+<section>
+  <h2>Audit → findings</h2>
+  <p class="sec-title">Eleven findings open for the skill owner, and one check passed</p>
+  <p style="color:var(--muted);font-size:14.5px">This site did not change the skill. The skill owner can fix these findings in a later pass. The audit checked each finding again against main on 29 Oct 2026. A11 and A12 add to the ten findings of the first audit.</p>
+  <div class="findings">
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A1. SKILL.md does not follow the house STE rule</h3>
+      <p>The STE linter gives 11 findings on SKILL.md on main, and 10 of them are hard. The linter counts 605 words, so the rate is 1.8 per 100 words. The findings include long sentences and semicolons.</p>
+      <span class="where">SKILL.md · whole file · open</span>
+    </div></div>
+    <div class="f low done"><span class="sev">Low · passed</span><div class="body">
+      <h3>A2. The files name no skill outside the library</h3>
+      <p>No file names another skill. The skill itself is in <code>dashboards/</code> and not in <code>skills/</code>. A listing of <code>skills/</code> does not find it, so the brief's <code>skills/&lt;skill&gt;</code> path finds nothing.</p>
+      <span class="where">all nine files · no change needed</span>
+    </div></div>
+    <div class="f high"><span class="sev">High · open</span><div class="body">
+      <h3>A3. Cash is the cumulative net increase, which is right only from a zero opening</h3>
+      <p>The template sets cash to the cumulative sum of the monthly net increase (<code>cashSeries</code>, <code>opening</code>). forecast-method.md says the same. That sum equals cash only if cash was zero at the start of the range. mosofin-workflow.md states the zero-opening condition for A/R, A/P and inventory, but not for cash. The template has no field for opening cash. In the example, the label "Cash at end of Sep" sits on $129,100, the Q3 increase, and not on a bank balance.</p>
+      <span class="where">assets/dashboard-template.html · references/forecast-method.md · Sanity checks · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A4. The template hard-codes August and 2026, and Sync starts on 1 January 2026</h3>
+      <p>The template prints "Actual through August", "August net income", "July–August average" and "2026" in the monthly table. A run on other months shows wrong labels. Sync always sends <code>start_date 2026-01-01</code>, so it replaces a range that the user chose.</p>
+      <span class="where">assets/dashboard-template.html · fc-sub, fc-basis, renderMonthly, syncPrompt · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A5. get_balance_sheet is not in the Reads table</h3>
+      <p>mosofin-workflow.md names <code>get_balance_sheet</code> in prose, as the fallback when the year did not open at zero and as a cross-check. The Gate 4 Reads table does not list it.</p>
+      <span class="where">references/mosofin-workflow.md · Gate 4 and Reading the cash flow report · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A6. "Intercompany removed" removes one side only</h3>
+      <p>The row subtracts <code>arIc</code> from receivables and keeps the matching payable in A/P. The data object has no <code>apIc</code> field. In the example the row gives 67,300 − 57,000 = 10,300. Removal of both sides gives 67,300 − 47,500 = 19,800, the same as before. So the row is not a consolidation elimination [2] [3].</p>
+      <span class="where">assets/dashboard-template.html · renderAccounts · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A7. Upside can fall below base, and the P10 and P90 names suggest percentiles</h3>
+      <p>Upside is the mean of the last two months of operating cash flow. When the last month is the best, upside is less than base, and P90 = max(upside, rate) equals base. In the example, upside is 48,850 and base is 52,100. The names P10 and P90 are presets, not percentiles.</p>
+      <span class="where">references/forecast-method.md · Scenario rates · template presets() and scenarios() · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A8. No currency check</h3>
+      <p>Gate 3 collects every connected QuickBooks file, and the group is a sum by month. A file in another currency goes into the sum as it is [4]. The example leaves the Canadian file out for this reason. No rate appears on these pages [5].</p>
+      <span class="where">references/mosofin-workflow.md · Gate 3 and Consolidation rules · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A9. Steps 3 and 4 depend on one environment</h3>
+      <p>Step 3 writes to <code>/mnt/user-data/outputs</code>. Step 4 calls <code>present_files</code>. Other hosts may not have that folder or that tool.</p>
+      <span class="where">SKILL.md · Steps 3 and 4 · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A10. The description promises runway and future cash</h3>
+      <p>The description names runway and "how much cash will we have". Because of A3, the cash figure is a cumulative change unless the range starts at zero cash. The forecast adds to that figure, so it is a change too.</p>
+      <span class="where">SKILL.md · description · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>A11. Forecast labels assume a January start</h3>
+      <p><code>fcLabels()</code> starts the forecast months at <code>MONTHS.length % 12</code>. For a July to September range that index is 3, so the first forecast month shows "Apr" and not "Oct". This adds to A4.</p>
+      <span class="where">assets/dashboard-template.html · fcLabels · open</span>
+    </div></div>
+    <div class="f low"><span class="sev">Low · open</span><div class="body">
+      <h3>A12. The KPI subtitle calls the cumulative sum a bank balance</h3>
+      <p>The first KPI shows "Cash at end of" the last month with the subtitle "Bank plus undeposited funds". The value is the cumulative net increase from A3. The subtitle makes A3 worse.</p>
+      <span class="where">assets/dashboard-template.html · renderKpis · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Site owner</h2>
+  <p class="sec-title">Open conflicts between other Northbrook pages and their skills</p>
+  <p style="color:var(--muted);font-size:14.5px">The pages of this skill use the name Northbrook only. They reuse no figure from other Northbrook pages.</p>
+  <div class="findings">
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The 13-week forecast page does not agree with its read-back</h3>
+      <p>The cash-flow-forecast-13-week page starts on Monday 6 October with a $150,000 covenant floor. That skill's read-back says Monday 2 November and a $250,000 floor. The read-back wins. The site owner must fix the page.</p>
+      <span class="where">site/skills/cash-flow-forecast-13-week · open</span>
+    </div></div>
+    <div class="f med"><span class="sev">Medium · open</span><div class="body">
+      <h3>The budget-vs-actual page uses a calendar year</h3>
+      <p>The budget-vs-actual-analysis page uses a calendar year. That skill's read-back says a June year end and an FY26 Board Budget. Its method.md key example says FY25. The pages of this skill use a calendar year, so they differ from the BvA read-back.</p>
+      <span class="where">site/skills/budget-vs-actual-analysis · open</span>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Passed</h2>
+  <p class="sec-title">What checked out</p>
+  <ul class="pass">
+    <li><span class="ok">PASS</span><span>Line counts on main: SKILL.md 86, forecast-method 32, manual-workflow 42, mosofin-workflow 79, ui-spec 95. Also dashboard-template.html 516, example-data.json 31, example-manual.csv 9, build_dashboard.py 94. Total 984.</span></li>
+    <li><span class="ok">PASS</span><span>The description has 771 of 1,024 characters after a YAML parse.</span></li>
+    <li><span class="ok">PASS</span><span>Verdict tags on main: 0 in each of the nine files. The skill is not in the card format.</span></li>
+    <li><span class="ok">PASS</span><span>Em dashes in the nine files: 29 on 24 lines. ui-spec.md has 7, SKILL.md 6, the template 5, mosofin-workflow.md 4.</span></li>
+    <li><span class="ok">PASS</span><span>SKILL.md has 5 workflow steps and 4 guardrails. mosofin-workflow.md has 5 gates. ui-spec.md has 7 fixed layout items and 4 tabs. The data object has 9 required keys. The CSV has 11 columns.</span></li>
+    <li><span class="ok">PASS</span><span>Every tool named reads data or presents a file. No tool writes to QuickBooks or MosoFin, as the read-only guardrail says.</span></li>
+    <li><span class="ok">PASS</span><span>The example re-adds: group net increase 48,400 + 33,600 + 47,100 = 129,100. P10 129,100 + 6 × 45,500 = 402,100. Base and P90 129,100 + 6 × 52,100 = 441,700.</span></li>
+  </ul>
+  <h3 style="margin:0;font-size:18px">Not yet tested</h3>
+  <p style="color:var(--muted);font-size:14.5px">Nobody ran the skill live against company files. The audit did not run the template with the example data. It read the code and computed the figures by hand. Nobody tested the Sync and Ask buttons inside Claude. The audit checked the outside sources through search results only.</p>
+</section>
+
+<footer>The skill is on <code>main</code> of <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/dashboards/multi-entity-forecast-dashboard">MosoFin/mosofin-finance-skills</a> in <code>dashboards/</code>, not in the card format. Pull request #1 did not include it. The full path history on main has 3 commits, all from 1 Sep 2026. f975856 added the skill in its own genre. 4ab35b1 shipped the generator and anchored the gitignore. 695552e kept bytecode out of the repository. No commit after fde2da3 touches the folder. A live run, a template run and fixes for A1 and A3 to A12 are still to do.</footer>
+
+</div>
