@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory to GL Reconciliation in Plain English | MosoFin</title>
+<meta name="description" content="How an inventory reconciliation compares the books, the stock system and a physical count, then explains each difference. Facts cited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#f7f8f6; --panel:#ffffff; --ink:#14201b; --muted:#56655f; --faint:#86948e;
+    --rule:#dfe6e2; --rule-strong:#c6d1cb;
+    --green:#0b8f5a; --green-soft:#e3f3ea;
+    --wrong:#b3261e; --wrong-soft:#fbeae8;
+    --hold:#a06a12;  --hold-soft:#f7eedb;
+    --shadow:0 1px 2px rgba(20,32,27,.05), 0 10px 28px -18px rgba(20,32,27,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+      --rule:#26312c; --rule-strong:#34413b;
+      --green:#43c78e; --green-soft:#123024;
+      --wrong:#ef8b82; --wrong-soft:#341816;
+      --hold:#dba657;  --hold-soft:#2d2413;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1210; --panel:#151c19; --ink:#e8eeea; --muted:#9eaba5; --faint:#76857e;
+    --rule:#26312c; --rule-strong:#34413b;
+    --green:#43c78e; --green-soft:#123024;
+    --wrong:#ef8b82; --wrong-soft:#341816;
+    --hold:#dba657;  --hold-soft:#2d2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 16px 96px;display:flex;flex-direction:column;gap:64px}
+  @media (min-width:700px){.wrap{padding-left:28px;padding-right:28px}}
+  .num{font-variant-numeric:tabular-nums}
+  .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  header{display:flex;flex-direction:column;gap:18px}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  .lede{margin:0;font-size:20px;line-height:1.5;color:var(--muted);max-width:52ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .short{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+  .short p{margin:0;font-size:18px;max-width:62ch}
+
+  section{display:flex;flex-direction:column;gap:20px}
+  h2{margin:0;font-size:clamp(24px,3.4vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  p{margin:0;max-width:64ch}
+  .muted{color:var(--muted)}
+
+  figure{margin:0;display:flex;flex-direction:column;gap:12px}
+  .canvas{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px 16px;overflow-x:auto;box-shadow:var(--shadow)}
+  .canvas svg{display:block;width:100%;min-width:680px;height:auto}
+  figcaption{font-size:15px;color:var(--muted);max-width:66ch}
+
+  table.grid{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;font-variant-numeric:tabular-nums}
+  table.grid th,table.grid td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+  table.grid th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  table.grid th[scope="row"]{text-align:left;color:var(--muted);text-transform:none;letter-spacing:0;font-size:14px}
+  table.grid td.t{text-align:left;white-space:normal;min-width:150px}
+  table.grid td.c{font-weight:700;color:var(--ink)}
+  table.grid td.h{color:var(--green);font-weight:600}
+  table.grid td.w{color:var(--wrong);font-weight:600}
+  table.grid td.a{color:var(--hold);font-weight:600}
+  table.grid tr.breach td{background:var(--wrong-soft)}
+  table.grid tr.breach td.h,table.grid tr.breach td.c{color:var(--wrong)}
+  table.grid tr.breach th{color:var(--wrong);font-weight:700}
+  table.grid tr.tot th,table.grid tr.tot td{border-bottom:none;border-top:2px solid var(--rule-strong);font-weight:700;color:var(--ink)}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.compare{grid-template-columns:1fr}}
+  .book{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-top:5px solid var(--green)}
+  .book.bad{border-top-color:var(--wrong)}
+  .book h3{margin:0;font-size:19px;font-weight:700}
+  .book .who{font-size:14.5px;color:var(--muted);margin-top:-8px}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:16.5px}
+  .row:last-child{border-bottom:none}
+  .row .v{font-weight:700;font-size:19px;white-space:nowrap}
+  .row.off{background:var(--wrong-soft);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+  .row.off .v{color:var(--wrong)}
+  .row.same .v{color:var(--muted)}
+  .verdict{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--green-soft);color:var(--ink)}
+  .bad .verdict{background:var(--wrong-soft)}
+
+  .scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+  .stat .v{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .stat .v.wrong{color:var(--wrong)}
+  .stat .v.good{color:var(--green)}
+  .stat .v.hold{color:var(--hold)}
+  .stat .s{font-size:14.5px;color:var(--muted)}
+
+  ol.qs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+  ol.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+  ol.qs li::before{content:counter(q);position:absolute;left:18px;top:15px;width:30px;height:30px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700;display:grid;place-items:center;font-size:15px}
+  ol.qs .q{font-weight:600;font-size:17.5px}
+  ol.qs .why{font-size:15px;color:var(--muted)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .card .tag{align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--green-soft);color:var(--green)}
+  .card .tag.up{background:var(--hold-soft);color:var(--hold)}
+  .card .tag.bad{background:var(--wrong-soft);color:var(--wrong)}
+
+  .gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .get{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .get b{font-size:17px}
+  .get span{font-size:15px;color:var(--muted)}
+
+  .never{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--green);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .never ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+  dl{margin:0;display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  dt,dd{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  dt{font-weight:700}
+  dd{color:var(--muted);font-size:16px}
+  dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:560px){dl{grid-template-columns:1fr}dt{border-bottom:none;padding-bottom:2px}dd{padding-top:0}dl > :nth-last-child(2){border-bottom:none}}
+
+  sup.c{font-size:.68em;line-height:0;margin-left:1px}
+  sup.c a{color:var(--green);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-weight:600}
+  sup.c a:hover,sup.c a:focus-visible{text-decoration:underline}
+  ol.srcs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  ol.srcs li{counter-increment:s;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px 12px 52px;position:relative;font-size:15px;scroll-margin-top:24px}
+  ol.srcs li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:7px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  ol.srcs li:target{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  ol.srcs a{color:var(--green);font-weight:600;overflow-wrap:anywhere}
+  ol.srcs .what{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+  .about{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .about a{color:var(--green)}
+  footer{border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:14px;display:flex;flex-direction:column;gap:6px}
+  blockquote{margin:0;padding:14px 18px;border-left:4px solid var(--rule-strong);background:var(--panel);border-radius:8px;max-width:64ch;color:var(--ink)}
+  .never blockquote{background:var(--green-soft);border-left-color:var(--green)}
+  blockquote code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14.5px;overflow-wrap:anywhere}
+  .card p{font-size:16px}
+  ol.qs.abc li::before{content:counter(q,upper-alpha)}
+</style>
+
+</head>
+<body>
+<div class="wrap" role="main">
+  <nav aria-label="Breadcrumb" style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:-36px;color:var(--muted)"><a href="./" style="color:inherit">← Inventory to GL reconciliation</a><span aria-hidden="true">·</span><a href="../../" style="color:inherit">All skills</a></nav>
+
+<header>
+  <span class="label">MosoFin · Inventory to GL reconciliation, in plain words</span>
+  <h1>Is the stock in our books really on the shelves?</h1>
+  <p class="lede">Your books say that you hold stock of a certain value. This skill checks if that stock is <b>really on the shelves</b>. If it is not, the skill finds <b>the reason for each difference</b>.</p>
+  <div class="short">
+    <span class="label">The 20-second version</span>
+    <p>You give it a period and your count results. It compares three things: the value in your books, the quantity in your stock system and the goods on your shelves. It sorts each difference by its cause. It says which causes the data supports and which need a person to check. It proposes the fixes. It never changes your books.</p>
+  </div>
+</header>
+
+<section>
+  <span class="label">Three things, not two</span>
+  <h2>The books, the stock system and the shelves</h2>
+  <p>The books hold one value for stock: the inventory account in the general ledger (GL). The stock system holds a quantity and a cost for each item. Accountants call it the subledger. The shelves hold the real goods.</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 760 230" role="img" aria-label="Three boxes. The books show 187,020 dollars in account 1300. The stock system shows 186,420 dollars. The shelves show the physical count of 26 September. The first comparison, books to stock system, finds a 600 dollar difference. The second comparison, stock system to shelves, needs a count. Only that second comparison tests that the goods exist.">
+        <rect x="10" y="40" width="200" height="110" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+        <text x="110" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">The books</text>
+        <text x="110" y="96" text-anchor="middle" font-size="13" fill="var(--muted)">GL account 1300</text>
+        <text x="110" y="126" text-anchor="middle" font-size="20" font-weight="800" fill="var(--ink)">$187,020</text>
+        <rect x="280" y="40" width="200" height="110" rx="12" fill="var(--panel)" stroke="var(--rule-strong)"/>
+        <text x="380" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">The stock system</text>
+        <text x="380" y="96" text-anchor="middle" font-size="13" fill="var(--muted)">Items module, all locations</text>
+        <text x="380" y="126" text-anchor="middle" font-size="20" font-weight="800" fill="var(--ink)">$186,420</text>
+        <rect x="550" y="40" width="200" height="110" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+        <text x="650" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">The shelves</text>
+        <text x="650" y="96" text-anchor="middle" font-size="13" fill="var(--muted)">Physical count</text>
+        <text x="650" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">26 September</text>
+        <line x1="212" y1="95" x2="276" y2="95" stroke="var(--wrong)" stroke-width="2"/>
+        <line x1="482" y1="95" x2="546" y2="95" stroke="var(--green)" stroke-width="2"/>
+        <text x="245" y="180" text-anchor="middle" font-size="13" font-weight="600" fill="var(--wrong)">Leg 1: $600 apart</text>
+        <text x="245" y="200" text-anchor="middle" font-size="12" fill="var(--muted)">software check</text>
+        <text x="515" y="180" text-anchor="middle" font-size="13" font-weight="600" fill="var(--green)">Leg 2: needs a count</text>
+        <text x="515" y="200" text-anchor="middle" font-size="12" fill="var(--muted)">tests that goods exist</text>
+      </svg>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars, at 30 September 2026. Accountants call the comparisons the GL-to-subledger leg and the subledger-to-count leg.</figcaption>
+  </figure>
+  <p>Many small accounting platforms keep the stock system inside the same software as the books. Then the books and the stock system agree "by construction". That agreement proves that the software works. It does not prove that the goods exist. Only a physical count tests that.</p>
+  <p>For US tax, a business must take a physical inventory at reasonable intervals. It must adjust the book amount of inventory to agree with the actual inventory<sup class="c"><a href="#src1" aria-label="source 1">1</a></sup>. That is an IRS rule for tax returns. Your books and your tax return can differ, so ask your accountant. An accounting textbook says the same about the books: a business with up-to-date stock records still compares a physical count with the recorded balance<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</p>
+</section>
+
+<section>
+  <span class="label">The mistake it catches</span>
+  <h2>Two figures that agree can still prove nothing</h2>
+  <div class="compare">
+    <div class="book bad">
+      <h3>The common shortcut</h3>
+      <span class="who">One platform, books and stock system compared, no count</span>
+      <div class="rows num">
+        <div class="row"><span>GL inventory</span><span class="v">$50,000</span></div>
+        <div class="row"><span>Stock system</span><span class="v">$50,000</span></div>
+        <div class="row off"><span>Reported as</span><span class="v">"reconciled"</span></div>
+      </div>
+      <div class="verdict">The two figures come from one database. The result says nothing about the shelves. The skill reports this result as "nil by construction", and never as a reconciliation.</div>
+    </div>
+    <div class="book">
+      <h3>What the skill does</h3>
+      <span class="who">It computes the difference, then asks for the count</span>
+      <div class="rows num">
+        <div class="row"><span>GL 1300 Inventory</span><span class="v">$187,020</span></div>
+        <div class="row"><span>Items module</span><span class="v">$186,420</span></div>
+        <div class="row off"><span>187,020 − 186,420</span><span class="v">$600</span></div>
+      </div>
+      <div class="verdict">The difference is not zero, so the skill investigates it. It finds JE-0918: freight of $600, posted by journal entry straight to 1300 on 18 September. The entry did not go through the items module.</div>
+    </div>
+  </div>
+  <p>The left card uses example figures to show the shortcut. The right card is Northbrook Trading. The skill calls the $600 an unexplained difference until you decide. You can add the $600 to the item costs, or you can move it out of account 1300. Either way, the stock system needs a matching change. The skill posts nothing.</p>
+  <p>The skill also states the date of the last full count in the header. A perfect match with no recent count is a weak result. If there was never a count, that is the headline finding.</p>
+</section>
+
+<section>
+  <span class="label">What a run finds</span>
+  <h2>Five items counted at Northbrook Trading on 26 September</h2>
+  <p>This example is the skill's own example: it follows the skill's own read-back. Other pages on this site use Northbrook Trading with different facts. Each Northbrook example stands alone. Northbrook is a trading company in US dollars. It counted its A items (its most important items) on Saturday 26 September 2026. Its rule: investigate any item difference above $500, or a total above $2,000.</p>
+  <figure>
+    <div class="canvas">
+      <table class="grid" aria-label="Northbrook's count comparison on 26 September 2026 for five items: stock system quantity, counted quantity, difference in units and dollars, and the cause the skill gives">
+        <thead><tr><th scope="col" style="text-align:left">Item</th><th scope="col" style="text-align:left">Location</th><th scope="col">System</th><th scope="col">Count</th><th scope="col">Units</th><th scope="col">Unit $</th><th scope="col">Value $</th><th scope="col" style="text-align:left">Cause, and what supports it</th></tr></thead>
+        <tbody>
+        <tr class="breach"><th scope="row">A-100 Espresso grinder</th><td class="t">Main</td><td>120</td><td>114</td><td>−6</td><td>85.00</td><td>−510.00</td><td class="t">Shrinkage. A recount on Monday 28 September also found 114. The cause is not yet explained</td></tr>
+        <tr><th scope="row">A-110 Kettle</th><td class="t">Main</td><td>300</td><td>310</td><td>+10</td><td>22.00</td><td>+220.00</td><td class="t">Overage. Below $500, so not investigated. No cause found</td></tr>
+        <tr class="breach"><th scope="row">A-120 Blender</th><td class="t">Main</td><td>200</td><td>160</td><td>−40</td><td>40.00</td><td>−1,600.00</td><td class="t">Cut-off. 40 units left on 25 September, but the shipment went into the books on 28 September</td></tr>
+        <tr><th scope="row">A-130 Stand mixer</th><td class="t">Main / Showroom</td><td>50 / 0</td><td>44 / 6</td><td>−6 / +6</td><td>150.00</td><td>−900.00 / +900.00</td><td class="t">Wrong location. Someone moved 6 units but did not record a transfer. Net value 0.00</td></tr>
+        <tr><th scope="row">A-140 Coffee machine</th><td class="t">Main</td><td>40</td><td>40</td><td>0</td><td>210.00</td><td>0.00</td><td class="t a">Damaged. 3 units are still at full cost. A person checks the condition</td></tr>
+        <tr class="tot"><th scope="row">Net difference</th><td></td><td></td><td></td><td></td><td></td><td class="c">−1,890.00</td><td class="t">−510 + 220 − 1,600 + 0 + 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Example figures for a made-up company, in dollars. Value = difference in units × unit cost.</figcaption>
+  </figure>
+  <p>The skill applies the threshold in two tests. Per item, A-100 ($510) and A-120 ($1,600) are above $500, so it investigates them. The two A-130 rows are $900 each, one by one, but their net value effect is nil. In total, $1,890 is below $2,000, so the total test passes. A-110 ($220) stays on the list, but the skill does not investigate it.</p>
+  <p>For each difference, the skill says if the data supports the cause or if a person must check it. The dates in the books support the A-120 cut-off. A person must check the shipping log, the damaged units and the cause of the A-100 loss.</p>
+  <p>The count was on 26 September, but the period ends on 30 September. So the skill rolls the count forward: count, plus goods received, minus goods shipped after the count date. Take care with A-120. The 40 units left before the count, so the skill does not subtract them again. On 30 September the shelves hold 160 and the stock system shows 200 − 40 = 160. A-120 needs no adjustment. It is a timing item inside September, and it is not shrinkage.</p>
+</section>
+
+<section>
+  <span class="label">Shrinkage, and what is not shrinkage</span>
+  <h2>$510 of loss that a count supports, and three unexplained differences</h2>
+  <p>Shrinkage is stock that disappears without an identifiable reason, for example theft<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill uses the word only where a count supports it. At Northbrook, only A-100 qualifies: 6 × 85.00 = $510.00. The skill checked the data and found no missing receipt and no duplicate. Two checks need people: a search of the storage area and questions to the warehouse team. Northbrook's warehouse lead owns them, and they are still open. So the cause is "not yet explained". The skill does not say "theft".</p>
+  <div class="scale">
+    <div class="stat"><span class="label">Of average inventory</span><span class="v num hold">0.28%</span><span class="s">510 ÷ 184,200. Average = (181,380 on 31 Aug + 187,020 on 30 Sep) ÷ 2</span></div>
+    <div class="stat"><span class="label">Of September revenue</span><span class="v num hold">0.53%</span><span class="s">510 ÷ 96,000</span></div>
+    <div class="stat"><span class="label">Trend in account 5150</span><span class="v num">$380 → $510</span><span class="s">July 380, August 420, September 510 (proposed). The skill gives no industry rate</span></div>
+  </div>
+  <div class="three">
+    <div class="card">
+      <span class="tag up">Unexplained difference</span>
+      <h3>The 3PL: $200</h3>
+      <p>The stock system shows 2,000 C-300 mugs at the Midlands warehouse company (a 3PL). Its statement for 30 September shows 1,950. 50 × 4.00 = $200. The skill sends a query to the 3PL. Northbrook did not count there, so the skill does not call it shrinkage.</p>
+    </div>
+    <div class="card">
+      <span class="tag bad">Unexplained difference</span>
+      <h3>Below zero: $84</h3>
+      <p>The stock system shows B-215 Filter pack at −24 units. 24 × 3.50 = $84. A quantity below zero is always wrong. A receipt is probably missing. The skill proposes no entry until someone finds it.</p>
+    </div>
+    <div class="card">
+      <span class="tag up">Unexplained difference</span>
+      <h3>The books: $600</h3>
+      <p>JE-0918, the freight entry from the section above. The skill shows it as a decision for you, and does not call it shrinkage.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Cut-off and damaged stock</span>
+  <h2>A bill that came late, and three damaged machines</h2>
+  <p>Harlow Supply sent bill BL-5521, dated Tuesday 29 September, for 60 units × 20.00 = $1,200.00. Someone entered it on Friday 2 October, and the goods arrived on Thursday 1 October. The skill found it because it tests entries posted after the period end, as well as entries dated near it.</p>
+  <p>Who owned those goods on 30 September? The shipping terms in the purchase contract decide. Under "FOB shipping point", the buyer owns the goods when they leave the seller. Under "FOB destination", the seller owns them until they reach the buyer<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. Northbrook did not give the terms. So the skill does not decide. It holds the bill until you supply the terms. The bill moved the books and the stock system together, so it causes no difference between them.</p>
+  <p>Northbrook found damage on three A-140 coffee machines. They cost $210.00 each, and the owner thinks that each can sell for $60.00. US accounting rules value stock at FIFO or average cost at the lower of cost and net realizable value. Net realizable value is about the expected selling price less the costs to sell<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>. The skill proposes a write-down of 3 × (210 − 60) = $450.00.</p>
+  <p>The skill also checks the reserve account (1310 Inventory Reserve): opening 4,000 + additions 700 − write-offs 1,100 − releases 0 = $3,600. Account 1310 shows $3,600, so it ties. After the write-down, the reserve would be 3,600 + 450 = $4,050.</p>
+</section>
+
+<section>
+  <span class="label">The proposals</span>
+  <h2>Six proposals, and none of them posted</h2>
+  <ul class="never" style="list-style:none">
+    <li><b>A-100:</b> change the quantity to 114 in the stock system, to account 5150 Inventory Shrinkage and Adjustments, value −$510.00. The memo cites the count date, 26 September.</li>
+    <li><b>A-110:</b> after a recount, change the quantity to 310, to account 5150, value +$220.00. The cause is not established.</li>
+    <li><b>A-130:</b> record a transfer of 6 units from Main to Showroom. Value $0.00.</li>
+    <li><b>A-140:</b> journal entry, debit 5160 Inventory Write-Down $450.00, credit 1310 Inventory Reserve $450.00.</li>
+    <li><b>JE-0918 and BL-5521:</b> decisions for you. The freight needs your choice, and the bill needs the title terms.</li>
+    <li><b>B-215:</b> find the missing receipt first.</li>
+  </ul>
+  <p>The two count changes have a net effect on account 5150 of −510 + 220 = −$290, a net cost of $290. The count changes go into the stock system. A journal entry changes the books but not the item quantities. Next month, that would show a new difference between the books and the stock system.</p>
+</section>
+
+<section>
+  <span class="label">How a run starts</span>
+  <h2>Nine items, in one message</h2>
+  <p>The skill asks these first, in one short batch. It asks only for what it cannot already see. Item D is a request, not a question.</p>
+  <ol class="qs abc">
+    <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and other linked platforms. With it, the skill reads from there. Without it, you upload the files, and the checks are the same. The skill asks only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
+    <li><div class="q">Which period?</div><div class="why">The period sets every balance and the cut-off window. Required.</div></li>
+    <li><div class="q">Is your stock system separate (a warehouse system, a manufacturing system or a 3PL platform), or the item module in your accounting platform?</div><div class="why">This decides what the comparison proves. One system agrees by construction. Required. The skill tests your answer against the data, but you give the final answer.</div></li>
+    <li><div class="q">Please give your count results: the items counted, the quantities and the locations.</div><div class="why">The count is the only part that tests that the goods exist. The count comparison needs it. The skill never guesses a count result. Without a count, it calls no difference shrinkage.</div></li>
+    <li><div class="q">When was your last physical count? How often do you count: all stock once a year, a part each cycle, or never?</div><div class="why">A clean match with no recent count is weak. Required. If there was never a count, that is the headline finding.</div></li>
+    <li><div class="q">Any stock in transit or on consignment, in or out? Give the quantity, the value and the title terms.</div><div class="why">The contract decides who owns the goods, not the location in the system. Recommended. The skill never decides ownership for you.</div></li>
+    <li><div class="q">Does a 3PL hold any of your stock? If so, its statement for the period.</div><div class="why">The skill compares the 3PL's stock with its statement. A person supplies the statement.</div></li>
+    <li><div class="q">Your reserve and write-down policy. If you use standard cost, also your policy for cost variances.</div><div class="why">A write-down needs a policy. The skill can read the balances, but not the policy. Recommended.</div></li>
+    <li><div class="q">Above what amount, per item and in total, must a count difference be investigated?</div><div class="why">Recommended. Without it, the skill lists all differences by value, largest first, and says that it applied no threshold.</div></li>
+  </ol>
+  <p>Then it reads the plan back and waits for your yes. This is the skill's own read-back:</p>
+  <blockquote><i>"Reconciling Northbrook Trading's inventory at 30 September, with the GL and item listing read from your Mosofin connection. The item listing is the same platform's items module, so the GL-to-subledger difference is computed — nil by construction if zero, investigated if not. Count: the A-item cycle count of 26 September you uploaded; last full count 31 December. Stock at the Midlands 3PL checked against its September statement. Shall I go ahead?"</i></blockquote>
+  <p>On this page, the last full count is Wednesday 31 December 2025, nine months before the period end.</p>
+</section>
+
+<section>
+  <span class="label">What you need</span>
+  <h2>Connect once, or upload four kinds of file</h2>
+  <div class="two">
+    <div class="card">
+      <span class="tag">Connected with MosoFin</span>
+      <h3>Say yes, then give it what no ledger holds</h3>
+      <ul>
+        <li>It reads back the workspace and the company file by name, and waits for your yes</li>
+        <li>It checks if you connected a warehouse, manufacturing or 3PL platform. If you connected only the accounting platform, it says that the item module is probably the same database as the books</li>
+        <li>It reads the inventory, reserve, shrinkage and variance accounts, the items, the costs and the locations</li>
+        <li>It reads the transactions near the period end, and anything posted after it</li>
+        <li>You still give it the <b>count</b>, the <b>3PL statement</b> and the <b>title terms</b>. It cannot read them</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag up">Uploading instead</span>
+      <h3>Bring the balances, the items and the count</h3>
+      <ul>
+        <li><b>GL inventory balances</b> at period end, by account. A trial balance works. CSV or XLSX, required</li>
+        <li><b>Item listing</b> at the count date and the period end: item, quantity, unit cost, value, location. CSV or XLSX, required</li>
+        <li><b>Count results</b>: items, quantities, locations, count date. CSV, XLSX, or count sheets as PDF or image. Required for the count comparison</li>
+        <li><b>GL detail</b> for the inventory, reserve, shrinkage and variance accounts. Also <b>sales, purchases and bills</b> near the period end, and the <b>chart of accounts</b>. CSV or XLSX, recommended</li>
+        <li><b>3PL statement</b>, and in-transit and consignment details with title terms, where they apply. PDF or CSV</li>
+        <li>Period, company name, currency, stock system, last count date and how often you count, typed in the chat. Required. Your reserve and variance policies, recommended</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="font-size:15px">On the upload path, the skill names each file that it received. It says what it read from each file: the date, the number of rows and the totals. It tells you at once about a file that it cannot read, or a file for the wrong period or location.</p>
+</section>
+
+<section>
+  <span class="label">What you get back</span>
+  <h2>Eight sheets, from the summary to the coverage</h2>
+  <div class="gets">
+    <div class="get"><b>Summary</b><span>One system or two, the books-to-system difference, and the date of the last count in the header.</span></div>
+    <div class="get"><b>GL to subledger</b><span>The two figures, the difference, and any postings that went around the stock system.</span></div>
+    <div class="get"><b>Count variances</b><span>Each difference with its cause, and if data supports it or a person must check it.</span></div>
+    <div class="get"><b>In-transit and cut-off</b><span>Goods on the road, and entries near or after the period end.</span></div>
+    <div class="get"><b>Write-downs and reserves</b><span>The reserve roll-forward and each proposed write-down, with its policy.</span></div>
+    <div class="get"><b>GL posting</b><span>The proposed entries, marked as proposals for a person to post.</span></div>
+    <div class="get"><b>Ledger checks</b><span>Every quantity below zero, consignment stock, and the structure of your accounts.</span></div>
+    <div class="get"><b>Coverage</b><span>What it read, and what a person supplied. The count shows as manual, with its owner and date.</span></div>
+  </div>
+  <p class="muted" style="font-size:15px">It asks before it makes an Excel file. If you say no, you get the same sheets as tables. After you see the results, it offers to save your decisions for the next run. Examples are the account map, the locations, the count routine and its owner, and your threshold. It never saves quantities, balances, differences, shrinkage figures, count results or item costs.</p>
+</section>
+
+<section>
+  <span class="label">What it never does</span>
+  <div class="never">
+    <h2>Six rules that never bend</h2>
+    <ul>
+      <li><b>Never reads MosoFin without asking.</b> A connected account is not permission to read it.</li>
+      <li><b>Never reads anything before you answer the intake items</b> and say yes to the read-back.</li>
+      <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
+      <li><b>Never calls a same-system agreement a reconciliation.</b> It still computes the difference. Zero is "nil by construction". It investigates any other result.</li>
+      <li><b>Never treats the books as proof that the goods exist.</b> It calls a difference shrinkage only where a count supports it.</li>
+      <li><b>Never guesses a count result, an owner of goods in transit or the cause of a difference.</b> It never saves quantities, balances, differences, shrinkage figures, count results or item costs.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <span class="label">Words you'll hear</span>
+  <h2>Seven terms, in plain English</h2>
+  <dl>
+    <dt>General ledger (GL)</dt><dd>Your books. Here, it holds one dollar value for all stock.</dd>
+    <dt>Subledger</dt><dd>The stock system: a quantity and a cost for each item.</dd>
+    <dt>Nil by construction</dt><dd>A zero difference between two figures from one database. It proves that the software works, and nothing more.</dd>
+    <dt>Shrinkage</dt><dd>Stock that disappears without an identifiable reason, for example theft<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>. The skill uses the word only with a count.</dd>
+    <dt>Cut-off</dt><dd>A check that each receipt and shipment is in the right period.</dd>
+    <dt>3PL</dt><dd>A third-party logistics company that stores your stock for you.</dd>
+    <dt>Net realizable value</dt><dd>About the expected selling price less the costs to sell. Stock can never carry more than this under US rules<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup>.</dd>
+  </dl>
+</section>
+
+<section id="sources">
+  <span class="label">Sources</span>
+  <h2>Where the facts on this page come from</h2>
+  <p class="muted">The sources are an IRS tax publication, two sections of an accounting textbook and a US accounting standard. We found each one on 28 October 2026 in search results. We did not open the pages, so follow each link for today's wording. What the skill does comes from the skill's own files.</p>
+  <ol class="srcs">
+    <li id="src1" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="Inventories"><a href="https://www.irs.gov/publications/p538" rel="noopener">IRS: Publication 538, Accounting Periods and Methods (01/2022)</a><span class="what">A tax source. A business must take a physical inventory at reasonable intervals and adjust the book amount to agree with the actual inventory. A business can keep a book inventory if it follows sound accounting practices. This is a US tax rule, not tax advice.</span></li>
+    <li id="src2" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://openstax.org/books/principles-financial-accounting/pages/6-2-compare-and-contrast-perpetual-versus-periodic-inventory-systems" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 6.2 Compare and Contrast Perpetual versus Periodic Inventory Systems</a><span class="what">With up-to-date stock records, a business still compares a physical count with the recorded balance. Differences come from shrinkage, damage, mismanagement or outdated goods. Shrinkage is stock that disappears without an identifiable reason, such as theft.</span></li>
+    <li id="src3" data-checked="2026-10-28" data-via="from search results, page not opened" data-at="FOB shipping point; FOB destination"><a href="https://openstax.org/books/principles-financial-accounting/pages/6-5-discuss-and-record-transactions-applying-the-two-commonly-used-freight-in-methods" rel="noopener">OpenStax: Principles of Accounting, Volume 1, 6.5 Discuss and Record Transactions Applying the Two Commonly Used Freight-In Methods</a><span class="what">The shipping terms decide who owns goods in transit. Under FOB shipping point, the buyer owns them once they leave the seller. Under FOB destination, the seller owns them until they reach the buyer.</span></li>
+    <li id="src4" data-checked="2026-10-28" data-via="from search results, page not opened"><a href="https://storage.fasb.org/ASU%202015-11.pdf" rel="noopener">FASB: Accounting Standards Update No. 2015-11, Inventory (Topic 330): Simplifying the Measurement of Inventory</a><span class="what">A business measures stock at FIFO or average cost at the lower of cost and net realizable value. When that value is below cost, the difference is a loss in that period. This is a US GAAP rule.</span></li>
+  </ol>
+  <p class="muted" style="font-size:14.5px">No outside authority backs the three legs, "nil by construction", the eight sheets, the investigation threshold or the labels for data and fieldwork. They are the skill's own rules. We made up Northbrook Trading and every figure in the example. All four sources are US sources.</p>
+</section>
+
+<section>
+  <div class="about">
+    <span class="label">About this skill</span>
+    <p>This page explains <code>inventory-to-gl-reconciliation</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/inventory-to-gl-reconciliation">Read the skill on GitHub →</a> The skill is in the card format on the main branch. It merged in PR #1 on 26 October 2026, and a commit from the bookkeeping audit followed on 27 October 2026. This page describes that version. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span>We made up Northbrook Trading, its suppliers and every figure in the example. They are not your data. The tax publication, the textbook and the accounting standard are US sources. The IRS publication covers tax only, and your books and your tax return can differ. Other countries have their own rules. Ask your accountant what applies to you.</span>
+</footer>
+
+</div>
+<!-- cite:start - generated by build.py from the tracker and the page's sources; do not edit -->
+<style>
+#sources .cite-meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px;font-size:12.5px}
+#sources .cite-meta>span{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:2px 8px;border-radius:6px;background:var(--sunk,#f1f4f2);color:var(--muted,#56655f)}
+#sources .cm-when{font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.02em}
+#sources .cm-at{color:var(--ink,#14201b)}
+#sources .cm-status{background:var(--hold-soft,#f7eedb)!important;color:var(--hold,#a06a12)!important;font-weight:500}
+#sources .cm-back{background:transparent!important;padding-left:0!important}
+#sources .cm-back a{font-weight:500;color:var(--blue,#3f6d96);text-decoration:none;border-bottom:1px dotted currentColor}
+#sources .cm-back a+a::before{content:"·";color:var(--faint,#86948e);margin:0 6px 0 2px;display:inline-block}
+sup.c{scroll-margin-top:90px} sup.c:target a{background:var(--blue-soft,#e7eff6);border-radius:4px;outline:2px solid var(--blue,#3f6d96);outline-offset:1px}
+#cite-pop{position:absolute;z-index:50;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 40px;border-radius:10px;
+ background:var(--panel,#fff);color:var(--ink,#14201b);border:1px solid var(--rule-strong,#c6d1cb);box-shadow:0 8px 24px -10px rgba(0,0,0,.35);font-size:13.5px;line-height:1.4;pointer-events:none}
+#cite-pop[hidden]{display:none}
+#cite-pop b{position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:600 12px "IBM Plex Mono",monospace;background:var(--blue-soft,#e7eff6);color:var(--blue,#3f6d96)}
+#cite-pop .cp-status{color:var(--hold,#a06a12);font-weight:500} #cite-pop .cp-t{font-weight:600} #cite-pop .cp-at{color:var(--ink,#14201b)} #cite-pop .cp-when{color:var(--muted,#56655f);font:12px "IBM Plex Mono",monospace}
+@media (prefers-reduced-motion:no-preference){sup.c:target a{transition:background .3s}}
+</style>
+<script>(()=>{
+const CHECKED="2026-10-28", MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const day=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[3]} ${MON[+m[2]-1]} ${m[1]}`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const data=i=>{const S=(typeof SOURCES!=="undefined"&&SOURCES[i-1])||{},li=document.getElementById("src"+i)||{dataset:{}};
+  return {checked:li.dataset.checked||S.checked||CHECKED, at:li.dataset.at||S.at||"", status:li.dataset.status||S.status||"", via:li.dataset.via||S.via||"", title:(li.querySelector&&li.querySelector("a")||{}).textContent||S.t||""}};
+const where=a=>{const box=a.closest("article,.rule,section,header");if(!box)return "this page";
+  const h=box.querySelector("h3,.label,h2,h1");let t=(h?h.textContent:"").replace(/\s+/g," ").trim();
+  if(box.matches("article")&&box.id){const n=box.id.replace(/\D/g,"");if(n&&!/^Level/i.test(t))t="Level "+n+(t?" · "+t:"")}
+  return t.length>48?t.slice(0,46)+"…":t||"this page"};
+function run(){
+  const marks=[...document.querySelectorAll('sup.c a[href^="#src"]')].filter(a=>!a.closest("#sources,.legend"));
+  const back={};
+  marks.forEach((a,k)=>{const sup=a.parentElement,n=+a.getAttribute("href").slice(4),d=data(n);
+    sup.id=sup.id||"cite-"+(k+1);
+    (back[n]=back[n]||[]).push({id:sup.id,w:where(a)});
+    a.setAttribute("aria-label",`Source ${n}: ${d.title}${d.at?", "+d.at:""}. Checked ${day(d.checked)}${d.via?", "+d.via:""}.`);
+    a.dataset.n=n;});
+  document.querySelectorAll('#sources ol.srcs li[id^="src"]').forEach(li=>{
+    const n=+li.id.slice(3),d=data(n),seen={},links=[];
+    (back[n]||[]).forEach(b=>{if(seen[b.w]){seen[b.w].c++;return}seen[b.w]={c:1,id:b.id};links.push(b.w)});
+    const old=li.querySelector(".cite-meta");if(old)old.remove();
+    const m=document.createElement("span");m.className="cite-meta";
+    m.innerHTML=`<span class="cm-when">Checked <time datetime="${esc(d.checked)}">${day(d.checked)}</time>${d.via?" · "+esc(d.via):""}</span>`
+      +(d.at?`<span class="cm-at">In the source: ${esc(d.at)}</span>`:"")
+      +(d.status?`<span class="cm-status">${esc(d.status)}</span>`:"")
+      +(links.length?`<span class="cm-back">Cited in: ${links.map(w=>`<a href="#${seen[w].id}">${esc(w)}${seen[w].c>1?" ×"+seen[w].c:""}</a>`).join("")}</span>`:"");
+    li.appendChild(m);});
+  const pop=document.createElement("div");pop.id="cite-pop";pop.setAttribute("role","tooltip");pop.hidden=true;document.body.appendChild(pop);
+  const show=a=>{const n=+a.dataset.n,d=data(n);
+    pop.innerHTML=`<b>${n}</b><span class="cp-t">${esc(d.title)}</span>${d.at?`<span class="cp-at">${esc(d.at)}</span>`:""}${d.status?`<span class="cp-status">${esc(d.status)}</span>`:""}<span class="cp-when">Checked ${day(d.checked)}${d.via?" · "+esc(d.via):""}</span>`;
+    pop.hidden=false;const r=a.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.width=w+"px";
+    let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,innerWidth-w-12));
+    const y=r.top>pop.offsetHeight+16?r.top-pop.offsetHeight-8:r.bottom+8;
+    pop.style.left=x+scrollX+"px";pop.style.top=y+scrollY+"px";};
+  const hide=()=>{pop.hidden=true};
+  marks.forEach(a=>{a.addEventListener("mouseenter",()=>show(a));a.addEventListener("focus",()=>show(a));
+    a.addEventListener("mouseleave",hide);a.addEventListener("blur",hide);});
+  addEventListener("scroll",hide,{passive:true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();
+})();</script>
+<!-- cite:end -->
+</body>
+</html>
