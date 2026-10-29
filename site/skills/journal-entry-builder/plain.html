@@ -360,7 +360,7 @@
   <h2>"Freight-out" is not in the chart</h2>
   <p>The owner writes: "Move September's courier charges, $640, from Office Supplies to Freight-out." The skill finds three courier bills in 6520 Office Supplies. They are 210 on Tue 8 Sep, 195 on Fri 11 Sep and 235 on Tue 22 Sep. Their total is 640.</p>
   <p>Northbrook's chart has no account with the name Freight-out. That is a hard stop. The skill does not make a new account. It does not choose the account with the nearest name, and it does not write a placeholder, because a chart exists. It asks the owner. The owner names 6150 Shipping and Delivery, and the skill builds J5 again with that account.</p>
-  <p>Why stop? An import with an unknown account fails, or it can make a new account in your books. Only two things stop an entry. One is an account that is not in the chart. The other is an entry that does not balance, and the skill never adds a figure to force the balance.</p>
+  <p>Why stop? An import with an unknown account fails, or it can make a new account in your books. The skill's files name this one case as a hard stop. An entry that does not balance fails the balance check, and the skill never adds a figure to force the balance.</p>
 </section>
 
 <section>
@@ -392,7 +392,7 @@
       <table class="grid" aria-label="The three review flags: J2 is above the 25,000 dollar limit and is a manual entry to revenue. J4 is a manual entry to accounts receivable. Each flag goes with its entry to the person who posts it">
         <thead><tr><th scope="col" style="text-align:left">Entry</th><th scope="col" style="text-align:left">Flag</th><th scope="col" style="text-align:left">What the skill does</th></tr></thead>
         <tbody>
-        <tr><th scope="row">J2, 33,000</th><td class="t a">Above the limit: 33,000 is more than 25,000</td><td class="t">It flags the entry for review by a second person</td></tr>
+        <tr><th scope="row">J2, 33,000</th><td class="t a">Above the limit: 33,000 is more than 25,000</td><td class="t">It flags the entry for review, per the journal-entry-review skill</td></tr>
         <tr><th scope="row">J2, 33,000</th><td class="t a">A manual entry to revenue</td><td class="t">It asks the owner for the business reason. The memo gives it: 11 months of Pinnacle's prepayment move to deferred revenue</td></tr>
         <tr><th scope="row">J4, 1,612.50 to A/R</th><td class="t a">A manual entry to accounts receivable</td><td class="t">A journal line to A/R does not apply against Crestline's account. So the customer list and the A/R total stop agreeing. The skill recommends a credit memo in QuickBooks' customer records</td></tr>
         </tbody>

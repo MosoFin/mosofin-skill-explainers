@@ -247,7 +247,7 @@
 <header>
   <span class="label">MosoFin · expense report processing, in plain words</span>
   <h1>Who is chasing the receipts, and did we pay for this twice?</h1>
-  <p class="lede">Staff spend their own money, or the company card, and want the company to repay them. This skill checks each claim line against <b>your policy</b>, puts it in the <b>right account</b>, and calculates what each employee is owed. It also asks one question a person rarely can: has the company already paid for this?</p>
+  <p class="lede">Staff spend their own money, or the company card, and want the company to repay them. This skill checks each claim line against <b>your policy</b>, puts it in the <b>right account</b>, and calculates what the company owes each employee. It also asks one question a person rarely can: has the company already paid for this?</p>
   <div class="short">
     <span class="label">The 20-second version</span>
     <p>You give it the expense reports, your policy, your mileage rate and your tax rules. It reads your chart of accounts, your employee list and the transactions already in your books. It checks every line against your policy and against those transactions. It codes each line to a real account, shows the history behind the code, and calculates the net amount per employee. Every result is a proposal for a manager. It approves, pays and posts nothing.</p>
@@ -266,7 +266,7 @@
         <tr><th scope="row">P1</th><td class="t">Airfare, United, 2 Sep</td><td class="t">Corporate card</td><td>412.00</td><td class="t">Matched to its card charge in your books, as expected</td><td class="t">Not reimbursable</td><td class="t">Travel, Airfare 6410</td></tr>
         <tr><th scope="row">P2</th><td class="t">Hotel, 2 nights × $189.00</td><td class="t">Corporate card</td><td>378.00</td><td class="t">Matched to its card charge, as expected</td><td class="t">Not reimbursable</td><td class="t">Travel, Lodging 6420</td></tr>
         <tr class="breach"><th scope="row">P3</th><td class="t">"Flight to Denver", 2 Sep</td><td class="t">Out of pocket</td><td class="c">412.00</td><td class="t">Same merchant, same amount and same date as P1</td><td class="t w">Reject: double reimbursement</td><td class="t">Removed</td></tr>
-        <tr><th scope="row">P4</th><td class="t">Client dinner, 3 people, receipt</td><td class="t">Out of pocket</td><td>210.00</td><td class="t">$70.00 a head against the $60 cap. Allowed 3 × 60 = 180.00</td><td class="t a">Review: $30.00 over, a manager may approve it</td><td class="t">Meals 6450</td></tr>
+        <tr><th scope="row">P4</th><td class="t">Client dinner, 3 people, receipt</td><td class="t">Out of pocket</td><td>210.00</td><td class="t">$70.00 a head against the $60 cap. Allowed 3 × 60 = 180.00</td><td class="t a">Policy violation: the skill disallows the $30.00 over the cap. Its severity for a policy violation is Reject</td><td class="t">Meals 6450</td></tr>
         <tr><th scope="row">P5</th><td class="t">Taxi, no receipt</td><td class="t">Out of pocket</td><td>38.00</td><td class="t">Above the $25 receipt rule. Receipt status "per the report"</td><td class="t a">Review: waits for the receipt</td><td class="t">Waits for the review</td></tr>
         <tr><th scope="row">P6</th><td class="t">Mileage, 120 miles × $0.45</td><td class="t">Own car</td><td>54.00</td><td class="t">Rate from the policy, with its date</td><td class="t h">Approved, as a proposal</td><td class="t">Travel, Local Transport 6430</td></tr>
         <tr class="tot"><th scope="row">Out of pocket</th><td class="t">P3 + P4 + P5 + P6</td><td></td><td class="c">714.00</td><td class="t">Rejected 412.00. Disallowed 30.00. Pending 38.00</td><td class="t h">Approved now 234.00</td><td></td></tr>
@@ -275,7 +275,7 @@
     </div>
     <figcaption>Example figures for a made-up company, in dollars. Priya claimed 412.00 + 210.00 + 38.00 + 54.00 = $714.00 out of pocket. The skill rejects $412.00 and disallows $30.00. It approves $234.00 now: 180.00 + 54.00. $38.00 waits for the receipt. If the receipt arrives, Priya receives 234.00 + 38.00 = $272.00. The $60 cap, the $25 receipt rule and the $0.45 rate are Northbrook's own policy, not tax rates. The account numbers come from Northbrook's chart of accounts.</figcaption>
   </figure>
-  <p>The run covers six employees. Three of them are shown on this page. Across those three, the money splits like this:</p>
+  <p>The run covers six employees. This page shows three of them. Across those three, the money splits like this:</p>
   <div class="scale">
     <div class="stat"><span class="label">Claimed out of pocket</span><span class="v num">$1,280.40</span><span class="s">714.00 + 285.60 + 280.80, across Priya, Marcus and Lena</span></div>
     <div class="stat"><span class="label">Approved now</span><span class="v num good">$560.40</span><span class="s">234.00 + 86.40 + 240.00, as a proposal for a manager</span></div>
@@ -310,7 +310,7 @@
       <div class="verdict">$412.00 leaves the company a second time. One person reviews the card statement and another reviews the expense reports, in different weeks. Neither sees both lines.</div>
     </div>
   </div>
-  <p>The skill treats a near match as a Review, not a Reject. A tip added after the card was authorised makes the card amount and the claimed amount differ a little. If the merchant name differs between the card feed and the claim, the skill matches on amount and date alone, and says so. It also compares each claim with the reimbursements to the same employee for expense dates in the last 90 days. A claim sent again on a later report is the most common duplicate.</p>
+  <p>The skill treats a near match as a Review, not a Reject. A tip added after the card authorisation makes the card amount and the claimed amount differ a little. If the merchant name differs between the card feed and the claim, the skill matches on amount and date alone, and says so. It also compares each claim with the reimbursements to the same employee for expense dates in the last 90 days. A claim sent again on a later report is the most common duplicate.</p>
   <div class="scale">
     <div class="stat"><span class="label">Expense schemes</span><span class="v num wrong">13%</span><span class="s">Share of the cases in a fraud study that were expense reimbursement schemes: claims for fictitious or inflated business expenses<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup></span></div>
     <div class="stat"><span class="label">Median loss</span><span class="v num">$50,000</span><span class="s">The median loss in those schemes, against $145,000 across all cases in the same study<sup class="c"><a href="#src4" aria-label="source 4">4</a></sup></span></div>
@@ -333,7 +333,7 @@
       <span class="tag up">One charge, three things inside</span>
       <h3>Lena Okafor: a Berlin conference and a dinner in euros</h3>
       <p>Lena's $1,500.00 conference package on the corporate card covers registration, meals and lodging in one charge, with no itemised receipt. The skill asks you how to allocate it. It does not pick an allocation.</p>
-      <p>Her team dinner for 4 people cost EUR 240.00 out of pocket. You chose the central bank close as the exchange rate source, 1.17, so the dinner is $280.80. That is $70.20 a head against the $60 cap. Allowed 4 × 60 = $240.00. The skill marks $40.80 for Review. Lena claimed $280.80 and the skill approves $240.00.</p>
+      <p>Her team dinner for 4 people cost EUR 240.00 out of pocket. You chose the central bank close as the exchange rate source, 1.17, so the dinner is $280.80. That is $70.20 a head against the $60 cap. Allowed 4 × 60 = $240.00. The $40.80 over the cap is a policy violation, and the skill disallows it. Its severity for a policy violation is Reject. Lena claimed $280.80 and the skill approves $240.00.</p>
     </div>
     <div class="card">
       <span class="tag bad">The checks on your books</span>
@@ -358,7 +358,7 @@
   <h2>It asks its questions in one message, before it reads anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads your chart of accounts, employees, posted transactions and balances from there. Without it, you upload the files and the checks are the same. The skill asks this only if your account has a MosoFin connection.</div></li>
-    <li><div class="q">Which expense reports: which employees, which period, and from which tool?</div><div class="why">Required. The claims are the whole input. Each tool has its own quirks: split lines, scan confidence, prepaid cards. The skill must tell company-paid lines from out-of-pocket ones.</div></li>
+    <li><div class="q">Which expense reports: which employees and which period?</div><div class="why">Required. The claims are the whole input. Each tool has its own quirks: split lines, scan confidence, prepaid cards. The skill must tell company-paid lines from out-of-pocket ones.</div></li>
     <li><div class="q">Your travel and expense policy: receipt rules, caps per person and per night, travel class, gifts, alcohol and pre-approval.</div><div class="why">Required for the policy checks. Without it, the skill runs the coding, the arithmetic, the personal-expense flags and the duplicate check. It then says that policy validation was not performed.</div></li>
     <li><div class="q">The receipts.</div><div class="why">Recommended. Receipt images are not in your books. Without the receipts, the skill reports receipt status "per the report" only.</div></li>
     <li><div class="q">The mileage rate and the per-diem table in force, with their effective dates.</div><div class="why">Required if anyone claims mileage or per-diems. They change every year, and the skill never supplies one from memory. Without them, it flags every such line as missing its rate.</div></li>
@@ -383,7 +383,7 @@
         <li>It reads your employee list, with departments</li>
         <li>It reads the transactions already posted, the corporate card activity and each claimant's reimbursements for the last 90 days, for the duplicate check</li>
         <li>It reads the clearing and reimbursement payable balances, and how you coded each merchant before</li>
-        <li>If a connected expense tool such as Concur or Expensify is live, it may read the reports there</li>
+        <li>If a connected expense tool such as Concur or Expensify is live, it reads the reports there</li>
         <li>You still give it the <b>policy</b>, the <b>rates</b>, the <b>tax rules</b> and the <b>exchange rate source</b>, every time. They are never in the books</li>
       </ul>
     </div>
@@ -407,14 +407,14 @@
   <span class="label">What you get back</span>
   <h2>Six sheets: the lines, the exceptions, and what your books say</h2>
   <div class="gets">
-    <div class="get"><b>The summary</b><span>Employees, period, totals claimed, approved and rejected, and the reimbursement amount. The approval status, the policy violations, and each assumption it made, for you to accept or correct. It says whether a policy was supplied at all.</span></div>
+    <div class="get"><b>The summary</b><span>Employees, period, totals claimed, approved and rejected, and the reimbursement amount. The approval status, the policy violations, and each assumption it made, for you to accept or correct. It says whether you supplied a policy at all.</span></div>
     <div class="get"><b>Line detail</b><span>Every line with its account, tax code, policy check and receipt status. Two more columns show if the line is already posted, with the matched transaction, and the coding support from your history. A company-paid line shows its matched card charge.</span></div>
     <div class="get"><b>Exceptions</b><span>Each issue with a severity, Reject, Review or Approve with note, and a recommended action.</span></div>
-    <div class="get"><b>Posting inputs</b><span>The sums by account, the reimbursable amount and the card-paid amount, handed to the journal entry skill as a proposal. If your card charges sit in a clearing account, the card-paid lines clear it. If they go to expense from the bank feed, those lines get no new entry, only a change of account where needed. Nothing is posted.</span></div>
+    <div class="get"><b>Posting inputs</b><span>The sums by account, the reimbursable amount and the card-paid amount, handed to the journal entry skill as a proposal. If your card charges sit in a clearing account, the card-paid lines clear it. If they go to expense from the bank feed, those lines get no new entry, only a change of account where needed. It posts nothing.</span></div>
     <div class="get"><b>Ledger checks</b><span>Duplicate matches against posted transactions, and the clearing residual with its oldest item. The payable, tested by employee against approved reports not yet paid. Claimants with no employee record.</span></div>
     <div class="get"><b>Coverage</b><span>For each task, which tool read the data, as at when, and any gap. With no policy, every policy row reads "not performed". The duplicate check still shows as run.</span></div>
   </div>
-  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you have seen the results, it offers to save your policy, your rates with their dates and your account map for the next run. It saves nothing about the claims.</p>
+  <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save your policy, your rates with their dates and your account map for the next run. It saves nothing about the claims.</p>
 </section>
 
 <section>
@@ -436,9 +436,9 @@
   <h2>Eight terms, in plain English</h2>
   <dl>
     <dt>Out of pocket</dt><dd>The employee paid with their own money and wants the company to repay them.</dd>
-    <dt>Corporate card</dt><dd>The company already paid. Nothing is owed to the employee. This distinction drives the whole calculation.</dd>
+    <dt>Corporate card</dt><dd>The company already paid. The company owes the employee nothing. This distinction drives the whole calculation.</dd>
     <dt>Double reimbursement</dt><dd>An out-of-pocket claim for a charge the company card already paid. The skill rejects it and names the matched transaction.</dd>
-    <dt>Clearing account</dt><dd>A waiting room where the two halves of a transaction meet. Accountants call it Corporate Card Clearing. It should return to zero. A residual is unmatched activity.</dd>
+    <dt>Clearing account</dt><dd>A waiting room where the two halves of a transaction meet. Accountants call it Corporate Card Clearing. It should return to zero. A residual means activity with no match.</dd>
     <dt>Due from Employee</dt><dd>Money the employee owes the company, usually a personal charge on a company card. An old balance here is money nobody chased.</dd>
     <dt>Per diem</dt><dd>A set daily allowance instead of repaying actual costs. The table comes from you, with its effective date.</dd>
     <dt>Accountable plan</dt><dd>The US arrangement under which repaid expenses are not wages. It needs a business connection, substantiation and the return of any excess<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>.</dd>
@@ -463,7 +463,7 @@
 <section>
   <div class="about">
     <span class="label">About this skill</span>
-    <p>This page explains <code>expense-report-processor</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">Read the skill on GitHub →</a> This page describes the skill in its card format. The card format is on main of MosoFin/mosofin-finance-skills. It was merged in PR #1 on 26 October 2026, with changes from a bookkeeping audit on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
+    <p>This page explains <code>expense-report-processor</code>, from the MosoFin finance skills library, <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> on GitHub. <a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/expense-report-processor">Read the skill on GitHub →</a> This page describes the skill in its card format. The card format is on main of MosoFin/mosofin-finance-skills. PR #1 merged it on 26 October 2026, with changes from a bookkeeping audit on 27 October 2026. Want the worked examples? <a href="learn.html">Learn it step by step →</a></p>
   </div>
 </section>
 

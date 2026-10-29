@@ -459,7 +459,7 @@ const LEVELS = [
     pair:[["ok","Caught before payment","$3,200.00","The open INV-2210. A person voids it, and nothing is lost."]],
     rules:[Q.q2, Q.q10],
     math:[["INV-2210 under Pinnacle Design","$3,200.00, paid"],["INV-2210 under Pinnacle Design LLC","$3,200.00, open"],["Rule 6: same number, two vendor records","High",1],["Findings from one match","2: vendor-master duplicate, duplicate bill"],["Void the open bill before payment: cost","$0.00",1],["Acme name score","0.91"],["Threshold","0.85"],["0.91 ≥ 0.85?","yes, Rule 4 at Medium",1],["In the headline under Standard?","C yes, D below it"]],
-    verdict:["flag","Clusters C and D. The skill proposes a merge for each pair of vendor records, and says that a merge is not reversible. Under Standard, cluster C goes into the headline. Cluster D stays on the list at Medium, below the threshold. A person voids the open Pinnacle bill before payment, and that saves $3,200.00 at no cost.","FLAGGED"] },
+    verdict:["flag","Clusters C and D. The skill proposes a merge for each pair of vendor records, and says that a merge is not reversible in most systems. Under Standard, cluster C goes into the headline. Cluster D stays on the list at Medium, below the threshold. A person voids the open Pinnacle bill before payment, and that saves $3,200.00 at no cost.","FLAGGED"] },
 
   { n:4, title:"Same amount, five days apart, or thirty",
     chips:["Bill register","Recurring list"], src:"Rules 11, 4 and 13", cites:[],

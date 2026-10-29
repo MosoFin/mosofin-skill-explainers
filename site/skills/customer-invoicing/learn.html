@@ -372,7 +372,7 @@
 </section>
 
 <footer>
-  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format of the skill, on main of MosoFin/mosofin-finance-skills. The card format was merged in PR #1 on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The UK is one example jurisdiction, and the £250 limit is a UK rule only. Check with your accountant what applies to you. This page explains <code>customer-invoicing</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
+  <span>This page quotes the rules from the skill's own files: <code>references/overview.md</code>, <code>references/gates.md</code>, <code>references/method.md</code> and <code>references/edge-cases.md</code>. These files are the card format of the skill, on main of MosoFin/mosofin-finance-skills. PR #1 merged the card format on 26 October 2026, with a bookkeeping-audit fix on 27 October 2026. The page cites the facts to the sources above. All figures come from made-up worked examples, not from your data. The UK is one example jurisdiction, and the £250 limit is a UK rule only. Check with your accountant what applies to you. This page explains <code>customer-invoicing</code> from <a href="https://github.com/MosoFin/mosofin-finance-skills">MosoFin/mosofin-finance-skills</a> (<a href="https://github.com/MosoFin/mosofin-finance-skills/tree/main/skills/customer-invoicing">read it on GitHub</a>). New to this? Start with the <a href="plain.html">plain-language overview</a>.</span>
 </footer>
 
 </div>
@@ -417,7 +417,7 @@ const RULES = [
   { id:"2", title:"The jurisdiction comes from you", r:Q.q4, cites:[],
     plain:"The company's country suggests a jurisdiction but does not settle it. The place of your registration and the place of the supply can differ. So the skill asks you." },
   { id:"3", title:"The tax point can differ from the invoice date", r:Q.q7, cites:[1],
-    plain:"The skill shows both dates and asks you which one is the tax point. It never sets the invoice date itself.",
+    plain:"The skill asks you for the tax point when it differs from the invoice date, and records both dates. It never sets the invoice date itself.",
     backed:"A UK full VAT invoice shows the time of supply and the date of issue as two fields.{1}" },
   { id:"4", title:"Ask about an unusual price now", r:Q.q10, cites:[],
     plain:"The skill compares each price with the item's standard price and with the last price to this customer. If the price differs from both, it asks you." },
@@ -451,7 +451,7 @@ const LEVELS = [
             ["Seller","Northbrook Trading Ltd, legal name and address","the books: company profile"],
             ["Customer","Harbor Retail Ltd, name, address and VAT number",["the books: check the VAT number is current","bad"]],
             ["Invoice date","31 October 2026","you"],
-            ["Tax point","28 October or 31 October",["you choose","bad"]],
+            ["Tax point","28 October or 31 October",["you give it","bad"]],
             ["Description and price","Storage racking, Installation","the books: item list"],
             ["Quantity","10 units, 6 hours","you"],
             ["VAT rate","20% on both lines","the books: VAT code, you check it"],
@@ -495,11 +495,11 @@ const LEVELS = [
       head:["Check","What the skill sees","Result"],
       rows:[["Jurisdiction","UK VAT, from the owner",["not from the profile's country","good"]],
             ["NT-2026-0418, invoice date","31 October 2026","from the owner"],
-            ["NT-2026-0418, goods delivered","28 October 2026",["skill shows both dates and asks","bad"]],
+            ["NT-2026-0418, goods delivered","28 October 2026",["skill records both dates and asks for the tax point","bad"]],
             ["NT-2026-0411, Irish business customer","0% VAT",["no reverse charge wording","bad"]]]},
     rules:[Q.q4, Q.q7, Q.q8],
-    math:[["Jurisdiction source","the owner",1],["Invoice date","31 Oct 2026"],["Delivery date","28 Oct 2026"],["Tax point","the owner chooses",1],["NT-2026-0411: VAT rate","0%"],["NT-2026-0411: reverse charge wording","missing",1]],
-    verdict:["flag","The skill shows both dates on NT-2026-0418 and asks which one is the tax point. On NT-2026-0411, it reports the missing reverse charge wording.","PHRASE"] },
+    math:[["Jurisdiction source","the owner",1],["Invoice date","31 Oct 2026"],["Delivery date","28 Oct 2026"],["Tax point","the owner gives it",1],["NT-2026-0411: VAT rate","0%"],["NT-2026-0411: reverse charge wording","missing",1]],
+    verdict:["flag","The skill records both dates on NT-2026-0418 and asks the owner for the tax point. On NT-2026-0411, it reports the missing reverse charge wording.","PHRASE"] },
 
   { tier:"Check mode · September and October invoices" },
   { n:5, title:"The sequence",

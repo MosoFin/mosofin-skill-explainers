@@ -377,7 +377,7 @@
       </tbody>
     </table>
   </div>
-  <p class="muted" style="font-size:15px">Rule 4 scores how alike two names are, from 0 to 1. The score gives extra weight to names that start the same way<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill flags a pair at 0.85 or above and shows the score, so a person can judge it. Acme Corp and Acme Corporation scored 0.91. Rule 3 found Summit Cleaning's $950.00 on 1 September and 6 September, five days apart. It did not flag the 1 October invoice: a bill 30 days later is a monthly pattern, not a duplicate.</p>
+  <p class="muted" style="font-size:15px">Rule 4 scores how alike two names are, from 0 to 1. The score gives extra weight to names that start the same way<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill flags a pair at 0.85 or above and shows the score, so a person can judge it. Acme Corp and Acme Corporation scored 0.91. Rule 3 found Summit Cleaning's $950.00 on 1 September and 6 September, five days apart. It did not flag the 1 October invoice. That bill is outside the 7-day window, and a bill about 30 days later is a monthly pattern, not a duplicate.</p>
 </section>
 
 <section>
@@ -473,7 +473,7 @@
     <dt>Vendor master</dt><dd>Your list of supplier records. A <b>vendor alias</b> is one supplier that exists under more than one record.</dd>
     <dt>Duplicate payment</dt><dd>The same bill paid twice. The copies can carry the same invoice number, or a changed one, or sit under two supplier records.</dd>
     <dt>Cluster</dt><dd>A group of records that the skill suspects are the same bill. Each cluster carries one rule and one confidence level.</dd>
-    <dt>Confidence level</dt><dd>How strong the evidence for a match is, from Very High to Low. Each of the ten rules has a fixed level.</dd>
+    <dt>Confidence level</dt><dd>How strong the evidence for a match is, from Very High to Low. Each of the ten rules carries its own level.</dd>
     <dt>Sensitivity</dt><dd>Which confidence levels count in the headline exposure. Strict counts more, Permissive counts less, and Standard sits between. The scan lists every match at every setting, and the result always says which setting ran.</dd>
     <dt>Similarity score</dt><dd>A number from 0 to 1 that says how alike two names are, with extra weight when the first characters agree. The US Census Bureau developed it to match names and addresses between records<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill's threshold is 0.85.</dd>
     <dt>Credit note</dt><dd>A document from a supplier that reduces what you owe. One left unused while you pay later bills in full is money the supplier owes you.</dd>
@@ -483,7 +483,7 @@
 <section id="sources">
   <span class="label">Sources</span>
   <h2>Where the facts on this page come from</h2>
-  <p class="muted">The sources are a fraud study, the accounting software's own help and a US statistical method paper. The others are an IRS publication, an FBI report and a US control standard. We checked each one on 27 October 2026 official source pages. We reviewed each linked source on 27 October 2026; follow the link for the latest wording. What the skill does comes from the skill's own files.</p>
+  <p class="muted">The sources are a fraud study, the accounting software's own help and a US statistical method paper. The others are an IRS publication, an FBI report and a US control standard. We checked each one on 27 October 2026 official source pages. We reviewed each linked source on 27 October 2026. Follow the link for the latest wording. What the skill does comes from the skill's own files.</p>
   <ol class="srcs">
     <li id="src1" data-checked="2026-10-27" data-via="official source page, checked 27 Oct 2026"><a href="https://www.acfe.com/-/media/files/acfe/pdfs/rttn/2024/2024-report-to-the-nations.pdf" rel="noopener">ACFE: Occupational Fraud 2024: A Report to the Nations</a><span class="what">Billing schemes, invoices for false or inflated goods or services, appeared in 424 of the 1,921 cases, 22%. The median loss was $100,000. A billing scheme typically ran 18 months before detection, against 12 months for all frauds. Frauds caught within six months had a median loss of $30,000. Those that ran two to three years had a median loss of $250,000.</span></li>
     <li id="src2" data-checked="2026-10-27" data-via="official source page, checked 27 Oct 2026"><a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/chart-accounts/merge-duplicate-vendors/L0NPj861i_US_en_US" rel="noopener">Intuit: Merge duplicate vendors in QuickBooks Online</a><span class="what">A merge moves the duplicate's past transactions to the vendor you keep and makes the duplicate inactive. To bring a merged vendor back you must create the profile again by hand. Vendors merge in pairs.</span></li>

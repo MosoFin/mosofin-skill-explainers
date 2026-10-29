@@ -320,7 +320,7 @@
 <section>
   <span class="label">What it explains</span>
   <h2>Every difference gets a type, an owner and an age</h2>
-  <p>The skill puts each difference in one of three types. A <b>timing</b> item clears by itself next period, for example a payment in transit. The skill records it and does not correct it. A <b>permanent</b> item is an error, and the skill proposes an entry to correct it. An <b>investigating</b> item has no explanation yet. That is normal, if a person owns it and has a target date.</p>
+  <p>The skill puts each difference in one of three types. A <b>timing</b> item clears by itself next period, for example a payment in transit. The skill records it and does not adjust it. A <b>permanent</b> item is an error, and the skill proposes an entry for it. An <b>investigating</b> item has no explanation yet. That is normal, if a person owns it and has a target date.</p>
   <div class="three">
     <div class="card">
       <span class="tag">Prepaid expenses: $7,250</span>
@@ -338,9 +338,9 @@
       <p>This account must be zero, so the skill does it first. Lines: 23.40, 640, 1,150, 410 and 1,800, which add up to 4,023.40. Each line goes to the payroll lead, with a target date of Friday 16 October 2026.</p>
     </div>
   </div>
-  <p>The August items, 1,100 and 2,040, belong to a closed month. The skill flags them for review as possible prior-period adjustments. You and your accountant decide what to do with them.</p>
+  <p>The August items, 1,100 and 2,040, come from a closed month. The skill proposes the entries. The opening check finds no change to a closed period, so the skill's rule for possible prior-period adjustments does not apply here. You and your accountant decide how to treat the August amounts.</p>
   <p>The skill then ranks the items by size and by age. You set the size limit. At Northbrook it is $500 for each account. Items above it need immediate action: three clearing lines (640, 1,150 and 1,800), the $750 in receivables, the three prepaid items and the 2,040 accrual. Items older than three months must go to a manager, whatever their size. In payroll clearing, that is 23.40 (more than a year old), 640 and 1,150. The 410 is 92 days old, at the three-month limit.</p>
-  <p>The US securities regulator's staff says that a percentage limit is acceptable as a first test only. A small item can still matter<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. That is why the skill asks for your limit and does not choose one. The skill adds its own rule: a small item that stays open for a year usually means that nobody owns the account.</p>
+  <p>The US securities regulator's staff says that a percentage limit is acceptable as a first test only. A small item can still matter<sup class="c"><a href="#src3" aria-label="source 3">3</a></sup>. The skill asks for your limit and does not choose one. The skill adds its own rule: a small item that stays open for a year usually means that nobody owns the account.</p>
   <div class="scale">
     <div class="stat"><span class="label">Proposed entries</span><span class="v num">4</span><span class="s">1,150 + 1,100 + 5,000 + 2,040 = 9,290</span></div>
     <div class="stat"><span class="label">Accounts over $500</span><span class="v num wrong">4</span><span class="s">Clearing, receivables, prepaid, accrued</span></div>
@@ -367,7 +367,7 @@
     <li><div class="q">For each account with support outside the books, where is the schedule, and can you supply it?</div><div class="why">Examples are prepaid, fixed asset, lease, payroll, loan and tax schedules, and bank statements. Without the schedule, the account stays "not reconciled", with the gap and an owner named.</div></li>
     <li><div class="q">What size of difference is too large?</div><div class="why">Accountants call this the materiality threshold. The skill suggests a basis and asks. It never assumes a limit.</div></li>
     <li><div class="q">Do you have last period's reconciliation?</div><div class="why">The skill needs it to check the items that stayed open from last period. Without it, the skill says that it could not do this check.</div></li>
-    <li><div class="q">Who prepares, and who reviews?</div><div class="why">The workpaper names both. They must not be the same person.</div></li>
+    <li><div class="q">Who prepares, and who reviews?</div><div class="why">The workpaper names both. They should not be the same person.</div></li>
   </ol>
   <p>On the MosoFin path, the skill also asks for your approved limit for small write-offs, and the profit and loss account that receives them. At Northbrook, the limit is $100. Then the skill reads the plan back and waits for your yes. Its own example says "all balance sheet accounts". This page uses seven named accounts.</p>
   <blockquote><i>"Reconciling all balance sheet accounts of Northbrook Trading at 30 September, with the GL read from your Mosofin connection. ... the fixed asset register is still outstanding, so fixed assets will show as not reconciled. Materiality $500; prepared by the bookkeeper, reviewed by the controller. Shall I go ahead?"</i></blockquote>
@@ -423,7 +423,7 @@
       <li><b>Never reads anything before you answer the intake questions</b> and say yes to the read-back.</li>
       <li><b>Never writes, updates or deletes anything, in any system.</b> Every entry that it makes is a proposal for a person to post.</li>
       <li><b>Never calls an account reconciled without independent support.</b> Missing support means "not reconciled". The skill never reconciles an account to another view of itself.</li>
-      <li><b>Never forces a difference to agree, and never corrects a timing difference.</b> It records timing items and watches them. Every open item has an owner and a target date.</li>
+      <li><b>Never forces a difference to agree, and never adjusts a timing difference.</b> It records timing items and watches them. Every open item has an owner and a target date.</li>
       <li><b>Never chooses the period, the size limit or the company for you.</b> It never signs off a reconciliation on test data.</li>
     </ul>
   </div>

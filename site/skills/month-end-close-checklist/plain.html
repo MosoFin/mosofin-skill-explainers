@@ -296,7 +296,7 @@
         </tbody>
       </table>
     </div>
-    <figcaption>Example figures for a made-up company, in dollars. The entry references are made up. A dash means that the books show no amount for the task.</figcaption>
+    <figcaption>Example figures for a made-up company, in dollars. We made up the entry references. A dash means that the books show no amount for the task.</figcaption>
   </figure>
   <div class="compare">
     <div class="book">
@@ -307,7 +307,7 @@
         <div class="row off"><span>Status in the template</span><span class="v">Complete</span></div>
         <div class="row"><span>Next step</span><span class="v">ask the owner</span></div>
       </div>
-      <div class="verdict">The two columns disagree. The skill calls this the most useful line on the whole board. The task owner finds the entry or posts it.</div>
+      <div class="verdict">The two columns disagree. The skill calls this the most useful line on the whole board. It asks before the books lock.</div>
     </div>
     <div class="book bad">
       <h3>Status from memory</h3>
@@ -360,20 +360,20 @@
     <div class="stat"><span class="label">Northbrook's calendar</span><span class="v num good">9 days</span><span class="s">Mon 2 Nov to Tue 10 Nov, weekend included. That is 7 business days: 2, 3, 4, 5, 6, 9 and 10 November</span></div>
   </div>
   <p class="muted" style="font-size:15px">The benchmark covers mostly larger organisations. A small business can close faster or slower. The skill does not set a target. You give it your close date.</p>
-  <p>After the close, the skill reads the time when each entry was created to find where the close slipped. It does not use the entry date, because close entries carry the last day of the month. At Northbrook, someone entered the September deferred revenue release on Day 6, three days after its Day 3 due date. The August release also went in on Day 6. That is a slip the books measure, so nobody must remember it. If the books do not give the created time, the skill says so and asks the owner.</p>
+  <p>After the close, the skill reads the time when someone created each entry to find where the close slipped. It does not use the entry date, because close entries carry the last day of the month. At Northbrook, someone entered the September deferred revenue release on Day 6, three days after its Day 3 due date. The August release also went in on Day 6. That is a slip the books measure, so nobody must remember it. If the books do not give the created time, the skill says so, and that measurement is manual.</p>
 </section>
 
 <section>
   <span class="label">How a run starts</span>
-  <h2>It asks seven questions before it reads anything</h2>
+  <h2>It asks its questions in one message before it reads anything</h2>
   <ol class="qs">
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms you link. With it, the skill reads from there. Without it, you upload the files and the checks are the same. The skill asks this only if your account has a MosoFin connection. If not, it says once that the run is manual.</div></li>
     <li><div class="q">Which month do you close, and is it a soft close or a hard close?</div><div class="why">Required. A soft close and a hard close need different levels of care.</div></li>
     <li><div class="q">Your close calendar: the target close date.</div><div class="why">Required. The days in the task list change to fit this date.</div></li>
-    <li><div class="q">Your reporting framework, for example US GAAP.</div><div class="why">Required. It decides which tasks and reports apply.</div></li>
+    <li><div class="q">Your reporting framework, for example US GAAP.</div><div class="why">Required. It is the basis the close reports on.</div></li>
     <li><div class="q">Do you report on a cash or an accrual basis?</div><div class="why">Required. It decides if most Day 1 and Day 3 tasks apply. The skill uses it on every read and writes it in the workpaper header.</div></li>
-    <li><div class="q">Your team, the owner of each task, your close template and last month's close, if you have them.</div><div class="why">Recommended. Your books do not hold the names of the owners. Without them, each owner reads "to assign". The skill prefers your template to its generic list.</div></li>
-    <li><div class="q">Your materiality threshold: the amount below which a difference needs less attention.</div><div class="why">Recommended. It decides which differences need full attention. The skill never assumes a threshold.</div></li>
+    <li><div class="q">Your team, the owner of each task, your close template and last month's close, if you have them.</div><div class="why">Recommended. Your books do not hold the names of the owners. Without them, the checklist is worth little. The skill records owners by role where it can, and it prefers your template to its generic list.</div></li>
+    <li><div class="q">Your materiality threshold: the amount below which a difference needs less attention.</div><div class="why">Recommended. It decides which differences need full attention. The skill never assumes a threshold. Without one, it does not split the reconciliations by materiality.</div></li>
   </ol>
   <p>Then it reads your answers back and waits for your yes. For Northbrook, the read-back is like this:</p>
   <blockquote><i>"Closing October for Northbrook Trading, a hard close, read from your Mosofin connection. Target close Tuesday 10 November. US GAAP, accrual basis. Owners from your template. Materiality $5,000. One company, one currency, no inventory, so those tasks do not apply. Shall I go ahead?"</i></blockquote>
@@ -418,7 +418,7 @@
     <div class="get"><b>Open items</b><span>Blockers, with the tasks that wait on outside information in a separate group.</span></div>
     <div class="get"><b>Variances and materiality</b><span>Actual against the budget or last month, and every balance sheet account listed above or below your threshold.</span></div>
     <div class="get"><b>Final tie-out</b><span>The trial balance and each account's reconciliation status from its owner or workpaper. The continuity check, account by account. The sign-off by a preparer and a reviewer.</span></div>
-    <div class="get"><b>Lessons learned</b><span>The problems, the proposed changes and the close timing, measured from the times that entries were created.</span></div>
+    <div class="get"><b>Lessons learned</b><span>The problems, the proposed changes and the close timing, measured from the times when someone created the entries.</span></div>
     <div class="get"><b>Scoping and coverage</b><span>Each task group, if it applies, and the evidence. For each task, what the skill read and what it could not read.</span></div>
   </div>
   <p class="muted" style="font-size:15px">It asks whether you want the sheets as an Excel file before it makes one. If you say no, you get the same sheets as tables in the chat. After you see the results, it offers to save the task list, the owners, the dependencies, the materiality basis and the scoping decisions. It never saves statuses or results. It reads them again on each run.</p>
@@ -430,7 +430,7 @@
     <span class="label">What it never does</span>
     <ul>
       <li><b>Never uses MosoFin without asking.</b> A connected account is not permission to read it.</li>
-      <li><b>Never reads anything before you answer the seven questions</b> and say yes to the read-back.</li>
+      <li><b>Never reads anything before you answer its questions</b> and say yes to the read-back.</li>
       <li><b>Never locks the books, posts an entry or marks a task complete.</b> It observes evidence and reports it. People run the close.</li>
       <li><b>Never treats a posted entry as proof that the entry is correct or complete.</b> The task owner still owns the task.</li>
       <li><b>Never assumes a materiality threshold.</b> It asks you for one.</li>
@@ -444,8 +444,8 @@
   <h2>Six terms, in plain English</h2>
   <dl>
     <dt>Close</dt><dd>The work at the end of a month that makes the numbers complete and correct enough to report.</dd>
-    <dt>Soft and hard close</dt><dd>A soft close is a lighter close for internal use. A hard close is the full close, with more care.</dd>
-    <dt>Accrual</dt><dd>An entry for income you earned or a cost you incurred that nobody has paid yet<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
+    <dt>Soft and hard close</dt><dd>A soft close locks the books for reporting but still allows adjustments. A hard close is final, with more care.</dd>
+    <dt>Accrual</dt><dd>An entry for income you earned or a cost you incurred that nobody paid yet<sup class="c"><a href="#src2" aria-label="source 2">2</a></sup>.</dd>
     <dt>Materiality threshold</dt><dd>The amount you choose. A difference below it needs less detail. A difference above it gets full attention.</dd>
     <dt>Tie-out</dt><dd>The final checks that show the books are ready to report.</dd>
     <dt>Continuity</dt><dd>This month's opening balance equals last month's closing balance as you reported it, for each account.</dd>

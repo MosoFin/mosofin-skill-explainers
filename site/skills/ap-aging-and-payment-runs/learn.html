@@ -340,7 +340,7 @@
     <div class="math num" id="steps" aria-live="polite"></div>
     <div class="results" id="results" aria-live="polite"></div>
     <div id="aging"></div>
-    <p class="fine">The page counts days past due in whole calendar days from the as-of date. "This week" ends on the Sunday after the as-of date, and "next week" is the 7 days after that. The page puts a past-due bill with no penalty and no threat with the bills due this week. The skill's own order does not name that case, so your judgement may differ. The run stops at the first bill that does not fit in the cash that is left. The preset gives $33,090 proposed and $6,910 left. A figure from the calculator is a proposal. A person approves it, and the bank or the accounting system pays it.</p>
+    <p class="fine">The page counts days past due in whole calendar days from the as-of date. "This week" ends on the Sunday after the as-of date, and "next week" is the 7 days after that. The page puts a past-due bill with no penalty and no threat with the bills due this week. The skill's own order does not name that case, so your judgement may differ. The run stops at the first bill that does not fit in the remaining cash. The preset gives $33,090 proposed and $6,910 left. A figure from the calculator is a proposal. A person approves it, and the bank or the accounting system pays it.</p>
   </div>
 </section>
 
@@ -360,7 +360,7 @@
   <h2>Where every fact on this page comes from</h2>
   <p class="muted">The rules are the skill's own. The facts below come from six outside sources. They are an OpenStax textbook, two FBI IC3 publications, a GOV.UK page, a US Treasury page and the GAO Green Book. MosoFin checked each one on 27 October 2026 from search results and did not open the pages. Follow the link for today's wording.</p>
   <ol class="srcs" id="srclist"></ol>
-  <p class="fine"><b>Not backed by an outside authority.</b> The default buckets, the ranking order, the output sheets and the three vendor tiers are the skill's own. Northbrook Trading, its bills, its tiers and every figure in the examples are made up. The page marks them where they appear.</p>
+  <p class="fine"><b>Not backed by an outside authority.</b> The default buckets, the ranking order, the output sheets and the three vendor tiers are the skill's own. MosoFin made up Northbrook Trading, its bills, its tiers and every figure in the examples. The page marks them where they appear.</p>
 </section>
 
 <footer>
@@ -409,8 +409,8 @@ const RULES = [
     plain:"The aging answers the first question. The payment run answers the second: with the cash you have this week, who do you pay first?" },
   { id:"2", title:"Bands make the problem visible", r:Q.q6, cites:[],
     plain:"The skill sorts every open bill into a bucket by days past due. It totals each bucket, and each vendor." },
-  { id:"3", title:"A derived due date is marked", r:Q.q5, cites:[],
-    plain:"If a bill has no due date, the skill calculates one from the bill date and the terms. The sheet says that the date was derived." },
+  { id:"3", title:"The skill marks a derived due date", r:Q.q5, cites:[],
+    plain:"If a bill has no due date, the skill calculates one from the bill date and the terms. The sheet says that the skill derived the date." },
   { id:"4", title:"A discount is a return on cash", r:Q.q8, cites:[1],
     plain:"The skill calculates the last day, the amount and the annual return of each early-pay discount.",
     backed:"For 2/10, net 30, a finance textbook puts the annual cost of a missed discount at 36.73 percent.{1}" },
@@ -421,10 +421,10 @@ const RULES = [
     plain:"Cash available is the cash you choose to spend this week. It is not your bank balance. The skill asks you for it." },
   { id:"7", title:"Tiers come from you", r:Q.q3, cites:[],
     plain:"You tell the skill which vendors are critical, standard or discretionary. Critical vendors rank first in the run." },
-  { id:"8", title:"Show what is left unpaid", r:Q.q11, cites:[],
-    plain:"The skill stops adding payments when the cash is used. It shows the deferred and held bills on the face of the output." },
+  { id:"8", title:"Show the unpaid remainder", r:Q.q11, cites:[],
+    plain:"The skill stops adding payments when no cash remains. It shows the deferred and held bills on the face of the output." },
   { id:"9", title:"A proposal, never a payment", r:Q.q12, cites:[6],
-    plain:"The run is headed as a proposal. A person approves it, and the bank or the accounting system pays it.",
+    plain:"The run carries the heading \"proposal\". A person approves it, and the bank or the accounting system pays it.",
     backed:"Different people should hold the authority, the custody of assets and the accounting.{6}" },
   { id:"10", title:"New bank details wait", r:Q.q14, cites:[2,3],
     plain:"At the start, the skill asks if a vendor asked to change bank details. It flags each vendor you name on the proposed run. You check the change through a channel that the vendor did not supply.",
@@ -432,7 +432,7 @@ const RULES = [
   { id:"11", title:"A rate with its date", r:Q.q15, cites:[],
     plain:"For bills in other currencies, the skill converts at the rate you give. It shows the rate, its source and its date." },
   { id:"12", title:"Asked every run", r:Q.q16, cites:[],
-    plain:"The skill can save tiers, payment methods and holds. It never saves the cash available, because the cash changes every week." },
+    plain:"The skill can save tiers, payment methods and holds. It never saves the cash available, because the cash changes daily." },
 ];
 
 const fmt = (n, d=0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -449,7 +449,7 @@ const LEVELS = [
       rows:[["Power Co","$3,400","Fri 30 Oct","Fri 6 Nov","7",["1–30","bad"]]]},
     rules:[Q.q1, Q.q6, Q.q5],
     math:[["As-of date","Fri 6 Nov"],["− due date","Fri 30 Oct"],["= days past due","7 days",1],["7 is in the band 1 to 30","bucket 1–30",1],["A bill with no due date: Harbor, billed Fri 30 Oct, Net 30","30 Oct + 30 days"],["= derived due date, marked on the sheet","Sun 29 Nov",1]],
-    verdict:["note","Power Co's $3,400 goes in the 1–30 bucket. If a bill has no due date, the skill calculates one from its terms. The sheet then says that the date was derived.","1–30"] },
+    verdict:["note","Power Co's $3,400 goes in the 1–30 bucket. If a bill has no due date, the skill calculates one from its terms. The sheet then says that the skill derived the date.","1–30"] },
 
   { n:2, title:"The whole aging",
     chips:["Open bills","Aging report"], src:"Rule 2", cites:[],
@@ -499,12 +499,12 @@ const LEVELS = [
     pair:[["ok","Proposed run","$33,090","six bills, groups 1 to 4"],["note","Cash left","$6,910","$40,000 − $33,090"],["bad","Left unpaid, on the face","$29,600","Pinnacle $14,000, Brightline $6,000, Acme $9,600 held"]],
     rules:[Q.q10, Q.q11, Q.q2, Q.q3, Q.q16],
     math:[["3,400 + 1,200 + 12,500 + 7,200 + 7,840 + 950","$33,090",1],["Next bill: $33,090 + $14,000 (Pinnacle)","$47,090"],["$47,090 is more than $40,000","stop",1],["Cash left: $40,000 − $33,090","$6,910",1],["Left unpaid: 14,000 + 6,000 + 9,600","$29,600"],["Check: open $62,850 − bills in the run $33,250","$29,600",1],["The cash test counts Harbor at cash paid","$7,840, not $8,000"]],
-    verdict:["note","The skill proposes $33,090 and leaves $6,910 of cash. Pinnacle waits for the next run, Brightline is deferred and Acme is held. The skill asks for the cash available again next week.","PROPOSAL"] },
+    verdict:["note","The skill proposes $33,090 and leaves $6,910 of cash. Pinnacle waits for the next run, the skill defers Brightline, and it holds Acme. The skill asks for the cash available again next week.","PROPOSAL"] },
 
   { tier:"The limits · what the run must never do" },
   { n:6, title:"What the run must never do",
     chips:["Vendor records","Email","Holds"], src:"Rules 9 and 10", cites:[2,3,6],
-    situation:"On 3 November, an email from Lakeside Freight gave new bank details. The owner names Lakeside when the skill asks about bank-detail changes. Acme Corp's $9,600 bill is in dispute, and the owner has put Acme on credit hold.",
+    situation:"On 3 November, an email from Lakeside Freight gave new bank details. The owner names Lakeside when the skill asks about bank-detail changes. Acme Corp's $9,600 bill is in dispute, and the owner put Acme on credit hold.",
     facts:["The FBI says to check a request to change payment details through a second channel. For example, use a phone number that is already on file "+C(2)+".",
            "In 2024, people reported losses of $2,770,151,146 to business email compromise, from 21,442 complaints "+C(3)+".",
            "Different people should hold the authority, the custody of assets and the accounting. This helps to prevent fraud, waste and abuse "+C(6)+". The skill proposes the run, a person approves it, and the bank or the accounting system pays it."],
@@ -649,7 +649,7 @@ function run(){
     runTot+=b.pay; inRun.push(b);
     s+=line(`${b.g} · ${esc(b.v)} (${GROUPS[b.g]})${b.live?`, after the ${fmt(b.disc,2)} discount`:""}: ${fmt(b.pay,b.pay%1?2:0)}`, fmt(runTot,runTot%1?2:0));
   });
-  steps.innerHTML = haveCash ? line("Ranked run, adding until the cash is used","running total",1)+s : line("Enter the cash available to rank the run.","—");
+  steps.innerHTML = haveCash ? line("Ranked run, adding until no cash remains","running total",1)+s : line("Enter the cash available to rank the run.","—");
   let out = res("ok","Bucket totals",fmt(total),tot.map((x,i)=>`${BUCKETS[i]} ${fmt(x)}`).join(" · "));
   if(haveCash){
     out += res("ok","Proposed run",fmt(runTot,runTot%1?2:0),`${inRun.length} bills. Proposal: no payment has been made or scheduled.`);

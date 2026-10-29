@@ -447,7 +447,7 @@ const RULES = [
   { id:"8", title:"A roll-forward is not a reconciliation", r:Q.q3, cites:[],
     plain:"With no schedule, the skill says that it has a roll-forward only." },
   { id:"9", title:"Name the shape of the variance", r:Q.q13, cites:[],
-    plain:"A variance of one month's cost points to a missed run. A variance of one whole item points to an item in the wrong place." },
+    plain:"A variance of one month's cost points to a missed run. A variance of one whole item's remaining balance points to an item that nobody booked, or booked to a different account." },
   { id:"10", title:"Drafts only", r:Q.q4, cites:[],
     plain:"Every entry is a proposal for a person to post. If you ask the skill to post, it declines once and gives you the drafts." },
 ];
@@ -515,7 +515,7 @@ const LEVELS = [
       rows:[["1 GL closing balance","the books","$22,100"],["2 Roll-forward: 14,900 + 7,200 − 0","the same books","$22,100"],["3 Schedule: 6,600 + 3,600 + 2,250 + 2,400","the owner's dates","$14,850"]],
       total:["Variance, leg 1 − leg 3","","$7,250"]},
     rules:[Q.q3, Q.q12, Q.q7, Q.q13],
-    math:[["September, not yet amortized: 600 + 400 + 150","$1,150"],["August, missed run: 550 + 400 + 150","$1,100"],["One whole item: the deposit D1","$5,000"],["Explained: 1,150 + 1,100 + 5,000","$7,250",1],["Unexplained","$0",1],["After E1 to E3: 22,100 − 1,150 − 1,100 + 1,500","$21,350"],["Schedule with Pixelform: 14,850 + 1,500","$16,350"],["Difference left: 21,350 − 16,350","$5,000 = the deposit",1]],
+    math:[["September, not yet amortized: 600 + 400 + 150","$1,150"],["August, missed run: 550 + 400 + 150","$1,100"],["Not a prepaid (Test 0c): the deposit D1","$5,000"],["Explained: 1,150 + 1,100 + 5,000","$7,250",1],["Unexplained","$0",1],["After E1 to E3: 22,100 − 1,150 − 1,100 + 1,500","$21,350"],["Schedule with Pixelform: 14,850 + 1,500","$16,350"],["Difference left: 21,350 − 16,350","$5,000 = the deposit",1]],
     verdict:["flag","Legs 1 and 2 agree, but that proves only that the books add up. Against the schedule, the account is $7,250 too high. The skill names three parts and drafts E1, E2 and E3. It recommends that the owner moves the deposit to Deposits. After that move, 16,350 = 16,350.","$7,250"] },
 
   { tier:"The limits · balance sheet, tax and posting" },
@@ -531,7 +531,7 @@ const LEVELS = [
       total:["Total","$16,350","$13,500","$450"]},
     rules:[Q.q14, Q.q4],
     math:[["Current: 6,600 + 3,600 + 1,800 + 1,500","$13,500",1],["Delta, Oct to Dec 2027: 3 × 150","$450",1],["Not split: the expo booth","$2,400"],["Check: 13,500 + 450 + 2,400","$16,350",1],["Non-current prepaid account in the chart","none: the skill says so"],["Entries that the skill posts","0"]],
-    verdict:["note","The skill reports $13,500 current and $450 non-current, with $2,400 not split. Northbrook's chart has no non-current prepaid account, and the skill says so. Pinnacle Clinics paid Northbrook $36,000 in advance. Accountants call that deferred revenue, so it goes to accruals-and-deferrals. If the owner asks it to post, the skill declines once and gives the drafts. It offers to save the run's settings only after the results, and only on a yes.","LIMITS"] },
+    verdict:["note","The skill reports $13,500 current and $450 non-current, with $2,400 not split. Northbrook's chart has no non-current prepaid account, and the skill says so. Pinnacle Clinics paid Northbrook $36,000 in advance. Accountants call that deferred revenue, and this skill does nothing with it. The skill's files do not name a skill for it. On this site, the accruals-and-deferrals page covers it. If the owner asks it to post, the skill declines once and gives the drafts. It offers to save the run's settings only after the results, and only on a yes.","LIMITS"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }

@@ -347,7 +347,7 @@
     <div id="itemout"></div>
     <div class="results" id="results" aria-live="polite"></div>
     <div class="math num" id="steps" aria-live="polite"></div>
-    <p class="fine">The page counts the age in calendar days: the as-of date minus the date opened. An item is over 3 months when the as-of date is later than the same day three calendar months after the date opened. The skill does not say if it counts days or calendar months, so that choice is this page's. A residual at or below the write-off limit, with no investigating items, gets a proposed write-off to a P&amp;L account. Every entry is a proposal for a person to post. A status of Reconciled with proposed entries rests on a person posting them.</p>
+    <p class="fine">The page counts the age in calendar days: the as-of date minus the date opened. An item is over 3 months when the as-of date is later than the same day three calendar months after the date opened. The skill does not say if it counts days or calendar months, so that choice is this page's. A residual below the write-off limit, with no investigating items, gets a proposed write-off to a P&amp;L account. Every entry is a proposal for a person to post. A status of Reconciled with proposed entries rests on a person posting them.</p>
   </div>
 </section>
 
@@ -358,7 +358,7 @@
     <div><b>Asks first</b>Use MosoFin for this run, or upload the data yourself? Which company or entities? Which accounts? Which period end? Where is the support for each account outside the books? What materiality threshold applies? Do you have last period's reconciliation? Who prepares and who reviews? On the MosoFin path, it also asks for the approved write-off limit and its P&amp;L account.</div>
     <div><b>Needs</b>The skill needs the trial balance at period end, the support for each account in scope and the chart of accounts. The GL detail and last period's reconciliation make the work stronger. You type in the accounts, the period end, the company name and the base currency.</div>
     <div><b>Gives back</b>The skill gives back one sheet for each account, with the two sides, the items, a roll-forward, proposed entries and a carry-forward check. A coverage sheet shows how the skill got each side. It asks before it makes an Excel file.</div>
-    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to your books, plugs a difference or corrects a timing item. It never calls an account reconciled without independent support, and never chooses the period, the threshold or the company.</div>
+    <div><b>Never</b>The skill never reads your data before you answer its questions and say yes to its read-back. It never writes to your books, plugs a difference or adjusts a timing item. It never calls an account reconciled without independent support, and never chooses the period, the threshold or the company.</div>
   </div>
 </section>
 
@@ -416,7 +416,7 @@ const RULES = [
     plain:"Support that nobody supplied makes the account not reconciled. An aging from the same books is only a mechanical check.",
     backed:"A federal guide on internal control lists reconciliations of summary information to supporting detail as a common control.{2}" },
   { id:"3", title:"No plugs, and timing items stay", r:Q.q3, cites:[],
-    plain:"A timing item clears next period by itself. The skill records it and watches it. It corrects only permanent items, with a proposed entry." },
+    plain:"A timing item clears next period by itself. The skill records it and watches it. It proposes an entry only for a permanent item." },
   { id:"4", title:"You set the threshold", r:Q.q4, cites:[3],
     plain:"The skill suggests a basis for materiality and asks you. It never chooses the period, the threshold or the company.",
     backed:"SEC staff accept a percentage threshold as a first assessment only. A threshold alone has no basis in law or accounting literature.{3}" },
@@ -480,29 +480,29 @@ const LEVELS = [
     chips:["General ledger detail"], src:"Rules 4 and 7", cites:[3],
     situation:"Payroll clearing 2200 must be zero. It shows $4,023.40 in five open lines, so the skill does this account first. Northbrook set the threshold at $500 for each account.",
     facts:["SEC staff accept a percentage threshold as an initial assessment only. They say that the use of a threshold alone has no basis in law or accounting literature "+C(3)+".",
-           "The staff consider misstatements separately and in total "+C(3)+". Staff bulletins are staff views, not Commission rules. So the skill asks for the threshold and does not choose one."],
+           "The staff consider misstatements separately and in total "+C(3)+". Staff bulletins are staff views, not Commission rules. The skill asks for the threshold and does not choose one."],
     visual:{type:"table",
       head:["Line","Opened","Days at 30 Sep","Over 3 months","Over $500"],
       rows:[["$23.40","before 1 Oct 2025","over 364",["yes","bad"],"no"],["$640.00 · EE-03","Tue 3 Feb 2026","239",["yes","bad"],["yes","bad"]],["$1,150.00 · EE-05","Thu 30 Apr 2026","153",["yes","bad"],["yes","bad"]],["$410.00 · EE-11","Tue 30 Jun 2026","92","at the limit","no"],["$1,800.00 · JE-0912","Thu 24 Sep 2026","6","no",["yes","bad"]]],
       total:["$4,023.40","","","",""]},
     rules:[Q.q4, Q.q12, Q.q13, Q.q15],
     math:[["Lines: 23.40 + 640 + 1,150 + 410 + 1,800","$4,023.40",1],["Over 3 months: 23.40 + 640 + 1,150","$1,813.40"],["Over $500: 640 + 1,150 + 1,800","$3,590.00"],["30 Jun plus three calendar months","30 Sep: at the limit"],["Roll the balance forward to October","no",1],["Owner of each line","payroll lead"],["Target date of each line","Fri 16 Oct 2026",1]],
-    verdict:["note","Three lines escalate by age, and three lines are above $500. The $23.40 is more than a year old, so probably nobody owns the account. The skill does not define 3 months in days. This page puts the 410 at the limit. The work on each line goes to payroll-clearing-reconciliation.","ESCALATE"] },
+    verdict:["note","Three lines escalate by age, and three lines are above $500. The $23.40 is more than a year old, so probably nobody owns the account. The skill does not define 3 months in days. This page puts the 410 at the limit. The skill ages and explains each line of a clearing account itself.","ESCALATE"] },
 
   { tier:"Over time · the opening balance and the coverage sheet" },
   { n:5, title:"Roll-forward and the opening check",
     chips:["General ledger detail","Accrual schedules"], src:"Rule 6", cites:[4],
     situation:"Accrued expenses 2110 show $27,790. The schedules support $25,750: AP cutoff 14,650, electricity 2,100 and audit fees 9,000. No prior reconciliation exists, so the skill uses the 31 August balance as read today, and says so.",
     facts:["A textbook says that prior period adjustments correct errors in the statements of earlier periods "+C(4)+". They change the opening balance of retained earnings and do not go through current net income "+C(4)+".",
-           "This page does not say that Northbrook must restate. The owner and the accountant decide if the 1,100 or the 2,040 is material. The skill only flags them.",
+           "This page does not say that Northbrook must restate. The opening check finds no change to a closed period, so the skill's rule for possible prior-period adjustments does not apply. The owner and the accountant decide how to treat the 1,100 and the 2,040.",
            "The bonus, the payroll tax and the loan interest accruals sit in other accounts. This example keeps them out of the run."],
     visual:{type:"table",
       head:["Roll-forward","Amount"],
       rows:[["Opening, 31 August","$2,040.00"],["Additions: accruals booked in September","$25,750.00"],["Reductions",["$0.00","bad"]],["Reduction expected on Tue 1 Sep: the August reversal","$2,040.00"]],
       total:["Closing, ties to the GL","$27,790.00"]},
     rules:[Q.q11],
-    math:[["Opening + additions − reductions: 2,040 + 25,750 − 0","$27,790.00",1],["GL balance","$27,790.00"],["Schedules: 14,650 + 2,100 + 9,000","$25,750.00"],["Difference: 27,790 − 25,750","$2,040.00",1],["Type","permanent"],["Proposed entry: Dr 2110 Accrued expenses","$2,040.00"],["Cr 6310 Utilities","$2,040.00"],["Possible prior-period items, for review","1,100 prepaid · 2,040 accrued",1]],
-    verdict:["note","The closing balance ties to the GL. The movement test finds no reduction where the August reversal should be. The skill proposes one entry for $2,040. It flags the $2,040 and the prepaid $1,100 for review, because both belong to August.","FLAG"] },
+    math:[["Opening + additions − reductions: 2,040 + 25,750 − 0","$27,790.00",1],["GL balance","$27,790.00"],["Schedules: 14,650 + 2,100 + 9,000","$25,750.00"],["Difference: 27,790 − 25,750","$2,040.00",1],["Type","permanent"],["Proposed entry: Dr 2110 Accrued expenses","$2,040.00"],["Cr 6310 Utilities","$2,040.00"],["Opening check: closed period changed","no",1]],
+    verdict:["note","The closing balance ties to the GL. The movement test finds no reduction where the August reversal should be. The skill proposes one entry for $2,040. The opening check finds no change to August, so the skill raises no prior-period flag.","FLAG"] },
 
   { n:6, title:"The coverage sheet: seven accounts, two sides each",
     chips:["All seven accounts"], src:"Rules 2 and 8", cites:[2,5],
@@ -647,7 +647,7 @@ function run(){
     out+=res(unrec===0?"ok":"flag","Unreconciled",m2(unrec),"Adjusted GL minus the supporting balance.","r-unrec");
     if(inv.length){ status="Investigating"; cls="flag"; }
     else if(unrec===0){ status="Reconciled"; cls="ok"; }
-    else if(!isNaN(lim) && Math.abs(unrec)<=lim){ status="Reconciled: immaterial residual, approved write-off proposed"; cls="note"; wo=true; }
+    else if(!isNaN(lim) && Math.abs(unrec)<lim){ status="Reconciled: immaterial residual, approved write-off proposed"; cls="note"; wo=true; }
     else { status="Investigating"; cls="flag"; }
   }
   const jes=perm.length+(wo?1:0);
@@ -661,7 +661,7 @@ function run(){
   if(isNaN(lim)){ wtxt="Enter the approved limit. The skill never assumes one."; wcls="note"; }
   else if(wo){ wtxt=`Proposed: ${m2(unrec)} to a P&L account, with reviewer approval.`; wcls="note"; }
   else if(!cand){ wtxt="Not needed."; }
-  else if(Math.abs(cand)>lim){ wtxt=`Not allowed: ${m2(Math.abs(cand))} is above the ${m2(lim)} limit.`; wcls="flag"; }
+  else if(Math.abs(cand)>=lim){ wtxt=`Not allowed: ${m2(Math.abs(cand))} is not below the ${m2(lim)} limit.`; wcls="flag"; }
   else { wtxt="Not yet: finish the investigation first."; wcls="note"; }
   out+=res(wcls,"Write-off",wcls==="flag"?"not allowed":wo?"proposed":"—",wtxt,"r-wo");
   steps.innerHTML=s; box.innerHTML=out;

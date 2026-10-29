@@ -421,7 +421,7 @@ const RULES = [
     plain:"An accrual reverses when the invoice arrives, and the invoice takes its place. A posted invoice with no document leaves a payable nobody can support.",
     backed:"IAS 37 describes accruals as amounts owed for goods or services received but not yet paid, invoiced or formally agreed with the supplier." },
   { id:"12", title:"Check who the statement is for", r:Q.q12, cites:[],
-    plain:"The skill reads the addressee and the account reference off the statement. It checks them against your company file before it matches anything." },
+    plain:"The skill asks which company the statement is for and what account reference it carries. It checks the account reference against your company file before it matches anything." },
   { id:"13", title:"A payment they never received is serious", r:Q.q13, cites:[7],
     plain:"If someone changed the supplier's bank details by fraud, the supplier's statement is where it shows. The skill flags it for a person to follow up.",
     backed:"The FBI counts $2,770,151,146 of reported business email compromise losses in 2024, from 21,442 complaints.{7} It advises checking account changes through a second channel.{7}" },
@@ -463,8 +463,8 @@ const LEVELS = [
       head:["Check before calling it missing","Result"],
       rows:[["A match at any of the four tiers","none"],["A second Harbor record in the vendor master","none"],["Posted to a sibling company","no"],["What remains",["candidate unrecorded liability","bad"]]]},
     rules:[Q.q2, Q.q4, Q.q11, Q.q3],
-    math:[["INV-0049 on the statement","$2,480.00"],["Matching item in your ledger","none"],["Proposed accrual at 30 Sep","$2,480.00",1],["Proposed entry","Dr expense or inventory, Cr accrued liabilities"],["The accrual reverses on","1 Oct, day 1 of the next period"],["Label on the entry","PROPOSED \u2014 NOT POSTED"],["Next action","ask Harbor for the invoice copy"]],
-    verdict:["flag","The skill proposes an accrual of $2,480.00 at 30 Sep and asks for the invoice copy. It does not post an invoice from the statement line. When the invoice arrives, it takes the accrual's place.","FLAG"] },
+    math:[["INV-0049 on the statement","$2,480.00"],["Matching item in your ledger","none"],["Proposed accrual at 30 Sep, once you say the bill is real","$2,480.00",1],["Proposed entry","Dr expense or inventory, Cr accrued liabilities"],["The accrual reverses on","1 Oct, day 1 of the next period"],["Label on the entry","PROPOSED \u2014 NOT POSTED"],["Next action","ask Harbor for the invoice copy"]],
+    verdict:["flag","The skill asks for the invoice copy. Once you say the bill is real, it proposes an accrual of $2,480.00 at 30 Sep. It does not post an invoice from the statement line. When the invoice arrives, it takes the accrual's place.","FLAG"] },
 
   { n:4, title:"A credit note nobody claimed",
     chips:["Statement","Ledger","Payments"], src:"Rules 10 and 5", cites:[5],
@@ -487,8 +487,8 @@ const LEVELS = [
       head:["Statement item","Date","Amount","Days from 17 Aug"],
       rows:[["INV-0577","2 Aug","$950.00","15 before"],["INV-0612","1 Sep","$950.00","15 after"]]},
     rules:[Q.q9, Q.q8],
-    math:[["17 Aug − 2 Aug","15 days"],["1 Sep − 17 Aug: 14 days to 31 Aug, + 1","15 days"],["A tie at tier 2?","yes",1],["Open on the statement: $950.00 + $950.00","$1,900.00"],["Open in your ledger","$950.00"],["Missing invoice, whichever month it is","$950.00",1]],
-    verdict:["note","The skill does not pick one. It reports the tie and asks for the document number of the ledger item. Whichever month that is, the other $950.00 is a missing invoice.","TIE"] },
+    math:[["17 Aug − 2 Aug","15 days"],["1 Sep − 17 Aug: 14 days to 31 Aug, + 1","15 days"],["A tie at tier 2?","yes",1],["Open on the statement: $950.00 + $950.00","$1,900.00"],["Open in your ledger","$950.00"],["Candidate missing invoice, whichever month it is","$950.00",1]],
+    verdict:["note","The skill does not pick one. It reports the tie for a person to settle. Whichever month the ledger item is, the other $950.00 is a candidate missing invoice. The skill runs the duplicate-vendor check before it calls it missing.","TIE"] },
 
   { n:6, title:"The payment that went somewhere else",
     chips:["Ledger","Bank","Statement","Vendor master"], src:"Rule 13", cites:[6,7],
@@ -500,7 +500,7 @@ const LEVELS = [
       rows:[["2 Sep","Harbor's bank details change in your vendor master, after an email",""],["12 Sep","Your payment to Harbor clears your bank","$5,600.00"],["25 Sep","Harbor's statement: INV-0044 open, no payment received",["$5,600.00","bad"]]]},
     rules:[Q.q13],
     math:[["Paid by you on 12 Sep","$5,600.00"],["Received by Harbor, per its statement","$0.00"],["Difference","$5,600.00",1],["Days from the bank change to the payment: 12 − 2","10 days"],["Verdict","serious, [manual]",1]],
-    verdict:["flag","This is the pattern that business email compromise produces. The skill flags it as serious and [manual]. A person calls Harbor on a phone number already on file. Billing schemes are a separate risk that is also common.","SERIOUS"] },
+    verdict:["flag","This is the pattern that business email compromise produces. The skill flags it as serious. It contacts nobody, so a person calls Harbor on a phone number already on file. Billing schemes are a separate risk that is also common.","SERIOUS"] },
 ];
 
 function el(tag, attrs={}, html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
@@ -602,7 +602,7 @@ function run(){
   h += Math.abs(diff)<0.005
     ? res("ok","Unexplained", "$0.00", "It ties. Every difference has a name.")
     : res("flag","Unexplained", fmt(diff), `The statement is ${fmt(Math.abs(diff))} ${diff>0?"above":"below"} what your named items explain. Look for items on one side only, then check the dates.`);
-  if(M>0) h += res("flag","Invoices to ask for", fmt(M), "These are candidate unrecorded liabilities. Ask the supplier for each invoice copy. At a period end, accrue them. Do not post an invoice from a statement line.");
+  if(M>0) h += res("flag","Invoices to ask for", fmt(M), "These are candidate unrecorded liabilities. Ask the supplier for each invoice copy. At a period end, accrue the ones you know you owe. Do not post an invoice from a statement line.");
   box.innerHTML = h;
 }
 inputs.forEach(i=>i.addEventListener("input",()=>{document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));run();}));

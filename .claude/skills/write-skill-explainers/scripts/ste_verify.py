@@ -1,3 +1,4 @@
+import re
 """Prove an STE rewrite changed wording only.
 usage: ste_verify.py PAGE.html [REF]   (REF = git ref holding the original, default HEAD)
 Checks: (1) HTML skeleton identical (tags, attributes, order) outside text; (2) every number/currency/percent/date token
@@ -56,6 +57,15 @@ def mask_js(code):
             k=code.find('\n',i); k=n if k<0 else k; out.append(code[i:k]); i=k
         elif c=='/' and code[i+1:i+2]=='*':
             k=code.find('*/',i); k=n if k<0 else k+2; out.append(code[i:k]); i=k
+        elif c=='/' and re.match(r'[\s(,=:\[!&|?{};]$', ''.join(out)[-1:] or '('):   # a regex literal: keep it whole, so a quote inside it is not a string
+            j=i+1; cls=False
+            while j<n and (cls or code[j]!='/'):
+                if code[j]=='\\': j+=2; continue
+                if code[j]=='[': cls=True
+                elif code[j]==']': cls=False
+                elif code[j]=='\n': break
+                j+=1
+            j=min(j+1,n); out.append(code[i:j]); i=j
         elif c in '"\'':
             i=string(i,c); out.append(c+'#'+c)
         elif c=='`':

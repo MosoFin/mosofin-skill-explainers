@@ -552,7 +552,7 @@ const LEVELS = [
     chips:["Q3 Form 941 as filed","Payroll register","General ledger"], src:"Rules 3, 8, 9 and 10", cites:[3,5],
     situation:"Northbrook uploaded its Q3 Form 941 as filed. The skill ties the tax and the wages on the filing to the register and the books. The register is there, so the skill then checks each tax against its own wage base.",
     facts:["The IRS matches the amounts on the four quarterly Forms 941 with the Form W-2 totals on the yearly Form W-3 "+C(3)+". If they do not agree, the IRS or the Social Security Administration may contact the employer "+C(3)+".",
-           "So the skill clears each difference before the year-end W-2s go to employees. This page gives no Form 941 line numbers.",
+           "So the skill reports each difference, and a person must resolve it before the year-end W-2s go to employees. This page gives no Form 941 line numbers.",
            "The same checks apply in the UK. An employer reports pay in a Full Payment Submission on or before payday "+C(5)+". It pays HMRC separately, by the 22nd of the month after the tax month ends if it pays electronically "+C(5)+".",
            "HMRC found that some micro-employers think that the filing settles everything "+C(5)+"."],
     visual:{type:"table",

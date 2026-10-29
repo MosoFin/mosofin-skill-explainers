@@ -346,7 +346,7 @@
         <div class="row"><span>The schedule: 6,600 + 3,600 + 2,250 + 2,400</span><span class="v">$14,850</span></div>
         <div class="row off"><span>Difference</span><span class="v">$7,250</span></div>
       </div>
-      <div class="verdict">It names each part by its shape. 1,150 is September's cost, not yet booked. 1,100 is one whole month, August, that nobody booked. 5,000 is the deposit. 1,150 + 1,100 + 5,000 = 7,250, with 0 unexplained.</div>
+      <div class="verdict">It names each part by its shape. 1,150 is September's cost, not yet booked. 1,100 is one whole month, August, that nobody booked. 5,000 is the deposit that the ledger tests flag. 1,150 + 1,100 + 5,000 = 7,250, with 0 unexplained.</div>
     </div>
     <div class="book bad">
       <h3>The common shortcut</h3>
@@ -412,9 +412,9 @@
   <p>It also shows what the limit does. Spread over 12 months, the two items cost 50 + 40 = 90 a month. As expense on payment, September carries 1,080, which is 990 more. The next 11 months carry none of them. The owner keeps $1,000. The skill applies your limit and never sets one. The accruals page for Northbrook uses a $500 limit for accruals. That is a different policy, and both limits are the owner's.</p>
   <div class="two">
     <div class="card">
-      <span class="tag up">Goes to accruals-and-deferrals</span>
+      <span class="tag up">Outside this skill</span>
       <h3>Pinnacle Clinics paid Northbrook $36,000 for a year</h3>
-      <p>That is money that a customer paid in advance. Accountants call it deferred revenue. This skill does nothing with it. Another skill moves it into income month by month.</p>
+      <p>That is money that a customer paid in advance. Accountants call it deferred revenue. This skill does nothing with it. The skill's files do not name a skill for it. On this site, the accruals-and-deferrals page covers it.</p>
     </div>
     <div class="card">
       <span class="tag up">Not a prepaid</span>
@@ -449,7 +449,7 @@
     <li><div class="q">Use MosoFin for this run, or upload the data yourself?</div><div class="why">MosoFin is the connection to your books and the other platforms that you link. With it, the skill reads from there. Without it, you upload the files, and the tests are the same. The skill asks this only if your account has the MosoFin tools. If not, it says once that the run is manual.</div></li>
     <li><div class="q">Which company, or which companies in a group?</div><div class="why">Each company gets its own schedule, with its name on it. The skill never puts two companies into one schedule. On the MosoFin path it asks you by name and never chooses for you.</div></li>
     <li><div class="q">Which account or accounts hold your prepaids?</div><div class="why">Many books have more than one. Sometimes an "Other Current Assets" account holds many different items. On the MosoFin path the skill reads your chart of accounts first, then asks you to confirm.</div></li>
-    <li><div class="q">The start and end date of the cover for each open item, and your current prepaid schedule if you have one.</div><div class="why">This is the one question that you must answer. Your books cannot supply these dates. The skill asks item by item. If you do not know a date, the item goes on the schedule with blank dates and the flag "unknown". The skill never guesses a date.</div></li>
+    <li><div class="q">The start and end date of the cover for each open item, and your current prepaid schedule if you have one.</div><div class="why">Required. Your books cannot supply these dates. The skill asks item by item. If you do not know a date, the item goes on the schedule with blank dates and the flag "unknown". The skill never guesses a date.</div></li>
     <li><div class="q">Your materiality threshold: the amount below which a payment goes straight to expense.</div><div class="why">This decides what goes on the schedule. You set it, and the skill never sets it. The skill can show what a proposed limit does in total. If you set none, the coverage sheet says so.</div></li>
     <li><div class="q">Whole-month or daily?</div><div class="why">Both ways are correct, but one schedule must not mix them. The skill looks at how your past entries divide the cost, then asks you to confirm.</div></li>
     <li><div class="q">Do you recover sales tax such as VAT or GST when you pay, and in which country?</div><div class="why">Where you can recover the tax, it comes out at payment, and the skill does not spread it. You state the policy. The skill still tests the books for recoverable tax inside the asset.</div></li>
