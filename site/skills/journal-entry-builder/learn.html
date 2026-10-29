@@ -418,7 +418,7 @@ const Q = {
 
 const RULES = [
   { id:"1", title:"Debits equal credits", r:Q.q6, cites:[1,2],
-    plain:"The skill adds each side to the cent. If an entry does not balance, the skill stops. It never adds a figure to force the balance.",
+    plain:"The skill adds each side to the cent. If an entry does not balance, it fails the balance check. The skill never adds a figure to force the balance.",
     backed:"Every transaction changes at least two accounts, with at least one debit and one credit.{1} Double-entry accounting requires the debits to equal the credits.{2}" },
   { id:"2", title:"The chart is the authority", r:Q.q3, cites:[],
     plain:"If an account is not in your chart, the entry stops. With no chart at all, the skill uses descriptive names and labels each one PLACEHOLDER \u2014 REMAP REQUIRED." },
@@ -701,7 +701,7 @@ function run(){
   const matv=money(fld("mat").value), big=Math.max(D,K);
   let mat;
   if(isNaN(matv)) mat=res("note","Materiality","not run","No threshold given. The skill never chooses one.","r-mat");
-  else if(big>cents(matv)){ flags++; mat=res("flag","Materiality","flag",`${m2(big)} is above ${m2(cents(matv))}. A second person reviews it.`,"r-mat"); }
+  else if(big>cents(matv)){ flags++; mat=res("flag","Materiality","flag",`${m2(big)} is above ${m2(cents(matv))}. The skill flags it for review.`,"r-mat"); }
   else mat=res("ok","Materiality","no flag",`${m2(big)} is not above ${m2(cents(matv))}.`,"r-mat");
   // period
   const P=dnum(fld("post").value), Cl=dnum(fld("closed").value);
