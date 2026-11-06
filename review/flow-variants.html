@@ -408,6 +408,31 @@ button, input, select { font: inherit; }
 .flow-seg span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink); border-radius: 4px; }
 .flow-seg.done span { width: 100%; }
 
+/* Minimal mode: titles only, details open on demand, no subtitle bar, legend or lane tints. */
+.flow.min { box-shadow: none; }
+.flow.min .flow-lanebg, .flow.min .flow-legend, .flow.min .flow-lanes small { display: none; }
+.flow.min .flow-lanes { font-size: 12.5px; font-weight: 600; }
+.flow-count { font: 500 12px "IBM Plex Mono", ui-monospace, monospace; color: var(--muted); }
+.flow.min .fnode { border: 1px solid var(--rule); border-left: 3px solid var(--c); padding: 8px 34px 9px 12px; }
+.flow.min .fnode.t-approve { background: var(--panel); }
+.flow.min .fnode.t-decide { border-style: dashed; border-left-style: solid; }
+.flow.min .fk { font-size: 10px; }
+.flow.min .ft { font-size: 14.5px; font-weight: 600; }
+.flow.js.min .fnode::after { content: "+"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--faint, var(--muted)); }
+.flow.js.min .fnode.open::after { content: "−"; top: 14px; transform: none; }
+.flow.js.min .fnode.open .fs { display: block; }
+.flow.js.min .fnode.open .fg { display: flex; }
+.flow.min .fnode.now { box-shadow: 0 0 0 2px var(--c); transform: none; }
+.flow.min .fnode.past { opacity: .55; }
+.flow.min .fnode.open { opacity: 1; }
+.flow.min .flow-wires path { stroke-width: 1.2; }
+.flow.min .flow-wires path.lit { stroke-width: 1.6; }
+.flow.min .flow-sub { position: static; background: none; backdrop-filter: none; border: 0; padding: 0 14px 14px; }
+.flow.min .flow-sub-k, .flow.min .flow-sub-g, .flow.min .flow-sub-t { display: none; }
+.flow.min.ended .flow-sub-t { display: block; min-height: 0; margin: 0 0 4px; font-size: 14.5px; color: var(--muted); }
+.flow.min .flow-time { margin-top: 0; }
+.flow.min .flow-seg { height: 4px; }
+
 @media (max-width: 760px) {
   .flow-lanes, .flow-lanebg { display: none; }
   .flow-legend { margin-left: 0; }
@@ -521,6 +546,7 @@ button, input, select { font: inherit; }
 <button role="tab" aria-selected="true" data-tab="a"><b>A · Swimlanes</b><span>The whole map at once, in three columns</span></button>
 <button role="tab" aria-selected="false" data-tab="b"><b>B · Storyboard</b><span>One big scene at a time, with a who-does-what track</span></button>
 <button role="tab" aria-selected="false" data-tab="c"><b>C · Chat replay</b><span>The run as a conversation with the agent</span></button>
+<button role="tab" aria-selected="false" data-tab="d"><b>D · Minimal</b><span>Titles only. Open a step for its details</span></button>
 </div>
 <div class="rv-panel" data-panel="a"><section aria-labelledby="flow-h">
   
@@ -546,6 +572,31 @@ button, input, select { font: inherit; }
   </div>
 </section>
 </div>
+<div class="rv-panel" data-panel="d" hidden><section aria-labelledby="flow-h">
+  
+  <p class="flow-intro">Each card is one step. The column shows who does it: you, the agent, or the agent reading your data. Press play, or select a card.</p>
+  <div class="flow min" data-flow id="min-flow-bank-reconciliation">
+    <script type="application/json" class="flow-data">{"intro": "Press play to watch one bank reconciliation, from your request to the sign-off.", "end": "The run is complete. You hold the sign-off, and the agent changed nothing in your books. It can save your settings for next time, but only after you say yes.", "paths": {"mosofin": "Connected to MosoFin", "upload": "Upload files"}, "when": {"mosofin": "yes", "upload": "no"}}</script>
+    <div class="flow-bar">
+      <div class="flow-btns">
+        <button type="button" class="flow-btn primary" data-act="play" aria-label="Play the run">▶ Play</button>
+        <button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+        <button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+        <button type="button" class="flow-btn" data-act="restart" aria-label="Start again from step 1">↺</button>
+      </div>
+      <div class="flow-paths" role="group" aria-label="Choose a path"></div>
+      <ul class="flow-legend"><li><i style="--c:var(--fl-you)"></i>You act</li><li><i style="--c:var(--fl-agent)"></i>Agent works</li><li><i style="--c:var(--fl-data)"></i>Agent reads your data</li><li><i style="--c:var(--fl-gate);--b:var(--fl-gate-soft)"></i>Waits for your approval</li><li><span style="color:var(--fl-warn)" aria-hidden="true">⛨</span>Safeguard</li></ul>
+    </div>
+    <div class="flow-board">
+      <div class="flow-lanebg" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-lanes" aria-hidden="true"><span style="--c:var(--fl-you)">You<small>asks, answers, approves</small></span><span style="--c:var(--fl-agent)">Agent<small>reads, checks, explains</small></span><span style="--c:var(--fl-data)">Your data<small>read-only</small></span></div>
+      <div class="flow-grid"><div class="frow"><button type="button" class="fnode l-you t-act" style="grid-row:1" data-row="1" data-lane="you"><span class="fk"><span>You</span></span><span class="ft">Ask for a bank reconciliation</span><span class="fs">You name the account and the month, or the agent asks for them.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:2" data-row="2" data-lane="agent"><span class="fk"><span>Agent</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Ask six questions in one message</span><span class="fs">The agent asks about the source, the account, the period, the statement, the last reconciliation and the amount worth chasing.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent never assumes the period.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-act" style="grid-row:3" data-row="3" data-lane="you"><span class="fk"><span>You</span></span><span class="ft">Answer the questions</span><span class="fs">One reply answers all six questions, so the run does not stop again for each one.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-decide" style="grid-row:4" data-row="4" data-lane="agent"><span class="fk"><span>Decision</span></span><span class="ft">Connected to MosoFin, and you chose it?</span><span class="fs">Your answer sets how the agent gets your books: it reads them directly, or you upload files.</span></button></div><div class="frow"><button type="button" class="fnode l-data t-read" style="grid-row:5" data-row="5" data-lane="data" data-path="mosofin"><span class="fk"><span>Reads, read-only</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Check workspace, company file and tools</span><span class="fs">The agent confirms the workspace and the company file by name. It checks for a bank feed.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent uses read-only tools. Tools that write to your books are out of scope.</span></button><button type="button" class="fnode l-you t-act" style="grid-row:5" data-row="5" data-lane="you" data-path="upload"><span class="fk"><span>You</span></span><span class="ft">Upload the statement and ledger</span><span class="fs">You upload the bank statement, the ledger cash activity and the last reconciliation or its date.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-approve" style="grid-row:6" data-row="6" data-lane="you"><span class="fk"><span>Your approval</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Approve the plan</span><span class="fs">The agent reads the plan back to you and waits.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent reads nothing until you say yes.</span></button></div><div class="frow"><button type="button" class="fnode l-data t-read" style="grid-row:7" data-row="7" data-lane="data" data-path="mosofin"><span class="fk"><span>Reads, read-only</span></span><span class="ft">Read the books in one batch</span><span class="fs">The agent reads accounts, the trial balance, the general ledger, deposits, payments, transfers and journal entries.</span></button><button type="button" class="fnode l-data t-read" style="grid-row:7" data-row="7" data-lane="data" data-path="upload"><span class="fk"><span>Reads, read-only</span></span><span class="ft">Read your uploaded files</span><span class="fs">The agent reads the statement and the ledger activity that you uploaded.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:8" data-row="8" data-lane="agent"><span class="fk"><span>Agent</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Agree the opening balance</span><span class="fs">The agent records both ending balances, agrees the opening balance and brings last period&#x27;s open items forward.</span><span class="fg"><span aria-hidden="true">⛨</span> With no statement balance, the agent prepares the book side only and builds no bridge.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:9" data-row="9" data-lane="agent"><span class="fk"><span>Agent</span></span><span class="ft">Match transactions and build the bridge</span><span class="fs">Open items from last period match first. Then the agent tries exact, fuzzy, reference and split matches, and finds duplicates in the books.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:10" data-row="10" data-lane="agent"><span class="fk"><span>Agent</span></span><span class="ft">Sort what is left unmatched</span><span class="fs">The agent sorts fees, interest, returned payments, loans, reserves and chargebacks. An unknown item stays unknown and gets an owner.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-output" style="grid-row:11" data-row="11" data-lane="agent"><span class="fk"><span>Result</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Propose entries with evidence</span><span class="fs">Each proposed entry uses your account names and points to its evidence: a statement line or ledger rows.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent proposes entries only. It never posts them.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-approve" style="grid-row:12" data-row="12" data-lane="you"><span class="fk"><span>Your approval</span></span><span class="ft">Review and sign off</span><span class="fs">You get a summary, the open items, the exceptions, the proposed entries and a blank sign-off for two people.</span></button></div></div>
+    </div>
+    <div class="flow-sub" aria-live="off"><div class="flow-sub-k"></div><p class="flow-sub-t"></p><div class="flow-sub-g" hidden></div><div class="flow-time"></div></div>
+  </div>
+</section>
+
+<p class="rv-note">Best for: a calm page. The playing step opens by itself. Select any step to keep its details open.</p></div>
 <div class="rv-panel" data-panel="b" hidden><div class="pl" id="pl-b"><div class="pl-bar"><div class="flow-btns">
 <button type="button" class="flow-btn primary" data-act="play">▶ Play</button>
 <button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
@@ -584,6 +635,10 @@ button, input, select { font: inherit; }
     let frames = [], idx = -1, playing = false, timer = 0, started = 0, spent = 0, dur = 0, user = false;
 
     root.classList.add("js");
+    // Minimal mode: cards show titles only. The playing card opens its details; a card the reader opens stays open.
+    const min = root.classList.contains("min");
+    const count = min ? Object.assign(document.createElement("span"), { className: "flow-count" }) : null;
+    if (min) root.querySelector(".flow-btns").after(count);
     const svg = document.createElementNS(SVGNS, "svg");
     svg.setAttribute("class", "flow-wires");
     svg.setAttribute("aria-hidden", "true");
@@ -681,6 +736,12 @@ button, input, select { font: inherit; }
         const bar = s.firstChild; bar.style.transition = "none"; bar.style.width = k < i ? "100%" : "0";
         if (k === i) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
       });
+      root.classList.remove("ended");
+      if (min) {
+        const cur = i >= 0 ? frames[i] : [];
+        nodes.forEach((n) => { const o = n.classList.contains("pinned") || cur.includes(n); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o)); });
+        count.textContent = i >= 0 ? `Step ${i + 1} of ${frames.length}` : `${frames.length} steps`;
+      }
       if (i < 0) { caption(null); draw(false); return; }
       const f = frames[i];
       caption(f, i);
@@ -736,6 +797,10 @@ button, input, select { font: inherit; }
       subK.innerHTML = `<span>Run complete</span>`;
       subT.textContent = cfg.end || "The run is complete.";
       subG.hidden = true;
+      if (min) {
+        root.classList.add("ended"); count.textContent = "Run complete";
+        nodes.forEach((n) => { const o = n.classList.contains("pinned"); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o)); });
+      }
       label("↺ Watch again", "Watch the run again");
       idx = frames.length;
     }
@@ -759,6 +824,11 @@ button, input, select { font: inherit; }
     root.querySelector('[data-act="next"]').addEventListener("click", () => { user = true; pause(); go(Math.min(frames.length - 1, idx + 1), true); });
     root.querySelector('[data-act="restart"]').addEventListener("click", () => { user = true; pause(); go(0, true); play(); });
     for (const n of nodes) n.addEventListener("click", () => {
+      if (min) {   // open or close this card's details, and keep the run going
+        const o = !n.classList.contains("open");
+        n.classList.toggle("pinned", o); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o));
+        return;
+      }
       const i = frames.findIndex((f) => f.includes(n));
       if (i < 0) return;
       user = true; pause(); go(i, true);

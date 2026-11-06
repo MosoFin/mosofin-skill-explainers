@@ -29,8 +29,11 @@ page = f"""<!doctype html>
 <button role="tab" aria-selected="true" data-tab="a"><b>A · Swimlanes</b><span>The whole map at once, in three columns</span></button>
 <button role="tab" aria-selected="false" data-tab="b"><b>B · Storyboard</b><span>One big scene at a time, with a who-does-what track</span></button>
 <button role="tab" aria-selected="false" data-tab="c"><b>C · Chat replay</b><span>The run as a conversation with the agent</span></button>
+<button role="tab" aria-selected="false" data-tab="d"><b>D · Minimal</b><span>Titles only. Open a step for its details</span></button>
 </div>
 <div class="rv-panel" data-panel="a">{build.flow_section(skill, "Bank reconciliation").replace('<h2 id="flow-h">Watch a run, step by step</h2>', '')}</div>
+<div class="rv-panel" data-panel="d" hidden>{build.flow_section(skill, "Bank reconciliation").replace('<h2 id="flow-h">Watch a run, step by step</h2>', '').replace('class="flow" data-flow id="flow-', 'class="flow min" data-flow id="min-flow-').replace('id="flow-h"', 'id="flow-h-min"')}
+<p class="rv-note">Best for: a calm page. The playing step opens by itself. Select any step to keep its details open.</p></div>
 <div class="rv-panel" data-panel="b" hidden><div class="pl" id="pl-b">{ctrl()}<div class="sb-track"></div><div class="sb-stage" aria-live="polite"></div><div class="sb-strip" aria-label="All steps"></div><div class="pl-time"></div></div>
 <p class="rv-note">Best for: telling the story clearly, one idea at a time. The track above the scene shows who acts at each step.</p></div>
 <div class="rv-panel" data-panel="c" hidden><div class="pl" id="pl-c">{ctrl()}<div class="ch-win" aria-live="polite"></div><div class="pl-time" style="padding-top:12px"></div></div>

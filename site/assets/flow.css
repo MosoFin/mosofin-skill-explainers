@@ -100,6 +100,31 @@
 .flow-seg span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink); border-radius: 4px; }
 .flow-seg.done span { width: 100%; }
 
+/* Minimal mode: titles only, details open on demand, no subtitle bar, legend or lane tints. */
+.flow.min { box-shadow: none; }
+.flow.min .flow-lanebg, .flow.min .flow-legend, .flow.min .flow-lanes small { display: none; }
+.flow.min .flow-lanes { font-size: 12.5px; font-weight: 600; }
+.flow-count { font: 500 12px "IBM Plex Mono", ui-monospace, monospace; color: var(--muted); }
+.flow.min .fnode { border: 1px solid var(--rule); border-left: 3px solid var(--c); padding: 8px 34px 9px 12px; }
+.flow.min .fnode.t-approve { background: var(--panel); }
+.flow.min .fnode.t-decide { border-style: dashed; border-left-style: solid; }
+.flow.min .fk { font-size: 10px; }
+.flow.min .ft { font-size: 14.5px; font-weight: 600; }
+.flow.js.min .fnode::after { content: "+"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--faint, var(--muted)); }
+.flow.js.min .fnode.open::after { content: "−"; top: 14px; transform: none; }
+.flow.js.min .fnode.open .fs { display: block; }
+.flow.js.min .fnode.open .fg { display: flex; }
+.flow.min .fnode.now { box-shadow: 0 0 0 2px var(--c); transform: none; }
+.flow.min .fnode.past { opacity: .55; }
+.flow.min .fnode.open { opacity: 1; }
+.flow.min .flow-wires path { stroke-width: 1.2; }
+.flow.min .flow-wires path.lit { stroke-width: 1.6; }
+.flow.min .flow-sub { position: static; background: none; backdrop-filter: none; border: 0; padding: 0 14px 14px; }
+.flow.min .flow-sub-k, .flow.min .flow-sub-g, .flow.min .flow-sub-t { display: none; }
+.flow.min.ended .flow-sub-t { display: block; min-height: 0; margin: 0 0 4px; font-size: 14.5px; color: var(--muted); }
+.flow.min .flow-time { margin-top: 0; }
+.flow.min .flow-seg { height: 4px; }
+
 @media (max-width: 760px) {
   .flow-lanes, .flow-lanebg { display: none; }
   .flow-legend { margin-left: 0; }

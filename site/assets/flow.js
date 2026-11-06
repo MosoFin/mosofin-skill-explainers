@@ -20,6 +20,10 @@
     let frames = [], idx = -1, playing = false, timer = 0, started = 0, spent = 0, dur = 0, user = false;
 
     root.classList.add("js");
+    // Minimal mode: cards show titles only. The playing card opens its details; a card the reader opens stays open.
+    const min = root.classList.contains("min");
+    const count = min ? Object.assign(document.createElement("span"), { className: "flow-count" }) : null;
+    if (min) root.querySelector(".flow-btns").after(count);
     const svg = document.createElementNS(SVGNS, "svg");
     svg.setAttribute("class", "flow-wires");
     svg.setAttribute("aria-hidden", "true");
@@ -117,6 +121,12 @@
         const bar = s.firstChild; bar.style.transition = "none"; bar.style.width = k < i ? "100%" : "0";
         if (k === i) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
       });
+      root.classList.remove("ended");
+      if (min) {
+        const cur = i >= 0 ? frames[i] : [];
+        nodes.forEach((n) => { const o = n.classList.contains("pinned") || cur.includes(n); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o)); });
+        count.textContent = i >= 0 ? `Step ${i + 1} of ${frames.length}` : `${frames.length} steps`;
+      }
       if (i < 0) { caption(null); draw(false); return; }
       const f = frames[i];
       caption(f, i);
@@ -172,6 +182,10 @@
       subK.innerHTML = `<span>Run complete</span>`;
       subT.textContent = cfg.end || "The run is complete.";
       subG.hidden = true;
+      if (min) {
+        root.classList.add("ended"); count.textContent = "Run complete";
+        nodes.forEach((n) => { const o = n.classList.contains("pinned"); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o)); });
+      }
       label("↺ Watch again", "Watch the run again");
       idx = frames.length;
     }
@@ -195,6 +209,11 @@
     root.querySelector('[data-act="next"]').addEventListener("click", () => { user = true; pause(); go(Math.min(frames.length - 1, idx + 1), true); });
     root.querySelector('[data-act="restart"]').addEventListener("click", () => { user = true; pause(); go(0, true); play(); });
     for (const n of nodes) n.addEventListener("click", () => {
+      if (min) {   // open or close this card's details, and keep the run going
+        const o = !n.classList.contains("open");
+        n.classList.toggle("pinned", o); n.classList.toggle("open", o); n.setAttribute("aria-expanded", String(o));
+        return;
+      }
       const i = frames.findIndex((f) => f.includes(n));
       if (i < 0) return;
       user = true; pause(); go(i, true);
