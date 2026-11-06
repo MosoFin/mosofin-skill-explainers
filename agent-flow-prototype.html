@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank Reconciliation Agent Flow</title>
+<meta name="description" content="See each step of the MosoFin bank reconciliation agent: what you do, what the agent does, and what it reads from your books.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f7f8f6;--panel:#ffffff;--sunk:#f1f4f2;--ink:#101310;--muted:#5c625d;--rule:#dfe4e0;
+  --you:#2f5fd0;--you-soft:#eaf0fd;--agent:#16b84e;--agent-soft:#e8f8ed;--agent-ink:#0d6b2e;
+  --data:#8a5a12;--data-soft:#f8f0e2;--gate:#7a3fc4;--gate-soft:#f2ebfb;--warn:#b42318;--warn-soft:#fdecea;
+  --line:#9aa59e;--shadow:0 1px 2px rgba(16,19,16,.06),0 4px 14px rgba(16,19,16,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1210;--panel:#141b18;--sunk:#18211d;--ink:#e8eeea;--muted:#a5b0aa;--rule:#26322c;
+  --you:#7ea2f5;--you-soft:#17213a;--agent:#43c78e;--agent-soft:#123024;--agent-ink:#7fe0b2;
+  --data:#e0b26a;--data-soft:#2b2214;--gate:#b892f0;--gate-soft:#241a35;--warn:#f08a80;--warn-soft:#331816;
+  --line:#5d6b64;--shadow:none;}}
+:root[data-theme="dark"]{
+  --bg:#0d1210;--panel:#141b18;--sunk:#18211d;--ink:#e8eeea;--muted:#a5b0aa;--rule:#26322c;
+  --you:#7ea2f5;--you-soft:#17213a;--agent:#43c78e;--agent-soft:#123024;--agent-ink:#7fe0b2;
+  --data:#e0b26a;--data-soft:#2b2214;--gate:#b892f0;--gate-soft:#241a35;--warn:#f08a80;--warn-soft:#331816;
+  --line:#5d6b64;--shadow:none;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Archivo,system-ui,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 16px 64px}
+.eyebrow{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.02em;margin:8px 0 10px}
+.lede{color:var(--muted);max-width:680px;margin:0 0 24px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 0 18px}
+button{font:inherit;cursor:pointer}
+.play{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 18px;font-weight:600}
+.play:focus-visible,.node:focus-visible,.seg button:focus-visible{outline:3px solid var(--you);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:8px 14px;color:var(--muted);font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--sunk);color:var(--ink);font-weight:600}
+.status{font-size:14px;color:var(--muted);min-height:1.5em;flex-basis:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin:0 0 18px;padding:0;list-style:none}
+.legend li{display:flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:3px;border:2px solid}
+.board{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);padding:0 12px 20px}
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:0 18px;position:sticky;top:0;z-index:3;background:var(--panel);border-bottom:1px solid var(--rule);padding:14px 0 10px;margin-bottom:14px;border-radius:14px 14px 0 0}
+.lane-h{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.lane-h small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.grid{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:26px 18px;z-index:1}
+.lane-bg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0 18px;pointer-events:none;z-index:0}
+.lane-bg div{border-radius:10px}
+.lane-bg div:nth-child(1){background:color-mix(in srgb,var(--you-soft) 45%,transparent)}
+.lane-bg div:nth-child(3){background:color-mix(in srgb,var(--data-soft) 45%,transparent)}
+svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+.wires path{fill:none;stroke:var(--line);stroke-width:1.6}
+.wires marker path{fill:var(--line);stroke:none}
+.wires path.on{stroke:var(--ink);stroke-width:2.2}
+.wires path.off{opacity:.25}
+.wires text{font:500 11px "IBM Plex Mono",monospace;fill:var(--muted)}
+.node{position:relative;z-index:2;text-align:left;width:100%;background:var(--panel);color:var(--ink);border:1.5px solid var(--rule);border-left:5px solid var(--c);border-radius:10px;padding:10px 12px;transition:transform .2s,box-shadow .2s,opacity .2s}
+.node .k{display:flex;justify-content:space-between;gap:8px;font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c)}
+.node .t{display:block;font-weight:650;font-size:15px;line-height:1.3;margin-top:3px}
+.node .d{display:none;font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.node[aria-expanded="true"] .d{display:block}
+.node .d ul{margin:6px 0 0;padding-left:18px}
+.guard{display:flex;gap:6px;align-items:flex-start;margin-top:8px;font-size:12.5px;line-height:1.4;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:5px 8px}
+.node.decide{border-style:dashed;border-left-style:solid}
+.node.optional{border-style:dashed}
+.node.you{--c:var(--you)} .node.agent{--c:var(--agent-ink)} .node.data{--c:var(--data)} .node.gate{--c:var(--gate)}
+.node.gate{background:var(--gate-soft)}
+.node.current{box-shadow:0 0 0 3px var(--c);transform:translateY(-2px)}
+.node.done{opacity:.72}
+.node.dim{opacity:.32}
+.n-you{grid-column:1}.n-agent{grid-column:2}.n-data{grid-column:3}
+.lane-tag{display:none}
+.note{font-size:13px;color:var(--muted);margin-top:18px}
+@media (max-width:720px){
+  .lanes{display:none}.lane-bg{display:none}
+  .grid{grid-template-columns:1fr;gap:22px}
+  .n-you,.n-agent,.n-data{grid-column:1}
+  .node{width:90%}.n-agent{margin-left:5%}.n-data{margin-left:10%}
+  .lane-tag{opacity:.8}
+  .lane-tag{display:inline}
+}
+@media (prefers-reduced-motion:reduce){.node{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">Agent flow · prototype</div>
+  <h1>How the bank reconciliation agent works</h1>
+  <p class="lede">Each card is one step of a run. The column shows who does the step: you, the agent, or the agent reading your data. Select a card to see more, or play the run from start to end.</p>
+
+  <div class="controls">
+    <button class="play" id="play" type="button">▶ Play the run</button>
+    <div class="seg" role="group" aria-label="Choose how the books are supplied">
+      <button type="button" data-path="yes" aria-pressed="true">Connected to MosoFin</button>
+      <button type="button" data-path="no" aria-pressed="false">Upload files</button>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </div>
+
+  <ul class="legend">
+    <li><span class="sw" style="border-color:var(--you)"></span>You act</li>
+    <li><span class="sw" style="border-color:var(--agent)"></span>Agent works</li>
+    <li><span class="sw" style="border-color:var(--data)"></span>Agent reads data (read-only)</li>
+    <li><span class="sw" style="border-color:var(--gate);background:var(--gate-soft)"></span>Waits for your approval</li>
+    <li><span class="sw" style="border-color:var(--warn);background:var(--warn-soft)"></span>Safeguard</li>
+  </ul>
+
+  <div class="board">
+    <div class="lanes" aria-hidden="true">
+      <div class="lane-h" style="color:var(--you)">● You<small>Questions, approvals, sign-off</small></div>
+      <div class="lane-h" style="color:var(--agent-ink)">● Agent<small>Asks, matches, explains</small></div>
+      <div class="lane-h" style="color:var(--data)">● Your data<small>Books and statements, read-only</small></div>
+    </div>
+    <div class="grid" id="grid">
+      <div class="lane-bg" aria-hidden="true"><div></div><div></div><div></div></div>
+      <svg class="wires" id="wires" aria-hidden="true"></svg>
+    </div>
+    <p class="note">Prototype. The steps come from the skill's internal anatomy page. A production version would build this chart from a flow file for each skill.</p>
+  </div>
+</main>
+
+<script>
+const STEPS = [
+  {id:"ask", row:1, lane:"you", kind:"You", title:"Ask for a bank reconciliation",
+   d:"You start the run. You can name the account and month, or let the agent ask."},
+  {id:"intake", row:2, lane:"agent", kind:"Agent", title:"Ask six questions in one message",
+   d:"The agent asks everything before it reads anything:<ul><li>Use MosoFin, or upload files?</li><li>Which account? (shown masked)</li><li>Which period? It never assumes one.</li><li>The bank statement, always</li><li>When was it last reconciled?</li><li>How large a difference is worth chasing?</li></ul>"},
+  {id:"answer", row:3, lane:"you", kind:"You", title:"Answer the questions",
+   d:"One reply covers all six questions, so the run does not stop again and again."},
+  {id:"route", row:4, lane:"agent", kind:"Decision", cls:"decide", title:"Connected to MosoFin, and you chose it?",
+   d:"If yes, the agent reads your books directly. If no, it gives you a short upload checklist."},
+  {id:"gates", row:5, lane:"data", kind:"Read-only", title:"Check workspace, company file and tools",
+   d:"The agent confirms the workspace by name and the company file. It checks for a bank feed. It confirms that it has read-only tools only.",
+   guard:"Tools that write to your books are out of scope.", path:"yes"},
+  {id:"upload", row:5, lane:"you", kind:"You", title:"Upload the statement and ledger",
+   d:"<ul><li>Bank statement (PDF or CSV), required</li><li>Ledger cash activity and ending balance</li><li>Prior reconciliation, or its date</li><li>The first days of next period, recommended</li></ul>", path:"no"},
+  {id:"approve", row:6, lane:"you", kind:"Approval", cls:"gate", title:"Approve the plan",
+   d:"The agent reads the plan back to you. It does nothing more until you say yes.", guard:"No reading starts without your yes."},
+  {id:"fetch", row:7, lane:"data", kind:"Read-only", title:"Read the books in one batch",
+   d:"Accounts, trial balance, general ledger, deposits, bill payments, purchases, payments, transfers and journal entries. With uploads, the agent reads your files instead.", path:"yes"},
+  {id:"read", row:7, lane:"data", kind:"Read-only", title:"Read your uploaded files",
+   d:"The agent reads the statement and ledger activity that you uploaded.", path:"no"},
+  {id:"open", row:8, lane:"agent", kind:"Agent", title:"Agree the opening and carry open items forward",
+   d:"The agent records both ending balances, agrees the opening balance, and brings last period's open items forward. It checks that the closed period did not change.",
+   guard:"No statement balance? The agent says so and prepares the book side only. It does not build a bridge."},
+  {id:"match", row:9, lane:"agent", kind:"Agent", title:"Build the bridge and match transactions",
+   d:"Two ladders lead to one adjusted balance. Brought-forward items match first, then exact, fuzzy, reference and split matches. The agent records how each match was made and finds duplicates in the books."},
+  {id:"classify", row:10, lane:"agent", kind:"Agent", title:"Sort what is left unmatched",
+   d:"Fees, interest, returned payments (NSF), loans, reserves and chargebacks. Prior-period items get no entry. An unknown item stays “unknown” and gets an owner."},
+  {id:"propose", row:11, lane:"agent", kind:"Agent", title:"Propose entries, each tied to evidence",
+   d:"Each proposed entry uses your real account names and points to its evidence: a statement line or ledger rows.", guard:"Entries are proposed only. The agent never posts them."},
+  {id:"signoff", row:12, lane:"you", kind:"Approval", cls:"gate", title:"Review and sign off",
+   d:"You get a summary, the matched and open lists, exceptions, proposed entries, coverage, and a blank sign-off for two people."},
+  {id:"save", row:13, lane:"agent", kind:"Optional", cls:"optional", title:"Offer to save your settings",
+   d:"The agent can save your policy choices and names for the next run.", guard:"Only after results, and only on an explicit yes."}
+];
+const EDGES = [
+  ["ask","intake"],["intake","answer"],["answer","route"],
+  ["route","gates","yes"],["route","upload","no"],
+  ["gates","approve"],["upload","approve"],
+  ["approve","fetch"],["approve","read"],["fetch","open"],["read","open"],
+  ["open","match"],["match","classify"],["classify","propose"],["propose","signoff"],["signoff","save"]
+];
+const narrow = matchMedia("(max-width: 720px)");
+const LANE_NAME = {you:"You", agent:"Agent", data:"Your data"};
+const grid = document.getElementById("grid"), wires = document.getElementById("wires");
+const els = {};
+let path = "yes";
+
+for (const s of STEPS) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = `node ${s.lane === "you" && s.cls === "gate" ? "gate" : s.lane} n-${s.lane} ${s.cls || ""}`;
+  b.style.gridRow = s.row;
+  // Two steps share row 5 and row 7, one per path. Only the active path's step is placed in the grid.
+  b.dataset.path = s.path || "";
+  b.setAttribute("aria-expanded", "false");
+  b.innerHTML = `<span class="k"><span>${s.kind}</span>${s.kind.toLowerCase() === LANE_NAME[s.lane].toLowerCase() ? "" : `<span class="lane-tag">${LANE_NAME[s.lane]}</span>`}</span>
+    <span class="t">${s.title}</span>
+    <span class="d">${s.d}${s.guard ? `<span class="guard"><span aria-hidden="true">⛨</span><span>${s.guard}</span></span>` : ""}</span>`;
+  if (s.guard && !s.d) b.querySelector(".d").innerHTML = "";
+  b.addEventListener("click", () => {
+    b.setAttribute("aria-expanded", b.getAttribute("aria-expanded") === "true" ? "false" : "true");
+    draw();
+  });
+  grid.appendChild(b);
+  els[s.id] = b;
+}
+
+function onPath(id) { const p = els[id].dataset.path; return !p || p === path; }
+
+function layout() {
+  // On the "upload" path the shared rows hold the upload-side steps; hide the other path's
+  // read step in row 7 so one card shows per row there, but keep both branches visible in row 5.
+  for (const s of STEPS) {
+    const el = els[s.id];
+    // In one column there is no room for both branches side by side, so show the chosen path only.
+    el.hidden = (s.id === "fetch" && path === "no") || (s.id === "read" && path === "yes") || (narrow.matches && !onPath(s.id));
+    el.classList.toggle("dim", !onPath(s.id) && !el.hidden);
+  }
+}
+
+function draw() {
+  const g = grid.getBoundingClientRect();
+  const parts = [];
+  for (const [a, b, label] of EDGES) {
+    const A = els[a], B = els[b];
+    if (A.hidden || B.hidden) continue;
+    const ra = A.getBoundingClientRect(), rb = B.getBoundingClientRect();
+    const x1 = ra.left + ra.width / 2 - g.left, y1 = ra.bottom - g.top;
+    const x2 = rb.left + rb.width / 2 - g.left, y2 = rb.top - g.top;
+    const my = y1 + (y2 - y1) / 2;
+    const r = Math.min(8, Math.abs(x2 - x1) / 2, (y2 - y1) / 2);
+    let d;
+    if (Math.abs(x2 - x1) < 2) d = `M${x1},${y1} V${y2 - 1}`;
+    else {
+      const sx = Math.sign(x2 - x1);
+      d = `M${x1},${y1} V${my - r} Q${x1},${my} ${x1 + sx * r},${my} H${x2 - sx * r} Q${x2},${my} ${x2},${my + r} V${y2 - 1}`;
+    }
+    const on = onPath(a) && onPath(b);
+    const cls = [A.classList.contains("done") && (B.classList.contains("done") || B.classList.contains("current")) ? "on" : "", on ? "" : "off"].join(" ");
+    parts.push(`<path class="${cls}" d="${d}" marker-end="url(#arr)"/>`);
+    if (label) parts.push(`<text class="${on ? "" : "off"}" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${my - 6}" text-anchor="${x2 > x1 ? "start" : "end"}" opacity="${on ? 1 : .35}">${label}</text>`);
+  }
+  wires.innerHTML = `<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--line)" stroke="none"/></marker></defs>` + parts.join("");
+}
+
+document.querySelectorAll(".seg button").forEach(btn => btn.addEventListener("click", () => {
+  path = btn.dataset.path;
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", String(x === btn)));
+  stop(); layout(); draw();
+}));
+
+// Play the run: step through the active path in order.
+const status = document.getElementById("status"), playBtn = document.getElementById("play");
+let timer = null, i = -1;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function order() { return STEPS.filter(s => onPath(s.id) && !els[s.id].hidden).map(s => s.id); }
+function stop() {
+  clearInterval(timer); timer = null; i = -1;
+  playBtn.textContent = "▶ Play the run";
+  Object.values(els).forEach(e => e.classList.remove("current", "done"));
+  status.textContent = "";
+}
+function tick() {
+  const o = order();
+  if (i >= 0) { els[o[i]].classList.remove("current"); els[o[i]].classList.add("done"); }
+  i++;
+  if (i >= o.length) { clearInterval(timer); timer = null; playBtn.textContent = "↺ Play again"; status.textContent = "Run complete. You hold the sign-off; the agent posted nothing."; draw(); return; }
+  const el = els[o[i]], s = STEPS.find(x => x.id === o[i]);
+  el.classList.add("current");
+  status.textContent = `Step ${i + 1} of ${o.length} · ${LANE_NAME[s.lane]}: ${s.title}`;
+  el.scrollIntoView({block: "center", behavior: reduce ? "auto" : "smooth"});
+  draw();
+}
+playBtn.addEventListener("click", () => {
+  if (timer) { stop(); draw(); return; }
+  stop(); playBtn.textContent = "■ Stop"; tick(); timer = setInterval(tick, 1600);
+});
+
+layout();
+narrow.addEventListener("change", () => { layout(); draw(); });
+new ResizeObserver(draw).observe(grid);
+document.fonts && document.fonts.ready.then(draw);
+draw();
+</script>
+</body>
+</html>
