@@ -478,6 +478,69 @@ def flow_section(skill, t):
 </section>
 """
 
+# --- Chat replay. chats/<skill>.json is an example conversation in which a person uses the skill.
+# build.py renders the whole conversation as plain HTML; site/assets/chat.js replays it like a live chat.
+CHATS = os.path.join(ROOT, "chats")
+
+def chat_of(skill):
+    p = os.path.join(CHATS, f"{skill}.json")
+    return json.load(open(p)) if os.path.exists(p) else None
+
+def chat_inline(t):
+    """Escape the text, then turn **bold** into <strong>."""
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", e(t))
+
+def chat_card(c):
+    title = f'<div class="cc-title">{e(c.get("title", ""))}</div>' if c.get("title") else ""
+    if c["type"] in ("bridge", "signoff"):
+        rows = "".join(f'<tr class="{e(r[2]) if len(r) > 2 else ""}"><th scope="row">{e(r[0])}</th><td>{e(r[1]) if r[1] else "<span class=cc-line></span>"}</td></tr>'
+                       for r in c["rows"])
+        return f'<div class="cc cc-{c["type"]}">{title}<table>{rows}</table></div>'
+    head = "".join(f"<th scope=col>{e(h)}</th>" for h in c.get("head", []))
+    rows = "".join("<tr>" + "".join(f"<td>{e(x)}</td>" for x in r) + "</tr>" for r in c["rows"])
+    return f'<div class="cc cc-table">{title}<div class="cc-scroll"><table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></div></div>'
+
+def chat_message(m):
+    guard = f'<p class="cm-guard"><span aria-hidden="true">⛨</span> {e(m["guard"])}</p>' if m.get("guard") else ""
+    if m["role"] == "user":
+        att = "".join(f'<span class="cm-file"><span aria-hidden="true">📄</span> {e(a)}</span>' for a in m.get("attach", []))
+        return f'<div class="cm cm-user"><p class="cm-bubble">{chat_inline(m["text"])}</p>{att}</div>'
+    if m["role"] == "tool":
+        calls = "".join(f"<li><code>{e(x)}</code></li>" for x in m.get("calls", []))
+        tag = f'<span class="cm-tag">{e(m["tag"])}</span>' if m.get("tag") else ""
+        return (f'<div class="cm cm-tool"><details><summary><span class="cm-ico" aria-hidden="true">✓</span>'
+                f'<span class="cm-label">{e(m["label"])}</span>{tag}</summary><ul>{calls}</ul></details></div>')
+    parts = [f'<p>{chat_inline(m["text"])}</p>'] if m.get("text") else []
+    if m.get("list"): parts.append("<ol>" + "".join(f"<li>{chat_inline(x)}</li>" for x in m["list"]) + "</ol>")
+    if m.get("card"): parts.append(chat_card(m["card"]))
+    if m.get("after"): parts.append(f'<p>{chat_inline(m["after"])}</p>')
+    return (f'<div class="cm cm-agent"><span class="cm-av" aria-hidden="true">M</span><div class="cm-body">'
+            f'<span class="cm-name">MosoFin agent</span>{"".join(parts)}{guard}</div></div>')
+
+def chat_section(skill, t):
+    c = chat_of(skill)
+    if not c: return ""
+    msgs = "".join(chat_message(m) for m in c["messages"])
+    return f"""<section aria-labelledby="chat-h">
+  <h2 id="chat-h">Watch someone use it</h2>
+  <p class="chat-intro">{e(c.get("example", ""))}</p>
+  <div class="chat" data-chat id="chat-{e(skill)}">
+    <div class="chat-head">
+      <span class="chat-who"><span class="cm-av" aria-hidden="true">M</span><span><b>MosoFin agent</b><small>{e(t)} skill</small></span></span>
+      <span class="chat-ctrl">
+        <button type="button" class="chat-btn primary" data-act="play" aria-label="Play the conversation">▶ Play</button>
+        <button type="button" class="chat-btn" data-act="restart" aria-label="Start again">↺</button>
+        <button type="button" class="chat-btn" data-act="speed" aria-label="Change speed">1×</button>
+        <button type="button" class="chat-btn" data-act="skip" aria-label="Show the whole conversation">Show all</button>
+      </span>
+      <span class="chat-prog" aria-hidden="true"><span></span></span>
+    </div>
+    <div class="chat-log" tabindex="0" aria-label="Example conversation">{msgs}</div>
+    <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">Message the agent</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
+  </div>
+</section>
+"""
+
 def landing(r):
     s, t = r["skill"], title_of(r)
     cards = []
