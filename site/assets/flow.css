@@ -1,0 +1,117 @@
+/* Flow movie: one run of a skill, step by step, in three lanes (you, the agent, your data).
+   build.py renders the cards as plain HTML, so the steps read well without JavaScript.
+   flow.js adds the wires, the play controls, the subtitles and the timeline. */
+:root {
+  --fl-you: var(--blue, #3f6d96);
+  --fl-you-soft: var(--blue-soft, #e7eff6);
+  --fl-agent: #0f7f39;
+  --fl-agent-soft: var(--green-soft, #e8f8ed);
+  --fl-data: var(--hold, #a06a12);
+  --fl-data-soft: var(--hold-soft, #f7eedb);
+  --fl-gate: #6c3fb5;
+  --fl-gate-soft: #f1eafb;
+  --fl-warn: #b42318;
+  --fl-warn-soft: #fdecea;
+  --fl-wire: #a3aca5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fl-agent: #5fd39c; --fl-gate: #b892f0; --fl-gate-soft: #241a35;
+    --fl-warn: #f08a80; --fl-warn-soft: #331816; --fl-wire: #56645c;
+  }
+}
+:root[data-theme="dark"] {
+  --fl-agent: #5fd39c; --fl-gate: #b892f0; --fl-gate-soft: #241a35;
+  --fl-warn: #f08a80; --fl-warn-soft: #331816; --fl-wire: #56645c;
+}
+
+.flow { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); margin: 14px 0 0; }
+.flow-intro { color: var(--muted); margin: 0 0 4px; max-width: 70ch; }
+
+/* Controls */
+.flow-bar { display: none; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px 12px; border-bottom: 1px solid var(--rule); }
+.flow.js .flow-bar { display: flex; }
+.flow-btns { display: inline-flex; gap: 6px; }
+.flow-btn { font: inherit; font-size: 14px; cursor: pointer; border: 1px solid var(--rule-strong, var(--rule)); background: var(--panel); color: var(--ink); border-radius: 999px; min-width: 38px; height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.flow-btn.primary { background: var(--ink); color: var(--ground, #fff); border-color: var(--ink); font-weight: 600; padding: 0 16px; }
+.flow-btn:hover { border-color: var(--ink); }
+.flow-btn:focus-visible, .fnode:focus-visible, .flow-seg:focus-visible, .flow-paths button:focus-visible { outline: 3px solid var(--fl-you); outline-offset: 2px; }
+.flow-paths { display: inline-flex; border: 1px solid var(--rule-strong, var(--rule)); border-radius: 999px; overflow: hidden; }
+.flow-paths button { font: inherit; font-size: 13.5px; cursor: pointer; border: 0; background: none; color: var(--muted); padding: 0 14px; height: 36px; }
+.flow-paths button[aria-pressed="true"] { background: var(--sunk); color: var(--ink); font-weight: 600; }
+.flow-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--muted); margin-left: auto; }
+.flow-legend li { display: flex; align-items: center; gap: 6px; }
+.flow-legend i { width: 10px; height: 10px; border-radius: 3px; border: 2px solid var(--c); background: var(--b, transparent); }
+
+/* Board */
+.flow-board { position: relative; padding: 0 14px 18px; }
+.flow-lanes, .flow-grid, .flow-lanebg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 16px; }
+.flow-lanes { padding: 12px 0 10px; font-size: 13.5px; font-weight: 700; }
+.flow-lanes span { display: flex; align-items: baseline; gap: 8px; color: var(--c); }
+.flow-lanes small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.flow-lanebg { position: absolute; left: 14px; right: 14px; top: 44px; bottom: 18px; pointer-events: none; }
+.flow-lanebg i { border-radius: 10px; }
+.flow-lanebg i:nth-child(1) { background: color-mix(in srgb, var(--fl-you-soft) 55%, transparent); }
+.flow-lanebg i:nth-child(3) { background: color-mix(in srgb, var(--fl-data-soft) 55%, transparent); }
+.flow-grid { position: relative; row-gap: 22px; padding-top: 6px; }
+.frow { display: contents; }
+.flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
+.flow-wires path { fill: none; stroke: var(--fl-wire); stroke-width: 1.6; }
+.flow-wires path.lit { stroke: var(--ink); stroke-width: 2; }
+.flow-wires path.dim { opacity: .3; }
+.flow-wires marker path { fill: var(--fl-wire); stroke: none; }
+.flow-wires text { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; fill: var(--muted); }
+.flow-wires circle { fill: var(--fl-agent); stroke: var(--panel); stroke-width: 2; }
+
+/* Cards */
+.fnode { --c: var(--fl-agent); position: relative; z-index: 2; font: inherit; color: var(--ink); text-align: left; width: 100%; background: var(--panel); border: 1.5px solid var(--rule-strong, var(--rule)); border-left: 5px solid var(--c); border-radius: 10px; padding: 9px 12px 10px; cursor: default; transition: opacity .25s, transform .25s, box-shadow .25s; }
+.flow.js .fnode { cursor: pointer; }
+.fnode.l-you { grid-column: 1; --c: var(--fl-you); }
+.fnode.l-agent { grid-column: 2; --c: var(--fl-agent); }
+.fnode.l-data { grid-column: 3; --c: var(--fl-data); }
+.fnode.t-approve { --c: var(--fl-gate); background: var(--fl-gate-soft); }
+.fnode.t-decide { border-style: dashed; border-left-style: solid; }
+.fnode.t-optional { border-style: dashed; }
+.fk { display: flex; justify-content: space-between; gap: 8px; font: 500 10.5px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+.fk .fn { color: var(--muted); }
+.ft { display: block; font-weight: 650; font-size: 15px; line-height: 1.3; margin-top: 3px; }
+.fs { display: block; font-size: 13.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.fg { display: flex; gap: 6px; margin-top: 7px; font-size: 12.5px; line-height: 1.4; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 6px; padding: 4px 8px; }
+.flow.js .fs, .flow.js .fg { display: none; }
+.flow.js .fnode .shield { display: inline; }
+.shield { display: none; color: var(--fl-warn); }
+.fnode.past { opacity: .62; }
+.fnode.future { opacity: .9; }
+.fnode.now { box-shadow: 0 0 0 3px var(--c), 0 10px 26px -14px var(--c); transform: translateY(-2px); opacity: 1; }
+.fnode.off { opacity: .28; }
+.fnode[hidden] { display: none; }
+
+/* Subtitles and timeline */
+.flow-sub { display: none; position: sticky; bottom: 0; z-index: 4; background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--rule); border-radius: 0 0 14px 14px; padding: 12px 16px 14px; }
+.flow.js .flow-sub { display: block; }
+.flow-sub-k { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.flow-sub-k b { color: var(--c, var(--ink)); font-weight: 600; }
+.flow-sub-t { font-size: 16px; line-height: 1.45; margin: 4px 0 0; min-height: 2.9em; }
+.flow-sub-t strong { font-weight: 650; }
+.flow-sub-g { display: inline-flex; gap: 6px; margin-top: 6px; font-size: 13px; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 6px; padding: 3px 8px; }
+.flow-sub-g[hidden] { display: none; }
+.flow-time { display: flex; gap: 3px; margin-top: 10px; }
+.flow-seg { flex: 1; height: 8px; border: 0; padding: 0; border-radius: 4px; background: var(--rule); cursor: pointer; position: relative; overflow: hidden; }
+.flow-seg span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink); border-radius: 4px; }
+.flow-seg.done span { width: 100%; }
+
+@media (max-width: 760px) {
+  .flow-lanes, .flow-lanebg { display: none; }
+  .flow-legend { margin-left: 0; }
+  .flow-grid { grid-template-columns: minmax(0, 1fr); row-gap: 20px; padding-top: 14px; }
+  .frow { display: flex; gap: 10px; }
+  .frow > .fnode { flex: 1 1 0; min-width: 0; }
+  .frow > .fnode:only-of-type.l-you { margin-right: 10%; }
+  .frow > .fnode:only-of-type.l-agent { margin: 0 5%; }
+  .frow > .fnode:only-of-type.l-data { margin-left: 10%; }
+  .ft { font-size: 14.5px; }
+  .flow-sub-t { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fnode { transition: none; }
+}

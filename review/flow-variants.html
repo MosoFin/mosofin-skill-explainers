@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow Design Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>:root {
+  --ground: #fff;
+  --panel: #fff;
+  --sunk: #f5f7f4;
+  --ink: #101310;
+  --muted: #5c625d;
+  --faint: #8b928c;
+  --rule: #e5e9e4;
+  --rule-strong: #d2d8d1;
+  --green: #16b84e;
+  --green-soft: #e8f8ed;
+  --blue: #3f6d96;
+  --blue-soft: #e7eff6;
+  --hold: #a06a12;
+  --hold-soft: #f7eedb;
+  --shadow: 0 14px 40px -28px rgba(16, 19, 16, .34);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0d1210;
+    --panel: #151c19;
+    --sunk: #111815;
+    --ink: #e8eeea;
+    --muted: #a5b0aa;
+    --faint: #829088;
+    --rule: #26312c;
+    --rule-strong: #3a4941;
+    --green: #43c78e;
+    --green-soft: #123024;
+    --blue: #8db3d8;
+    --blue-soft: #15202b;
+    --hold: #dba657;
+    --hold-soft: #2d2413;
+    --shadow: 0 14px 40px -28px rgba(0, 0, 0, .72);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0d1210;
+  --panel: #151c19;
+  --sunk: #111815;
+  --ink: #e8eeea;
+  --muted: #a5b0aa;
+  --faint: #829088;
+  --rule: #26312c;
+  --rule-strong: #3a4941;
+  --green: #43c78e;
+  --green-soft: #123024;
+  --blue: #8db3d8;
+  --blue-soft: #15202b;
+  --hold: #dba657;
+  --hold-soft: #2d2413;
+  --shadow: 0 14px 40px -28px rgba(0, 0, 0, .72);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  inset: 0 0 auto;
+  height: 6px;
+  background: #c5e4c9;
+}
+.wrap {
+  max-width: 1200px;
+  padding: 0 28px 96px;
+  gap: 76px;
+}
+.site-nav {
+  min-height: 66px;
+  margin: 0 -28px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -.025em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand-name { color: #111; }
+.brand-badge {
+  margin-left: 1px;
+  padding: 3px 8px;
+  border: 1px solid #e3e7e3;
+  border-radius: 999px;
+  color: var(--faint);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  object-fit: contain;
+}
+.nav-links { display: flex; align-items: center; gap: 26px; }
+.nav-links a {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links .nav-cta {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  border-radius: 7px;
+  background: #0c0d0e;
+  color: #fff;
+}
+.nav-links .nav-cta:hover { background: var(--green); color: #07190c; }
+.theme-toggle {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.theme-toggle:hover { border-color: var(--rule); background: var(--sunk); color: var(--ink); }
+.theme-glyph { font-size: 16px; line-height: 1; }
+header, section { gap: 19px; }
+header { padding: 26px 0 0; }
+.label {
+  color: #128735;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .16em;
+}
+h1 {
+  max-width: 940px;
+  font-size: clamp(42px, 8vw, 82px);
+  line-height: .99;
+  letter-spacing: -.065em;
+  font-weight: 800;
+}
+h2 {
+  font-size: clamp(25px, 3.6vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+  font-weight: 750;
+}
+h3 { letter-spacing: -.025em; }
+p { max-width: 70ch; }
+.lede { max-width: 66ch; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.6; color: var(--muted); }
+.accent { color: #13ad46; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.hero-primary, .hero-secondary {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+.hero-primary { border-color: #14b849; background: #14b849; color: #07190c; }
+.hero-primary:hover { background: #10a541; transform: translateY(-1px); }
+.hero-secondary:hover { border-color: var(--ink); background: var(--sunk); }
+.hero-note { color: var(--faint); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: .02em; }
+.proof-panel {
+  overflow: hidden;
+  border: 1px solid #202824;
+  border-radius: 16px;
+  background: #0c1110;
+  color: #f4f8f5;
+}
+.proof-top, .proof-foot { min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 22px; }
+.proof-top { border-bottom: 1px solid #252d29; color: #a8b4ad; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; font-weight: 600; letter-spacing: .1em; }
+.proof-state { margin-left: auto; color: #57d77e; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #3ad466; box-shadow: 0 0 12px rgba(58,212,102,.45); }
+.proof-body { display: grid; grid-template-columns: 1fr 1.15fr; gap: 36px; padding: clamp(24px,5vw,52px); }
+.proof-intro .label { color: #5de17f; }
+.proof-intro h2 { max-width: 420px; margin-top: 15px; color: #fff; font-size: clamp(26px,4vw,42px); }
+.proof-intro p { margin-top: 14px; color: #aab5ae; font-size: 15px; }
+.proof-steps { align-self: center; display: grid; gap: 10px; }
+.proof-steps div { min-height: 70px; display: grid; grid-template-columns: 46px 1fr; align-content: center; column-gap: 14px; padding: 12px 15px; border: 1px solid #26302a; border-radius: 9px; background: #111816; }
+.proof-steps div > span { grid-row: span 2; align-self: center; color: #5de17f; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; }
+.proof-steps b { font-size: 14px; font-weight: 650; }
+.proof-steps small { color: #9ba69f; font-size: 12px; }
+.proof-foot { min-height: 46px; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid #252d29; color: #96a29a; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; }
+.proof-foot span + span::before { content: "·"; margin-right: 10px; color: #48ce6d; }
+.library-section { scroll-margin-top: 28px; }
+.library-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+.library-heading h2 { margin-top: 8px; }
+.library-heading p { margin-top: 8px; color: var(--muted); }
+.library-total { padding: 7px 11px; border: 1px solid var(--rule); border-radius: 999px; color: var(--muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; white-space: nowrap; }
+.library-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 8px; }
+.search-box { min-height: 48px; flex: 1; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid var(--rule-strong); border-radius: 8px; background: var(--panel); color: var(--faint); }
+.search-box:focus-within { border-color: #16b84e; box-shadow: 0 0 0 3px rgba(22,184,78,.13); }
+.search-box > span { font-size: 23px; line-height: 1; }
+.search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 14px; }
+.search-box input::placeholder { color: var(--faint); }
+.genre-filters { display: flex; gap: 6px; padding: 4px; border: 1px solid var(--rule); border-radius: 9px; background: var(--sunk); }
+.filter-button, .pagination button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; }
+.filter-button.is-active { background: var(--panel); color: var(--ink); box-shadow: 0 1px 3px rgba(16,19,16,.12); }
+.result-count { color: var(--faint); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; }
+.tbl tr[hidden] { display: none; }
+.empty-state { padding: 28px; border: 1px dashed var(--rule-strong); border-radius: 10px; color: var(--muted); text-align: center; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.pagination button { border: 1px solid var(--rule); background: var(--panel); }
+.pagination button:hover:not(:disabled) { border-color: #16b84e; color: var(--ink); }
+.pagination button:disabled { cursor: not-allowed; opacity: .45; }
+.page-numbers { display: flex; gap: 5px; }
+.pagination .page-number { width: 36px; padding: 0; }
+.pagination .page-number.is-current { border-color: #16b84e; background: #e8f8ed; color: #12632d; }
+a { text-underline-offset: 3px; }
+.crumb { margin-bottom: -42px; }
+.cards { gap: 14px; }
+.card, .panel, .stat, .tbl {
+  border-color: var(--rule);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.card { border-top: 2px solid var(--green); padding: 24px; transition: transform .18s ease, border-color .18s ease; }
+.card:hover { transform: translateY(-3px); border-color: var(--green); box-shadow: var(--shadow); }
+.card.todo { border-top-color: var(--rule-strong); }
+.panel { padding: 24px; }
+.stats { gap: 14px; }
+.stat { padding: 20px; }
+.stat .v { font-size: 38px; }
+.tbl { overflow: hidden; }
+th { padding-top: 14px; padding-bottom: 14px; }
+td { padding-top: 13px; padding-bottom: 13px; }
+footer { padding-top: 22px; }
+button, input, select { font: inherit; }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .wrap { padding: 0 20px 64px; gap: 54px; }
+  .site-nav { margin: 0 -20px; padding: 0 20px; min-height: 66px; gap: 8px; }
+  .brand { gap: 6px; font-size: 12px; letter-spacing: -.04em; }
+  .brand-badge, .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 0; }
+  .nav-links .nav-cta { padding: 8px 8px; font-size: 11px; }
+  .theme-toggle { margin-right: 4px; padding: 0 5px; }
+  header { padding-top: 18px; }
+  h1 { font-size: clamp(40px, 12vw, 62px); }
+  .crumb { margin-bottom: -25px; }
+  .proof-body { grid-template-columns: 1fr; gap: 24px; }
+  .proof-foot { justify-content: flex-start; padding: 10px 18px; }
+  .library-controls { align-items: stretch; flex-direction: column; }
+  .genre-filters { width: fit-content; }
+}
+:root[data-theme="dark"] body { background: var(--ground); color: var(--ink); }
+:root[data-theme="dark"] .brand-name { color: var(--ink); }
+:root[data-theme="dark"] .accent { color: #55d98d; }
+:root[data-theme="dark"] .label { color: #68d995; }
+:root[data-theme="dark"] .nav-links .nav-cta { background: #e8eeea; color: #101310; }
+:root[data-theme="dark"] .nav-links .nav-cta:hover { background: #43c78e; color: #07190c; }
+:root[data-theme="dark"] .pagination .page-number.is-current { background: #123024; color: #75dfa8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body { background: var(--ground); color: var(--ink); }
+  :root:not([data-theme="light"]) .brand-name { color: var(--ink); }
+  :root:not([data-theme="light"]) .accent { color: #55d98d; }
+  :root:not([data-theme="light"]) .label { color: #68d995; }
+  :root:not([data-theme="light"]) .nav-links .nav-cta { background: #e8eeea; color: #101310; }
+  :root:not([data-theme="light"]) .nav-links .nav-cta:hover { background: #43c78e; color: #07190c; }
+  :root:not([data-theme="light"]) .pagination .page-number.is-current { background: #123024; color: #75dfa8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+</style>
+<style>body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,system-ui,sans-serif}.wrap{max-width:1120px;margin:0 auto;padding:36px 16px 64px}h1{font-size:clamp(26px,4vw,38px);margin:6px 0 8px;letter-spacing:-.02em}.eyebrow{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.lede{color:var(--muted);max-width:70ch;margin:0}</style>
+<style>/* Flow movie: one run of a skill, step by step, in three lanes (you, the agent, your data).
+   build.py renders the cards as plain HTML, so the steps read well without JavaScript.
+   flow.js adds the wires, the play controls, the subtitles and the timeline. */
+:root {
+  --fl-you: var(--blue, #3f6d96);
+  --fl-you-soft: var(--blue-soft, #e7eff6);
+  --fl-agent: #0f7f39;
+  --fl-agent-soft: var(--green-soft, #e8f8ed);
+  --fl-data: var(--hold, #a06a12);
+  --fl-data-soft: var(--hold-soft, #f7eedb);
+  --fl-gate: #6c3fb5;
+  --fl-gate-soft: #f1eafb;
+  --fl-warn: #b42318;
+  --fl-warn-soft: #fdecea;
+  --fl-wire: #a3aca5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fl-agent: #5fd39c; --fl-gate: #b892f0; --fl-gate-soft: #241a35;
+    --fl-warn: #f08a80; --fl-warn-soft: #331816; --fl-wire: #56645c;
+  }
+}
+:root[data-theme="dark"] {
+  --fl-agent: #5fd39c; --fl-gate: #b892f0; --fl-gate-soft: #241a35;
+  --fl-warn: #f08a80; --fl-warn-soft: #331816; --fl-wire: #56645c;
+}
+
+.flow { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); margin: 14px 0 0; }
+.flow-intro { color: var(--muted); margin: 0 0 4px; max-width: 70ch; }
+
+/* Controls */
+.flow-bar { display: none; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px 12px; border-bottom: 1px solid var(--rule); }
+.flow.js .flow-bar { display: flex; }
+.flow-btns { display: inline-flex; gap: 6px; }
+.flow-btn { font: inherit; font-size: 14px; cursor: pointer; border: 1px solid var(--rule-strong, var(--rule)); background: var(--panel); color: var(--ink); border-radius: 999px; min-width: 38px; height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.flow-btn.primary { background: var(--ink); color: var(--ground, #fff); border-color: var(--ink); font-weight: 600; padding: 0 16px; }
+.flow-btn:hover { border-color: var(--ink); }
+.flow-btn:focus-visible, .fnode:focus-visible, .flow-seg:focus-visible, .flow-paths button:focus-visible { outline: 3px solid var(--fl-you); outline-offset: 2px; }
+.flow-paths { display: inline-flex; border: 1px solid var(--rule-strong, var(--rule)); border-radius: 999px; overflow: hidden; }
+.flow-paths button { font: inherit; font-size: 13.5px; cursor: pointer; border: 0; background: none; color: var(--muted); padding: 0 14px; height: 36px; }
+.flow-paths button[aria-pressed="true"] { background: var(--sunk); color: var(--ink); font-weight: 600; }
+.flow-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--muted); margin-left: auto; }
+.flow-legend li { display: flex; align-items: center; gap: 6px; }
+.flow-legend i { width: 10px; height: 10px; border-radius: 3px; border: 2px solid var(--c); background: var(--b, transparent); }
+
+/* Board */
+.flow-board { position: relative; padding: 0 14px 18px; }
+.flow-lanes, .flow-grid, .flow-lanebg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 16px; }
+.flow-lanes { padding: 12px 0 10px; font-size: 13.5px; font-weight: 700; }
+.flow-lanes span { display: flex; align-items: baseline; gap: 8px; color: var(--c); }
+.flow-lanes small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.flow-lanebg { position: absolute; left: 14px; right: 14px; top: 44px; bottom: 18px; pointer-events: none; }
+.flow-lanebg i { border-radius: 10px; }
+.flow-lanebg i:nth-child(1) { background: color-mix(in srgb, var(--fl-you-soft) 55%, transparent); }
+.flow-lanebg i:nth-child(3) { background: color-mix(in srgb, var(--fl-data-soft) 55%, transparent); }
+.flow-grid { position: relative; row-gap: 22px; padding-top: 6px; }
+.frow { display: contents; }
+.flow-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
+.flow-wires path { fill: none; stroke: var(--fl-wire); stroke-width: 1.6; }
+.flow-wires path.lit { stroke: var(--ink); stroke-width: 2; }
+.flow-wires path.dim { opacity: .3; }
+.flow-wires marker path { fill: var(--fl-wire); stroke: none; }
+.flow-wires text { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; fill: var(--muted); }
+.flow-wires circle { fill: var(--fl-agent); stroke: var(--panel); stroke-width: 2; }
+
+/* Cards */
+.fnode { --c: var(--fl-agent); position: relative; z-index: 2; font: inherit; color: var(--ink); text-align: left; width: 100%; background: var(--panel); border: 1.5px solid var(--rule-strong, var(--rule)); border-left: 5px solid var(--c); border-radius: 10px; padding: 9px 12px 10px; cursor: default; transition: opacity .25s, transform .25s, box-shadow .25s; }
+.flow.js .fnode { cursor: pointer; }
+.fnode.l-you { grid-column: 1; --c: var(--fl-you); }
+.fnode.l-agent { grid-column: 2; --c: var(--fl-agent); }
+.fnode.l-data { grid-column: 3; --c: var(--fl-data); }
+.fnode.t-approve { --c: var(--fl-gate); background: var(--fl-gate-soft); }
+.fnode.t-decide { border-style: dashed; border-left-style: solid; }
+.fnode.t-optional { border-style: dashed; }
+.fk { display: flex; justify-content: space-between; gap: 8px; font: 500 10.5px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+.fk .fn { color: var(--muted); }
+.ft { display: block; font-weight: 650; font-size: 15px; line-height: 1.3; margin-top: 3px; }
+.fs { display: block; font-size: 13.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.fg { display: flex; gap: 6px; margin-top: 7px; font-size: 12.5px; line-height: 1.4; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 6px; padding: 4px 8px; }
+.flow.js .fs, .flow.js .fg { display: none; }
+.flow.js .fnode .shield { display: inline; }
+.shield { display: none; color: var(--fl-warn); }
+.fnode.past { opacity: .62; }
+.fnode.future { opacity: .9; }
+.fnode.now { box-shadow: 0 0 0 3px var(--c), 0 10px 26px -14px var(--c); transform: translateY(-2px); opacity: 1; }
+.fnode.off { opacity: .28; }
+.fnode[hidden] { display: none; }
+
+/* Subtitles and timeline */
+.flow-sub { display: none; position: sticky; bottom: 0; z-index: 4; background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--rule); border-radius: 0 0 14px 14px; padding: 12px 16px 14px; }
+.flow.js .flow-sub { display: block; }
+.flow-sub-k { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.flow-sub-k b { color: var(--c, var(--ink)); font-weight: 600; }
+.flow-sub-t { font-size: 16px; line-height: 1.45; margin: 4px 0 0; min-height: 2.9em; }
+.flow-sub-t strong { font-weight: 650; }
+.flow-sub-g { display: inline-flex; gap: 6px; margin-top: 6px; font-size: 13px; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 6px; padding: 3px 8px; }
+.flow-sub-g[hidden] { display: none; }
+.flow-time { display: flex; gap: 3px; margin-top: 10px; }
+.flow-seg { flex: 1; height: 8px; border: 0; padding: 0; border-radius: 4px; background: var(--rule); cursor: pointer; position: relative; overflow: hidden; }
+.flow-seg span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink); border-radius: 4px; }
+.flow-seg.done span { width: 100%; }
+
+@media (max-width: 760px) {
+  .flow-lanes, .flow-lanebg { display: none; }
+  .flow-legend { margin-left: 0; }
+  .flow-grid { grid-template-columns: minmax(0, 1fr); row-gap: 20px; padding-top: 14px; }
+  .frow { display: flex; gap: 10px; }
+  .frow > .fnode { flex: 1 1 0; min-width: 0; }
+  .frow > .fnode:only-of-type.l-you { margin-right: 10%; }
+  .frow > .fnode:only-of-type.l-agent { margin: 0 5%; }
+  .frow > .fnode:only-of-type.l-data { margin-left: 10%; }
+  .ft { font-size: 14.5px; }
+  .flow-sub-t { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fnode { transition: none; }
+}
+</style>
+<style>/* Review page shell */
+.rv-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+.rv-tabs button { font: inherit; cursor: pointer; border: 1px solid var(--rule-strong); background: var(--panel); color: var(--ink); border-radius: 12px; padding: 10px 14px; text-align: left; min-width: 0; flex: 1 1 200px; }
+.rv-tabs button b { display: block; font-size: 15px; }
+.rv-tabs button span { display: block; font-size: 13px; color: var(--muted); }
+.rv-tabs button[aria-selected="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink) inset; }
+.rv-panel[hidden] { display: none; }
+.rv-note { font-size: 14px; color: var(--muted); margin: 10px 0 0; }
+
+/* Shared player controls for B and C */
+.pl { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); margin-top: 14px; overflow: hidden; }
+.pl-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px 12px; border-bottom: 1px solid var(--rule); }
+.pl-time { display: flex; gap: 3px; padding: 0 16px 16px; }
+.pl-time .flow-seg span { transition: none; }
+
+/* B. Storyboard */
+.sb-track { position: relative; padding: 14px 16px 6px; }
+.sb-track svg { display: block; width: 100%; height: 108px; overflow: visible; }
+.sb-track .ln { stroke: var(--rule-strong); stroke-width: 2; fill: none; }
+.sb-track .ln.lit { stroke: var(--ink); }
+.sb-track .lane-l { font: 600 11.5px Archivo, sans-serif; }
+.sb-track .lane-r { fill: var(--sunk); }
+.sb-track .dot { cursor: pointer; stroke: var(--panel); stroke-width: 2.5; transition: r .2s; }
+.sb-track .dot.future { opacity: .35; }
+.sb-track .dot.now { r: 9; }
+.sb-track .halo { fill: none; stroke-width: 2; opacity: .5; }
+.sb-stage { position: relative; margin: 6px 16px 14px; min-height: 250px; display: grid; }
+.sb-scene { grid-area: 1 / 1; display: flex; gap: 16px; align-items: stretch; transition: opacity .35s, transform .35s; }
+.sb-scene.out { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+.sb-scene.in { opacity: 0; transform: translateX(24px); }
+.sb-card { --c: var(--fl-agent); flex: 1; min-width: 0; border: 1.5px solid var(--rule-strong); border-top: 6px solid var(--c); border-radius: 14px; padding: 18px 20px 20px; background: var(--panel); }
+.sb-card.l-you { --c: var(--fl-you); } .sb-card.l-data { --c: var(--fl-data); }
+.sb-card.t-approve { --c: var(--fl-gate); background: var(--fl-gate-soft); }
+.sb-who { display: flex; align-items: center; gap: 12px; }
+.sb-av { width: 44px; height: 44px; border-radius: 50%; background: var(--c); color: var(--panel); display: grid; place-items: center; flex: none; }
+.sb-av svg { width: 24px; height: 24px; }
+.sb-who b { display: block; font-size: 15px; color: var(--c); }
+.sb-who span { font: 500 11px "IBM Plex Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.sb-card h3 { font-size: clamp(22px, 3vw, 30px); line-height: 1.15; letter-spacing: -.01em; margin: 16px 0 8px; }
+.sb-card p { font-size: 17px; line-height: 1.55; color: var(--ink); margin: 0; max-width: 62ch; }
+.sb-guard { display: inline-flex; gap: 8px; margin-top: 14px; font-size: 14.5px; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 8px; padding: 7px 12px; }
+.sb-step { font: 500 11px "IBM Plex Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-left: auto; align-self: flex-start; }
+.sb-strip { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 14px; scrollbar-width: thin; }
+.sb-thumb { --c: var(--fl-agent); flex: 0 0 132px; font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--rule); border-left: 4px solid var(--c); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 8px; font-size: 12px; line-height: 1.3; opacity: .55; }
+.sb-thumb.l-you { --c: var(--fl-you); } .sb-thumb.l-data { --c: var(--fl-data); } .sb-thumb.t-approve { --c: var(--fl-gate); }
+.sb-thumb.past { opacity: .8; } .sb-thumb.now { opacity: 1; box-shadow: 0 0 0 2px var(--c); }
+.sb-thumb i { display: block; font: 500 10px "IBM Plex Mono", monospace; font-style: normal; color: var(--muted); }
+
+/* C. Chat replay */
+.ch-win { height: 540px; overflow-y: auto; padding: 18px 16px 8px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; background: var(--sunk); }
+.ch-msg { max-width: min(78%, 560px); display: flex; flex-direction: column; gap: 4px; animation: chIn .35s ease-out; }
+.ch-msg .who { font: 500 10.5px "IBM Plex Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ch-bub { border-radius: 16px; padding: 10px 14px; font-size: 15px; line-height: 1.5; }
+.ch-bub b { display: block; font-size: 15px; margin-bottom: 2px; }
+.ch-msg.you { align-self: flex-end; align-items: flex-end; }
+.ch-msg.you .ch-bub { background: var(--fl-you); color: var(--ground); border-bottom-right-radius: 4px; }
+.ch-msg.agent .ch-bub { background: var(--panel); border: 1px solid var(--rule-strong); border-bottom-left-radius: 4px; }
+.ch-msg.agent .who { color: var(--fl-agent); }
+.ch-msg.approve .ch-bub { background: var(--fl-gate-soft); color: var(--ink); border: 1.5px solid var(--fl-gate); }
+.ch-msg.approve .who { color: var(--fl-gate); }
+.ch-guard { display: inline-flex; gap: 6px; font-size: 12.5px; color: var(--fl-warn); background: var(--fl-warn-soft); border-radius: 6px; padding: 3px 8px; }
+.ch-tool { align-self: center; display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 92%; animation: chIn .35s ease-out; }
+.ch-chip { display: inline-flex; align-items: center; gap: 8px; border: 1px dashed var(--fl-data); color: var(--ink); background: var(--fl-data-soft); border-radius: 999px; padding: 6px 14px; font-size: 13.5px; }
+.ch-chip .st { font: 500 10.5px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .06em; color: var(--fl-data); }
+.ch-tool small { font-size: 12.5px; color: var(--muted); text-align: center; }
+.ch-opts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.ch-opts span { border: 1px solid var(--rule-strong); border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+.ch-opts span.on { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.ch-typing { align-self: flex-start; display: inline-flex; gap: 4px; padding: 12px 14px; background: var(--panel); border: 1px solid var(--rule-strong); border-radius: 16px; border-bottom-left-radius: 4px; }
+.ch-typing.you { align-self: flex-end; background: var(--fl-you); border-color: var(--fl-you); border-radius: 16px 16px 4px 16px; }
+.ch-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: chDot 1s infinite; }
+.ch-typing.you i { background: var(--ground); }
+.ch-typing i:nth-child(2) { animation-delay: .15s; } .ch-typing i:nth-child(3) { animation-delay: .3s; }
+.spin { width: 12px; height: 12px; border: 2px solid var(--fl-data); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes chIn { from { opacity: 0; transform: translateY(8px); } }
+@keyframes chDot { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+
+@media (max-width: 760px) {
+  .sb-stage { min-height: 300px; }
+  .sb-scene { flex-direction: column; }
+  .sb-card p { font-size: 16px; }
+  .ch-msg { max-width: 88%; }
+  .ch-win { height: 480px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-scene, .ch-msg, .ch-tool { transition: none; animation: none; }
+}
+</style>
+</head><body><main class="wrap">
+<div class="eyebrow">Design review · bank reconciliation</div>
+<h1>Pick a style for the step-by-step flow</h1>
+<p class="lede">The same run, three ways. Each one plays like a movie. Press play, switch the path, or select a step. Pick the style you like, and every skill gets it.</p>
+<div class="rv-tabs" role="tablist">
+<button role="tab" aria-selected="true" data-tab="a"><b>A · Swimlanes</b><span>The whole map at once, in three columns</span></button>
+<button role="tab" aria-selected="false" data-tab="b"><b>B · Storyboard</b><span>One big scene at a time, with a who-does-what track</span></button>
+<button role="tab" aria-selected="false" data-tab="c"><b>C · Chat replay</b><span>The run as a conversation with the agent</span></button>
+</div>
+<div class="rv-panel" data-panel="a"><section aria-labelledby="flow-h">
+  
+  <p class="flow-intro">Each card is one step. The column shows who does it: you, the agent, or the agent reading your data. Press play, or select a card.</p>
+  <div class="flow" data-flow id="flow-bank-reconciliation">
+    <script type="application/json" class="flow-data">{"intro": "Press play to watch one bank reconciliation, from your request to the sign-off.", "end": "The run is complete. You hold the sign-off, and the agent changed nothing in your books. It can save your settings for next time, but only after you say yes.", "paths": {"mosofin": "Connected to MosoFin", "upload": "Upload files"}, "when": {"mosofin": "yes", "upload": "no"}}</script>
+    <div class="flow-bar">
+      <div class="flow-btns">
+        <button type="button" class="flow-btn primary" data-act="play" aria-label="Play the run">▶ Play</button>
+        <button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+        <button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+        <button type="button" class="flow-btn" data-act="restart" aria-label="Start again from step 1">↺</button>
+      </div>
+      <div class="flow-paths" role="group" aria-label="Choose a path"></div>
+      <ul class="flow-legend"><li><i style="--c:var(--fl-you)"></i>You act</li><li><i style="--c:var(--fl-agent)"></i>Agent works</li><li><i style="--c:var(--fl-data)"></i>Agent reads your data</li><li><i style="--c:var(--fl-gate);--b:var(--fl-gate-soft)"></i>Waits for your approval</li><li><span style="color:var(--fl-warn)" aria-hidden="true">⛨</span>Safeguard</li></ul>
+    </div>
+    <div class="flow-board">
+      <div class="flow-lanebg" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-lanes" aria-hidden="true"><span style="--c:var(--fl-you)">You<small>asks, answers, approves</small></span><span style="--c:var(--fl-agent)">Agent<small>reads, checks, explains</small></span><span style="--c:var(--fl-data)">Your data<small>read-only</small></span></div>
+      <div class="flow-grid"><div class="frow"><button type="button" class="fnode l-you t-act" style="grid-row:1" data-row="1" data-lane="you"><span class="fk"><span>You</span></span><span class="ft">Ask for a bank reconciliation</span><span class="fs">You name the account and the month, or the agent asks for them.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:2" data-row="2" data-lane="agent"><span class="fk"><span>Agent</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Ask six questions in one message</span><span class="fs">The agent asks about the source, the account, the period, the statement, the last reconciliation and the amount worth chasing.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent never assumes the period.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-act" style="grid-row:3" data-row="3" data-lane="you"><span class="fk"><span>You</span></span><span class="ft">Answer the questions</span><span class="fs">One reply answers all six questions, so the run does not stop again for each one.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-decide" style="grid-row:4" data-row="4" data-lane="agent"><span class="fk"><span>Decision</span></span><span class="ft">Connected to MosoFin, and you chose it?</span><span class="fs">Your answer sets how the agent gets your books: it reads them directly, or you upload files.</span></button></div><div class="frow"><button type="button" class="fnode l-data t-read" style="grid-row:5" data-row="5" data-lane="data" data-path="mosofin"><span class="fk"><span>Reads, read-only</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Check workspace, company file and tools</span><span class="fs">The agent confirms the workspace and the company file by name. It checks for a bank feed.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent uses read-only tools. Tools that write to your books are out of scope.</span></button><button type="button" class="fnode l-you t-act" style="grid-row:5" data-row="5" data-lane="you" data-path="upload"><span class="fk"><span>You</span></span><span class="ft">Upload the statement and ledger</span><span class="fs">You upload the bank statement, the ledger cash activity and the last reconciliation or its date.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-approve" style="grid-row:6" data-row="6" data-lane="you"><span class="fk"><span>Your approval</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Approve the plan</span><span class="fs">The agent reads the plan back to you and waits.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent reads nothing until you say yes.</span></button></div><div class="frow"><button type="button" class="fnode l-data t-read" style="grid-row:7" data-row="7" data-lane="data" data-path="mosofin"><span class="fk"><span>Reads, read-only</span></span><span class="ft">Read the books in one batch</span><span class="fs">The agent reads accounts, the trial balance, the general ledger, deposits, payments, transfers and journal entries.</span></button><button type="button" class="fnode l-data t-read" style="grid-row:7" data-row="7" data-lane="data" data-path="upload"><span class="fk"><span>Reads, read-only</span></span><span class="ft">Read your uploaded files</span><span class="fs">The agent reads the statement and the ledger activity that you uploaded.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:8" data-row="8" data-lane="agent"><span class="fk"><span>Agent</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Agree the opening balance</span><span class="fs">The agent records both ending balances, agrees the opening balance and brings last period&#x27;s open items forward.</span><span class="fg"><span aria-hidden="true">⛨</span> With no statement balance, the agent prepares the book side only and builds no bridge.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:9" data-row="9" data-lane="agent"><span class="fk"><span>Agent</span></span><span class="ft">Match transactions and build the bridge</span><span class="fs">Open items from last period match first. Then the agent tries exact, fuzzy, reference and split matches, and finds duplicates in the books.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-work" style="grid-row:10" data-row="10" data-lane="agent"><span class="fk"><span>Agent</span></span><span class="ft">Sort what is left unmatched</span><span class="fs">The agent sorts fees, interest, returned payments, loans, reserves and chargebacks. An unknown item stays unknown and gets an owner.</span></button></div><div class="frow"><button type="button" class="fnode l-agent t-output" style="grid-row:11" data-row="11" data-lane="agent"><span class="fk"><span>Result</span><span class="shield" title="Safeguard">⛨</span></span><span class="ft">Propose entries with evidence</span><span class="fs">Each proposed entry uses your account names and points to its evidence: a statement line or ledger rows.</span><span class="fg"><span aria-hidden="true">⛨</span> The agent proposes entries only. It never posts them.</span></button></div><div class="frow"><button type="button" class="fnode l-you t-approve" style="grid-row:12" data-row="12" data-lane="you"><span class="fk"><span>Your approval</span></span><span class="ft">Review and sign off</span><span class="fs">You get a summary, the open items, the exceptions, the proposed entries and a blank sign-off for two people.</span></button></div></div>
+    </div>
+    <div class="flow-sub" aria-live="off"><div class="flow-sub-k"></div><p class="flow-sub-t"></p><div class="flow-sub-g" hidden></div><div class="flow-time"></div></div>
+  </div>
+</section>
+</div>
+<div class="rv-panel" data-panel="b" hidden><div class="pl" id="pl-b"><div class="pl-bar"><div class="flow-btns">
+<button type="button" class="flow-btn primary" data-act="play">▶ Play</button>
+<button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+<button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+<button type="button" class="flow-btn" data-act="restart" aria-label="Start again">↺</button></div>
+<div class="flow-paths" role="group" aria-label="Choose a path"></div></div><div class="sb-track"></div><div class="sb-stage" aria-live="polite"></div><div class="sb-strip" aria-label="All steps"></div><div class="pl-time"></div></div>
+<p class="rv-note">Best for: telling the story clearly, one idea at a time. The track above the scene shows who acts at each step.</p></div>
+<div class="rv-panel" data-panel="c" hidden><div class="pl" id="pl-c"><div class="pl-bar"><div class="flow-btns">
+<button type="button" class="flow-btn primary" data-act="play">▶ Play</button>
+<button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+<button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+<button type="button" class="flow-btn" data-act="restart" aria-label="Start again">↺</button></div>
+<div class="flow-paths" role="group" aria-label="Choose a path"></div></div><div class="ch-win" aria-live="polite"></div><div class="pl-time" style="padding-top:12px"></div></div>
+<p class="rv-note">Best for: showing what working with the agent feels like. Reads from your books appear as tool-call chips.</p></div>
+</main>
+<script type="application/json" id="flow-src">{"intro": "Press play to watch one bank reconciliation, from your request to the sign-off.", "end": "The run is complete. You hold the sign-off, and the agent changed nothing in your books. It can save your settings for next time, but only after you say yes.", "paths": {"mosofin": "Connected to MosoFin", "upload": "Upload files"}, "when": {"mosofin": "yes", "upload": "no"}, "steps": [{"lane": "you", "type": "act", "title": "Ask for a bank reconciliation", "say": "You name the account and the month, or the agent asks for them."}, {"lane": "agent", "type": "work", "title": "Ask six questions in one message", "say": "The agent asks about the source, the account, the period, the statement, the last reconciliation and the amount worth chasing.", "guard": "The agent never assumes the period."}, {"lane": "you", "type": "act", "title": "Answer the questions", "say": "One reply answers all six questions, so the run does not stop again for each one."}, {"lane": "agent", "type": "decide", "title": "Connected to MosoFin, and you chose it?", "say": "Your answer sets how the agent gets your books: it reads them directly, or you upload files."}, [{"lane": "data", "type": "read", "path": "mosofin", "title": "Check workspace, company file and tools", "say": "The agent confirms the workspace and the company file by name. It checks for a bank feed.", "guard": "The agent uses read-only tools. Tools that write to your books are out of scope."}, {"lane": "you", "type": "act", "path": "upload", "title": "Upload the statement and ledger", "say": "You upload the bank statement, the ledger cash activity and the last reconciliation or its date."}], {"lane": "you", "type": "approve", "title": "Approve the plan", "say": "The agent reads the plan back to you and waits.", "guard": "The agent reads nothing until you say yes."}, [{"lane": "data", "type": "read", "path": "mosofin", "title": "Read the books in one batch", "say": "The agent reads accounts, the trial balance, the general ledger, deposits, payments, transfers and journal entries."}, {"lane": "data", "type": "read", "path": "upload", "title": "Read your uploaded files", "say": "The agent reads the statement and the ledger activity that you uploaded."}], {"lane": "agent", "type": "work", "title": "Agree the opening balance", "say": "The agent records both ending balances, agrees the opening balance and brings last period's open items forward.", "guard": "With no statement balance, the agent prepares the book side only and builds no bridge."}, {"lane": "agent", "type": "work", "title": "Match transactions and build the bridge", "say": "Open items from last period match first. Then the agent tries exact, fuzzy, reference and split matches, and finds duplicates in the books."}, {"lane": "agent", "type": "work", "title": "Sort what is left unmatched", "say": "The agent sorts fees, interest, returned payments, loans, reserves and chargebacks. An unknown item stays unknown and gets an owner."}, {"lane": "agent", "type": "output", "title": "Propose entries with evidence", "say": "Each proposed entry uses your account names and points to its evidence: a statement line or ledger rows.", "guard": "The agent proposes entries only. It never posts them."}, {"lane": "you", "type": "approve", "title": "Review and sign off", "say": "You get a summary, the open items, the exceptions, the proposed entries and a blank sign-off for two people."}]}</script>
+<script>// Flow movie. build.py renders each step as a card (.fnode) with data-row, data-path and data-lane.
+// This script draws the wires, then plays the run one row ("frame") at a time: the card lights up,
+// a dot travels along the wire into it, the subtitle reads the step aloud in text, and the timeline fills.
+(() => {
+  const LANES = { you: "You", agent: "Agent", data: "Your data" };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const narrow = matchMedia("(max-width: 760px)");
+  const SVGNS = "http://www.w3.org/2000/svg";
+
+  function setup(root) {
+    const cfg = JSON.parse(root.querySelector(".flow-data").textContent);
+    const grid = root.querySelector(".flow-grid");
+    const nodes = [...root.querySelectorAll(".fnode")];
+    const sub = root.querySelector(".flow-sub");
+    const subK = sub.querySelector(".flow-sub-k"), subT = sub.querySelector(".flow-sub-t"), subG = sub.querySelector(".flow-sub-g");
+    const time = sub.querySelector(".flow-time");
+    const playBtn = root.querySelector('[data-act="play"]');
+    const pathKeys = Object.keys(cfg.paths || {});
+    let path = pathKeys[0] || "";
+    let frames = [], idx = -1, playing = false, timer = 0, started = 0, spent = 0, dur = 0, user = false;
+
+    root.classList.add("js");
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "flow-wires");
+    svg.setAttribute("aria-hidden", "true");
+    grid.prepend(svg);
+
+    // Path choice (for example "Connected" or "Upload files").
+    const pathBox = root.querySelector(".flow-paths");
+    if (pathKeys.length > 1) {
+      for (const k of pathKeys) {
+        const b = document.createElement("button");
+        b.type = "button"; b.textContent = cfg.paths[k]; b.dataset.path = k;
+        b.setAttribute("aria-pressed", String(k === path));
+        b.addEventListener("click", () => { path = k; user = true; pause(); build(); go(Math.min(idx, frames.length - 1), false); });
+        pathBox.append(b);
+      }
+    } else pathBox.remove();
+
+    const onPath = (n) => !n.dataset.path || n.dataset.path === path;
+
+    function build() {
+      pathBox.querySelectorAll && pathBox.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.path === path)));
+      for (const n of nodes) {
+        // Side-by-side alternatives stay visible on wide screens (dimmed); one column shows the chosen path only.
+        // An off-path card that shares its cell (same row, same lane) with an on-path card is hidden too.
+        const shared = nodes.some((m) => m !== n && onPath(m) && m.dataset.row === n.dataset.row && m.dataset.lane === n.dataset.lane);
+        n.hidden = !onPath(n) && (narrow.matches || shared);
+        n.classList.toggle("off", !onPath(n));
+      }
+      root.querySelectorAll(".frow").forEach((r) => r.classList.toggle("solo", [...r.children].filter((c) => !c.hidden).length === 1));
+      const rows = new Map();
+      for (const n of nodes) if (onPath(n)) (rows.get(+n.dataset.row) || rows.set(+n.dataset.row, []).get(+n.dataset.row)).push(n);
+      frames = [...rows.keys()].sort((a, b) => a - b).map((k) => rows.get(k));
+      time.replaceChildren(...frames.map((f, i) => {
+        const s = document.createElement("button");
+        s.type = "button"; s.className = "flow-seg";
+        s.setAttribute("aria-label", `Go to step ${i + 1}: ${title(f[0])}`);
+        s.append(document.createElement("span"));
+        s.addEventListener("click", () => { user = true; pause(); go(i, true); });
+        return s;
+      }));
+    }
+
+    const title = (n) => n.querySelector(".ft").textContent.trim();
+    const say = (n) => n.querySelector(".fs")?.textContent.trim() || "";
+    const guard = (n) => n.querySelector(".fg")?.textContent.replace(/^\s*⛨\s*/, "").trim() || "";
+    const words = (s) => s.split(/\s+/).filter(Boolean).length;
+
+    function wire(a, b, g) {
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      const x1 = ra.left + ra.width / 2 - g.left, y1 = ra.bottom - g.top;
+      const x2 = rb.left + rb.width / 2 - g.left, y2 = rb.top - g.top;
+      if (y2 <= y1 + 2) return null;
+      const my = y1 + Math.min(14, (y2 - y1) / 2);
+      if (Math.abs(x2 - x1) < 2) return { d: `M${x1},${y1} V${y2 - 2}`, x1, x2, my };
+      const r = Math.min(7, Math.abs(x2 - x1) / 2, (my - y1));
+      const sx = Math.sign(x2 - x1);
+      return { d: `M${x1},${y1} V${my - r} Q${x1},${my} ${x1 + sx * r},${my} H${x2 - sx * r} Q${x2},${my} ${x2},${my + r} V${y2 - 2}`, x1, x2, my };
+    }
+
+    function draw(animate) {
+      const g = grid.getBoundingClientRect();
+      const out = ['<defs><marker id="fa-' + root.id + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>'];
+      const dots = [];
+      // Connect every visible card in one row to every visible card in the next row that shares its path.
+      const rows = [...new Set(nodes.filter((n) => !n.hidden).map((n) => +n.dataset.row))].sort((a, b) => a - b);
+      for (let i = 0; i + 1 < rows.length; i++) {
+        const A = nodes.filter((n) => !n.hidden && +n.dataset.row === rows[i]);
+        const B = nodes.filter((n) => !n.hidden && +n.dataset.row === rows[i + 1]);
+        for (const a of A) for (const b of B) {
+          if (a.dataset.path && b.dataset.path && a.dataset.path !== b.dataset.path) continue;
+          const w = wire(a, b, g); if (!w) continue;
+          const live = onPath(a) && onPath(b);
+          const lit = live && a.classList.contains("past") && (b.classList.contains("past") || b.classList.contains("now"));
+          out.push(`<path class="${lit ? "lit" : ""} ${live ? "" : "dim"}" d="${w.d}" marker-end="url(#fa-${root.id})"/>`);
+          if (b.dataset.path && a.classList.contains("t-decide") && cfg.paths[b.dataset.path]) {
+            const right = w.x2 > w.x1;
+            out.push(`<text x="${w.x2 + (right ? -10 : 10)}" y="${w.my - 5}" text-anchor="${right ? "end" : "start"}" opacity="${live ? 1 : .4}">${esc(cfg.when?.[b.dataset.path] || "")}</text>`);
+          }
+          if (animate && live && b.classList.contains("now") && a.classList.contains("past")) dots.push(w.d);
+        }
+      }
+      for (const d of dots) out.push(`<circle r="5" cx="0" cy="0"><animateMotion dur="0.7s" fill="freeze" begin="indefinite" path="${d}" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>`);
+      svg.innerHTML = out.join("");
+      if (!dots.length) return;
+      svg.querySelectorAll("animateMotion").forEach((m) => { try { m.beginElement(); } catch {} });
+      setTimeout(() => svg.querySelectorAll("circle").forEach((c) => c.remove()), 900);
+    }
+
+    function go(i, animate) {
+      idx = i;
+      nodes.forEach((n) => n.classList.remove("past", "now", "future"));
+      frames.forEach((f, k) => f.forEach((n) => n.classList.add(k < i ? "past" : k === i ? "now" : "future")));
+      [...time.children].forEach((s, k) => {
+        s.classList.toggle("done", k < i);
+        const bar = s.firstChild; bar.style.transition = "none"; bar.style.width = k < i ? "100%" : "0";
+        if (k === i) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
+      });
+      if (i < 0) { caption(null); draw(false); return; }
+      const f = frames[i];
+      caption(f, i);
+      draw(animate && !reduce);
+      if (user && playing) {
+        const r = f[0].getBoundingClientRect(), bottom = innerHeight - sub.offsetHeight;
+        if (r.top < 0 || r.bottom > bottom) f[0].scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+      }
+      const text = f.map((n) => title(n) + " " + say(n) + " " + guard(n)).join(" ");
+      dur = Math.min(8000, 1400 + 220 * words(text));   // about 4.5 words a second, plus a pause to look at the card
+      spent = 0;
+    }
+
+    function caption(f, i) {
+      if (!f) {
+        subK.innerHTML = `<span>${frames.length} steps</span>`;
+        subT.textContent = cfg.intro || "Press play to watch one run, step by step.";
+        subG.hidden = true; return;
+      }
+      const lanes = [...new Set(f.map((n) => n.dataset.lane))];
+      subK.innerHTML = `<span>Step ${i + 1} of ${frames.length}</span>` + lanes.map((l) => `<b style="--c:var(--fl-${l})">${LANES[l]}</b>`).join("");
+      subT.innerHTML = f.map((n) => `<strong>${esc(title(n))}.</strong> ${esc(say(n))}`).join("<br>");
+      const gs = f.map(guard).filter(Boolean);
+      subG.hidden = !gs.length;
+      subG.innerHTML = gs.length ? `<span aria-hidden="true">⛨</span><span>${gs.map(esc).join(" ")}</span>` : "";
+    }
+
+    function fill() {
+      const bar = time.children[idx]?.firstChild; if (!bar) return;
+      const left = Math.max(0, dur - spent);
+      bar.style.transition = "none";
+      bar.style.width = (100 * spent / dur) + "%";
+      void bar.offsetWidth;
+      bar.style.transition = `width ${left}ms linear`;
+      bar.style.width = "100%";
+    }
+
+    function schedule() {
+      clearTimeout(timer);
+      started = performance.now();
+      fill();
+      timer = setTimeout(() => {
+        if (idx + 1 < frames.length) { go(idx + 1, true); schedule(); }
+        else end();
+      }, Math.max(0, dur - spent));
+    }
+
+    function end() {
+      playing = false;
+      time.children[idx]?.classList.add("done");
+      frames[idx].forEach((n) => { n.classList.remove("now"); n.classList.add("past"); });
+      draw(false);
+      subK.innerHTML = `<span>Run complete</span>`;
+      subT.textContent = cfg.end || "The run is complete.";
+      subG.hidden = true;
+      label("↺ Watch again", "Watch the run again");
+      idx = frames.length;
+    }
+
+    function play() {
+      if (idx >= frames.length || idx < 0) { go(0, true); }
+      playing = true; label("❚❚ Pause", "Pause the run"); schedule();
+    }
+    function pause() {
+      if (!playing) return;
+      playing = false; clearTimeout(timer);
+      spent += performance.now() - started;
+      const bar = time.children[idx]?.firstChild;
+      if (bar) { const w = getComputedStyle(bar).width; bar.style.transition = "none"; bar.style.width = w; }
+      label("▶ Play", "Play the run");
+    }
+    function label(t, a) { playBtn.textContent = t; playBtn.setAttribute("aria-label", a); }
+
+    root.querySelector('[data-act="play"]').addEventListener("click", () => { user = true; sub.setAttribute("aria-live", "polite"); playing ? pause() : play(); });
+    root.querySelector('[data-act="prev"]').addEventListener("click", () => { user = true; pause(); go(Math.max(0, Math.min(idx, frames.length) - 1), true); });
+    root.querySelector('[data-act="next"]').addEventListener("click", () => { user = true; pause(); go(Math.min(frames.length - 1, idx + 1), true); });
+    root.querySelector('[data-act="restart"]').addEventListener("click", () => { user = true; pause(); go(0, true); play(); });
+    for (const n of nodes) n.addEventListener("click", () => {
+      const i = frames.findIndex((f) => f.includes(n));
+      if (i < 0) return;
+      user = true; pause(); go(i, true);
+    });
+
+    build(); go(-1, false);
+    narrow.addEventListener("change", () => { build(); draw(false); });
+    new ResizeObserver(() => draw(false)).observe(grid);
+    document.fonts?.ready.then(() => draw(false));
+
+    // Start once when the chart comes into view, and pause while it is off screen.
+    let autoPaused = false, seen = false;
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        if (!seen && !reduce) { seen = true; play(); }
+        else if (autoPaused) { autoPaused = false; play(); }
+      } else if (playing) { autoPaused = true; pause(); }
+    }, { threshold: 0.35 }).observe(grid);
+  }
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  document.querySelectorAll(".flow[data-flow]").forEach(setup);
+})();
+</script>
+<script>// Review variants B (storyboard) and C (chat replay). Both read the same flow data as variant A.
+(() => {
+  const FLOW = JSON.parse(document.getElementById("flow-src").textContent);
+  const LANES = { you: "You", agent: "Agent", data: "Your data" };
+  const TYPES = { act: "You", work: "Agent", read: "Reads, read-only", decide: "Decision", approve: "Your approval", output: "Result", optional: "Optional" };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const esc = (s) => String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const words = (s) => String(s || "").split(/\s+/).filter(Boolean).length;
+  const ICON = {
+    you: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+    agent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6"/></svg>',
+    data: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>',
+  };
+  const rows = FLOW.steps.map((r) => (Array.isArray(r) ? r : [r]));
+  const keys = Object.keys(FLOW.paths || {});
+
+  // A small player: frames, timer, controls, timeline. The view supplies show(i, frames) and reset().
+  function player(root, view) {
+    let path = keys[0] || "", frames = [], idx = -1, playing = false, timer = 0, dur = 0, spent = 0, started = 0;
+    const bar = root.querySelector(".pl-bar"), time = root.querySelector(".pl-time");
+    const playBtn = bar.querySelector('[data-act="play"]');
+    const box = bar.querySelector(".flow-paths");
+    keys.forEach((k) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = FLOW.paths[k]; b.dataset.path = k;
+      b.addEventListener("click", () => { path = k; pause(); build(); view.reset(frames, path); go(0); });
+      box.append(b);
+    });
+    function build() {
+      box.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.path === path)));
+      frames = rows.map((r) => r.filter((s) => !s.path || s.path === path)).filter((f) => f.length);
+      time.replaceChildren(...frames.map((f, i) => {
+        const s = document.createElement("button");
+        s.type = "button"; s.className = "flow-seg"; s.setAttribute("aria-label", `Go to step ${i + 1}: ${f[0].title}`);
+        s.append(document.createElement("span"));
+        s.addEventListener("click", () => { pause(); go(i); });
+        return s;
+      }));
+    }
+    function go(i) {
+      idx = i;
+      [...time.children].forEach((s, k) => { const b = s.firstChild; b.style.transition = "none"; b.style.width = k < i ? "100%" : "0"; });
+      view.show(i, frames, path);
+      const text = frames[i].map((s) => `${s.title} ${s.say} ${s.guard || ""}`).join(" ");
+      dur = Math.min(8000, 1400 + 220 * words(text)) + (view.extra ? view.extra(frames[i]) : 0);
+      spent = 0;
+    }
+    function fill() {
+      const b = time.children[idx]?.firstChild; if (!b) return;
+      b.style.transition = "none"; b.style.width = (100 * spent / dur) + "%"; void b.offsetWidth;
+      b.style.transition = `width ${dur - spent}ms linear`; b.style.width = "100%";
+    }
+    function schedule() {
+      clearTimeout(timer); started = performance.now(); fill();
+      timer = setTimeout(() => { if (idx + 1 < frames.length) { go(idx + 1); schedule(); } else end(); }, dur - spent);
+    }
+    function end() { playing = false; label("↺ Watch again"); view.end && view.end(frames); idx = frames.length; }
+    function play() { if (idx < 0 || idx >= frames.length) { view.reset(frames, path); go(0); } playing = true; label("❚❚ Pause"); schedule(); }
+    function pause() {
+      if (!playing) return;
+      playing = false; clearTimeout(timer); spent += performance.now() - started;
+      const b = time.children[idx]?.firstChild; if (b) { const w = getComputedStyle(b).width; b.style.transition = "none"; b.style.width = w; }
+      label("▶ Play");
+    }
+    function label(t) { playBtn.textContent = t; }
+    playBtn.addEventListener("click", () => (playing ? pause() : play()));
+    bar.querySelector('[data-act="prev"]').addEventListener("click", () => { pause(); go(Math.max(0, Math.min(idx, frames.length) - 1)); });
+    bar.querySelector('[data-act="next"]').addEventListener("click", () => { pause(); go(Math.min(frames.length - 1, idx + 1)); });
+    bar.querySelector('[data-act="restart"]').addEventListener("click", () => { pause(); view.reset(frames, path); go(0); play(); });
+    build(); view.reset(frames, path); go(0);
+    return { play, pause, goTo: (i) => { pause(); go(i); }, get playing() { return playing; } };
+  }
+
+  // ---------------------------------------------------------------- B. Storyboard
+  function storyboard(root) {
+    const track = root.querySelector(".sb-track"), stage = root.querySelector(".sb-stage"), strip = root.querySelector(".sb-strip");
+    let P, cur = [];
+    const laneY = { you: 18, agent: 54, data: 90 };
+    function drawTrack(frames, i) {
+      if (track.clientWidth < 120) return;   // hidden tab: draw when it is shown
+      const W = track.clientWidth - 32, left = 86, step = (W - left - 12) / Math.max(1, frames.length - 1);
+      const pts = frames.map((f, k) => ({ x: left + k * step, y: laneY[f[0].lane], f, k }));
+      let s = `<svg viewBox="0 0 ${W} 108" aria-hidden="true">`;
+      for (const [l, y] of Object.entries(laneY)) s += `<rect class="lane-r" x="0" y="${y - 13}" width="${W}" height="26" rx="13"/><text class="lane-l" x="12" y="${y + 4}" fill="var(--fl-${l})">${LANES[l]}</text>`;
+      for (let k = 1; k < pts.length; k++) {
+        const a = pts[k - 1], b = pts[k], mx = (a.x + b.x) / 2;
+        s += `<path class="ln ${k <= i ? "lit" : ""}" d="M${a.x},${a.y} C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}"/>`;
+      }
+      for (const p of pts) {
+        const st = p.f[0], c = st.type === "approve" ? "gate" : st.lane;
+        if (p.k === i) s += `<circle class="halo" cx="${p.x}" cy="${p.y}" r="14" stroke="var(--fl-${c})"><animate attributeName="r" values="10;16;10" dur="1.6s" repeatCount="indefinite"/></circle>`;
+        s += `<circle class="dot ${p.k < i ? "past" : p.k === i ? "now" : "future"}" data-k="${p.k}" cx="${p.x}" cy="${p.y}" r="6.5" fill="var(--fl-${c})"><title>Step ${p.k + 1}: ${esc(st.title)}</title></circle>`;
+      }
+      track.innerHTML = s + "</svg>";
+      track.querySelectorAll(".dot").forEach((d) => d.addEventListener("click", () => P.goTo(+d.dataset.k)));
+    }
+    function card(st, i, n) {
+      const c = st.type === "approve" ? "t-approve" : "";
+      return `<article class="sb-card l-${st.lane} ${c}">
+        <div class="sb-who"><span class="sb-av">${ICON[st.lane]}</span><div><b>${LANES[st.lane]}</b><span>${esc(TYPES[st.type])}</span></div><span class="sb-step">Step ${i + 1} of ${n}</span></div>
+        <h3>${esc(st.title)}</h3><p>${esc(st.say)}</p>
+        ${st.guard ? `<div class="sb-guard"><span aria-hidden="true">⛨</span><span>${esc(st.guard)}</span></div>` : ""}
+      </article>`;
+    }
+    function scene(html) {
+      const old = stage.querySelector(".sb-scene:not(.out)");
+      const el = document.createElement("div");
+      el.className = "sb-scene" + (reduce ? "" : " in"); el.innerHTML = html;
+      stage.append(el);
+      if (old) { old.classList.add("out"); setTimeout(() => old.remove(), reduce ? 0 : 400); }
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("in")));
+    }
+    const view = {
+      reset(frames) {
+        strip.innerHTML = frames.map((f, k) => `<button type="button" class="sb-thumb l-${f[0].lane} ${f[0].type === "approve" ? "t-approve" : ""}" data-k="${k}"><i>${k + 1} · ${LANES[f[0].lane]}</i>${esc(f[0].title)}</button>`).join("");
+        strip.querySelectorAll(".sb-thumb").forEach((b) => b.addEventListener("click", () => P.goTo(+b.dataset.k)));
+      },
+      show(i, frames) {
+        cur = frames;
+        drawTrack(frames, i);
+        scene(frames[i].map((st) => card(st, i, frames.length)).join(""));
+        strip.querySelectorAll(".sb-thumb").forEach((b, k) => { b.classList.toggle("past", k < i); b.classList.toggle("now", k === i); });
+        const t = strip.children[i]; if (t) strip.scrollTo({ left: t.offsetLeft - strip.clientWidth / 2 + t.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
+      },
+      end(frames) {
+        drawTrack(frames, frames.length);
+        scene(`<article class="sb-card"><div class="sb-who"><span class="sb-av">✓</span><div><b>Run complete</b><span>${frames.length} steps</span></div></div><h3>What you end with</h3><p>${esc(FLOW.end)}</p></article>`);
+      },
+    };
+    P = player(root, view);
+    new ResizeObserver(() => { const i = [...strip.children].findIndex((b) => b.classList.contains("now")); if (i >= 0) drawTrack(cur, i); }).observe(track);
+    return P;
+  }
+
+  // ---------------------------------------------------------------- C. Chat replay
+  function chat(root) {
+    const win = root.querySelector(".ch-win");
+    let shown = -1, P;
+    function bubble(st, path) {
+      if (st.type === "read") {
+        return `<div class="ch-tool"><span class="ch-chip"><span class="spin" aria-hidden="true"></span><span class="st">Reading</span>${esc(st.title)}</span><small>${esc(st.say)}</small>${st.guard ? `<span class="ch-guard">⛨ ${esc(st.guard)}</span>` : ""}</div>`;
+      }
+      const cls = st.type === "approve" ? "you approve" : st.lane;
+      const who = st.type === "approve" ? "You · approval" : st.lane === "you" ? "You" : st.type === "work" ? "Agent" : "Agent · " + TYPES[st.type].toLowerCase();
+      let extra = "";
+      if (st.type === "decide" && FLOW.paths) extra = `<div class="ch-opts">${keys.map((k) => `<span class="${k === path ? "on" : ""}">${esc(FLOW.paths[k])}</span>`).join("")}</div>`;
+      const body = st.type === "approve" ? `<b>${esc(st.title)}</b>${esc(st.say)}<div class="ch-opts"><span class="on">Yes</span><span>Not yet</span></div>` : `<b>${esc(st.title)}</b>${esc(st.say)}${extra}`;
+      return `<div class="ch-msg ${cls}"><span class="who">${who}</span><div class="ch-bub">${body}</div>${st.guard ? `<span class="ch-guard">⛨ ${esc(st.guard)}</span>` : ""}</div>`;
+    }
+    function add(html) { win.insertAdjacentHTML("beforeend", html); win.scrollTop = win.scrollHeight; }
+    function finishTools() { win.querySelectorAll(".ch-chip .spin").forEach((s) => { s.outerHTML = '<span aria-hidden="true">✓</span>'; }); win.querySelectorAll(".ch-chip .st").forEach((s) => { if (s.textContent === "Reading") s.textContent = "Read"; }); }
+    let typingTimer = 0, pending = null;
+    // A step that is still "typing" is shown at once when the run moves on, so no message is lost.
+    const flush = () => { clearTimeout(typingTimer); if (pending) { const f = pending; pending = null; f(); } };
+    const view = {
+      extra: () => (reduce ? 0 : 700),
+      reset() { clearTimeout(typingTimer); pending = null; win.innerHTML = ""; shown = -1; },
+      show(i, frames, path) {
+        flush();
+        if (i <= shown) { view.reset(); for (let k = 0; k < i; k++) frames[k].forEach((st) => add(bubble(st, path))); finishTools(); shown = i - 1; }
+        for (let k = shown + 1; k < i; k++) frames[k].forEach((st) => add(bubble(st, path)));
+        finishTools();
+        shown = i;
+        const f = frames[i];
+        const reveal = () => { pending = null; win.querySelector(".ch-typing")?.remove(); f.forEach((st) => add(bubble(st, path))); };
+        if (reduce || f[0].type === "read") return reveal();
+        add(`<div class="ch-typing ${f[0].lane === "you" ? "you" : ""}" aria-hidden="true"><i></i><i></i><i></i></div>`);
+        pending = reveal;
+        typingTimer = setTimeout(reveal, 700);
+      },
+      end() { flush(); finishTools(); add(`<div class="ch-tool"><span class="ch-chip" style="border-style:solid;border-color:var(--fl-agent);background:var(--fl-agent-soft)"><span aria-hidden="true">✓</span><span class="st" style="color:var(--fl-agent)">Done</span>Run complete</span><small>${esc(FLOW.end)}</small></div>`); },
+    };
+    P = player(root, view);
+    return P;
+  }
+
+  const players = { b: storyboard(document.getElementById("pl-b")), c: chat(document.getElementById("pl-c")) };
+  window.__rvPlayers = players;
+})();
+</script>
+<script>
+document.querySelectorAll('[role="tab"]').forEach((t) => t.addEventListener("click", () => {
+  document.querySelectorAll('[role="tab"]').forEach((x) => x.setAttribute("aria-selected", String(x === t)));
+  document.querySelectorAll(".rv-panel").forEach((p) => p.hidden = p.dataset.panel !== t.dataset.tab);
+  Object.entries(window.__rvPlayers || {}).forEach(([k, p]) => { if (k !== t.dataset.tab) p.pause(); });
+  document.querySelector('.flow [data-act="play"]')?.textContent.includes("Pause") && t.dataset.tab !== "a" && document.querySelector('.flow [data-act="play"]').click();
+  const p = window.__rvPlayers?.[t.dataset.tab]; if (p && !p.playing) p.play();
+}));
+</script>
+</body></html>

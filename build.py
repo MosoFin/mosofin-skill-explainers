@@ -183,6 +183,12 @@ def problems(rows):
                 out.append(f"{s}: {k}.html has no meta description — write one (about 70-160 characters) under the <title>")
             elif st != "todo" and k in CITED and not cited(p):
                 out.append(f"{s}: {k}.html has no Sources section with outside links — every fact needs a cited authority")
+    for r in rows:
+        f = flow_of(r["skill"])
+        # A skill without a flow file gets no flow section yet. Once every skill has one, make a missing file an error.
+        if f is not None: out += flow_problems(r["skill"], f)
+    for fn in sorted(os.listdir(FLOWS)) if os.path.isdir(FLOWS) else []:
+        if fn.endswith(".json") and fn[:-5] not in seen: out.append(f"flows/{fn}: {fn[:-5]} is not in the tracker")
     # every explainer file on disk must be tracked
     base = os.path.join(SITE, "skills")
     for s in sorted(os.listdir(base)) if os.path.isdir(base) else []:
@@ -309,7 +315,7 @@ def seo_block(path, title, desc, typ, modified="", crumbs=(), items=(), about=No
     ]
     return SEO_START + "\n" + "\n".join(meta) + "\n" + SEO_END
 
-def shell(title, body, desc, seo=""):
+def shell(title, body, desc, seo="", head=""):
     canonical = re.search(r'<link rel="canonical" href="([^"]+)"', seo)
     relative = canonical.group(1).removeprefix(SITE_URL) if canonical else ""
     depth = len([part for part in relative.strip("/").split("/") if part])
@@ -328,7 +334,7 @@ def shell(title, body, desc, seo=""):
 <style>{STYLE}</style>
 <link rel="stylesheet" href="{'../' * depth}assets/brand.css">
 <script src="{'../' * depth}assets/theme.js" defer></script>
-</head>
+{head}</head>
 <body>
 <div class="wrap" role="main">
 <nav class="site-nav" aria-label="Main navigation"><a class="brand" href="{'../' * depth}"><img class="brand-mark" src="{'../' * depth}assets/mosofin-mark.png" alt="" width="30" height="30"><span class="brand-name">MosoFin-Skill-Explainer</span></a><div class="nav-links"><a href="{'../' * depth}#all-skills">Guides</a><a href="{'../' * depth}#how-it-works">How it works</a><a href="https://github.com/MosoFin/mosofin-finance-skills">Open source</a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch color theme"><span class="theme-glyph" aria-hidden="true">◐</span><span class="theme-name">Light</span></button><a class="nav-cta" href="{'../' * depth}#all-skills">Explore guides <span aria-hidden="true">→</span></a></div></nav>
@@ -374,6 +380,104 @@ def seo_page(r, kind, text):
 
 
 # --------------------------------------------------------------------------- pages
+# --- Flow movie. flows/<skill>.json describes one run of the skill as rows of steps in three lanes.
+# build.py renders the steps as plain HTML on the landing page; site/assets/flow.js plays them.
+FLOWS = os.path.join(ROOT, "flows")
+FLOW_LANES = {"you": "You", "agent": "Agent", "data": "Your data"}
+# type: (allowed lanes, card label)
+FLOW_TYPES = {"act": ({"you"}, "You"), "work": ({"agent"}, "Agent"), "read": ({"data"}, "Reads, read-only"),
+              "decide": ({"agent", "you"}, "Decision"), "approve": ({"you"}, "Your approval"),
+              "output": ({"agent"}, "Result"), "optional": ({"agent", "you"}, "Optional")}
+
+def flow_of(skill):
+    p = os.path.join(FLOWS, f"{skill}.json")
+    return json.load(open(p)) if os.path.exists(p) else None
+
+def flow_rows(f):
+    return [row if isinstance(row, list) else [row] for row in f.get("steps", [])]
+
+def flow_problems(skill, f):
+    """Shape and voice checks for one flow file. The text is public prose, so the house writing rules apply."""
+    out, where = [], f"flows/{skill}.json"
+    paths = f.get("paths") or {}
+    rows = flow_rows(f)
+    if not 5 <= len(rows) <= 12: out.append(f"{where}: {len(rows)} rows. Keep a run between 5 and 12 rows so it stays short")
+    if not f.get("end"): out.append(f"{where}: no 'end' line for the last subtitle")
+    if set(f.get("when") or {}) - set(paths): out.append(f"{where}: 'when' names a path that 'paths' does not list")
+    used = set()
+    texts = [("intro", f.get("intro", "")), ("end", f.get("end", ""))]
+    for i, row in enumerate(rows, 1):
+        lanes = [st.get("lane") for st in row]
+        if len(row) > 1 and len(set(lanes)) != len(lanes) and len({st.get("path") for st in row}) != len(row):
+            out.append(f"{where}: row {i} puts two steps in one lane. Steps side by side need different lanes or different paths")
+        for st in row:
+            lane, typ = st.get("lane"), st.get("type")
+            if lane not in FLOW_LANES: out.append(f"{where}: row {i}: lane must be one of {sorted(FLOW_LANES)}"); continue
+            if typ not in FLOW_TYPES: out.append(f"{where}: row {i}: type must be one of {sorted(FLOW_TYPES)}"); continue
+            if lane not in FLOW_TYPES[typ][0]: out.append(f"{where}: row {i}: a {typ} step goes in lane {sorted(FLOW_TYPES[typ][0])}, not {lane}")
+            if st.get("path"):
+                if st["path"] not in paths: out.append(f"{where}: row {i}: path {st['path']!r} is not in 'paths'")
+                used.add(st["path"])
+            t = st.get("title", "")
+            if not t or len(t) > 60: out.append(f"{where}: row {i}: title needs 1-60 characters, has {len(t)}")
+            if not st.get("say"): out.append(f"{where}: row {i}: no 'say' line for the subtitle")
+            texts += [(f"row {i} title", t), (f"row {i} say", st.get("say", "")), (f"row {i} guard", st.get("guard", ""))]
+    if paths and used != set(paths): out.append(f"{where}: paths {sorted(set(paths) - used)} have no steps")
+    for a, b in zip(rows, rows[1:]):
+        if len([x for x in a if not x.get("path")]) > 1 and len([x for x in b if not x.get("path")]) > 1:
+            out.append(f"{where}: two rows in a row have side-by-side steps. Put a single step between them so the wires stay readable")
+    for label, t in texts:
+        if not t: continue
+        if "—" in t or ";" in t: out.append(f"{where}: {label}: no em dash and no semicolon. Write two sentences")
+        for sent in re.split(r"(?<=[.!?])\s+", t):
+            if len(sent.split()) > 25: out.append(f"{where}: {label}: a sentence has {len(sent.split())} words, keep it to 25 or fewer")
+        bad = [w for w in BANNED if re.search(r"\b" + w, t, re.I)]
+        if bad: out.append(f"{where}: {label}: filler words {', '.join(bad)}")
+    return out
+
+def flow_section(skill, t):
+    f = flow_of(skill)
+    if not f: return ""
+    cells = []
+    for i, row in enumerate(flow_rows(f), 1):
+        cards = []
+        for st in row:
+            g = f'<span class="fg"><span aria-hidden="true">⛨</span> {e(st["guard"])}</span>' if st.get("guard") else ""
+            shield = '<span class="shield" title="Safeguard">⛨</span>' if st.get("guard") else ""
+            cards.append(f'<button type="button" class="fnode l-{st["lane"]} t-{st["type"]}" style="grid-row:{i}" data-row="{i}" data-lane="{st["lane"]}"'
+                         f'{" data-path=" + chr(34) + e(st["path"]) + chr(34) if st.get("path") else ""}>'
+                         f'<span class="fk"><span>{e(FLOW_TYPES[st["type"]][1])}</span>{shield}</span>'
+                         f'<span class="ft">{e(st["title"])}</span><span class="fs">{e(st["say"])}</span>{g}</button>')
+        cells.append(f'<div class="frow">{"".join(cards)}</div>')
+    data = json.dumps({k: f[k] for k in ("intro", "end", "paths", "when") if f.get(k)}, ensure_ascii=False).replace("</", "<\\/")
+    legend = "".join(f'<li><i style="--c:var(--fl-{c})' + (f';--b:var(--fl-{c}-soft)' if c == "gate" else "") + f'"></i>{l}</li>'
+                     for c, l in (("you", "You act"), ("agent", "Agent works"), ("data", "Agent reads your data"), ("gate", "Waits for your approval")))
+    legend += '<li><span style="color:var(--fl-warn)" aria-hidden="true">⛨</span>Safeguard</li>'
+    return f"""<section aria-labelledby="flow-h">
+  <h2 id="flow-h">Watch a run, step by step</h2>
+  <p class="flow-intro">Each card is one step. The column shows who does it: you, the agent, or the agent reading your data. Press play, or select a card.</p>
+  <div class="flow" data-flow id="flow-{e(skill)}">
+    <script type="application/json" class="flow-data">{data}</script>
+    <div class="flow-bar">
+      <div class="flow-btns">
+        <button type="button" class="flow-btn primary" data-act="play" aria-label="Play the run">▶ Play</button>
+        <button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+        <button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+        <button type="button" class="flow-btn" data-act="restart" aria-label="Start again from step 1">↺</button>
+      </div>
+      <div class="flow-paths" role="group" aria-label="Choose a path"></div>
+      <ul class="flow-legend">{legend}</ul>
+    </div>
+    <div class="flow-board">
+      <div class="flow-lanebg" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-lanes" aria-hidden="true"><span style="--c:var(--fl-you)">You<small>asks, answers, approves</small></span><span style="--c:var(--fl-agent)">Agent<small>reads, checks, explains</small></span><span style="--c:var(--fl-data)">Your data<small>read-only</small></span></div>
+      <div class="flow-grid">{"".join(cells)}</div>
+    </div>
+    <div class="flow-sub" aria-live="off"><div class="flow-sub-k"></div><p class="flow-sub-t"></p><div class="flow-sub-g" hidden></div><div class="flow-time"></div></div>
+  </div>
+</section>
+"""
+
 def landing(r):
     s, t = r["skill"], title_of(r)
     cards = []
@@ -407,7 +511,7 @@ def landing(r):
   <h1>{e(t)}</h1>
   <p class="lede">{e(r["summary"])}</p>
 </header>
-<section>
+{flow_section(s, t)}<section>
   <h2>Explainers</h2>
   <div class="cards">{"".join(cards)}</div>
 </section>
@@ -422,8 +526,10 @@ def landing(r):
     description = re.sub(r"\s+", " ", r["summary"]).strip()
     if len(description) > DESC_MAX:
         description = description[:DESC_MAX - 1].rsplit(" ", 1)[0].rstrip(".,;:") + "…"
+    head = ('<link rel="stylesheet" href="../../assets/flow.css">\n<script src="../../assets/flow.js" defer></script>\n'
+            if flow_of(s) else "")
     return shell(title, body, description, seo_block(f"skills/{s}/", title, description, "landing", r["verified"], crumbs,
-                                                      about=skill_source(r), index=pub))
+                                                      about=skill_source(r), index=pub), head)
 
 def chip(r, k):
     st = r[k]
