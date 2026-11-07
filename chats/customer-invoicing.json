@@ -1,0 +1,256 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading Ltd, invoice NT-2026-0418 to Harbor Retail Ltd, dated 31 October 2026, under UK VAT. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you prepare an invoice to Harbor Retail for the racking job?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Do you want me to prepare a new invoice, or check invoices you already issued?",
+        "Which company is selling?",
+        "Which customer, and what do I bill? I need the description, quantity, unit price and tax code of each line.",
+        "What is the invoice date? What is the tax point, and when did you deliver each line?",
+        "Which tax rules apply, and which fields and phrases must the invoice show? I never take this from your company's country.",
+        "Which tax rate applies to each line? Do your prices include tax? Do you round tax on each line or on the total?",
+        "What is your numbering scheme?",
+        "What are the payment terms, the currency and the customer's PO? Where do the payment details come from?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Prepare one invoice from Northbrook Trading Ltd to Harbor Retail Ltd. 10 storage racking units at £180 and 6 hours of installation at £65. Invoice date 31 October. We delivered and installed on 28 October. UK VAT, full VAT invoice. 20% on both lines, prices exclude VAT, rounded on each line. NT- with the year, then a number. Net 30, pounds, no PO."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Northbrook Trading Ltd, confirmed by name"
+        ],
+        [
+          "Invoice creation",
+          "No tool. A person enters the invoice"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I prepare **one invoice** from **Northbrook Trading Ltd** to **Harbor Retail Ltd**, dated **31 October**, under **UK VAT** with the full VAT invoice fields. I read the books from your MosoFin connection. I cannot create the invoice in your accounting system. You get a draft and a proposed entry. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_company_info",
+          "Northbrook Trading Ltd, legal name and address"
+        ],
+        [
+          "search_customers",
+          "Harbor Retail Ltd"
+        ],
+        [
+          "get_customer",
+          "Name, address, VAT number and Net 30"
+        ],
+        [
+          "search_items",
+          "Storage racking £180.00, Installation £55.00"
+        ],
+        [
+          "read_item",
+          ""
+        ],
+        [
+          "search_tax_codes",
+          "VAT 20%"
+        ],
+        [
+          "search_terms",
+          ""
+        ],
+        [
+          "search_invoices",
+          "Last number NT-2026-0417"
+        ],
+        [
+          "read_invoice",
+          "Harbor's last installation at £55.00"
+        ],
+        [
+          "search_accounts",
+          "Sales: products, Sales: services, VAT payable"
+        ],
+        [
+          "get_customer_balance",
+          ""
+        ],
+        [
+          "get_aged_receivables",
+          ""
+        ],
+        [
+          "search_estimates",
+          ""
+        ]
+      ],
+      "summary": "13 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "The next number is **NT-2026-0418**. It is proposed, not reserved. Two things need your answer before the invoice goes out:",
+      "card": {
+        "type": "table",
+        "title": "Questions on the draft",
+        "head": [
+          "Item",
+          "On the draft",
+          "What I see"
+        ],
+        "rows": [
+          [
+            "Installation price",
+            "£65.00 an hour",
+            "Standard price £55.00. Harbor's last invoice £55.00"
+          ],
+          [
+            "Tax point",
+            "Not given",
+            "Invoice date 31 October. Delivery 28 October"
+          ]
+        ]
+      },
+      "after": "Is £65.00 the price you agreed, or a keying error? At 6 hours, the difference is £60.00. And which date is the tax point? It decides the VAT period."
+    },
+    {
+      "role": "user",
+      "text": "£65 is the agreed price for this job. The tax point is 28 October."
+    },
+    {
+      "role": "agent",
+      "text": "Thank you. Here is the arithmetic. VAT on each line and VAT on the subtotal give the same £438.00, so there is no rounding difference:",
+      "card": {
+        "type": "table",
+        "title": "NT-2026-0418",
+        "head": [
+          "Line",
+          "Amount",
+          "VAT 20%"
+        ],
+        "rows": [
+          [
+            "1 · Storage racking, 10 × £180.00",
+            "£1,800.00",
+            "£360.00"
+          ],
+          [
+            "2 · Installation, 6 hours × £65.00",
+            "£390.00",
+            "£78.00"
+          ],
+          [
+            "Subtotal",
+            "£2,190.00",
+            "£438.00"
+          ],
+          [
+            "Total due, £2,190.00 + £438.00",
+            "£2,628.00",
+            ""
+          ]
+        ]
+      },
+      "after": "The total is more than £250, so UK rules need a full VAT invoice. The draft shows both names and addresses, Harbor's VAT number, the tax point and the date of issue."
+    },
+    {
+      "role": "agent",
+      "text": "You delivered both lines on 28 October, before the invoice date. So the entry credits sales, not deferred revenue:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entry",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "Accounts receivable",
+            "£2,628.00",
+            ""
+          ],
+          [
+            "Sales: products",
+            "",
+            "£1,800.00"
+          ],
+          [
+            "Sales: services",
+            "",
+            "£390.00"
+          ],
+          [
+            "VAT payable",
+            "",
+            "£438.00"
+          ],
+          [
+            "Total",
+            "£2,628.00",
+            "£2,628.00"
+          ]
+        ]
+      },
+      "after": "Your system makes this entry when a person enters the invoice. The receivable equals the amount due on the invoice."
+    },
+    {
+      "role": "agent",
+      "text": "The draft is marked as a draft. Before you send it, check two things. Check that Harbor's VAT number is still current. Check the bank details on the draft against a trusted source, such as your bank's letter. I do not send the invoice.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Approved by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want me to save your settings for the next invoice?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the UK field list, your numbering scheme and your account map. I never save tax IDs, bank details or invoice contents. I read the next number again on every run."
+    }
+  ]
+}

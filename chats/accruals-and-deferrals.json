@@ -1,0 +1,183 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, the September 2026 close. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you do our September accruals and deferrals?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need nine answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which company?",
+        "Which period? Please give the exact start and end dates.",
+        "Which categories are in scope: compensation, interest, utilities and services, revenue, deferred revenue, professional fees or tax?",
+        "What supports each category? I need the facts that the books cannot show, such as the bonus estimate, loan terms, contract periods and fee letters.",
+        "Do accruals reverse on day one of the next month, or does the next bill post against the accrual?",
+        "Do you keep the books on the accrual basis or the cash basis?",
+        "Which materiality threshold do you use? I never choose one for you.",
+        "Which reporting framework and which tax country apply?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading, 1 to 30 September. Bonus, interest, utilities, audit fees and deferred revenue. Our managing director estimates the 2026 bonus at $240,000. Payroll tax is 8%. The auditor says 75% of the $12,000 audit is done. Accruals reverse on day one. Accrual basis. Materiality is $500. US GAAP and US tax.",
+      "attach": [
+        "term-loan-agreement.pdf",
+        "customer-contracts.pdf",
+        "audit-engagement-letter.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        ["Workspace", "Northbrook Trading"],
+        ["Company file", "Confirmed by name"],
+        ["Tools", "Read-only tools only"],
+        ["get_company_info", "Calendar year, US dollars"]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan for **Northbrook Trading, 1 to 30 September**, on the accrual basis. In scope are the **bonus**, **interest** on the term loan, **utilities**, **audit fees** and **deferred revenue**. Electricity and audit fees reverse on 1 October. The bonus, its payroll tax and the interest are cumulative, so they do not reverse. Materiality is **$500**.",
+      "after": "Your chart has two accounts for accruals: **Accrued expenses** and **Accrued liabilities – other**. Which one do I use? And shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Use Accrued expenses. Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        ["search_accounts", "Accrued expenses, Deferred revenue"],
+        ["get_trial_balance", ""],
+        ["get_balance_sheet", "Term loan $300,000"],
+        ["get_general_ledger", "Bonus accrued to 31 Aug $160,000"],
+        ["search_journal_entries", "No reversal of the August accrual"],
+        ["search_bills", "August electricity $2,170, 31 days"],
+        ["search_sales_receipts", "Pinnacle Clinics $36,000, to Revenue"],
+        ["get_profit_and_loss", ""]
+      ],
+      "summary": "8 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "I found five accruals for September. Each one has a basis that you or the books gave me:",
+      "card": {
+        "type": "bridge",
+        "title": "September accruals",
+        "rows": [
+          ["Bonus, 240,000 × 9 ÷ 12, less $160,000 already accrued", "$20,000.00"],
+          ["+ Employer payroll tax on the bonus, 8%", "$1,600.00"],
+          ["+ Interest, 15 days at 6.5%, actual/365", "$801.37"],
+          ["+ Electricity, 30 days at $70.00 a day", "$2,100.00"],
+          ["+ Audit fees, 75% of $12,000", "$9,000.00"],
+          ["= Accruals for September", "$33,501.37", "total"]
+        ]
+      },
+      "after": "I used the loan's own day count, actual/365. Actual/360 gives $812.50. Electricity and audit fees reverse on 1 October, a total of **$11,100**."
+    },
+    {
+      "role": "agent",
+      "text": "The electricity accrual holds too much. Last month's estimate of **$2,040** did not reverse on 1 September:",
+      "card": {
+        "type": "bridge",
+        "title": "Accrued expenses, electricity",
+        "rows": [
+          ["Opening balance, 31 Aug", "$2,040.00"],
+          ["+ September accrual", "$2,100.00"],
+          ["− Reversal of August, not posted", "$0.00"],
+          ["= Closing balance", "$4,140.00", "total"],
+          ["− Proposed correction", "$2,040.00"],
+          ["= Closing after the correction", "$2,100.00", "total"],
+          ["Expected: this month's accrual", "$2,100.00", "ok"]
+        ]
+      },
+      "after": "The real August bill of $2,170 went straight to Utilities expense on 9 September. Without the correction, September carries **$4,270** of electricity. With it, September carries $2,230."
+    },
+    {
+      "role": "agent",
+      "text": "Two customers paid in advance. Pinnacle Clinics paid **$36,000** on 1 September, and all of it went to Revenue. I move the unearned part to Deferred revenue. I do not enter the receipt again.",
+      "card": {
+        "type": "table",
+        "title": "Deferred revenue at 30 Sep",
+        "head": ["Contract", "Unearned", "Current", "Non-current"],
+        "rows": [
+          ["Pinnacle Clinics, 12 months", "$33,000", "$33,000", "$0"],
+          ["Lakeside Freight, 24 months", "$42,000", "$24,000", "$18,000"],
+          ["Total", "$75,000", "$57,000", "$18,000"]
+        ]
+      },
+      "after": "I also release $2,000 of Lakeside's payment for September. Together, the two contracts reduce September revenue by **$31,000**. Pinnacle's receipt has no sales tax."
+    },
+    {
+      "role": "agent",
+      "text": "Three items stay out of my entries:",
+      "card": {
+        "type": "table",
+        "title": "Not in this run",
+        "head": ["Item", "Amount", "Where it goes"],
+        "rows": [
+          ["Water and courier, each below $500", "$440", "Small items list, with the total"],
+          ["Stock received 29 Sep, no invoice", "$4,800", "ap-accrual-cutoff"],
+          ["Insurance paid 1 Sep for 12 months", "$7,200", "prepaid-amortization-schedule"]
+        ]
+      },
+      "after": "Water is $180 and the courier is $260. They get no entry, but the list keeps their total for your auditor."
+    },
+    {
+      "role": "agent",
+      "text": "I propose these entries. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries",
+        "head": ["Entry", "Amount", "Evidence"],
+        "rows": [
+          ["Accrue the bonus", "$20,000.00", "Managing director's estimate, ledger"],
+          ["Accrue payroll tax on the bonus", "$1,600.00", "Your 8% rate"],
+          ["Accrue interest on the term loan", "$801.37", "Loan agreement"],
+          ["Accrue September electricity", "$2,100.00", "August bill"],
+          ["Accrue audit fees", "$9,000.00", "Engagement letter, auditor"],
+          ["Correct the missed August reversal", "$2,040.00", "Journal entries from 1 Sep"],
+          ["Move Pinnacle's unearned part to Deferred revenue", "$33,000.00", "Contract and receipt"],
+          ["Release Lakeside's September part", "$2,000.00", "Contract"],
+          ["Reverse electricity and audit fees on 1 Oct", "$11,100.00", "Your reversal policy"]
+        ]
+      },
+      "after": "After the correction, the net September expense is **$31,461.37**. Closing accrued liabilities are **$206,301.37**."
+    },
+    {
+      "role": "user",
+      "text": "Looks good. Can you just post these in QuickBooks?"
+    },
+    {
+      "role": "agent",
+      "text": "No. I never write to your books. A person posts these entries, and a reviewer signs them off.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          ["Prepared by", ""],
+          ["Reviewed by", ""]
+        ]
+      },
+      "after": "Do you want the eight sheets as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the eight sheets, from the summary to the coverage. I saved the categories, the threshold, the reversal policy, your accounts and the basis for each category. Next month, the run starts from them."
+    }
+  ]
+}

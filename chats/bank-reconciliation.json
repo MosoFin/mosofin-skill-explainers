@@ -1,5 +1,8 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, Operating account (…4471), September. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "$10": "the user's own threshold for which differences to chase"
+  },
   "messages": [
     {
       "role": "user",

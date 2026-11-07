@@ -1,0 +1,295 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, open bills as of Friday 6 November 2026, $40,000 of cash for the run. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Who do we owe, and who should we pay this week?"
+    },
+    {
+      "role": "agent",
+      "text": "I can build the aging and propose a payment run. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "What is the as-of date? Do you use aging buckets of your own?",
+        "Aging only, or a payment run too? For a run, how much cash is available? I never read it from a bank balance.",
+        "Which vendors are critical, standard or discretionary?",
+        "Is any vendor on hold, or any bill in dispute? Is any payment on its way that is not in the books yet? Did any vendor ask to change bank details?",
+        "How do you pay each vendor: ACH, wire, cheque or card?",
+        "Are any bills in another currency? If so, which exchange rate do you use?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. As of Friday 6 November, standard buckets. A run too, with $40,000. We keep $10,000 back. Power Co and PayrollCo are critical, Brightline Software is discretionary. Acme Corp is on hold. We dispute its bill. Nothing is on its way. An email on 3 November asked to change Lakeside Freight's bank details. All ACH, all US dollars."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Aging report",
+          "Available in your books"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I age **Northbrook Trading**'s bills as of **Friday 6 November**, with the default buckets. Then I propose a run within the **$40,000** you chose to spend. Power Co and PayrollCo are critical. **Acme Corp is on hold**. Lakeside Freight asked to change bank details. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_aged_payables",
+          "Nine open bills, $62,850"
+        ],
+        [
+          "search_bills",
+          ""
+        ],
+        [
+          "search_bill_payments",
+          ""
+        ],
+        [
+          "search_vendor_credits",
+          "No open credits"
+        ],
+        [
+          "search_terms",
+          "Harbor 2/10 Net 30, Crestline 1.5% a month"
+        ],
+        [
+          "search_vendors",
+          ""
+        ],
+        [
+          "search_accounts",
+          ""
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_company_info",
+          "US dollars"
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "You have **nine open bills** for **$62,850**. This is your books' own aging report. I did not rebuild it.",
+      "card": {
+        "type": "bridge",
+        "title": "Aging as of Friday 6 November",
+        "rows": [
+          [
+            "Not yet due, five bills",
+            "$30,150"
+          ],
+          [
+            "+ 1–30 days late, Power Co and Lakeside Freight",
+            "$10,600"
+          ],
+          [
+            "+ 31–60 days late, Crestline Logistics",
+            "$12,500"
+          ],
+          [
+            "+ 61–90 days late",
+            "$0"
+          ],
+          [
+            "+ 91–120 days late, Acme Corp",
+            "$9,600"
+          ],
+          [
+            "+ Over 120 days late",
+            "$0"
+          ],
+          [
+            "= Total open",
+            "$62,850",
+            "total"
+          ]
+        ]
+      },
+      "after": "Crestline is 45 days late. Acme is 96 days late, but you hold it."
+    },
+    {
+      "role": "agent",
+      "text": "Two bills change the order. One discount ends before your next run, and one late fee grows each month:",
+      "card": {
+        "type": "table",
+        "title": "Discounts and penalties",
+        "head": [
+          "Bill",
+          "Amount",
+          "Why it matters"
+        ],
+        "rows": [
+          [
+            "Harbor Office Supply, 2/10 Net 30, discount",
+            "$160",
+            "Ends Mon 9 Nov. About 37.2% a year"
+          ],
+          [
+            "Crestline Logistics, late fee 1.5% a month",
+            "$187.50",
+            "Each month it stays unpaid"
+          ]
+        ]
+      },
+      "after": "Your next run is on Friday 13 November, after Harbor's deadline. So I pay Harbor now, at $7,840. Crestline ranks above the larger Pinnacle Design bill, which costs nothing to wait on."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the proposed run. I rank the bills in my default order and stop when the next bill does not fit your cash:",
+      "card": {
+        "type": "table",
+        "title": "Proposed payment run",
+        "head": [
+          "Vendor",
+          "Pay",
+          "Why it is here"
+        ],
+        "rows": [
+          [
+            "Power Co",
+            "$3,400",
+            "Critical"
+          ],
+          [
+            "PayrollCo",
+            "$1,200",
+            "Critical"
+          ],
+          [
+            "Crestline Logistics",
+            "$12,500",
+            "Late, with a late fee"
+          ],
+          [
+            "Lakeside Freight",
+            "$7,200",
+            "Late, final notice. Flagged: new bank details"
+          ],
+          [
+            "Harbor Office Supply",
+            "$7,840",
+            "Discount ends Mon 9 Nov"
+          ],
+          [
+            "Summit Cleaning",
+            "$950",
+            "Due this week"
+          ]
+        ]
+      },
+      "after": "Pinnacle Design comes next. $33,090 + $14,000 = $47,090, which is more than $40,000. So the run stops there."
+    },
+    {
+      "role": "agent",
+      "text": "The run uses **$33,090** of your $40,000. The cash test counts Harbor at the cash you pay, not at $8,000.",
+      "card": {
+        "type": "bridge",
+        "title": "Cash for this run",
+        "rows": [
+          [
+            "Cash available, your figure",
+            "$40,000"
+          ],
+          [
+            "− Proposed run, six bills",
+            "$33,090"
+          ],
+          [
+            "= Cash left",
+            "$6,910",
+            "total"
+          ]
+        ]
+      },
+      "after": "I record the $160 discount with the Harbor payment, so the bill closes in full."
+    },
+    {
+      "role": "agent",
+      "text": "These bills stay unpaid. I show them here, not in a footnote, because you must decide about them:",
+      "card": {
+        "type": "bridge",
+        "title": "Left unpaid",
+        "rows": [
+          [
+            "Pinnacle Design, due next week, waits for 13 Nov",
+            "$14,000"
+          ],
+          [
+            "+ Brightline Software, discretionary, deferred",
+            "$6,000"
+          ],
+          [
+            "+ Acme Corp, on hold, on the Held and disputed sheet",
+            "$9,600"
+          ],
+          [
+            "= Left unpaid",
+            "$29,600",
+            "total"
+          ]
+        ]
+      },
+      "after": "Hold the Lakeside payment until you confirm the change by phone. Use a number from your records, not from the email. I put no bank details in the output."
+    },
+    {
+      "role": "agent",
+      "text": "The run is a **proposal**. No payment has been made or scheduled. A person approves it, and the bank or the accounting system pays it. I do not pay anything.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Approved by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next week?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the aging, the run, the held bills, the discounts, the exceptions and the coverage. I saved your vendor tiers, payment methods, the Acme hold and the ranking order. I never save bank details or the cash available. Next week, I ask for the cash again."
+    }
+  ]
+}

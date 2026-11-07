@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 _site/
+
+# Temporary working copies for isolated agent runs
+.claude/worktrees/

@@ -1,0 +1,300 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, a two-member LLC, closing the year ended 31 December 2025. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "2024-schedule-k1s.pdf": "the name of the user's own file of last year's Schedule K-1s"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you close our books for 2025?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which company? For a group, which entities?",
+        "When does your fiscal year end?",
+        "Is the business a corporation, partnership, LLC, sole proprietor or nonprofit?",
+        "For a partnership or LLC: how do the members share profit, and do you keep capital for each member?",
+        "Which framework: US GAAP, IFRS or other?",
+        "Is this the final trial balance, with all adjusting entries posted?",
+        "Does your accounting system close the year by itself when you move to the new year?",
+        "Is the audit complete?",
+        "Do you close straight to retained earnings, or through an Income Summary account?",
+        "Do you report on a cash or an accrual basis?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading. It is an LLC. Lena Hart gets 60% and Omar Vance 40%, with capital kept for each. US GAAP, accrual. We have no Income Summary account. All adjustments are in. I think QuickBooks closes the year. The audit is not done. Last year's K-1s are attached.",
+      "attach": [
+        "2024-schedule-k1s.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks Online, confirmed by name"
+        ],
+        [
+          "get_company_info",
+          "Year-end 31 December, US dollars"
+        ],
+        [
+          "Account types",
+          "Enabled"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I close **FY2025**, the year ended **31 December 2025**, for **Northbrook Trading**, an LLC with capital for each member. I use the **two-step** method, straight to capital, because you have no Income Summary account. The audit is not complete, so this is a **preliminary close**. Before I propose any entry, I test whether QuickBooks already closed the year. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "24 accounts, includes Customer Deposits as Other Income"
+        ],
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "get_profit_and_loss",
+          "Net income 212,900"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          ""
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ]
+      ],
+      "summary": "6 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Before I go on, one account needs your answer. **Customer Deposits** has the type Other Income and a credit of $4,000. The name says money that customers paid in advance. That is a liability, not income.",
+      "after": "Net income agrees with the P&L at 212,900, because the P&L follows the same type. So only a check of names against types finds this. Which is right, the name or the type?"
+    },
+    {
+      "role": "user",
+      "text": "The name. Customers paid that money in advance."
+    },
+    {
+      "role": "agent",
+      "text": "Then the trial balance is not final yet. A type correction is an adjusting entry, so I stop here. Please post this in QuickBooks, dated 31 December 2025:",
+      "card": {
+        "type": "table",
+        "title": "Correction for you to post",
+        "head": [
+          "Account",
+          "Amount",
+          "Side"
+        ],
+        "rows": [
+          [
+            "Customer Deposits, income account",
+            "$4,000",
+            "Debit"
+          ],
+          [
+            "Customer Deposits, liability account",
+            "$4,000",
+            "Credit"
+          ]
+        ]
+      },
+      "after": "Net income then falls to **$208,900**. Tell me when it is posted, and I read everything again."
+    },
+    {
+      "role": "user",
+      "text": "Posted. Please run it again."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books again, and tested the closed state",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_trial_balance",
+          "31 Dec 2025, 1,724,000 on each side"
+        ],
+        [
+          "get_trial_balance",
+          "1 Jan 2026, every income and expense account at 0"
+        ],
+        [
+          "search_journal_entries",
+          "No closing entry near 31 Dec 2025"
+        ],
+        [
+          "get_balance_sheet",
+          "Retained Earnings 208,900 at 1 Jan 2026"
+        ],
+        [
+          "get_profit_and_loss",
+          "Net income 208,900"
+        ],
+        [
+          "get_general_ledger",
+          "Member capital and distributions"
+        ]
+      ],
+      "summary": "6 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "You were right. **QuickBooks already closed the year.** On 1 January 2026, every income and expense account is at 0. No closing entry exists, and Retained Earnings holds the year's $208,900.",
+      "after": "So I propose no entry that closes revenue or expenses. A second close would count the profit twice and overstate equity by $208,900."
+    },
+    {
+      "role": "agent",
+      "text": "The final trial balance balances at **1,724,000** on each side. Opening capital is $350,000: $210,000 for Lena and $140,000 for Omar. That agrees with the ending capital on your 2024 K-1s."
+    },
+    {
+      "role": "agent",
+      "text": "QuickBooks moved the profit into Retained Earnings. It did not split it between the members, and it did not close their distributions. I propose two entries for that:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries, 31 Dec 2025",
+        "head": [
+          "Entry",
+          "Amount",
+          "Debit and credit"
+        ],
+        "rows": [
+          [
+            "P1, Lena Hart's 60% of $208,900",
+            "$125,340",
+            "Dr Retained Earnings, Cr Member Capital (Hart)"
+          ],
+          [
+            "P1, Omar Vance's 40% of $208,900",
+            "$83,560",
+            "Dr Retained Earnings, Cr Member Capital (Vance)"
+          ],
+          [
+            "P2, close Lena's distributions",
+            "$60,000",
+            "Dr Member Capital (Hart), Cr Member Distributions (Hart)"
+          ],
+          [
+            "P2, close Omar's distributions",
+            "$40,000",
+            "Dr Member Capital (Vance), Cr Member Distributions (Vance)"
+          ]
+        ]
+      },
+      "after": "Each account has its own name from your chart. A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "After P1 and P2, the members' capital moves by exactly the profit and the distributions:",
+      "card": {
+        "type": "bridge",
+        "title": "Members' capital, FY2025",
+        "rows": [
+          [
+            "Opening capital",
+            "$350,000"
+          ],
+          [
+            "+ Net income, P1",
+            "$208,900"
+          ],
+          [
+            "− Distributions, P2",
+            "$100,000"
+          ],
+          [
+            "= Closing capital",
+            "$458,900",
+            "total"
+          ],
+          [
+            "Lena Hart $275,340 and Omar Vance $183,560",
+            "$458,900",
+            "ok"
+          ]
+        ]
+      },
+      "after": "The post-closing trial balance balances at **591,400** on each side. It holds only permanent accounts. Assets and liabilities did not change."
+    },
+    {
+      "role": "agent",
+      "text": "This is a preliminary close. If the audit changes any figure, I run the tests again. Your workpaper has eight sheets, with the closed-state finding in its header.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes. And please post P1 and P2, then lock 2025 for me."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Closing_Entries_TB_FY2025_Northbrook Trading.xlsx**. I cannot post or lock anything. A person posts P1 and P2 in QuickBooks. Who locks 2025, and when?"
+    },
+    {
+      "role": "user",
+      "text": "Lena does, after the audit."
+    },
+    {
+      "role": "agent",
+      "text": "Thank you. The coverage sheet names the lock as a manual step for Lena Hart, after the audit.",
+      "after": "Do you want me to save your settings for next year?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the entity type, the profit shares, the two-step method, that QuickBooks closes the year, the Customer Deposits exception and who locks the period. I never save balances. Next year, I test the closed state again."
+    }
+  ]
+}

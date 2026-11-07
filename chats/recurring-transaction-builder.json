@@ -1,0 +1,169 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, office rent to Riverside Properties, 24 monthly bills from January 2027, built on 29 October 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "We signed a new office lease. Can you set up the rent as a recurring bill?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you give me the data yourself?",
+        "Is it a recurring journal entry, bill, invoice or subscription? With which supplier or customer?",
+        "What is the amount of each bill, and in which currency?",
+        "What is the start date, and the end date or the number of bills?",
+        "On which day? Please say \"the 1st\" or \"the last business day\". \"Monthly\" is not enough.",
+        "Which account, and which tax code if tax applies?",
+        "Which payment terms?",
+        "Which holiday calendar? And when a date falls on a holiday, do I move it forward or backward?",
+        "Does the amount increase, and when does it stop or pause?",
+        "If the first or last month is a part month, do I pro-rate by days or follow the contract?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. A bill to Riverside Properties, $8,500 a month in US dollars. 24 months from 1 January 2027, due on the 1st. Rent Expense, no sales tax. Due on receipt. US federal holidays, move forward. 3% more each year at the lease anniversary. No part months.",
+      "attach": [
+        "riverside-lease-2027.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        ["Workspace", "Northbrook Trading"],
+        ["Company file", "Confirmed by name"],
+        ["Saved settings", "None yet"],
+        ["Tools", "Read-only tools only"]
+      ],
+      "summary": "The agent can read your books. It cannot create, post or schedule anything."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I build a **recurring bill** for **Northbrook Trading**: office rent to **Riverside Properties**, **$8,500 a month** in US dollars, on the **1st**. That is **24 bills** from **1 January 2027**, moved **forward** on the **US federal holiday calendar**.",
+      "after": "The coding is **Rent Expense**, with a **3% increase** at each lease anniversary. I check it against your books. Nothing will be posted. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        ["Chart of accounts", "Rent Expense, active"],
+        ["Vendor list", "Riverside Properties, spelled as given"],
+        ["Recurring templates", "Riverside, $8,500 on the 1st, no end date"],
+        ["Riverside bills, January to October 2026", "All 10 posted"],
+        ["Ledger, 12 months", "Four monthly charges keyed by hand"]
+      ],
+      "summary": "One batch of reads. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Your coding passes. But your books already hold a Riverside template, and it has no end date:",
+      "card": {
+        "type": "table",
+        "title": "Checks against your books",
+        "head": ["Check", "Result", "Found"],
+        "rows": [
+          ["Rent Expense", "Pass", "Active expense account"],
+          ["Riverside Properties", "Pass", "On the vendor list, spelled as given"],
+          ["Old template", "Duplicate from January", "$8,500, monthly on the 1st, next date Sun 1 Nov 2026"],
+          ["Old template, January to October 2026", "No month missing", "10 × $8,500 = $85,000.00"]
+        ]
+      },
+      "after": "From January, the old and new templates would both bill you. Is the new lease a renewal of the old one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, it renews on 1 January. The old template's last bill is on 1 December."
+    },
+    {
+      "role": "agent",
+      "text": "Then a person ends the old template after its **Tuesday 1 December 2026** bill, before the new one goes in. Here are the 24 new bills. Seven fall on a weekend or a holiday, so they move forward:",
+      "card": {
+        "type": "table",
+        "title": "Bills that move forward",
+        "head": ["Bill", "Amount", "Due", "Scheduled"],
+        "rows": [
+          ["Bill 1", "$8,500.00", "Fri 1 Jan 2027, New Year's Day", "Mon 4 Jan 2027"],
+          ["Bill 5", "$8,500.00", "Sat 1 May 2027", "Mon 3 May 2027"],
+          ["Bill 8", "$8,500.00", "Sun 1 Aug 2027", "Mon 2 Aug 2027"],
+          ["Bill 13", "$8,755.00", "Sat 1 Jan 2028", "Mon 3 Jan 2028"],
+          ["Bill 16", "$8,755.00", "Sat 1 Apr 2028", "Mon 3 Apr 2028"],
+          ["Bill 19", "$8,755.00", "Sat 1 Jul 2028", "Mon 3 Jul 2028"],
+          ["Bill 22", "$8,755.00", "Sun 1 Oct 2028", "Mon 2 Oct 2028"]
+        ]
+      },
+      "after": "The other 17 bills fall on business days. No bill leaves its month."
+    },
+    {
+      "role": "agent",
+      "text": "The 3% increase starts at the first anniversary, 1 January 2028. In 24 months, it applies once:",
+      "card": {
+        "type": "bridge",
+        "title": "Total of the 24 bills",
+        "rows": [
+          ["Year 1, 12 × $8,500.00", "$102,000.00"],
+          ["+ Year 2, 12 × $8,755.00", "$105,060.00"],
+          ["= Total of the 24 bills", "$207,060.00", "total"],
+          ["Check: 24 × $8,500 + 12 × $255", "$207,060.00", "ok"]
+        ]
+      },
+      "after": "Each memo says why. Bill 13 reads \"lease yr 2, $8,500 + 3% at 1 Jan 2028 anniversary = $8,755\". Your lease runs 24 months, so lease accounting may apply. Please ask your accountant how to code it."
+    },
+    {
+      "role": "agent",
+      "text": "Your ledger also shows four monthly charges that someone keys by hand. These are candidates for you to choose from:",
+      "card": {
+        "type": "table",
+        "title": "Charges keyed by hand",
+        "head": ["Supplier", "A month", "What I see"],
+        "rows": [
+          ["Summit Cleaning", "$950", "A second $950 on 6 Sep may be a duplicate"],
+          ["Crestline Logistics", "$1,500", "$1,000 to August. Check the contract letter"],
+          ["Keystone Pest Control", "$350", "Same amount every month"],
+          ["Metro Shred", "$120", "Same amount every month"],
+          ["Total", "$2,920", ""]
+        ]
+      },
+      "after": "The $7,200 insurance belongs to the prepaid schedule. The loan interest changes each month, so it is not a candidate. Which charges do you want templates for?"
+    },
+    {
+      "role": "user",
+      "text": "Not Metro Shred. We check the shred count each month. I will look at the others. Can you just set up the rent in QuickBooks for me?"
+    },
+    {
+      "role": "agent",
+      "text": "No. I cannot create, post or schedule anything in your books. A person enters the template from this specification:",
+      "card": {
+        "type": "table",
+        "title": "Specification",
+        "head": ["Item", "On the file"],
+        "rows": [
+          ["File header", "NOT POSTED"],
+          ["Validation", "Northbrook Trading's chart, 29 Oct 2026"],
+          ["Bills", "24, all Pending"],
+          ["Total", "$207,060.00"],
+          ["Old template", "End after 1 Dec 2026"],
+          ["Lease", "Lease accounting may apply"]
+        ]
+      },
+      "after": "Each month, I can read the ledger and check that the rent posted, at the right amount and account. Do you want the six sheets as an Excel file? And shall I save your settings?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. Here is **Riverside Properties_RecurringSchedule_2026-10-29.xlsx**, with Northbrook Trading on every sheet. I saved the holiday calendar, the forward move, the list of recurring bills and your reason for Metro Shred. I never save a rate."
+    }
+  ]
+}

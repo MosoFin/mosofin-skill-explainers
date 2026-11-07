@@ -1,0 +1,189 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, IFRS statements for the year to 30 June 2026, in thousands of US dollars. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "northbrook-fy2025-statements.pdf": "the name of the user's own file of last year's statements as issued",
+    "bank-loan-schedule.xlsx": "the name of the user's own loan amortization schedule"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you build our year-end financial statements? The bank wants them."
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which framework: US GAAP, IFRS, a local GAAP or a special basis? What is the legal form of the company?",
+        "Which period, and which columns: the year only, or also the prior year or the budget?",
+        "Is this one company, or a group? For a group, do you want consolidated or separate statements?",
+        "Please attach last year's statements as issued.",
+        "How do you know which part of each loan is due within twelve months? Please attach the schedules.",
+        "Do you want whole dollars, thousands or millions?",
+        "Do you want the income statement by function or by nature?",
+        "Is there anything special, such as discontinued operations, segments or earnings per share?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. IFRS, and we are a private limited company. Year to 30 June 2026, with last year beside it. One company. Last year's statements and the loan schedule are attached. Thousands, by nature, non-current items first. Nothing special.",
+      "attach": [
+        "northbrook-fy2025-statements.pdf",
+        "bank-loan-schedule.xlsx"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        ["Workspace", "Northbrook Trading"],
+        ["Company file", "QuickBooks, Northbrook Trading, confirmed by name"],
+        ["get_company_info", "Year-end 30 June, US dollars"],
+        ["Tools", "Read-only tools only"]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I build **IFRS** statements for **Northbrook Trading** for the year to **30 June 2026**, with one comparative year. I read the trial balance from your books, on the accrual basis. I present by nature, non-current items first, in **thousands**. The loan split comes from your schedule. I check last year against your FY2025 statements. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read both year ends in one batch",
+      "tag": "read-only",
+      "rows": [
+        ["get_trial_balance", "30 June 2026, 21 accounts"],
+        ["get_trial_balance", "30 June 2025, same method"],
+        ["search_accounts", ""],
+        ["get_balance_sheet", "Platform version, loan as one line of 120"],
+        ["get_profit_and_loss", ""],
+        ["get_cash_flow_statement", "A cross-check only"],
+        ["get_general_ledger", "Equipment, bank loan and equity"]
+      ],
+      "summary": "7 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "The trial balance balances. Debits and credits are both **1,551** thousand, so the difference is 0. The year is not closed, so I use the year-to-date balances. One account needs your answer before I map it. **Ask My Accountant** holds a debit of 2 thousand. What is it?"
+    },
+    {
+      "role": "user",
+      "text": "That is a deposit we paid to a supplier."
+    },
+    {
+      "role": "agent",
+      "text": "Then it belongs in **Prepayments**, which becomes 12. I put the entry on the reclassifications sheet as a proposal. All 21 accounts now land on exactly one line. Your schedule puts 40 of the 120 loan due within twelve months, so I split it:",
+      "card": {
+        "type": "table",
+        "title": "Statement of financial position, $000",
+        "head": ["Line", "30 Jun 2026", "30 Jun 2025"],
+        "rows": [
+          ["Property, plant and equipment", "162", "148"],
+          ["Total current assets", "354", "364"],
+          ["Total assets", "516", "512"],
+          ["Bank loan, net of current portion", "80", "100"],
+          ["Current portion of bank loan", "40", "50"],
+          ["Total current liabilities", "144", "143"],
+          ["Total liabilities", "224", "243"],
+          ["Total equity", "292", "269"],
+          ["Total equity and liabilities", "516", "512"]
+        ]
+      },
+      "after": "Your platform's balance sheet shows the loan as one long-term line. That puts current liabilities at 104 instead of 144. After the split, I proved the balance again: 516 equals 224 plus 292."
+    },
+    {
+      "role": "agent",
+      "text": "Profit for the year is **38** thousand, up from 26. This is the income statement by nature:",
+      "card": {
+        "type": "table",
+        "title": "Statement of profit or loss, $000",
+        "head": ["Line", "FY2026", "FY2025"],
+        "rows": [
+          ["Revenue", "960", "880"],
+          ["Raw materials and consumables used", "(585)", "(540)"],
+          ["Employee benefit expense", "(210)", "(196)"],
+          ["Depreciation and amortization expense", "(26)", "(22)"],
+          ["Other expenses", "(80)", "(76)"],
+          ["Operating profit", "59", "46"],
+          ["Finance costs", "(9)", "(11)"],
+          ["Income tax expense", "(12)", "(9)"],
+          ["Profit for the year", "38", "26"]
+        ]
+      },
+      "after": "Other comprehensive income is nil, so total comprehensive income is also 38. With dividends of 15, retained earnings close at 242."
+    },
+    {
+      "role": "agent",
+      "text": "You made a profit of 38, but cash fell from 134 to 84. The cash flow statement shows why:",
+      "card": {
+        "type": "table",
+        "title": "Statement of cash flows, indirect method, $000",
+        "head": ["Line", "FY2026"],
+        "rows": [
+          ["Cash at 30 June 2025", "134"],
+          ["Net cash from operating activities", "35"],
+          ["Purchase of equipment", "(40)"],
+          ["New loan drawn", "20"],
+          ["Loan repaid", "(50)"],
+          ["Dividends paid", "(15)"],
+          ["Net decrease in cash", "(50)"],
+          ["Cash at 30 June 2026", "84"]
+        ]
+      },
+      "after": "Receivables and inventory grew, and you bought equipment. I show the loan as 20 drawn and 50 repaid, never as a net 30. The cash flow ends at the balance-sheet cash with no plug."
+    },
+    {
+      "role": "agent",
+      "text": "I compared last year's ledger with your FY2025 statements, line by line. Every line agrees. Then I ran the seven checks that link the statements:",
+      "card": {
+        "type": "table",
+        "title": "Tie-outs, $000",
+        "head": ["Tie-out", "Difference", "Figures", "Result"],
+        "rows": [
+          ["1. Balance sheet balances", "0", "516 = 224 + 292", "Pass"],
+          ["2. Profit = top of the cash flow", "0", "38 = 38", "Pass"],
+          ["3. Profit and other comprehensive income reach equity", "0", "38 = 38, 0 = 0", "Pass"],
+          ["4. Opening cash + flows = balance-sheet cash", "0", "134 + 35 − 40 − 45 = 84", "Pass"],
+          ["5. Closing retained earnings agree", "0", "242 = 204 + 38", "Pass"],
+          ["6. Last year = FY2025 as issued", "0", "Checked by hand against your PDF", "Manual"],
+          ["7. One currency", "0", "All five statements in USD $000", "Pass"]
+        ]
+      },
+      "after": "Tie-out 6 says manual because I compared it with your PDF, not with a system record."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has eight sheets. There is no separate comprehensive income sheet, because you have no other comprehensive income. Every statement has a footer with the entity, source, currency and rounding.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [["Prepared by", ""], ["Reviewed by", ""]]
+      },
+      "after": "These are management's own statements. They are not audited, reviewed or compiled, and I write no notes. Ask the bank which level it needs. Do you want an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, Excel please. Can you also post the supplier deposit entry?"
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Financial_Statements_2026-06_Northbrook Trading.xlsx**. I do not post entries. Sheet 8 has the draft: debit Prepayments 2, credit Ask My Accountant 2. Your bookkeeper posts it.",
+      "after": "Do you want me to save your settings for next year?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the framework, the presentation choices, the account-to-line mapping, the rounding and the comparative policy. I never save balances, statement figures or the trial balance."
+    }
+  ]
+}

@@ -1,0 +1,387 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, seven balance sheet accounts, 30 September 2026. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "Miscellaneous expense": "the name of the user's own P&L account for approved write-offs. The page gives no account name"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you reconcile our balance sheet accounts for September?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need eight answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which company? For a group, which entities?",
+        "Which accounts? Name them, or say all balance sheet accounts.",
+        "Which period end? I never assume one.",
+        "Some support is outside the books, such as prepaid, fixed asset, loan and accrual schedules. Can you attach each one?",
+        "What size of difference must you resolve at once? I can suggest a basis, but you choose the threshold.",
+        "Do you have last period's reconciliation?",
+        "Who prepares, and who reviews?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading. Payroll clearing, A/R, A/P, prepaid, accrued expenses, fixed assets and the term loan. Period end 30 September. Schedules attached, but the fixed asset register is not ready. $500 per account. No rec for August. The bookkeeper prepares, the controller reviews.",
+      "attach": [
+        "prepaid-schedule-september.xlsx",
+        "accrual-schedules-september.xlsx",
+        "term-loan-schedule.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "One more question. A small residual can get a write-off, but only below a limit that you approve. What is that limit, and which P&L account takes it?"
+    },
+    {
+      "role": "user",
+      "text": "Up to $100. Use Miscellaneous expense."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile **seven accounts** of **Northbrook Trading** at **30 September**, with the GL read through MosoFin. I tie A/R and A/P to their agings and test them against receipts and payments after the date. Payroll clearing must be zero. Your schedules support prepaid, accrued expenses and the loan. The fixed asset register is missing, so fixed assets show as **not reconciled**. Materiality is **$500**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_trial_balance",
+          "In scope $607,313.40"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "search_accounts",
+          "Payroll clearing 2200, Accrued expenses 2110"
+        ],
+        [
+          "get_general_ledger",
+          "Five open lines in payroll clearing"
+        ],
+        [
+          "get_aged_receivables",
+          "Aging total $68,200.00"
+        ],
+        [
+          "get_aged_payables",
+          ""
+        ],
+        [
+          "search_payments",
+          "Receipts from 1 to 9 Oct, $31,400.00"
+        ],
+        [
+          "search_bill_payments",
+          "Payments after the date, $41,200.00"
+        ],
+        [
+          "search_journal_entries",
+          "Entries to A/R without a customer"
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "10 reads in one batch. All live data, no mock. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "I start with the clearing account. Payroll clearing 2200 must be zero. It shows **$4,023.40** in five open lines:",
+      "card": {
+        "type": "table",
+        "title": "Payroll clearing 2200, open lines",
+        "head": [
+          "Line",
+          "Amount",
+          "Days at 30 Sep",
+          "Flag"
+        ],
+        "rows": [
+          [
+            "No reference",
+            "$23.40",
+            "over 364",
+            "Over 3 months"
+          ],
+          [
+            "EE-03",
+            "$640.00",
+            "239",
+            "Over 3 months, over $500"
+          ],
+          [
+            "EE-05",
+            "$1,150.00",
+            "153",
+            "Over 3 months, over $500"
+          ],
+          [
+            "EE-11",
+            "$410.00",
+            "92",
+            "At the 3-month limit"
+          ],
+          [
+            "JE-0912",
+            "$1,800.00",
+            "6",
+            "Over $500"
+          ]
+        ]
+      },
+      "after": "The $23.40 is more than a year old. That usually means nobody owns the account. I do not roll an open clearing balance forward. The payroll lead owns each line, with a target date of Fri 16 Oct."
+    },
+    {
+      "role": "agent",
+      "text": "Accounts receivable is **$750** away from its aging:",
+      "card": {
+        "type": "bridge",
+        "title": "Accounts receivable",
+        "rows": [
+          [
+            "GL balance, trial balance",
+            "$68,950.00"
+          ],
+          [
+            "− Customer aging, same books",
+            "$68,200.00"
+          ],
+          [
+            "= Difference",
+            "$750.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The aging comes from the same books, so this tie is only a mechanical check. The independent test is the receipts after the date. They paid $31,400 of the 30 September invoices. I found no late entries, no foreign currency and no rounding. A journal entry to A/R without a customer is the likely cause. The $750 is above $500, so it needs resolution now. The bookkeeper owns it, with a target date of Fri 9 Oct."
+    },
+    {
+      "role": "user",
+      "text": "Can you post the $750 to suspense so the account ties?"
+    },
+    {
+      "role": "agent",
+      "text": "No. I never plug a difference, and I never write to your books. The $750 is also above your $100 write-off limit. A write-off never goes to a suspense account on the balance sheet. A/R stays **Investigating** until the bookkeeper finds the cause."
+    },
+    {
+      "role": "agent",
+      "text": "Prepaid expenses show **$22,100**. Your schedule shows **$14,850**. Three errors explain the difference:",
+      "card": {
+        "type": "bridge",
+        "title": "Prepaid expenses",
+        "rows": [
+          [
+            "GL balance",
+            "$22,100.00"
+          ],
+          [
+            "− September amortization not booked, 600 + 400 + 150",
+            "$1,150.00"
+          ],
+          [
+            "− August amortization not booked, 550 + 400 + 150",
+            "$1,100.00"
+          ],
+          [
+            "− Refundable landlord deposit, reclass to a deposits asset",
+            "$5,000.00"
+          ],
+          [
+            "= Adjusted GL balance",
+            "$14,850.00",
+            "total"
+          ],
+          [
+            "Difference to the prepaid schedule",
+            "$0.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "Each item is permanent, so each one gets a proposed entry. None of them is timing."
+    },
+    {
+      "role": "agent",
+      "text": "Accrued expenses 2110 show **$27,790**. Your schedules support **$25,750**: AP cutoff $14,650, electricity $2,100 and audit fees $9,000. With no August rec, I start from the 31 August balance as I read it today.",
+      "card": {
+        "type": "bridge",
+        "title": "Accrued expenses 2110, roll-forward",
+        "rows": [
+          [
+            "Opening, 31 August",
+            "$2,040.00"
+          ],
+          [
+            "+ Accruals booked in September",
+            "$25,750.00"
+          ],
+          [
+            "− Reductions",
+            "$0.00"
+          ],
+          [
+            "= Closing, ties to the GL",
+            "$27,790.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The August accrual of $2,040 should reverse on Tue 1 Sep. No reduction is there, so the $2,040 is a permanent item. Nothing in August changed after you closed it, so I raise no prior-period flag."
+    },
+    {
+      "role": "agent",
+      "text": "I propose four entries. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries",
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Book the September prepaid amortization",
+            "$1,150.00",
+            "Prepaid schedule"
+          ],
+          [
+            "Book the August prepaid amortization",
+            "$1,100.00",
+            "Prepaid schedule"
+          ],
+          [
+            "Reclass the landlord deposit to a deposits asset",
+            "$5,000.00",
+            "Prepaid schedule"
+          ],
+          [
+            "Dr 2110 Accrued expenses, Cr 6310 Utilities",
+            "$2,040.00",
+            "Roll-forward of 2110"
+          ]
+        ]
+      },
+      "after": "The four entries total **$9,290**. A person posts them. I do not. Prepaid and accrued expenses are reconciled only when the entries are posted."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the coverage sheet. Each account shows how I got each side:",
+      "card": {
+        "type": "table",
+        "title": "Coverage, 30 September",
+        "head": [
+          "Account",
+          "GL balance",
+          "Support",
+          "Status"
+        ],
+        "rows": [
+          [
+            "Payroll clearing 2200",
+            "$4,023.40",
+            "Same books, must be zero",
+            "Investigating"
+          ],
+          [
+            "Accounts receivable",
+            "$68,950.00",
+            "Same books, receipts after the date",
+            "Investigating"
+          ],
+          [
+            "Accounts payable",
+            "$58,400.00",
+            "Same books, payments $41,200 after the date",
+            "Reconciled"
+          ],
+          [
+            "Prepaid expenses",
+            "$22,100.00",
+            "Your schedule",
+            "Reconciled, 3 proposed entries"
+          ],
+          [
+            "Accrued expenses 2110",
+            "$27,790.00",
+            "Your schedules",
+            "Reconciled, 1 proposed entry"
+          ],
+          [
+            "Fixed assets, net",
+            "$126,050.00",
+            "Not supplied",
+            "Not reconciled"
+          ],
+          [
+            "Term loan",
+            "$300,000.00",
+            "Your schedule, no lender confirmation",
+            "Reconciled"
+          ]
+        ]
+      },
+      "after": "Support with evidence covers **79.2%** of the $607,313.40 in scope. Fixed assets stay not reconciled until the controller supplies the register."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has one tab for each account and the coverage sheet. The bookkeeper prepares it, and the controller reviews it.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **BS_Recs_2026-09_Northbrook Trading.xlsx**. I saved the source for each account, the $500 threshold, the 3-month escalation, the people and the $100 limit. I never save balances, item detail or the workpaper."
+    }
+  ]
+}

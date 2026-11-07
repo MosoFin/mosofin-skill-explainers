@@ -1,0 +1,326 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, Priya Nair's expense report, September. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you check Priya's September expense report before we pay her?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which expense reports: which employees and which period?",
+        "What is your expense policy? I need the receipt rules, the caps and the pre-approval rules.",
+        "Where are the receipts?",
+        "Which tax jurisdiction and rules apply, for example to meals?",
+        "Which mileage rate do you pay, and from which date? I never supply one.",
+        "Do you use a per-diem table? If yes, which one?",
+        "For claims in another currency, which exchange rate source do you use?",
+        "Do you book company card charges to a clearing account, or to expense?",
+        "Who approved each report?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Priya Nair, September, exported from Expensify. Policy v3 is attached. Receipts are in Expensify. US rules, meals 50% deductible. Mileage is $0.45 a mile from 1 January. No per-diems, no foreign currency. Card charges go to Corporate Card Clearing. Her manager approved it.",
+      "attach": [
+        "priya-nair-september-expensify.csv",
+        "expense-policy-v3.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Expense tool",
+          "Expensify not connected"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Expensify is not connected, so I use your export. Here is my plan. I check **Priya Nair's September report** against **policy v3, dated 1 January**: receipts above $25, meals $60 a head, mileage $0.45 a mile. I code each line to your chart and compare each claim with the card charges in your books. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "Includes Meals 6450 and Corporate Card Clearing"
+        ],
+        [
+          "search_employees",
+          "Priya Nair, Sales"
+        ],
+        [
+          "search_credit_card_charges",
+          "Includes United $412.00, 2 Sep"
+        ],
+        [
+          "search_purchases",
+          ""
+        ],
+        [
+          "search_expenses",
+          ""
+        ],
+        [
+          "search_bills",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Corporate Card Clearing $1,264.00"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_company_info",
+          "US dollars"
+        ],
+        [
+          "Test data",
+          "None in the run"
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Priya flew to Denver from 2 to 4 September. Her report has six lines. The company card paid two of them, and both match their card charges, as expected:",
+      "card": {
+        "type": "table",
+        "title": "Priya Nair, September",
+        "head": [
+          "Line",
+          "Amount",
+          "Paid by",
+          "Result"
+        ],
+        "rows": [
+          [
+            "P1 Airfare, United, 2 Sep",
+            "$412.00",
+            "Company card",
+            "Matches its card charge"
+          ],
+          [
+            "P2 Hotel, 2 nights × $189.00",
+            "$378.00",
+            "Company card",
+            "Matches its card charge"
+          ],
+          [
+            "P3 \"Flight to Denver\", 2 Sep",
+            "$412.00",
+            "Priya",
+            "Reject"
+          ],
+          [
+            "P4 Client dinner, 3 people",
+            "$210.00",
+            "Priya",
+            "$30.00 over the cap"
+          ],
+          [
+            "P5 Taxi, no receipt",
+            "$38.00",
+            "Priya",
+            "Review"
+          ],
+          [
+            "P6 Mileage, 120 miles × $0.45",
+            "$54.00",
+            "Priya",
+            "Approve"
+          ]
+        ]
+      },
+      "after": "The company owes Priya nothing for P1 and P2. The card already paid them."
+    },
+    {
+      "role": "agent",
+      "text": "**P3 is a double reimbursement.** Priya claims the flight out of pocket, but the company card already paid it on P1:",
+      "card": {
+        "type": "table",
+        "title": "P3 against the card charge",
+        "head": [
+          "Test",
+          "Card charge P1",
+          "Claim P3"
+        ],
+        "rows": [
+          [
+            "Merchant",
+            "United",
+            "Flight to Denver"
+          ],
+          [
+            "Amount",
+            "$412.00",
+            "$412.00"
+          ],
+          [
+            "Date",
+            "2 Sep",
+            "2 Sep"
+          ],
+          [
+            "Paid by",
+            "Company card",
+            "Priya"
+          ]
+        ]
+      },
+      "after": "The dates are 0 days apart, inside my 3-day window. The money already left the company, so I mark P3 **Reject**, not Review. Most duplicates are honest errors. A person decides."
+    },
+    {
+      "role": "agent",
+      "text": "Two more lines break your policy:",
+      "list": [
+        "**P4**, the client dinner, is $70.00 a head against your $60 cap. I allow 3 × $60.00 = $180.00 and disallow the $30.00 over the cap.",
+        "**P5**, the taxi, is $38.00 with no receipt. Your policy asks for a receipt above $25, so I mark it **Review**."
+      ],
+      "after": "I cannot see receipt images, so receipt status is per the report. I code the dinner to Meals 6450. Under your US rule, the 50% limit sits with the company, not with Priya."
+    },
+    {
+      "role": "agent",
+      "text": "Here is what the company owes Priya:",
+      "card": {
+        "type": "bridge",
+        "title": "Net reimbursable",
+        "rows": [
+          [
+            "Report lines other than mileage",
+            "$1,450.00"
+          ],
+          [
+            "+ Mileage, 120 miles × $0.45",
+            "$54.00"
+          ],
+          [
+            "= Total submitted",
+            "$1,504.00",
+            "total"
+          ],
+          [
+            "− Company-paid lines, P1 and P2",
+            "$790.00"
+          ],
+          [
+            "− Rejected and disallowed, P3 and P4",
+            "$442.00"
+          ],
+          [
+            "− Personal portion",
+            "$0.00"
+          ],
+          [
+            "= Net reimbursable",
+            "$272.00",
+            "total"
+          ],
+          [
+            "Check: reimbursable lines, $180.00 + $38.00 + $54.00",
+            "$272.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "**$234.00** is ready for her manager now: $180.00 for the dinner and $54.00 for the mileage. The other $38.00 waits for the taxi receipt."
+    },
+    {
+      "role": "agent",
+      "text": "I also tested Corporate Card Clearing. It should come to zero, but it holds **$1,264.00**. The oldest item is a card charge of $118.00 from 11 July, with no claim. It is 108 days old, so it is a break, not timing. Someone must find the claim for it."
+    },
+    {
+      "role": "agent",
+      "text": "I propose these posting inputs. The journal entry skill can build the entry from them:",
+      "card": {
+        "type": "table",
+        "title": "Posting inputs",
+        "head": [
+          "Account",
+          "Amount",
+          "From"
+        ],
+        "rows": [
+          [
+            "Travel, Airfare 6410",
+            "$412.00",
+            "P1, clears the card charge"
+          ],
+          [
+            "Travel, Lodging 6420",
+            "$378.00",
+            "P2, clears the card charge"
+          ],
+          [
+            "Meals 6450",
+            "$180.00",
+            "P4, within the cap"
+          ],
+          [
+            "Travel, Local Transport 6430",
+            "$54.00",
+            "P6, at your rate"
+          ]
+        ]
+      },
+      "after": "P1 and P2 take $790.00 out of Corporate Card Clearing. P4 and P6 make $234.00 payable to Priya. A manager approves, and a person posts. I do not approve, pay or post anything."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has six sheets: the summary, the line detail, the exceptions, the posting inputs, the ledger checks and the coverage. The summary says that her manager approved the report.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Approved by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the six sheets. I saved policy v3, the $0.45 rate with its date, your account map and the clearing account. I never save names, claims or amounts."
+    }
+  ]
+}

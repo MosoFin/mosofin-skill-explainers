@@ -1,0 +1,231 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, the operations manager's corporate card, September statement. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you reconcile the operations manager's company card for September?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need seven answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which card is it, and who holds it? I record the holder by role, never by card number.",
+        "Which statement period is it, and does it match your accounting month?",
+        "Please attach the card statement.",
+        "Please attach the receipts, or an export from your receipt tool.",
+        "Below what amount is no receipt necessary? Above what amount is a purchase an asset?",
+        "Can you reclaim tax on card spend, and where?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. It is the operations manager's corporate card. The statement runs 1 to 30 September, same as our month. Receipts under $75 are not necessary. Assets start above $2,500. We do not reclaim tax on this card.",
+      "attach": [
+        "card-statement-september.pdf",
+        "receipts-september.zip"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I will reconcile the **corporate card held by the operations manager** at Northbrook Trading for **1 to 30 September**. I use your statement and receipts, and I read the books through MosoFin.",
+      "after": "Your receipt threshold is **$75** and your capitalisation threshold is **$2,500**. I do not assess tax recovery. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_purchases",
+          "Includes $2,900.00 to an electronics retailer"
+        ],
+        [
+          "get_general_ledger",
+          "Card liability $8,623.60 on 30 Sep"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "search_bill_payments",
+          ""
+        ],
+        [
+          "search_transfers",
+          ""
+        ],
+        [
+          "search_attachables",
+          ""
+        ],
+        [
+          "search_tax_codes",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "The statement closes at **$8,432.10**, with 42 charges and one payment. Your books show **$8,623.60** for the card on 30 September. Two items explain the difference:",
+      "card": {
+        "type": "bridge",
+        "title": "Statement to books",
+        "rows": [
+          [
+            "Card liability in the books, 30 Sep",
+            "$8,623.60"
+          ],
+          [
+            "− Charge posted 30 Sep, on October's statement",
+            "$340.00"
+          ],
+          [
+            "+ Charge on the statement, never entered",
+            "$148.50"
+          ],
+          [
+            "= Adjusted books",
+            "$8,432.10",
+            "total"
+          ],
+          [
+            "Difference to the statement closing balance",
+            "$0.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "The $340 is timing. The issuer recorded it on 1 October, and next month I check that it cleared."
+    },
+    {
+      "role": "agent",
+      "text": "The **$148.50** needs a person. It is a Saturday grocery-store purchase that nobody submitted. It has no receipt and no business purpose.",
+      "after": "I list it as a possible personal charge, and the cardholder owns the follow-up. I do not call it more than that."
+    },
+    {
+      "role": "agent",
+      "text": "One charge is in the wrong account. The laptop is over your **$2,500** line, but it is in Office Supplies:",
+      "card": {
+        "type": "table",
+        "title": "Capitalisation test",
+        "head": [
+          "Charge",
+          "Amount",
+          "Coded to",
+          "Result"
+        ],
+        "rows": [
+          [
+            "Electronics retailer, 9 Sep",
+            "$2,900.00",
+            "Office Supplies",
+            "Over the line: asset"
+          ],
+          [
+            "Office chair, 14 Sep",
+            "$640.00",
+            "Office Supplies",
+            "Expense"
+          ],
+          [
+            "Monitor, 22 Sep",
+            "$389.00",
+            "Office Supplies",
+            "Expense"
+          ]
+        ]
+      },
+      "after": "September's expenses are $2,900 too high, and your asset register does not have the laptop."
+    },
+    {
+      "role": "agent",
+      "text": "I propose two entries. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries",
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Move the laptop from Office Supplies to Computer Equipment",
+            "$2,900.00",
+            "Charge 9 Sep, your $2,500 threshold"
+          ],
+          [
+            "Enter the grocery charge",
+            "$148.50",
+            "Statement line"
+          ]
+        ]
+      },
+      "after": "If a person decides that the grocery charge is personal, it goes to Due from Employee. The $340 needs no entry. A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "The card ties to the cent. Your workpaper has six sheets. The first sheet says that this is a reconciliation, not a review. The last sheet shows what I could not check.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the card by its holder's role and your two thresholds. I saved no card numbers and no spending."
+    }
+  ]
+}

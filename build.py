@@ -187,6 +187,14 @@ def problems(rows):
         f = flow_of(r["skill"])
         # A skill without a flow file gets no flow section yet. Once every skill has one, make a missing file an error.
         if f is not None: out += flow_problems(r["skill"], f)
+    for r in rows:
+        c = chat_of(r["skill"])
+        if c is None:
+            out.append(f"{r['skill']}: no chats/{r['skill']}.json. Every skill page shows a chat replay. Write one with the write-chat-replay skill")
+        else:
+            out += chat_problems(r["skill"], c)
+    for fn in sorted(os.listdir(CHATS)) if os.path.isdir(CHATS) else []:
+        if fn.endswith(".json") and fn[:-5] not in seen: out.append(f"chats/{fn}: {fn[:-5]} is not in the tracker")
     for fn in sorted(os.listdir(FLOWS)) if os.path.isdir(FLOWS) else []:
         if fn.endswith(".json") and fn[:-5] not in seen: out.append(f"flows/{fn}: {fn[:-5]} is not in the tracker")
     # every explainer file on disk must be tracked
@@ -513,6 +521,68 @@ def ai_sprite():
 def chat_of(skill):
     p = os.path.join(CHATS, f"{skill}.json")
     return json.load(open(p)) if os.path.exists(p) else None
+
+CHAT_ROLE_KEYS = {"user": {"role", "text", "attach"},
+                  "agent": {"role", "text", "list", "card", "after"},
+                  "tool": {"role", "source", "label", "tag", "rows", "summary", "calls"}}
+CHAT_CARDS = {"bridge", "table", "signoff"}
+
+def money(v):
+    m = re.fullmatch(r"[$£€](-?[\d,]+(?:\.\d+)?)", v.strip())   # dollars, pounds or euros
+    return float(m.group(1).replace(",", "")) if m else None
+
+def bridge_problem(card):
+    """A bridge starts from its first row, adds "+" rows, subtracts "−" rows, and must equal its "=" row."""
+    rows = card.get("rows", [])
+    if not rows or money(rows[0][1]) is None: return "the first row needs an amount ($, £ or €) to start from"
+    total = money(rows[0][1])
+    for r in rows[1:]:
+        label, amt = r[0].strip(), money(r[1])
+        if len(r) > 2 and r[2] == "ok": continue
+        if amt is None: return f"row {r[0]!r} has no amount ($, £ or €)"
+        if label[:1] == "+": total += amt
+        elif label[:1] in "−-": total -= amt
+        elif label[:1] == "=":
+            if abs(total - amt) > 0.005: return f"rows add up to {total:,.2f}, but {label!r} says {amt:,.2f}"
+        else: return f"row {r[0]!r} must start with +, − or ="
+    return None
+
+def chat_problems(skill, c):
+    """Shape, arithmetic and voice checks for one chat file. The chat is public prose that imitates a real chat."""
+    out, where = [], f"chats/{skill}.json"
+    msgs = c.get("messages") or []
+    if not c.get("example"): out.append(f"{where}: no 'example' line. Say that the figures are fictional and where they come from")
+    if len(msgs) < 6: out.append(f"{where}: {len(msgs)} messages. A run needs at least 6 to show the request, the work and the result")
+    if msgs and msgs[0].get("role") != "user": out.append(f"{where}: the first message must come from the user")
+    texts = [("example", c.get("example", ""))]
+    for i, m in enumerate(msgs, 1):
+        role = m.get("role")
+        if role not in CHAT_ROLE_KEYS: out.append(f"{where}: message {i}: role must be user, agent or tool"); continue
+        extra = set(m) - CHAT_ROLE_KEYS[role]
+        if "guard" in extra: out.append(f"{where}: message {i}: no 'guard' notes. The chat imitates a real chat, and a real chat shows no notes")
+        elif extra: out.append(f"{where}: message {i}: unknown field(s) {sorted(extra)} for a {role} message")
+        if role in ("user", "agent") and not m.get("text"): out.append(f"{where}: message {i}: no 'text'")
+        if role == "tool":
+            if not m.get("label"): out.append(f"{where}: message {i}: a tool step needs a 'label'")
+            if m.get("source") == "mosofin" and not all(isinstance(r, list) and len(r) == 2 for r in m.get("rows", [])):
+                out.append(f"{where}: message {i}: MosoFin 'rows' must be [name, result] pairs. Use \"\" when the chat states no result")
+            texts += [(f"message {i} label", m.get("label", "")), (f"message {i} summary", m.get("summary", ""))]
+        card = m.get("card")
+        if card:
+            if card.get("type") not in CHAT_CARDS: out.append(f"{where}: message {i}: card type must be one of {sorted(CHAT_CARDS)}")
+            elif card["type"] == "bridge":
+                bp = bridge_problem(card)
+                if bp: out.append(f"{where}: message {i}: bridge does not tie: {bp}")
+        texts += [(f"message {i}", m.get("text", "")), (f"message {i} after", m.get("after", ""))]
+        texts += [(f"message {i} list", x) for x in m.get("list", [])]
+    for label, t in texts:
+        if not t: continue
+        if "—" in t or ";" in t: out.append(f"{where}: {label}: no em dash and no semicolon. Write two sentences")
+        for sent in re.split(r"(?<=[.!?])\s+", t):
+            if len(sent.split()) > 25: out.append(f"{where}: {label}: a sentence has {len(sent.split())} words, keep it to 25 or fewer")
+        bad = [w for w in BANNED if re.search(r"\b" + w, t, re.I)]
+        if bad: out.append(f"{where}: {label}: filler words {', '.join(bad)}")
+    return out
 
 def chat_inline(t):
     """Escape the text, then turn **bold** into <strong>."""

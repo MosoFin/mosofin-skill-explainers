@@ -1,0 +1,241 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, open bills from Ashford Seating, September. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "warehouse-receipts-september.xlsx": "the name of the user's own receipt sheet"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you check September's supplier bills before we pay them?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need six answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the documents?",
+        "How much difference do you accept on price, on quantity and on the total?",
+        "Who may approve a purchase order, and up to what amount?",
+        "Do you buy services on purchase orders? What replaces a delivery record for them?",
+        "Do you have orders or bills in a foreign currency? Which exchange rate do you use?",
+        "Who resolves the exceptions?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. We have no tolerance policy. A director approves any order over $2,500. Goods only, all in US dollars. AP owns the exceptions."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and what your books hold",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks Online Plus, confirmed by name"
+        ],
+        [
+          "Purchase orders",
+          "In the books"
+        ],
+        [
+          "Approval status",
+          "In the books"
+        ],
+        [
+          "Goods receipts",
+          "Not in the books"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Your books hold the bills, the purchase orders and their approvals. They do not hold the goods receipts. Without receipts, I can only do a **two-way match**, and tests 4, 7, 8 and 15 cannot run. Can you attach your delivery records?"
+    },
+    {
+      "role": "user",
+      "text": "Our warehouse keeps them in a spreadsheet. Here it is.",
+      "attach": [
+        "warehouse-receipts-september.xlsx"
+      ]
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I match **September's open bills** for **Northbrook Trading** against their purchase orders and your receipts. I use **exact match**, because you gave no tolerance. Your approval matrix applies. This is a **three-way match**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_bills",
+          "Includes the Ashford Seating bill on PO-1041"
+        ],
+        [
+          "search_purchase_orders",
+          "Includes PO-1041"
+        ],
+        [
+          "get_purchase_order",
+          "PO-1041, approved by a director"
+        ],
+        [
+          "Your receipt sheet",
+          "Includes GRN-2207, GRN-2211 and GRN-2215"
+        ]
+      ],
+      "summary": "3 reads in one batch, and your sheet. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "All fifteen tests ran, because your sheet records what arrived and its condition. The bill from **Ashford Seating** on **PO-1041** does not agree with the order or the delivery:",
+      "card": {
+        "type": "table",
+        "title": "PO-1041, line 1, chairs",
+        "head": [
+          "Document",
+          "Total",
+          "Quantity and price"
+        ],
+        "rows": [
+          [
+            "Purchase order",
+            "$4,200.00",
+            "100 at $42.00"
+          ],
+          [
+            "Goods receipt",
+            "",
+            "96 accepted, 4 damaged"
+          ],
+          [
+            "Ashford's bill",
+            "$4,350.00",
+            "100 at $43.50"
+          ]
+        ]
+      },
+      "after": "The headers agree: PO reference, supplier, currency, company and payment terms. A director approved the order. The problems are on the line."
+    },
+    {
+      "role": "agent",
+      "text": "That line has three High exceptions. Ashford charged **$1.50 a chair** over the order. Ashford also billed the full 100 chairs, but the warehouse rejected 4 as damaged.",
+      "card": {
+        "type": "bridge",
+        "title": "What you owe on this bill",
+        "rows": [
+          [
+            "Bill total, 100 × $43.50",
+            "$4,350.00"
+          ],
+          [
+            "− Price overbilling, 100 × $1.50 (exception 1)",
+            "$150.00"
+          ],
+          [
+            "− 4 damaged chairs billed in full, 4 × $42.00 (exceptions 4 and 15)",
+            "$168.00"
+          ],
+          [
+            "= Owed at the order price, 96 × $42.00",
+            "$4,032.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "My recommendation is **Hold**. The line is outside your tolerance, so the matched amount is $0 and the disputed amount is the full $4,350. AP owns all three exceptions."
+    },
+    {
+      "role": "agent",
+      "text": "Your sheet also shows three deliveries with a signed receipt and no bill. I checked every bill on their orders, open or paid. None of them bills these goods.",
+      "card": {
+        "type": "bridge",
+        "title": "Received, not invoiced at 30 Sep",
+        "rows": [
+          [
+            "GRN-2207, 50 chairs × $42.00, 18 Sep",
+            "$2,100.00"
+          ],
+          [
+            "+ GRN-2211, 4 desks × $215.00, 24 Sep",
+            "$860.00"
+          ],
+          [
+            "+ GRN-2215, 6 shelving units × $90.00, 29 Sep",
+            "$540.00"
+          ],
+          [
+            "= Received, not invoiced",
+            "$3,500.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "AP has nothing to pay here yet. But you owe for these goods, so your accountant must accrue **$3,500** at 30 September."
+    },
+    {
+      "role": "agent",
+      "text": "I propose two actions. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed actions",
+        "head": [
+          "Action",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Ask Ashford for a credit note on PO-1041",
+            "$318.00",
+            "PO-1041 price and the signed receipt"
+          ],
+          [
+            "Draft accrual at 30 Sep: debit Inventory, credit Accrued Liabilities, GRNI",
+            "$3,500.00",
+            "GRN-2207, GRN-2211 and GRN-2215"
+          ]
+        ]
+      },
+      "after": "The credit note brings the bill to $4,032. The accrual reverses on 1 October. A person sends the request and posts the entry. I do not pay, hold or post anything."
+    },
+    {
+      "role": "agent",
+      "text": "Your report says which match I ran. It has the summary, every line with its match basis, the exceptions with their owners, the month's findings and the coverage.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the report as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the six sheets. I saved which documents your books hold, the exact-match policy, your approval matrix and the exception owner. Next month, the run starts from them."
+    }
+  ]
+}
