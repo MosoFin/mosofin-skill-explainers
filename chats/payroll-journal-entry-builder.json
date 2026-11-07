@@ -1,0 +1,365 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, the September 2026 monthly payroll run, paid Friday 25 September. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "payrollco-register-september.csv": "the name of the register file that the owner exports from PayrollCo",
+    "september-payroll-draft.xlsx": "the name of the bookkeeper's one-entry draft"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you build the journal entries for our September payroll?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need eight answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which company and which run? In a group, which company employs these people?",
+        "What are the pay period and the pay date? Do you keep the books on a cash or accrual basis?",
+        "Please attach the payroll register for the run.",
+        "What does the business pay on top of pay, such as payroll taxes, a 401(k) match or benefits?",
+        "Do you use a payroll clearing account?",
+        "Do you split the cost by department? If yes, on what basis: hours, headcount or direct assignment?",
+        "Is any labour in this run part of an asset, such as software that you build?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading, the monthly run. Pay period 1 to 30 September, paid Friday 25 September, accrual basis. Register attached, with our costs in it. Yes, 2200 Payroll clearing. Split by headcount. No capitalised labour, the software project stopped on 31 August. Overtime is paid a month late, cut-off on the 20th. Flag any change over 5%.",
+      "attach": [
+        "payrollco-register-september.csv"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks Online, confirmed by name"
+        ],
+        [
+          "Payroll platform",
+          "Not connected"
+        ],
+        [
+          "Clearing account",
+          "2200 Payroll clearing, with payroll movement"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "No payroll platform is connected, so every amount comes from your register. I label it as supplied by you. It covers September and **12 employees** paid. I show totals only, never one person's pay.",
+      "after": "Here is my plan. I build the journal for **Northbrook Trading**'s **monthly run for September**, paid **25 September**, against the chart in your books. Net pay goes through **2200 Payroll clearing**. I split wages and employer costs by **headcount**, with **no capitalised labour**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "Includes 2200, 2210, 2230 and 2250"
+        ],
+        [
+          "search_departments",
+          "Warehouse and Office"
+        ],
+        [
+          "search_classes",
+          ""
+        ],
+        [
+          "search_locations",
+          ""
+        ],
+        [
+          "search_journal_entries",
+          "June, July and August runs"
+        ],
+        [
+          "get_general_ledger",
+          "2250 Accrued payroll, nil since 1 April"
+        ],
+        [
+          "get_profit_and_loss",
+          ""
+        ],
+        [
+          "search_employees",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "A pay run has three amounts. Gross pay is the expense. Withholdings go to others. Net pay goes to your staff:",
+      "card": {
+        "type": "bridge",
+        "title": "From the register",
+        "rows": [
+          [
+            "Gross pay, salaries and overtime",
+            "$48,000.00"
+          ],
+          [
+            "− Federal income tax withheld",
+            "$5,550.00"
+          ],
+          [
+            "− Employee social security and Medicare",
+            "$3,450.00"
+          ],
+          [
+            "− Employee 401(k)",
+            "$2,400.00"
+          ],
+          [
+            "= Net pay, owed to the staff",
+            "$36,600.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "On top of that, Northbrook owes **$4,600** of its own costs. The run costs you $52,600 in total."
+    },
+    {
+      "role": "agent",
+      "text": "The first entry records the employee side. Each withholding gets its own credit. I split wages by headcount, 4 in the warehouse and 8 in the office:",
+      "card": {
+        "type": "table",
+        "title": "Entry 1, Fri 25 Sep, proposed, not posted",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "5100 Direct labour, Warehouse",
+            "$16,000.00",
+            ""
+          ],
+          [
+            "6000 Wages and salaries, Office",
+            "$32,000.00",
+            ""
+          ],
+          [
+            "2210 Federal income tax withheld",
+            "",
+            "$5,550.00"
+          ],
+          [
+            "2210 Employee social security and Medicare",
+            "",
+            "$3,450.00"
+          ],
+          [
+            "2230 Employee 401(k)",
+            "",
+            "$2,400.00"
+          ],
+          [
+            "2200 Payroll clearing, net pay",
+            "",
+            "$36,600.00"
+          ],
+          [
+            "Totals",
+            "$48,000.00",
+            "$48,000.00"
+          ]
+        ]
+      },
+      "after": "2210 and 2230 hold employee and employer amounts. Each line keeps a memo, so every line still ties to its register column."
+    },
+    {
+      "role": "agent",
+      "text": "The second entry records your own costs. I keep it apart from the first, because these are an expense, not a deduction from pay:",
+      "card": {
+        "type": "table",
+        "title": "Entry 2, Fri 25 Sep, proposed, not posted",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "6010 Employer payroll taxes, Warehouse",
+            "$1,200.00",
+            ""
+          ],
+          [
+            "6010 Employer payroll taxes, Office",
+            "$2,400.00",
+            ""
+          ],
+          [
+            "6020 401(k) match expense, Warehouse",
+            "$333.33",
+            ""
+          ],
+          [
+            "6020 401(k) match expense, Office",
+            "$666.67",
+            ""
+          ],
+          [
+            "2210 Employer social security and Medicare",
+            "",
+            "$3,450.00"
+          ],
+          [
+            "2240 State unemployment payable",
+            "",
+            "$150.00"
+          ],
+          [
+            "2230 Employer 401(k) match",
+            "",
+            "$1,000.00"
+          ],
+          [
+            "Totals",
+            "$4,600.00",
+            "$4,600.00"
+          ]
+        ]
+      },
+      "after": "Warehouse carries $17,533.33 and Office $35,066.67. Together that is $52,600. The extra cent of the match goes to Office."
+    },
+    {
+      "role": "user",
+      "text": "Our bookkeeper drafted it as one entry, from last month's template. It balances. Is it the same?",
+      "attach": [
+        "september-payroll-draft.xlsx"
+      ]
+    },
+    {
+      "role": "agent",
+      "text": "It balances, and its total expense is also $52,600. But the wages line does not tie to the register:",
+      "card": {
+        "type": "bridge",
+        "title": "Line tie, wages",
+        "rows": [
+          [
+            "Wages in the draft",
+            "$51,450.00"
+          ],
+          [
+            "− Gross pay in the register",
+            "$48,000.00"
+          ],
+          [
+            "= Too much in wages",
+            "$3,450.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The $3,450 is your share of social security and Medicare, booked as if it were pay. 6010 Employer payroll taxes shows nothing. A balanced entry is not always a correct entry."
+    },
+    {
+      "role": "agent",
+      "text": "Staff earn overtime from 21 to 30 September, and the October run pays it. On the accrual basis, September carries that cost. This is my one estimate:",
+      "card": {
+        "type": "bridge",
+        "title": "Entry 3, Wed 30 Sep, ESTIMATE",
+        "rows": [
+          [
+            "Overtime, 8 days at $312.50, 5100 Warehouse",
+            "$2,500.00"
+          ],
+          [
+            "+ Employer part, 6010 Warehouse",
+            "$179.69"
+          ],
+          [
+            "= Credit 2250 Accrued payroll, reverses Thu 1 Oct",
+            "$2,679.69",
+            "total"
+          ]
+        ]
+      },
+      "after": "A wages-only accrual would be $179.69 too low. Last March's accrual reversed on 1 April, so nothing counts twice. On 25 September, PayrollCo takes the $36,600 net pay from the operating account, and 2200 clears for this run."
+    },
+    {
+      "role": "agent",
+      "text": "I compared the run with June, July and August. Gross pay and headcount did not change. Two movements need a word from you before anyone posts:",
+      "card": {
+        "type": "table",
+        "title": "Against August",
+        "head": [
+          "Line",
+          "Change",
+          "Result"
+        ],
+        "rows": [
+          [
+            "Income tax withheld",
+            "−$150",
+            "2.6%, under your 5% limit, no flag"
+          ],
+          [
+            "Office expense",
+            "+$2,000.00",
+            "Flagged. The software project stopped, so no pay goes to 1700"
+          ]
+        ]
+      },
+      "after": "Your answer about the project explains the second one. All eleven checks ran."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has eight sheets. Each entry is marked **PROPOSED, NOT POSTED**. A person posts them. I do not.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Approved by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Payroll_JE_2026-09-25_Northbrook Trading.xlsx**. I saved the account map, the two-entry layout, the headcount basis, the clearing account, the pay calendar and your 5% limit.",
+      "after": "I never save an amount or anyone's pay. Next month, the run starts from these settings."
+    }
+  ]
+}

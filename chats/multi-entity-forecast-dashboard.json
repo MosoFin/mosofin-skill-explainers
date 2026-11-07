@@ -1,0 +1,219 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading Group, three QuickBooks company files, July to September 2026, run on Thursday 1 October. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "northbrook-trading-group-forecast-dashboard.html": "the file name that the skill's build step gives, from the group name"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "We run three company files. How much cash does the group make, and how much will it have in six months?"
+    },
+    {
+      "role": "agent",
+      "text": "I can build a cash forecast dashboard for the whole group. First, one question. Do you want me to use your MosoFin connection to read the books, or will you supply the data yourself?"
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Found the workspace and the company files",
+      "tag": "read-only",
+      "rows": [
+        [
+          "list_workspaces",
+          "Northbrook Trading Group"
+        ],
+        [
+          "get_agent_datasources",
+          "Three QuickBooks files"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading Group**. Is that the right one? It holds three files: Northbrook Trading, Northbrook Services LLC and Northbrook Trading Canada Ltd.",
+      "list": [
+        "Do you want one file, each file separately, or the group consolidated?",
+        "I read 1 January to 31 October, unless you want another range."
+      ],
+      "after": "The Canada file keeps Canadian dollars. I add the files month by month, with no currency step. So I leave it out, and the report says why."
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us. Consolidated. Use July to September, it's a closed quarter."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books for two company files",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_cash_flow",
+          "Northbrook Trading, by month"
+        ],
+        [
+          "get_cash_flow",
+          "Northbrook Services LLC, by month"
+        ],
+        [
+          "get_aged_receivables",
+          "Trading only, includes Northbrook Services"
+        ],
+        [
+          "get_balance_sheet",
+          "Both files, 30 Sep"
+        ]
+      ],
+      "summary": "4 reads. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "In every month, operating plus investing plus financing equals the net cash increase. I added the two files month by month:",
+      "card": {
+        "type": "table",
+        "title": "Net cash increase by month",
+        "head": [
+          "Month",
+          "Trading",
+          "Services",
+          "Group"
+        ],
+        "rows": [
+          [
+            "July",
+            "$42,000",
+            "$6,400",
+            "$48,400"
+          ],
+          [
+            "August",
+            "$26,500",
+            "$7,100",
+            "$33,600"
+          ],
+          [
+            "September",
+            "$41,200",
+            "$5,900",
+            "$47,100"
+          ]
+        ]
+      },
+      "after": "In August, Trading bought equipment for $12,000. In September, it paid back $5,000 of a loan."
+    },
+    {
+      "role": "agent",
+      "text": "Together, the group's cash went up by **$129,100** in the quarter:",
+      "card": {
+        "type": "bridge",
+        "title": "Group, July to September",
+        "rows": [
+          [
+            "July",
+            "$48,400"
+          ],
+          [
+            "+ August",
+            "$33,600"
+          ],
+          [
+            "+ September",
+            "$47,100"
+          ],
+          [
+            "= Net cash increase, Jul to Sep",
+            "$129,100",
+            "total"
+          ]
+        ]
+      },
+      "after": "This is a change in cash. It is not your bank balance, because your companies had cash before July. The bank balance is that cash plus $129,100."
+    },
+    {
+      "role": "agent",
+      "text": "Services owes Trading $9,500. In the group total, that looks like money from a customer. I show both figures and hide nothing:",
+      "card": {
+        "type": "bridge",
+        "title": "Receivables at 30 Sep",
+        "rows": [
+          [
+            "Group receivables",
+            "$76,800"
+          ],
+          [
+            "− Owed by Services to Trading",
+            "$9,500"
+          ],
+          [
+            "= From outside customers",
+            "$67,300",
+            "total"
+          ]
+        ]
+      },
+      "after": "The same $9,500 stays in the group payables of $57,000. So the dashboard's \"Intercompany removed\" row is not a full group elimination. Aging came back for Trading only. I found no sign of test data."
+    },
+    {
+      "role": "agent",
+      "text": "The projection runs from October to March 2027. It starts from the $129,100 and adds one monthly rate for six months:",
+      "card": {
+        "type": "table",
+        "title": "Six months to March 2027",
+        "head": [
+          "Scenario",
+          "Monthly rate",
+          "March 2027"
+        ],
+        "rows": [
+          [
+            "Conservative (P10), September net income",
+            "$45,500",
+            "$402,100"
+          ],
+          [
+            "Base, September operating cash flow",
+            "$52,100",
+            "$441,700"
+          ],
+          [
+            "Upside (P90), August and September averaged",
+            "$48,850",
+            "$441,700"
+          ]
+        ]
+      },
+      "after": "I use September as the base because an average mixes in unusual months. September was your best month, so the upside rate is below base, and P90 equals base. No path goes below zero."
+    },
+    {
+      "role": "agent",
+      "text": "The projection adds no more equipment purchases or loan payments. Shall I build the dashboard?"
+    },
+    {
+      "role": "user",
+      "text": "Can you add the Canada file too, at a typical exchange rate?"
+    },
+    {
+      "role": "agent",
+      "text": "No. Every number in the dashboard comes from your books or your file, and I use no typical values. Your accountant can choose a rate and give me Canada's figures in US dollars. Then I can add them from that file.",
+      "after": "Shall I build it with the two files now?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, build it."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **northbrook-trading-group-forecast-dashboard.html**, with Overview, Accounts, Forecast and Report tabs. I checked it first. It shows no script errors, four headline figures, all four tabs, and the group and both files in the switcher.",
+      "after": "The Sync and Ask buttons work only when the file runs inside Claude with MosoFin attached. Elsewhere they show an amber strip. **Data sources:** get_cash_flow, get_aged_receivables and get_balance_sheet through MosoFin, read on 1 October 2026."
+    }
+  ]
+}

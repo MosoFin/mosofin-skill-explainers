@@ -65,6 +65,8 @@ def main(skill):
     def on_page(fig):
         if fig[:1] in "$£€":
             x = float(fig[1:].replace(",", ""))
+            if x == 0:
+                return True   # a zero difference ("$0.00") states that something ties. It is never an invented figure.
             # A small bare number ("10", "25") is too common to prove anything. It counts only with a currency sign or cents.
             return any(abs(v - x) < 0.005 and (marked or abs(x) >= 100) for v, marked in values)
         if fig.startswith("#") or fig.startswith("…") or fig.startswith("..."):

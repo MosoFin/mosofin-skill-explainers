@@ -1,0 +1,303 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, every journal entry, 1 July to 30 September 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you review our journal entries for the third quarter before the audit committee meets?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need nine answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which period do I review?",
+        "What are your approval limits? I never assume one.",
+        "What size of amount is material for you?",
+        "Does anyone make adjustments outside the books, for example your accountant at year end, in tax software or in a spreadsheet?",
+        "Who may see the output? It names logins and entries.",
+        "Must someone approve a hand-typed entry? If yes, can you export who approved each one?",
+        "Through which date are the books closed, and when was the close done?",
+        "Which accounts are sensitive, and do you know of any risk areas?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. 1 July to 30 September. The owner approves hand-typed entries over $10,000 by email, but we keep no export. Materiality is $25,000. Our outside accountant keeps year-end adjustments in a consolidation workbook. Output for the CFO and the audit committee. Books closed through 30 September, close done 9 October. Revenue, deferred revenue, the warranty reserve and equity are sensitive."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks Online, confirmed by name"
+        ],
+        [
+          "Consolidation workbook",
+          "Not connected"
+        ],
+        [
+          "Entry fields",
+          "Transaction date, create date, login, description"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I review **every journal entry** that **Northbrook Trading** posted from **1 July to 30 September**, against a baseline from **the six prior quarters**. The approval limit is **$10,000** and materiality is **$25,000**.",
+      "after": "The consolidation workbook is not connected, so the adjustments in it are **not in this population**. You keep no approval log, so I report the four approval tests as not run. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the population in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_journal_entries",
+          "1,284 transactions, all types"
+        ],
+        [
+          "search_journal_entries",
+          "Six prior quarters"
+        ],
+        [
+          "search_journal_entries",
+          "October, for reversals"
+        ],
+        [
+          "get_journal_entry",
+          ""
+        ],
+        [
+          "search_accounts",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Movement $2,486,310.45"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
+        [
+          "get_profit_and_loss",
+          ""
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "I read **1,284** transactions of all types. A person typed **48** of them by hand, which is 3.7%. Before I screen them, I prove that I read them all:",
+      "card": {
+        "type": "bridge",
+        "title": "Tie-out",
+        "rows": [
+          [
+            "Debits of the 1,284 transactions I read",
+            "$2,486,310.45"
+          ],
+          [
+            "= General ledger movement for the quarter",
+            "$2,486,310.45",
+            "total"
+          ]
+        ]
+      },
+      "after": "The difference is 0.00, so the screen is complete. The adjustments in the consolidation workbook are not in it, and the report header says so."
+    },
+    {
+      "role": "agent",
+      "text": "I start with the pattern, because it matters more than any one entry. In three quarters in a row, the **owner** login released the warranty reserve by hand on a Saturday:",
+      "card": {
+        "type": "table",
+        "title": "Pattern: warranty reserve releases, account 2450",
+        "head": [
+          "Quarter",
+          "Release",
+          "Operating profit after"
+        ],
+        "rows": [
+          [
+            "Q1, Sat 28 Mar",
+            "$9,500.00",
+            "$50,000"
+          ],
+          [
+            "Q2, Sat 27 Jun",
+            "$9,700.00",
+            "$50,000"
+          ],
+          [
+            "Q3, Sat 26 Sep",
+            "$9,800.00",
+            "$50,000"
+          ]
+        ]
+      },
+      "after": "Each release is just below your $10,000 limit, so none needed approval. Each one brings the quarter to exactly $50,000. In total, $29,000 left the reserve. This is a question, not a finding."
+    },
+    {
+      "role": "agent",
+      "text": "I screened all 1,284 transactions. Seven of the 48 hand-typed entries meet at least one warning sign. Three score 6 or more, so I review them:",
+      "card": {
+        "type": "table",
+        "title": "Flagged entries, top three",
+        "head": [
+          "Entry",
+          "Score",
+          "Warning signs"
+        ],
+        "rows": [
+          [
+            "JE-202609-027, $1,263.40",
+            "10",
+            "Dated 30 Sep, typed in 12 Oct, after the close, into a closed period"
+          ],
+          [
+            "JE-202609-019, $9,800.00",
+            "9",
+            "Reserve, just below the limit, unusual login, \"adjustment\", weekend, period end"
+          ],
+          [
+            "JE-202609-023, $33,000.00",
+            "6",
+            "Revenue, at or above materiality, round amount, period end"
+          ]
+        ]
+      },
+      "after": "A sign gets 3, 2 or 1 points, and the report states each weight. The other four flags score 2 or less. JE-202609-022 is a routine round accrual. JE-202609-024 already corrects JE-202608-014."
+    },
+    {
+      "role": "agent",
+      "text": "I cannot answer these three from the books. A person must give the support and the reason. I ask roles, not people. Can the bookkeeper explain JE-202609-027 and JE-202609-023?"
+    },
+    {
+      "role": "user",
+      "text": "The bookkeeper says 027 is the late September utilities bill. 023 defers the Pinnacle annual contract. Receipt and contract attached.",
+      "attach": [
+        "pinnacle-sales-receipt.pdf",
+        "pinnacle-service-contract.pdf"
+      ]
+    },
+    {
+      "role": "agent",
+      "text": "Thank you. Here is the follow-up for each entry:",
+      "card": {
+        "type": "table",
+        "title": "Follow-up",
+        "head": [
+          "Entry",
+          "Amount",
+          "Asked of",
+          "Result"
+        ],
+        "rows": [
+          [
+            "JE-202609-027",
+            "$1,263.40",
+            "Bookkeeper",
+            "Error in the date. Move it to the open period"
+          ],
+          [
+            "JE-202609-019",
+            "$9,800.00",
+            "Outside accountant, by Fri 23 Oct",
+            "Open. Send the warranty claims analysis"
+          ],
+          [
+            "JE-202609-023",
+            "$33,000.00",
+            "Bookkeeper",
+            "Legitimate. It defers 11 months of an annual payment"
+          ]
+        ]
+      },
+      "after": "The error is about a date, not about a person. A person moves the date of JE-202609-027. I do not change your books. If no support arrives for JE-202609-019, it goes to the audit committee chair."
+    },
+    {
+      "role": "agent",
+      "text": "Four of the 21 tests did not run. They need an approval log, and you keep none. The report lists them. It does not leave them out.",
+      "card": {
+        "type": "table",
+        "title": "Control observations",
+        "head": [
+          "Observation",
+          "Measure"
+        ],
+        "rows": [
+          [
+            "Tests run",
+            "17 of 21"
+          ],
+          [
+            "Hand-typed entries",
+            "48 of 1,284, 3.7%"
+          ],
+          [
+            "Descriptions of three words or fewer",
+            "9 of 48, 18.8%"
+          ],
+          [
+            "Lock date overridden",
+            "1 entry, JE-202609-027"
+          ],
+          [
+            "Approval tests",
+            "NOT RUN, no log"
+          ]
+        ]
+      },
+      "after": "To run the four tests next quarter, ask for an export from whoever keeps the approval emails."
+    },
+    {
+      "role": "agent",
+      "text": "Your review has nine sheets, with the patterns first. The header gives the population, the tie-out and that the workbook adjustments are not in it.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next quarter?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both. Please save this quarter's flags too, so we can compare."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **JE_Review_2026-Q3_Northbrook Trading.xlsx**. I saved the method only. These are your sensitive accounts, the $10,000 limit, the weights, the six-quarter baseline and one rule: quarter-end accruals to 2110 are routine.",
+      "after": "I do not save flags, scores, logins or explanations. Next quarter, I screen every entry again from the start."
+    }
+  ]
+}
