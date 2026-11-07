@@ -47,8 +47,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan for **Operating (…4471), 1 to 30 September**. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?",
-      "guard": "I propose entries only. I never post them."
+      "text": "Here is my plan for **Operating (…4471), 1 to 30 September**. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?"
     },
     {
       "role": "user",
@@ -202,8 +201,7 @@
           ]
         ]
       },
-      "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer.",
-      "guard": "A person posts these entries. I do not."
+      "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer."
     },
     {
       "role": "agent",
@@ -230,8 +228,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved your policy choices and names only. Next month, the run starts from them.",
-      "guard": "I save settings only after the results, and only when you say yes."
+      "text": "Done. I saved your policy choices and names only. Next month, the run starts from them."
     }
   ]
 }
