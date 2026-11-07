@@ -12,7 +12,7 @@ The tracker is the source of truth. Explainer pages themselves are hand-made and
 site/skills/<skill>/<kind>.html; this script writes only the index and the landing pages.
 Dependency-free on purpose.
 """
-import base64, csv, html, json, os, re, subprocess, sys
+import base64, csv, html, json, os, posixpath, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 TRACKER = os.path.join(ROOT, "tracker.tsv")
@@ -248,6 +248,14 @@ td.c{text-align:center} .dash{color:var(--faint)}
 footer{border-top:1px solid var(--rule);padding-top:18px;color:var(--faint);font-size:13.5px}
 """
 
+def pretty(rel):
+    """Public URL path for a file under site/: index.html -> "", skills/x/plain.html -> skills/x/plain/.
+    The stage step publishes each explainer as a folder, so its address has no .html ending."""
+    if rel == "index.html": return ""
+    if rel.endswith("/index.html"): return rel[:-len("index.html")]
+    if rel.endswith(".html"): return rel[:-len(".html")] + "/"
+    return rel
+
 def published_kinds(r):
     return [k for k, *_ in KINDS if r[k] == "published"]
 
@@ -346,7 +354,7 @@ def shell(title, body, desc, seo="", head=""):
 
 def seo_page(r, kind, text):
     """Hand-made explainer page: regenerate its SEO block and make sure the document is well formed."""
-    path = f"skills/{r['skill']}/{kind}.html"
+    path = pretty(f"skills/{r['skill']}/{kind}.html")
     title = html.unescape(re.search(r"<title>(.*?)</title>", text, re.S).group(1).strip())
     desc = html.unescape(re.search(r'<meta name="description" content="(.*?)"', text, re.S).group(1).strip())
     h1 = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1))).strip()
@@ -580,7 +588,7 @@ def landing(r):
         pt = page_h1(os.path.join(SITE, "skills", s, f"{k}.html"))
         if st == "internal":
             continue  # reviewers read it in the repository; the public site doesn't mention it
-        cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
+        cards.append(f'<a class="card" href="{k}/"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
                      f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p><span class="go">Open →</span></a>')
     if r["skill_status"] == "shipped":
         use = f"""<p>Install just this skill, no clone needed:</p>
@@ -629,7 +637,7 @@ def chip(r, k):
     st = r[k]
     if st != "published": return '<td class="c"><span class="pill soon">Coming soon</span></td>'
     anchor = {"plain": "Read overview", "learn": "Step-by-step guide", "anatomy": "Review skill design"}[k]
-    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill ok">{anchor}</span></a></td>'
+    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}/"><span class="pill ok">{anchor}</span></a></td>'
 
 # A kind gets a column on the public index once some skill has a published page of
 # that kind, so a kind that is only ever internal never shows up as a gap.
@@ -725,7 +733,7 @@ def sitemap(rows):
         ks = published_kinds(r)
         if not ks: continue
         urls.append((f"{SITE_URL}skills/{r['skill']}/", r["verified"]))
-        urls += [(f"{SITE_URL}skills/{r['skill']}/{k}.html", r["verified"]) for k in ks]
+        urls += [(SITE_URL + pretty(f"skills/{r['skill']}/{k}.html"), r["verified"]) for k in ks]
     body = "".join(f"  <url>\n    <loc>{e(u)}</loc>\n" + (f"    <lastmod>{e(d)}</lastmod>\n" if d else "") + "  </url>\n" for u, d in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + "</urlset>\n")
 
@@ -750,7 +758,7 @@ def llms_txt(rows, pages):
         desc = re.search(r'<meta name="description" content="(.*?)"', source, re.S)
         title = html.unescape(title.group(1).strip()) if title else relative
         desc = html.unescape(desc.group(1).strip()) if desc else ""
-        url_path = "" if relative == "index.html" else relative.removesuffix("index.html") if relative.endswith("/index.html") else relative
+        url_path = pretty(relative)
         return f"- [{title}]({SITE_URL}{url_path})" + (f": {desc}" if desc else "")
 
     landing_paths = [f"skills/{r['skill']}/index.html" for r in rows if published_kinds(r)]
@@ -844,7 +852,7 @@ def seo_problems(outs):
             if b > a + 1: bad.append(f"{rel}: heading jumps from h{a} to h{b}"); break
         if SEO_START not in h: continue   # an internal plain/learn page: title, description and headings are checked, the SEO block comes when it is published
         cano = re.search(r'<link rel="canonical" href="(.*?)"', h)
-        want = SITE_URL + rel.replace("index.html", "")
+        want = SITE_URL + pretty(rel)
         if not cano or html.unescape(cano.group(1)) != want: bad.append(f"{rel}: canonical should be {want}")
         for blk in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S):
             try: json.loads(blk)
@@ -883,6 +891,32 @@ def sync(path, ref):
 
 
 # --------------------------------------------------------------------------- stage
+def relocate(text):
+    """Rewrite the relative links of a page that moves from skills/x/plain.html to skills/x/plain/index.html:
+    one more "../" in front, and "name.html" becomes "name/"."""
+    def fix(m):
+        attr, url = m.group(1), m.group(2)
+        if re.match(r"(?:[a-z][a-z0-9+.-]*:|/|#|\$\{|\{)", url, re.I): return m.group(0)
+        path, rest = re.match(r"([^?#]*)(.*)", url, re.S).groups()
+        path = re.sub(r"(?:^|(?<=/))index\.html$", "", path)
+        path = re.sub(r"([^/]+)\.html$", r"\1/", path)
+        folder = path == "" or path.endswith("/") or path.endswith("/.") or path == "."
+        path = posixpath.normpath("../" + (path or "."))
+        if folder or path.endswith(".."): path += "/"
+        return f'{attr}="{path}{rest}"'
+    return re.sub(r'\b(href|src)="([^"]*)"', fix, text)
+
+def redirect_page(path):
+    """A small page at the old .html address. It sends the reader on to the address without .html."""
+    url, name = SITE_URL + path, path.rstrip("/").rsplit("/", 1)[-1] + "/"
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>This page moved</title>
+<link rel="canonical" href="{e(url)}"><meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="0; url={e(name)}">
+<script>location.replace("{e(name)}" + location.search + location.hash);</script>
+</head><body><p>This page moved to <a href="{e(name)}">{e(url)}</a>.</p></body></html>
+"""
+
 def stage(dest):
     import shutil
     rows = read_tracker()
@@ -895,6 +929,12 @@ def stage(dest):
             rel = os.path.relpath(os.path.join(d, fn), SITE)
             if rel in internal: dropped += 1; continue
             os.makedirs(os.path.join(dest, os.path.dirname(rel)), exist_ok=True)
+            if re.match(r"skills/[^/]+/(?:" + "|".join(k for k, *_ in KINDS) + r")\.html$", rel):   # explainers only, never index.html
+                folder = os.path.join(dest, rel[:-len(".html")])
+                os.makedirs(folder, exist_ok=True)
+                with open(os.path.join(folder, "index.html"), "w") as o: o.write(relocate(open(os.path.join(d, fn)).read()))
+                with open(os.path.join(dest, rel), "w") as o: o.write(redirect_page(pretty(rel)))
+                kept += 2; continue
             shutil.copy2(os.path.join(d, fn), os.path.join(dest, rel)); kept += 1
     print(f"staged {kept} file(s) to {dest}; left out {dropped} internal page(s)")
 
