@@ -15,8 +15,7 @@
         "Please attach the bank statement.",
         "When did you last reconcile this account?",
         "What size of difference is worth chasing?"
-      ],
-      "guard": "I read nothing until you answer."
+      ]
     },
     {
       "role": "user",
