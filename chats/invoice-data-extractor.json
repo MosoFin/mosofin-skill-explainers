@@ -1,0 +1,226 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, a batch of supplier bills in two PDFs, Monday 12 October 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "A pile of supplier bills came in. Can you read them and check them before we pay?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need five answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Please attach the bills: PDF, PNG, JPG or a scan of many pages.",
+        "Which company receives the bills?",
+        "Which output do you want: Excel, CSV or JSON?",
+        "Is any document in the batch not a bill, for example a receipt, a statement or a quote?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Both PDFs are attached. They are all for Northbrook Trading. Excel is fine. I think there is a statement in there.",
+      "attach": [
+        "bills_a.pdf",
+        "bills_b.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks, confirmed by name"
+        ],
+        [
+          "Legal name",
+          "Northbrook Trading"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "I found 13 documents in your two PDFs. The last two pages of bills_b.pdf are a Harbor Office Supply statement, which is usually not posted.",
+      "after": "Here is my plan. I extract **12 documents** for **Northbrook Trading**. I check each one against your supplier list and your posted bills, **paid and open, for the last 12 months**. Output as Excel. Shall I set the statement aside and go ahead?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_vendors",
+          "Includes two records for Pinnacle"
+        ],
+        [
+          "search_bills",
+          "Includes INV-7731 from Crestline"
+        ],
+        [
+          "search_payments",
+          "INV-7731 paid 22 Aug and 4 Sep"
+        ],
+        [
+          "search_purchase_orders",
+          "Includes PO-2041, open"
+        ],
+        [
+          "get_general_ledger",
+          ""
+        ],
+        [
+          "get_aged_payables",
+          ""
+        ],
+        [
+          "get_company_info",
+          "Northbrook Trading, US dollars"
+        ]
+      ],
+      "summary": "7 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "**Stop** on Crestline Logistics INV-7731 for **$4,860.00**. It is a \"Reminder\" copy of a bill that is already in your books and paid:",
+      "card": {
+        "type": "table",
+        "title": "Crestline INV-7731",
+        "head": [
+          "Check",
+          "Result",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Window searched",
+            "12 months",
+            "13 Oct 2025 to 12 Oct 2026"
+          ],
+          [
+            "Same supplier, same number",
+            "Match",
+            "INV-7731 in the books"
+          ],
+          [
+            "Already paid",
+            "Yes",
+            "Cheque, Sat 22 Aug"
+          ],
+          [
+            "Paid again",
+            "Yes",
+            "ACH, Fri 4 Sep"
+          ]
+        ]
+      },
+      "after": "A list of unpaid bills does not show this match. I hold the $4,860.00 from payment. The bill was also paid twice already. That needs a separate look. Here I only stop the third copy."
+    },
+    {
+      "role": "agent",
+      "text": "**Stop** on Keystone KS-1140 for **$350.00**. The bill is for **Northbrook Holdings LLC**, and no connected company has that name. I do not send it to the nearest match. Please tell me which company it belongs to."
+    },
+    {
+      "role": "agent",
+      "text": "Five bills need a person to look at them before payment:",
+      "card": {
+        "type": "table",
+        "title": "Review",
+        "head": [
+          "Bill",
+          "Total",
+          "Why"
+        ],
+        "rows": [
+          [
+            "Lakeside LF-7781",
+            "$2,600.00",
+            "Pays to a PO box. Your supplier record shows a different address"
+          ],
+          [
+            "Pinnacle PD-305",
+            "$2,400.00",
+            "Two supplier records match Pinnacle"
+          ],
+          [
+            "Summit SC-0926",
+            "$950.00",
+            "September work, with an October date"
+          ],
+          [
+            "Harbor INV-0478",
+            "$1,988.66",
+            "The bill says Net 30. Your record says 2/10 Net 30"
+          ],
+          [
+            "Maple Ridge MRP-114",
+            "1,299.50",
+            "New supplier. \"$\" only, and 03/10/2026 has two readings"
+          ]
+        ]
+      },
+      "after": "For Lakeside, call the phone number that you already have on file. Do not use a number from the bill. My bank-detail check is **NOT RUN**, because I cannot read bank details."
+    },
+    {
+      "role": "agent",
+      "text": "I write null for what I cannot see. Maple Ridge's currency and date are null until you tell me. I do not take \"$\" to mean US dollars.",
+      "after": "Metro Shred's MS-2209 does not add up. Its line and tax come to $129.90, but the printed total is $139.90. I record the figures as printed and flag the 10 dollars. Oakfield's PF-0007 is a pro forma, a quote for a sign, so I leave it out."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the batch in US dollars:",
+      "card": {
+        "type": "bridge",
+        "title": "12 documents, 12 October",
+        "rows": [
+          [
+            "Clean, 4 documents",
+            "$6,043.56"
+          ],
+          [
+            "+ Review, 4 documents in US dollars",
+            "$7,938.66"
+          ],
+          [
+            "+ Stop, 2 documents",
+            "$5,210.00"
+          ],
+          [
+            "= US dollars in the extraction",
+            "$19,192.22",
+            "total"
+          ]
+        ]
+      },
+      "after": "The count is 4 Clean + 5 Review + 2 Stop + 1 Excluded = 12. Maple Ridge is not in the total, because its currency is unknown. I post nothing and pay nothing."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Invoices_Extracted_2026-10-12_12invoices.xlsx**. It has the Invoices, Line Items, Tax Detail, Source Reference, Validation Results and Coverage sheets. Every figure points to its file and page.",
+      "after": "I can also compare the Harbor statement with your payables balance. And do you want me to save your settings for the next batch?"
+    },
+    {
+      "role": "user",
+      "text": "Save the settings. The statement can wait."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the Bill-To name for Northbrook Trading, the 12-month look-back and the status rules. I never save bill contents, amounts or bank details."
+    }
+  ]
+}

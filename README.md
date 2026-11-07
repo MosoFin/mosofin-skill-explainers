@@ -30,6 +30,7 @@ Public pages separate skill rules from outside finance facts. Each page links sk
 - [`build.py`](build.py) checks tracker and page consistency, generates the homepage and skill landing pages, adds search metadata, and generates `robots.txt`, `sitemap.xml`, and `llms.txt`.
 - [`site/`](site/) contains hand-authored explainer HTML, generated pages, styles, scripts, and crawler files.
 - [`.claude/skills/write-skill-explainers/SKILL.md`](.claude/skills/write-skill-explainers/SKILL.md) describes the content and citation workflow for new explainers.
+- [`chats/`](chats/) holds one example conversation for each skill. `build.py` shows it as the "Watch someone use it" chat replay on the skill's landing page, and `--check` fails if a skill has none. [`.claude/skills/write-chat-replay/SKILL.md`](.claude/skills/write-chat-replay/SKILL.md) describes how to write one.
 - [`.github/workflows/check.yml`](.github/workflows/check.yml) checks the repository on pushes and pull requests. [`.github/workflows/pages.yml`](.github/workflows/pages.yml) stages and deploys the static site to GitHub Pages.
 
 ## Build, check, and preview

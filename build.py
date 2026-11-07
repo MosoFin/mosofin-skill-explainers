@@ -189,7 +189,10 @@ def problems(rows):
         if f is not None: out += flow_problems(r["skill"], f)
     for r in rows:
         c = chat_of(r["skill"])
-        if c is not None: out += chat_problems(r["skill"], c)
+        if c is None:
+            out.append(f"{r['skill']}: no chats/{r['skill']}.json. Every skill page shows a chat replay. Write one with the write-chat-replay skill")
+        else:
+            out += chat_problems(r["skill"], c)
     for fn in sorted(os.listdir(CHATS)) if os.path.isdir(CHATS) else []:
         if fn.endswith(".json") and fn[:-5] not in seen: out.append(f"chats/{fn}: {fn[:-5]} is not in the tracker")
     for fn in sorted(os.listdir(FLOWS)) if os.path.isdir(FLOWS) else []:

@@ -1,0 +1,298 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, September adjustments, Wednesday 30 September 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you build our September adjusting entries? I have three items."
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "What are the items? Please give the amounts and any documents.",
+        "What is the posting date?",
+        "Which company do the entries belong to?",
+        "Do they have a tax effect, and in which jurisdiction?",
+        "Above what amount do you want a review flag? I never pick one.",
+        "What are the source documents, and should any entry reverse?",
+        "Through what date are the books closed, and did you report any later period?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. First, accrue the interim audit fieldwork: a $12,000 fee, 75% done. Second, move September's courier charges, $640, from Office Supplies to Freight-out. Third, August utilities look too high. Date them 30 September. Northbrook Trading, no tax effect. Flag anything over $25,000. The audit accrual reverses. Books are closed through 31 August, and August went to the bank.",
+      "attach": [
+        "audit-engagement-letter.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "QuickBooks Online, confirmed by name"
+        ],
+        [
+          "Currency and year",
+          "US dollars, calendar year"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I build **proposed entries** at **Northbrook Trading**, dated **Wed 30 Sep 2026**, against your chart, in **QuickBooks Online** import format. The audit accrual reverses on **Thu 1 Oct 2026**. No tax effect. Your review threshold is **$25,000**.",
+      "after": "For August utilities, I read account 2110 and the bills, and I show you what I find. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "Includes 6410, 2110, 6520 and 6150"
+        ],
+        [
+          "get_general_ledger",
+          "2110 holds JE-202608-014, $2,040.00"
+        ],
+        [
+          "search_bills",
+          "Three courier bills in 6520"
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ],
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
+        [
+          "Lock date",
+          "None in the books"
+        ]
+      ],
+      "summary": "6 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "J1 accrues 75% of the $12,000 fee, which is **$9,000.00**. This is a **proposed entry, not posted**:",
+      "card": {
+        "type": "table",
+        "title": "J1 · JE-202609-022 · Accrual · Wed 30 Sep 2026",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "6410 Audit and accounting fees",
+            "$9,000.00",
+            "—"
+          ],
+          [
+            "2110 Accrued expenses",
+            "—",
+            "$9,000.00"
+          ],
+          [
+            "Total",
+            "$9,000.00",
+            "$9,000.00"
+          ]
+        ]
+      },
+      "after": "No audit-fee accrual is open in 2110, and no bill from the auditor is in the books. So nothing is counted twice. I also propose the reversing entry, dated Thu 1 Oct 2026."
+    },
+    {
+      "role": "agent",
+      "text": "Your second item stopped. **Freight-out is not in your chart.** I do not make an account or choose the nearest name. I found the three courier bills:",
+      "card": {
+        "type": "table",
+        "title": "Courier bills in 6520 Office Supplies",
+        "head": [
+          "Bill date",
+          "Amount"
+        ],
+        "rows": [
+          [
+            "Tue 8 Sep 2026",
+            "$210.00"
+          ],
+          [
+            "Fri 11 Sep 2026",
+            "$195.00"
+          ],
+          [
+            "Tue 22 Sep 2026",
+            "$235.00"
+          ],
+          [
+            "Total",
+            "$640.00"
+          ]
+        ]
+      },
+      "after": "Which account in your chart do you want for them?"
+    },
+    {
+      "role": "agent",
+      "text": "You are right about August utilities. They are in the books two times:",
+      "card": {
+        "type": "bridge",
+        "title": "August utilities",
+        "rows": [
+          [
+            "Accrual JE-202608-014, still open in 2110",
+            "$2,040.00"
+          ],
+          [
+            "+ Bill posted to 6310, Wed 9 Sep",
+            "$2,170.00"
+          ],
+          [
+            "= August utilities in the books",
+            "$4,210.00",
+            "total"
+          ],
+          [
+            "− The accrual that did not reverse",
+            "$2,040.00"
+          ],
+          [
+            "= The real bill",
+            "$2,170.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The accrual did not reverse on 1 September. $2,040.00 is below your $25,000. Do you treat the error as immaterial?"
+    },
+    {
+      "role": "user",
+      "text": "Use 6150 Shipping and Delivery. And yes, the utilities error is immaterial."
+    },
+    {
+      "role": "agent",
+      "text": "Here are the other two proposed entries. Each one balances to the penny:",
+      "card": {
+        "type": "table",
+        "title": "J3 · JE-202609-024 · Correcting, and J5 · JE-202609-026 · Reclass",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "J3: 2110 Accrued expenses",
+            "$2,040.00",
+            "—"
+          ],
+          [
+            "J3: 6310 Utilities",
+            "—",
+            "$2,040.00"
+          ],
+          [
+            "J5: 6150 Shipping and Delivery",
+            "$640.00",
+            "—"
+          ],
+          [
+            "J5: 6520 Office Supplies",
+            "—",
+            "$640.00"
+          ]
+        ]
+      },
+      "after": "August is closed and reported, so J3 goes into September, and its memo names JE-202608-014. I do not change the August entry."
+    },
+    {
+      "role": "agent",
+      "text": "Every check ran with its evidence. No entry is above your threshold, so nothing has a flag:",
+      "card": {
+        "type": "table",
+        "title": "Validation results",
+        "head": [
+          "Entry",
+          "Checks run",
+          "Passed",
+          "Flagged"
+        ],
+        "rows": [
+          [
+            "J1",
+            "11",
+            "11",
+            "0"
+          ],
+          [
+            "J3",
+            "11",
+            "11",
+            "0"
+          ],
+          [
+            "J5",
+            "10",
+            "10",
+            "0"
+          ]
+        ]
+      },
+      "after": "The open period rests on your date of 31 August, because your books show no lock date. A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "The file has the entries in QuickBooks Online import columns, with a Validation Results sheet and a Coverage sheet.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want me to make the file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. Here is **Northbrook Trading_JE_September adjustments_2026-09-30.xlsx**. I saved the account map, the import format, the numbering, the $25,000 threshold and the reversal policy. I never save amounts or entries."
+    }
+  ]
+}
