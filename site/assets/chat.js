@@ -143,6 +143,23 @@
     speedBtn.addEventListener("click", () => { speed = speed === 1 ? 2 : 1; speedBtn.textContent = speed + "×"; });
     btn("skip").addEventListener("click", () => { user = true; token++; running = false; done = true; paused = true; showAll(); label(); });
 
+    // Assistant style switcher. It changes only the look; the replay keeps going. The choice is remembered per browser.
+    const ph = root.querySelector(".chat-ph"), nameEl = root.querySelector(".chat-name");
+    function style(key) {
+      const b = root.querySelector(`.ai-btn[data-ai="${key}"]`); if (!b) return;
+      root.dataset.ai = key;
+      root.querySelectorAll(".ai-btn").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      const name = b.querySelector("span").textContent;
+      root.querySelectorAll(".cm-av use").forEach((u) => u.setAttribute("href", `#ai-${key}`));
+      root.querySelectorAll(".cm-name").forEach((n) => { n.textContent = name; });
+      nameEl.textContent = name; ph.textContent = b.dataset.ph;
+    }
+    root.querySelectorAll(".ai-btn").forEach((b) => b.addEventListener("click", () => {
+      style(b.dataset.ai);
+      try { localStorage.setItem("mosofin-chat-ai", b.dataset.ai); } catch {}
+    }));
+    try { const saved = localStorage.getItem("mosofin-chat-ai"); if (saved) style(saved); } catch {}
+
     hideAll(); label();
     // Before the first play, show the opening message so the panel is not empty.
     msgs[0]?.classList.remove("wait"); msgs[0]?.querySelectorAll(".wait").forEach((x) => x.classList.remove("wait"));

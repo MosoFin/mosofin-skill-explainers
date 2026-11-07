@@ -481,6 +481,26 @@ def flow_section(skill, t):
 # --- Chat replay. chats/<skill>.json is an example conversation in which a person uses the skill.
 # build.py renders the whole conversation as plain HTML; site/assets/chat.js replays it like a live chat.
 CHATS = os.path.join(ROOT, "chats")
+# Style preview: each button shows the same conversation in the look of another assistant. The skill runs in Claude.
+# key, name, composer placeholder. The logos are in site/assets/ai/ (see NOTICE.txt there).
+CHAT_AI = [("chatgpt", "ChatGPT", "Message ChatGPT"), ("claude", "Claude", "Reply to Claude"),
+           ("metaai", "Meta AI", "Ask Meta AI"), ("grok", "Grok", "Ask Grok")]
+CHAT_DEFAULT = "claude"
+
+def ai_symbol(key):
+    """One logo as an SVG <symbol>, so the page holds each logo once."""
+    svg = open(os.path.join(SITE, "assets", "ai", f"{key}.svg")).read().strip()
+    vb = re.search(r'viewBox="([^"]+)"', svg).group(1)
+    inner = re.sub(r"^<svg[^>]*>|</svg>$", "", svg)
+    return f'<symbol id="ai-{key}" viewBox="{vb}">{inner}</symbol>'
+
+def ai_logo(key):
+    return f'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-{key}"/></svg>'
+
+def ai_sprite():
+    # Not display:none, because some browsers then skip the gradients inside the symbols.
+    return ('<svg class="ai-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">'
+            + "".join(ai_symbol(k) for k, *_ in CHAT_AI) + "</svg>")
 
 def chat_of(skill):
     p = os.path.join(CHATS, f"{skill}.json")
@@ -514,19 +534,25 @@ def chat_message(m):
     if m.get("list"): parts.append("<ol>" + "".join(f"<li>{chat_inline(x)}</li>" for x in m["list"]) + "</ol>")
     if m.get("card"): parts.append(chat_card(m["card"]))
     if m.get("after"): parts.append(f'<p>{chat_inline(m["after"])}</p>')
-    return (f'<div class="cm cm-agent"><span class="cm-av" aria-hidden="true">M</span><div class="cm-body">'
-            f'<span class="cm-name">MosoFin agent</span>{"".join(parts)}{guard}</div></div>')
+    name = dict((k, n) for k, n, _ in CHAT_AI)[CHAT_DEFAULT]
+    return (f'<div class="cm cm-agent"><span class="cm-av">{ai_logo(CHAT_DEFAULT)}</span><div class="cm-body">'
+            f'<span class="cm-name">{e(name)}</span>{"".join(parts)}{guard}</div></div>')
 
 def chat_section(skill, t):
     c = chat_of(skill)
     if not c: return ""
     msgs = "".join(chat_message(m) for m in c["messages"])
+    ai = {k: (n, ph) for k, n, ph in CHAT_AI}
+    switch = "".join(f'<button type="button" class="ai-btn" data-ai="{k}" data-ph="{e(ph)}" aria-pressed="{str(k == CHAT_DEFAULT).lower()}" '
+                     f'title="Show the chat in the style of {e(n)}">{ai_logo(k)}<span>{e(n)}</span></button>' for k, n, ph in CHAT_AI)
     return f"""<section aria-labelledby="chat-h">
   <h2 id="chat-h">Watch someone use it</h2>
   <p class="chat-intro">{e(c.get("example", ""))}</p>
-  <div class="chat" data-chat id="chat-{e(skill)}">
+  <div class="chat" data-chat data-ai="{CHAT_DEFAULT}" id="chat-{e(skill)}">
+    {ai_sprite()}
+    <div class="chat-ai" role="group" aria-label="Show the chat in the style of an assistant">{switch}</div>
     <div class="chat-head">
-      <span class="chat-who"><span class="cm-av" aria-hidden="true">M</span><span><b>MosoFin agent</b><small>{e(t)} skill</small></span></span>
+      <span class="chat-who"><span class="cm-av">{ai_logo(CHAT_DEFAULT)}</span><span><b class="chat-name">{e(ai[CHAT_DEFAULT][0])}</b><small>with the MosoFin {e(t.lower())} skill</small></span></span>
       <span class="chat-ctrl">
         <button type="button" class="chat-btn primary" data-act="play" aria-label="Play the conversation">▶ Play</button>
         <button type="button" class="chat-btn" data-act="restart" aria-label="Start again">↺</button>
@@ -536,8 +562,9 @@ def chat_section(skill, t):
       <span class="chat-prog" aria-hidden="true"><span></span></span>
     </div>
     <div class="chat-log" tabindex="0" aria-label="Example conversation">{msgs}</div>
-    <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">Message the agent</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
+    <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">{e(ai[CHAT_DEFAULT][1])}</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
   </div>
+  <p class="chat-note"><b>Style preview.</b> The skill runs in Claude. The other buttons show the same conversation in the style of another assistant. ChatGPT, Claude, Meta AI and Grok are trademarks of their owners. MosoFin is not affiliated with them, and they do not endorse MosoFin.</p>
 </section>
 """
 
