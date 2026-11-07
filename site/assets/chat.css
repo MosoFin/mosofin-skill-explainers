@@ -62,6 +62,28 @@
 .cm-tool ul { margin: 8px 0 0; padding: 10px 14px 10px 30px; border-left: 2px solid var(--rule); font-size: 13px; color: var(--muted); columns: 2 220px; }
 .cm-tool code { font: 12.5px "IBM Plex Mono", ui-monospace, monospace; }
 
+/* MosoFin tool card: logo, read-only badge, and one row per call that ticks off in turn */
+.cm-mf details { display: block; max-width: 580px; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.cm-mf summary { display: flex; width: 100%; border: 0; border-radius: 0; padding: 9px 14px; background: var(--sunk); color: var(--muted); flex-wrap: wrap; row-gap: 2px; }
+.mf-logo { width: 22px; height: 22px; border-radius: 5px; flex: none; }
+.mf-name { font-weight: 700; color: var(--ink); }
+.cm-mf .cm-ico { margin-left: auto; }
+.mf-rows { list-style: none; margin: 0; padding: 4px 14px; border-top: 1px solid var(--rule); }
+.mf-rows li { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13.5px; border-top: 1px dashed var(--rule); transition: opacity .2s; }
+.mf-rows li:first-child { border-top: 0; }
+.mf-rows code { font: 12.5px "IBM Plex Mono", ui-monospace, monospace; color: var(--ink); }
+.mf-rows b { font-weight: 600; }
+.mf-res { margin-left: auto; color: var(--muted); text-align: right; }
+.mf-st { position: relative; flex: none; width: 15px; height: 15px; border-radius: 50%; background: var(--ch-ok); }
+.mf-st::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--panel); }
+.mf-rows li.pend { opacity: .55; }
+.mf-rows li.pend .mf-st { background: var(--rule); }
+.mf-rows li.pend .mf-st::after, .mf-rows li.run .mf-st::after { content: ""; }
+.mf-rows li.pend .mf-res, .mf-rows li.run .mf-res { visibility: hidden; }
+.mf-rows li.run .mf-st { background: none; border: 2px solid var(--ch-ok); border-right-color: transparent; animation: cmSpin .7s linear infinite; }
+.mf-sum { margin: 0; padding: 8px 14px 10px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--rule); }
+.chat.js .mf-sum.wait { display: none; }
+
 /* Result cards */
 .cc { margin: 6px 0 10px; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-size: 14px; }
 .cc-title { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 9px 14px; background: var(--sunk); border-bottom: 1px solid var(--rule); }
@@ -126,6 +148,9 @@
 :root[data-theme="dark"] .chat[data-ai="grok"] { --ch-bg: #000; --ch-user: #1f1f1f; --ch-agent: #fff; }
 
 @media (max-width: 640px) {
+  .mf-rows li { flex-wrap: wrap; }
+  .mf-res { flex-basis: 100%; text-align: left; padding-left: 25px; margin-left: 0; }
+  .mf-res.mf-plain { display: none; }
   .ai-btn span { display: none; }
   .ai-btn { padding: 0 10px; }
   .chat.js .chat-log { height: 520px; }

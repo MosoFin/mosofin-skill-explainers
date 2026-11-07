@@ -533,6 +533,18 @@ def chat_message(m):
     if m["role"] == "user":
         att = "".join(f'<span class="cm-file"><span aria-hidden="true">📄</span> {e(a)}</span>' for a in m.get("attach", []))
         return f'<div class="cm cm-user"><p class="cm-bubble">{chat_inline(m["text"])}</p>{att}</div>'
+    if m["role"] == "tool" and m.get("source") == "mosofin":
+        # A MosoFin tool card: logo, read-only badge, one row per call or check, and what it found.
+        rows = "".join(
+            f'<li><span class="mf-st" aria-hidden="true"></span>'
+            f'{"<code>" + e(k) + "</code>" if re.fullmatch(r"[a-z_]+", k) else "<b>" + e(k) + "</b>"}'
+            f'<span class="mf-res{"" if v else " mf-plain"}">{e(v) if v else "Read"}</span></li>' for k, v in m.get("rows", []))
+        tag = f'<span class="cm-tag">{e(m["tag"])}</span>' if m.get("tag") else ""
+        summ = f'<p class="mf-sum">{e(m["summary"])}</p>' if m.get("summary") else ""
+        return (f'<div class="cm cm-tool cm-mf"><details open><summary>'
+                f'<img class="mf-logo" src="../../assets/mosofin-mark.png" alt="" width="22" height="22">'
+                f'<span class="mf-name">MosoFin</span><span class="cm-label">{e(m["label"])}</span>{tag}'
+                f'<span class="cm-ico" aria-hidden="true">✓</span></summary><ol class="mf-rows">{rows}</ol>{summ}</details></div>')
     if m["role"] == "tool":
         calls = "".join(f"<li><code>{e(x)}</code></li>" for x in m.get("calls", []))
         tag = f'<span class="cm-tag">{e(m["tag"])}</span>' if m.get("tag") else ""
