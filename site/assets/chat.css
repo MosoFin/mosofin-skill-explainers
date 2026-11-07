@@ -35,13 +35,13 @@
 @keyframes cmIn { from { opacity: 0; transform: translateY(6px); } }
 
 .cm-user { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.cm-bubble { margin: 0; max-width: 80%; background: var(--ch-user); color: var(--ch-user-ink, var(--ink)); border-radius: 18px; padding: 10px 16px; font-size: 15px; line-height: 1.5; }
+.cm-bubble { overflow-wrap: anywhere; margin: 0; max-width: 80%; background: var(--ch-user); color: var(--ch-user-ink, var(--ink)); border-radius: 18px; padding: 10px 16px; font-size: 15px; line-height: 1.5; }
 .cm-file { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; border: 1px solid var(--rule); border-radius: 10px; padding: 6px 10px; color: var(--muted); }
 
 .cm-agent { display: flex; gap: 12px; align-items: flex-start; }
 .cm-av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: var(--ch-av-bg, transparent); border: 1px solid var(--ch-av-line, transparent); }
 .cm-av svg { width: 20px; height: 20px; }
-.cm-body { min-width: 0; flex: 1; font-size: 15px; line-height: 1.6; font-family: var(--ch-font, inherit); }
+.cm-body { min-width: 0; flex: 1; font-size: 15px; line-height: 1.6; font-family: var(--ch-font, inherit); overflow-wrap: anywhere; }   /* long file names break instead of overflowing */
 .cm-name { display: block; font-weight: 650; font-size: 13.5px; margin: 3px 0 2px; }
 .cm-body p { margin: 0 0 8px; }
 .cm-body ol { margin: 0 0 8px; padding-left: 22px; }
@@ -98,6 +98,13 @@
 .cc-table td:nth-child(2) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cc-scroll { overflow-x: auto; }
 .cc-line { display: inline-block; width: 160px; border-bottom: 1px solid var(--ink); height: 1em; }
+/* The site's global table rules (no wrapping, small uppercase header cells) are for data tables.
+   Inside a chat card, a row label is ordinary text that wraps, and only the amount stays on one line. */
+.cc th, .cc td { white-space: normal; overflow-wrap: anywhere; }
+.cc tbody th, .cc-bridge th, .cc-signoff th { font: inherit; font-size: 14px; letter-spacing: normal; text-transform: none; color: var(--ink); font-weight: 400; }
+.cc-bridge td, .cc-table td:nth-child(2) { white-space: nowrap; overflow-wrap: normal; width: 1%; }
+.cc-table thead th { white-space: nowrap; }
+.cc-line { width: 100%; max-width: 160px; }
 .chat.js .cm-body > .wait, .chat.js .cm-body li.wait { display: none; }
 .chat.js .cc tr.wait { visibility: hidden; }
 
@@ -148,6 +155,9 @@
 :root[data-theme="dark"] .chat[data-ai="grok"] { --ch-bg: #000; --ch-user: #1f1f1f; --ch-agent: #fff; }
 
 @media (max-width: 640px) {
+  .cc th, .cc td { padding: 6px 10px; font-size: 13.5px; }
+  .cc-signoff td { width: 45%; }
+  .cm-agent { gap: 8px; }
   .mf-rows li { flex-wrap: wrap; }
   .mf-res { flex-basis: 100%; text-align: left; padding-left: 25px; margin-left: 0; }
   .mf-res.mf-plain { display: none; }
