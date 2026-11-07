@@ -87,7 +87,7 @@ A MosoFin tool card. Use it for every step where the agent reads the books throu
 ]}
 ```
 
-- The first row is the starting amount. Every next label starts with `+`, `−` or `=`.
+- The first row is the starting amount, in $, £ or €. Every next label starts with `+`, `−` or `=`.
 - `build.py --check` adds and subtracts the rows and fails if an `=` row does not match.
 - The third item styles a row: `total` (bold, with a rule above it) or `ok` (green). An `ok` row is not part
   of the sum.

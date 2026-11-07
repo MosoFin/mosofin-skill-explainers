@@ -525,22 +525,22 @@ CHAT_ROLE_KEYS = {"user": {"role", "text", "attach"},
 CHAT_CARDS = {"bridge", "table", "signoff"}
 
 def money(v):
-    m = re.fullmatch(r"\$(-?[\d,]+(?:\.\d+)?)", v.strip())
+    m = re.fullmatch(r"[$£€](-?[\d,]+(?:\.\d+)?)", v.strip())   # dollars, pounds or euros
     return float(m.group(1).replace(",", "")) if m else None
 
 def bridge_problem(card):
     """A bridge starts from its first row, adds "+" rows, subtracts "−" rows, and must equal its "=" row."""
     rows = card.get("rows", [])
-    if not rows or money(rows[0][1]) is None: return "the first row needs a $ amount to start from"
+    if not rows or money(rows[0][1]) is None: return "the first row needs an amount ($, £ or €) to start from"
     total = money(rows[0][1])
     for r in rows[1:]:
         label, amt = r[0].strip(), money(r[1])
         if len(r) > 2 and r[2] == "ok": continue
-        if amt is None: return f"row {r[0]!r} has no $ amount"
+        if amt is None: return f"row {r[0]!r} has no amount ($, £ or €)"
         if label[:1] == "+": total += amt
         elif label[:1] in "−-": total -= amt
         elif label[:1] == "=":
-            if abs(total - amt) > 0.005: return f"rows add up to ${total:,.2f}, but {label!r} says ${amt:,.2f}"
+            if abs(total - amt) > 0.005: return f"rows add up to {total:,.2f}, but {label!r} says {amt:,.2f}"
         else: return f"row {r[0]!r} must start with +, − or ="
     return None
 

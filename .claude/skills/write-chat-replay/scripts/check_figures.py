@@ -22,8 +22,8 @@ ROOT = os.getcwd()
 
 
 def figures(text):
-    """Dollar amounts, #numbers, masked account endings and 3+ digit numbers."""
-    out = set(re.findall(r"\$-?[\d,]+(?:\.\d+)?", text))
+    """Amounts in $, £ or €, #numbers, masked account endings and 3+ digit numbers."""
+    out = set(re.findall(r"[$£€]-?[\d,]+(?:\.\d+)?", text))
     out |= set(re.findall(r"#\d+", text))
     out |= set(re.findall(r"(?:…|\.\.\.)\d{3,}", text))
     out |= {n for n in re.findall(r"(?<![\d$#.,])\d{3,}(?![\d,])", text)}
@@ -52,7 +52,7 @@ def main(skill):
     # Every number on the page, as a value. "12,480.00" is one number. "46200,31800" (a data array)
     # is two. "#0d1210" (a colour) and "v2.4" are not numbers.
     values = []
-    for m in re.finditer(r"(?<![\w.#])(\$)?(\d[\d,]*\d|\d)(\.\d+)?", page_flat):
+    for m in re.finditer(r"(?<![\w.#])([$£€])?(\d[\d,]*\d|\d)(\.\d+)?", page_flat):
         dollar, body, cents = m.group(1), m.group(2), m.group(3) or ""
         parts = body.split(",")
         if len(parts) > 1 and len(parts[0]) <= 3 and all(len(x) == 3 for x in parts[1:]):
@@ -63,9 +63,9 @@ def main(skill):
                     values.append((float(x + (cents if i == len(parts) - 1 else "")), bool(dollar and i == 0)))
 
     def on_page(fig):
-        if fig.startswith("$"):
+        if fig[:1] in "$£€":
             x = float(fig[1:].replace(",", ""))
-            # A small bare number ("10", "25") is too common to prove anything. It counts only with "$" or cents.
+            # A small bare number ("10", "25") is too common to prove anything. It counts only with a currency sign or cents.
             return any(abs(v - x) < 0.005 and (marked or abs(x) >= 100) for v, marked in values)
         if fig.startswith("#") or fig.startswith("…") or fig.startswith("..."):
             core = fig.lstrip("#….")
