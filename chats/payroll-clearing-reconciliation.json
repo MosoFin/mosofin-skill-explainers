@@ -1,0 +1,296 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, payroll clearing 2200 and the payroll liabilities, September 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Our payroll clearing account never gets back to zero. Can you reconcile it for September?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need eight answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which company? I propose the payroll accounts from your chart, and you confirm them.",
+        "Which period?",
+        "How often do you pay each liability: monthly, semi-weekly or quarterly? I never assume this.",
+        "Please attach the payroll register for the period.",
+        "Please attach the bank statement for the period.",
+        "Up to what amount may I propose a write-off, and who approves it?",
+        "Do you have a statement of account from the tax authority or a benefit provider?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading, September. We pay federal taxes and 401(k) monthly. Register and bank statement attached. Write-offs under $50, and I approve them. No statements of account.",
+      "attach": [
+        "payroll-register-september.xlsx",
+        "bank-statement-september.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Payroll platform",
+          "None connected"
+        ],
+        [
+          "Payroll accounts in the chart",
+          "2200, 2210 and 2230"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile **2200 Payroll clearing**, **2210 Federal payroll taxes** and **2230 401(k)** for **September**. No payroll platform is connected, so your register gives the accrued side. Both liabilities are paid **monthly**. I read twelve months of detail, from 1 October 2025, and tie net pay to your **bank statement**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "2200, 2210 and 2230"
+        ],
+        [
+          "get_trial_balance",
+          "2200 at $4,023.40, 2210 at $27,000.00"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Twelve months from 1 Oct 2025"
+        ],
+        [
+          "search_payments",
+          "401(k) $3,400.00 on Fri 4 Sep"
+        ],
+        [
+          "search_checks",
+          "Includes check #1987"
+        ],
+        [
+          "search_journal_entries",
+          "Includes JE-0912"
+        ],
+        [
+          "get_profit_and_loss",
+          ""
+        ],
+        [
+          "search_employees",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "10 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "September's two pay runs each net to nil in 2200. So 2200 should hold nil, but it holds **$4,023.40**. Five items are stuck in it:",
+      "card": {
+        "type": "table",
+        "title": "2200 Payroll clearing at 30 Sep",
+        "head": [
+          "Item",
+          "Amount",
+          "In 2200 since",
+          "Days"
+        ],
+        "rows": [
+          [
+            "Old balance, no detail in the twelve months",
+            "$23.40",
+            "before 1 Oct 2025",
+            "over 364"
+          ],
+          [
+            "EE-03, direct deposit returned, not paid again",
+            "$640.00",
+            "Tue 3 Feb",
+            "239"
+          ],
+          [
+            "EE-05, final pay held in a dispute",
+            "$1,150.00",
+            "Thu 30 Apr",
+            "153"
+          ],
+          [
+            "EE-11, check #1987 not cashed, voided",
+            "$410.00",
+            "Tue 30 Jun",
+            "92"
+          ],
+          [
+            "JE-0912, memo “reclass contractor”, no pay run",
+            "$1,800.00",
+            "Thu 24 Sep",
+            "6"
+          ]
+        ]
+      },
+      "after": "Four items, **$2,223.40**, are more than 60 days old. The oldest is from before October 2025. JE-0912 debits 6000 Wages, but no pay run is behind it. I show staff by reference only, never by name."
+    },
+    {
+      "role": "agent",
+      "text": "2210 looks fine at first. Its roll-forward ties to the GL. But you pay monthly, so at a month end it should hold one month of taxes:",
+      "card": {
+        "type": "bridge",
+        "title": "2210 Federal payroll taxes",
+        "rows": [
+          [
+            "GL balance at 30 Sep",
+            "$27,000.00"
+          ],
+          [
+            "− September taxes, due Thu 15 Oct",
+            "$14,400.00"
+          ],
+          [
+            "= August taxes, not paid",
+            "$12,600.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The August deposit was due on Tue 15 Sep. Part of it is tax that you withheld from your staff. A person who willfully does not pay that can be personally liable. It needs a payment, not an entry."
+    },
+    {
+      "role": "agent",
+      "text": "The money that did leave ties to the bank:",
+      "card": {
+        "type": "table",
+        "title": "Bank and deposit ties",
+        "head": [
+          "Check",
+          "Amount",
+          "Result"
+        ],
+        "rows": [
+          [
+            "Net pay, register against the bank statement",
+            "$40,800.00",
+            "Ties"
+          ],
+          [
+            "401(k) for August, paid Fri 4 Sep, due Mon 7 Sep",
+            "$3,400.00",
+            "Ties"
+          ],
+          [
+            "Federal taxes for August, due Tue 15 Sep",
+            "$12,600.00",
+            "Not paid"
+          ]
+        ]
+      },
+      "after": "The year-to-date test on 2210 also ties: 12,300 + 116,100 − 101,400 = 27,000. It uses the same closing balance, so it cannot show the unpaid August. Only your monthly cadence shows it."
+    },
+    {
+      "role": "user",
+      "text": "Can you write the whole $4,023.40 off to miscellaneous expense, so 2200 is clean?"
+    },
+    {
+      "role": "agent",
+      "text": "No. **$1,050** of it is pay that two people did not get. You still owe it to them. I propose these entries instead:",
+      "card": {
+        "type": "table",
+        "title": "Proposals",
+        "head": [
+          "Item",
+          "Amount",
+          "Proposal"
+        ],
+        "rows": [
+          [
+            "P1 · EE-03 and EE-11",
+            "$1,050.00",
+            "Dr 2200, Cr 2260 Unclaimed wages payable"
+          ],
+          [
+            "P2 · Old balance",
+            "$23.40",
+            "Dr 2200, Cr 7900 Other income, under your $50"
+          ],
+          [
+            "P3 · JE-0912",
+            "$1,800.00",
+            "Dr 2200, Cr 2000 Accounts payable, if it is a contractor's bill"
+          ],
+          [
+            "EE-05",
+            "$1,150.00",
+            "No entry until the dispute ends"
+          ],
+          [
+            "2210 · August",
+            "$12,600.00",
+            "A payment for you to make"
+          ],
+          [
+            "2210 · September",
+            "$14,400.00",
+            "Timing, due Thu 15 Oct, no entry"
+          ]
+        ]
+      },
+      "after": "After P1, P2 and P3, 2200 holds $1,150, the disputed final pay. P2 holds only if the older detail names no person. Your state's rules decide when unclaimed pay goes to the state. A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has a tab for each account, the summary, the bank tie-out, the proposed entries, the stale balances and the coverage.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Payroll_Recs_2026-09_Northbrook Trading.xlsx**. I saved the account list, the cadences and your write-off limit. I never save personal data, balances or ageings."
+    }
+  ]
+}

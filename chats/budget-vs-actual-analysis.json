@@ -1,0 +1,167 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, September, against the FY26 Board Budget. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you compare September with our budget? Profit came in lower than we planned."
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which entity, or which set of entities?",
+        "Which period: the month, the quarter to date or the year to date? Is that period closed?",
+        "Which budget, by name: the original, a revised budget or the latest forecast?",
+        "What are your thresholds, as an amount and a percentage? Must a gap pass both, or either one?",
+        "Which one-time items fell in the period?",
+        "What driver data do you have? I need units, prices and headcount, with the budget's own figures for them.",
+        "Which grouping of lines does your management read?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading only. September, the month, and it is closed. Compare to the FY26 Board Budget. $5,000 and 10%, either one. No one-offs that I know of. The budget assumed 2,800 units at $150. Use the chart as it is."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace, the company file and the budgets",
+      "tag": "read-only",
+      "rows": [
+        ["Workspace", "Northbrook Trading"],
+        ["Company file", "Confirmed by name"],
+        ["Budget tool", "Enabled, so both sides come from the books"],
+        ["search_budgets", "More than one version, includes FY26 Board Budget"],
+        ["get_company_info", "Calendar year, US dollars"],
+        ["Tools", "Read-only tools only"]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I compare **Northbrook Trading**'s actuals for **September** with the **FY26 Board Budget**, both read from your books. September is closed, so the report is final. A line needs commentary when it passes **$5,000 or 10%**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read both sides in one batch",
+      "tag": "read-only",
+      "rows": [
+        ["get_profit_and_loss", "September net income $64,100"],
+        ["search_budgets", "FY26 Board Budget, net income $88,000"],
+        ["search_accounts", "Insurance $7,200, no budget line"],
+        ["search_classes", ""],
+        ["search_departments", ""],
+        ["get_general_ledger", "Includes $8,000 paid to a law firm"],
+        ["search_journal_entries", ""],
+        ["get_customer_sales", "3,200 units at $141.25"],
+        ["search_invoices", ""],
+        ["search_items", ""],
+        ["get_vendor_expenses", ""]
+      ],
+      "summary": "11 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Both sides use the accrual basis. One account is on one side only. **Insurance** shows $7,200 in September, and the budget has $0 for it. I show the $7,200 with the flag **no budget**, and I do not divide by zero."
+    },
+    {
+      "role": "agent",
+      "text": "Net income is **$23,900** below the budget. Each line adds its effect on profit:",
+      "card": {
+        "type": "bridge",
+        "title": "Budget to actual net income, September",
+        "rows": [
+          ["Budget net income, FY26 Board Budget", "$88,000"],
+          ["+ Revenue, 7.6% F", "$32,000"],
+          ["− Other income, 30.0% U", "$600"],
+          ["− Cost of goods sold, 10.5% U", "$17,600"],
+          ["− Payroll, 3.1% U", "$3,000"],
+          ["− Marketing, 60.0% U", "$18,000"],
+          ["− G&A, 23.8% U", "$9,500"],
+          ["− Insurance, no budget, U", "$7,200"],
+          ["= Actual net income", "$64,100", "total"]
+        ]
+      },
+      "after": "Six of seven lines pass $5,000 or 10%, so they get commentary. Payroll is $3,000 and 3.1% over. It is below both thresholds, so I note it and do not explain it."
+    },
+    {
+      "role": "agent",
+      "text": "Revenue is $32,000 favourable, but that hides a lower price. I split revenue and cost of goods sold into volume and price. The parts add to each line, with $0 unexplained.",
+      "card": {
+        "type": "table",
+        "title": "Drivers",
+        "head": ["Line and driver", "Amount", "How", "F/U"],
+        "rows": [
+          ["Revenue, volume", "+$60,000", "(3,200 − 2,800) × $150", "F"],
+          ["Revenue, price", "−$28,000", "($141.25 − $150) × 3,200", "U"],
+          ["Cost of goods sold, volume", "+$24,000", "(3,200 − 2,800) × $60", "U"],
+          ["Cost of goods sold, unit cost", "−$6,400", "($58 − $60) × 3,200", "F"]
+        ]
+      },
+      "after": "Most of the cost overrun comes from the extra units that also raised revenue. The invoices show lower prices. They do not show the reason, so the price cause stays **to be confirmed**."
+    },
+    {
+      "role": "agent",
+      "text": "Part of the shortfall is timing. It moved between months and will reverse:",
+      "card": {
+        "type": "bridge",
+        "title": "Timing in the shortfall",
+        "rows": [
+          ["Shortfall in net income", "$23,900"],
+          ["− Trade-show deposit for November, in marketing", "$12,000"],
+          ["− Insurance renewal, budgeted in October", "$7,200"],
+          ["= Rest of the shortfall", "$4,700", "total"]
+        ]
+      },
+      "after": "When October closes, its actuals can prove the insurance timing. The other $6,000 in marketing is higher ad cost, and it is permanent. Over the 3 remaining months, the arithmetic gives **$18,000**. Whether it continues is your call."
+    },
+    {
+      "role": "agent",
+      "text": "G&A is $9,500 over. The ledger shows **$8,000 paid to a law firm** and $1,500 of smaller items. It shows the payee, not the reason. I do not guess the cause. Who owns the open items?"
+    },
+    {
+      "role": "user",
+      "text": "The financial controller owns G&A and insurance. The sales director owns the price question. The marketing lead owns marketing."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the commentary for your management meeting. Each line says where its cause comes from:",
+      "card": {
+        "type": "table",
+        "title": "Commentary",
+        "head": ["Line", "Variance", "Cause", "Owner"],
+        "rows": [
+          ["Revenue", "$32,000 F", "Volume +$60,000. Price −$28,000, cause to be confirmed", "Sales director"],
+          ["Marketing", "$18,000 U", "$12,000 trade-show deposit, timing. $6,000 ad cost, permanent", "Marketing lead"],
+          ["G&A", "$9,500 U", "$8,000 to a law firm, cause to be confirmed", "Financial controller"],
+          ["Insurance", "$7,200 U", "Renewal budgeted in October, timing", "Financial controller"]
+        ]
+      },
+      "after": "Your report has six sheets: the summary, the commentary, the drivers, the full-year outlook, the waterfall data and the coverage. The header names the FY26 Board Budget and the either rule."
+    },
+    {
+      "role": "agent",
+      "text": "I revise no budget and post nothing. A person decides what to change.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [["Prepared by", ""], ["Reviewed by", ""]]
+      },
+      "after": "Do you want the report as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the six sheets. I saved the thresholds, the either rule, the budget version, the line structure and the owners. I never save the figures, the commentary or the outlook."
+    }
+  ]
+}

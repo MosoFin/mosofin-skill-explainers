@@ -1,0 +1,326 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, inventory at 30 September 2026, with the A-item cycle count of 26 September. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you reconcile our inventory to the books for September?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which period?",
+        "Is your stock in a separate system, such as a warehouse system or a 3PL platform? Or is it the item module of your accounting platform?",
+        "Please attach the count results: the items, the quantities and the locations.",
+        "When was the last count? Do you count once a year, in cycles, or not at all?",
+        "Is any stock in transit or on consignment? What are the title terms?",
+        "Does a 3PL hold stock for you? Please attach its statement for the period.",
+        "What is your policy for reserves and write-downs?",
+        "Above what amount do I investigate a count difference, for one item and in total?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Period end 30 September. We use the item module. We counted the A items on 26 September. Last full count was 31 December, and we cycle count since then. The Midlands 3PL holds our mugs. Damaged goods go to net realizable value, and the three damaged A-140 machines can sell for $60 each. Investigate over $500 per item or $2,000 in total.",
+      "attach": [
+        "a-item-count-26-september.xlsx",
+        "midlands-3pl-september.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and what is connected",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Stock platform",
+          "None connected, item module only"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile the inventory of **Northbrook Trading** at **30 September**, with the GL and the items read through MosoFin. The items are the **same platform's item module**. So a zero difference proves nothing, and I investigate any difference that is not zero. The count is your **A-item cycle count of 26 September**. I check the Midlands 3PL against its September statement. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "1300 Inventory, 1310 Inventory Reserve, 5150"
+        ],
+        [
+          "get_trial_balance",
+          "GL 1300 at $187,020.00"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "search_items",
+          "Item valuation $186,420.00 at 30 Sep"
+        ],
+        [
+          "search_locations",
+          "Main and Showroom"
+        ],
+        [
+          "get_general_ledger",
+          "Includes JE-0918"
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ],
+        [
+          "search_invoices",
+          "A-120 invoice entered Mon 28 Sep"
+        ],
+        [
+          "search_bills",
+          "BL-5521 entered Fri 2 Oct"
+        ],
+        [
+          "search_purchases",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "11 reads in one batch, with the entries posted after 30 Sep. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "First, the books against the items. They are one database, so they should agree. They do not:",
+      "card": {
+        "type": "bridge",
+        "title": "GL 1300 against the item module, 30 Sep",
+        "rows": [
+          [
+            "GL 1300 Inventory",
+            "$187,020.00"
+          ],
+          [
+            "− Item valuation, all locations",
+            "$186,420.00"
+          ],
+          [
+            "= Difference to investigate",
+            "$600.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "The cause is **JE-0918** on Fri 18 Sep. Someone posted $600 of freight-in straight to 1300. It went around the item module."
+    },
+    {
+      "role": "agent",
+      "text": "Next, your count against the items. These are the differences, valued at item cost:",
+      "card": {
+        "type": "table",
+        "title": "Count of 26 Sep",
+        "head": [
+          "Item and location",
+          "Value",
+          "Units",
+          "Class"
+        ],
+        "rows": [
+          [
+            "A-100 Espresso grinder, Main",
+            "−$510.00",
+            "114 counted, 120 in items",
+            "Shrinkage"
+          ],
+          [
+            "A-110, Main",
+            "+$220.00",
+            "310 counted, 300 in items",
+            "Overage, below $500"
+          ],
+          [
+            "A-120 Blender, Main",
+            "−$1,600.00",
+            "160 counted, 200 in items",
+            "Cut-off"
+          ],
+          [
+            "A-130, Main",
+            "−$900.00",
+            "44 counted, 50 in items",
+            "Wrong location"
+          ],
+          [
+            "A-130, Showroom",
+            "+$900.00",
+            "6 counted, 0 in items",
+            "Wrong location"
+          ],
+          [
+            "A-140, Main",
+            "$0.00",
+            "3 of 40 damaged",
+            "Damaged"
+          ]
+        ]
+      },
+      "after": "The net is **−$1,890**, below your $2,000 total. Two items are above $500: A-120 and A-100. The two A-130 rows cancel out in value."
+    },
+    {
+      "role": "agent",
+      "text": "A-120 is not shrinkage. The 40 blenders left on Fri 25 Sep, before the count. Someone entered the invoice on Mon 28 Sep. At 30 September, the shelves and the item module both show 160. A-120 needs no adjustment."
+    },
+    {
+      "role": "agent",
+      "text": "I also tested the entries posted after 30 September. Harlow Supply's bill **BL-5521** for $1,200 is dated Tue 29 Sep, and someone entered it on Fri 2 Oct. The goods arrived on Thu 1 Oct. The title terms decide who owned them on 30 September. I do not guess them. Can you send me the terms?"
+    },
+    {
+      "role": "user",
+      "text": "I will ask Harlow. Carry on."
+    },
+    {
+      "role": "agent",
+      "text": "A-100 is the only shrinkage. The recount on Mon 28 Sep also found 114. I found no missing receipt and no duplicate sale, so the cause is not yet explained.",
+      "card": {
+        "type": "table",
+        "title": "Shrinkage and other findings",
+        "head": [
+          "Measure",
+          "Figure",
+          "How"
+        ],
+        "rows": [
+          [
+            "Shrinkage, confirmed by the count",
+            "$510.00",
+            "A-100: 6 × 85.00"
+          ],
+          [
+            "Of average inventory",
+            "0.28%",
+            "510 ÷ 184,200"
+          ],
+          [
+            "Of September revenue",
+            "0.53%",
+            "510 ÷ 96,000"
+          ],
+          [
+            "Trend in account 5150",
+            "380 → 420 → 510",
+            "July, August, September"
+          ],
+          [
+            "Midlands 3PL, C-300 Mug",
+            "$200.00",
+            "50 × 4.00, not explained"
+          ],
+          [
+            "B-215 Filter pack",
+            "−$84.00",
+            "−24 × 3.50, not explained"
+          ]
+        ]
+      },
+      "after": "The warehouse lead must check the storage area and talk to the team about A-100. You did not count at the 3PL, so its $200 is a difference to its statement, not shrinkage. B-215 is below zero. That points to a missing receipt or a duplicate sale."
+    },
+    {
+      "role": "agent",
+      "text": "I propose these changes. The item module takes the quantity changes, and a journal entry takes the write-down:",
+      "card": {
+        "type": "table",
+        "title": "Proposals",
+        "head": [
+          "Proposal",
+          "Amount",
+          "Where"
+        ],
+        "rows": [
+          [
+            "A-100: quantity to 114, to account 5150",
+            "−$510.00",
+            "Item module"
+          ],
+          [
+            "A-110: quantity to 310 after a recount, to account 5150",
+            "+$220.00",
+            "Item module"
+          ],
+          [
+            "A-130: move 6 units from Main to Showroom",
+            "$0.00",
+            "Item module"
+          ],
+          [
+            "A-140: DR 5160 Inventory Write-Down, CR 1310 Inventory Reserve, 3 × (210 − 60)",
+            "$450.00",
+            "Journal entry"
+          ],
+          [
+            "JE-0918 freight-in",
+            "$600.00",
+            "Your decision"
+          ],
+          [
+            "BL-5521 Harlow Supply",
+            "$1,200.00",
+            "After the title terms"
+          ]
+        ]
+      },
+      "after": "The reserve in 1310 ties at $3,600, and it is $4,050 after the write-down. For JE-0918, you choose an item cost adjustment or a move out of 1300. Both need a matching item change. A person makes these changes. I post nothing."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has eight sheets, from the summary to the coverage sheet. It marks the count as manual, with its owner and date.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Inventory_Recon_2026-09.xlsx**. I saved that you use the item module, your account map, the locations, the 3PL, the count cadence and the thresholds. I never save quantities, balances or count results."
+    }
+  ]
+}

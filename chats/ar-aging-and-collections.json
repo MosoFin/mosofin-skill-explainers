@@ -1,0 +1,269 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, all customers, unpaid invoices as of 30 September 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Who owes us money, and who should we chase first?"
+    },
+    {
+      "role": "agent",
+      "text": "I can build your receivables aging and a collection plan. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "As of which date?",
+        "What do you need: the aging alone, a collection plan, DSO or reminder drafts? All customers, or one?",
+        "For DSO, which period do you want?",
+        "Do you have disputes, credit holds, customer tiers or payment history that I must know?",
+        "What is your collection policy? I need your approved wording, the payment contact and your escalation steps."
+      ],
+      "after": "One note: an aging lists unpaid invoices, so it is always on invoices issued (accrual). That is true even if you file on a cash basis."
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. As of 30 September. All customers, and all four. DSO for July to September. Acme Corp disputes its invoice. Summit Hotels sent us an insolvency notice. No tiers. Our policy is attached.",
+      "attach": [
+        "collection-policy.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Aging detail report",
+          "Available in your books"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I build the A/R aging for **Northbrook Trading** as of **30 September 2026**, accrual basis, from your MosoFin connection. I tie the invoice detail to the aging summary. Then I give a collection plan and reminder drafts in your approved wording. Every draft is marked not sent. DSO is for **July to September**, on credit sales. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Aging detail report",
+          "Six open invoices and one credit memo"
+        ],
+        [
+          "get_aged_receivables",
+          "Net $68,200"
+        ],
+        [
+          "search_invoices",
+          "July to September, $150,000"
+        ],
+        [
+          "search_credit_memos",
+          "July to September, $4,000"
+        ],
+        [
+          "search_customers",
+          ""
+        ],
+        [
+          "get_balance_sheet",
+          "A/R $68,950"
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "7 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Six invoices are unpaid, and Lakeside Freight has a credit that is not applied. Each invoice is in the aging at its open balance:",
+      "card": {
+        "type": "bridge",
+        "title": "Aging as of 30 September",
+        "rows": [
+          [
+            "Current, Pinnacle Clinics",
+            "$24,200"
+          ],
+          [
+            "+ 1-30 days late, Harbor Retail and Acme Corp",
+            "$15,300"
+          ],
+          [
+            "+ 31-60 days late, Harbor Retail",
+            "$8,500"
+          ],
+          [
+            "+ 61-90 days late",
+            "$0"
+          ],
+          [
+            "+ 91-120 days late, Crestline Foods",
+            "$6,400"
+          ],
+          [
+            "+ Over 120 days late, Summit Hotels",
+            "$15,000"
+          ],
+          [
+            "= Gross invoices",
+            "$69,400",
+            "total"
+          ],
+          [
+            "− Unapplied credit, Lakeside Freight CM-0044",
+            "$1,200"
+          ],
+          [
+            "= Net A/R",
+            "$68,200",
+            "total"
+          ]
+        ]
+      },
+      "after": "Overdue invoices total **$45,200**, which is 66.3% of net A/R. Two invoices are over 90 days, for $21,400."
+    },
+    {
+      "role": "agent",
+      "text": "The detail agrees with the aging summary to the cent. Your balance sheet shows **$750 more** than the aging:",
+      "card": {
+        "type": "bridge",
+        "title": "Tie-out",
+        "rows": [
+          [
+            "Net aging, detail and summary agree",
+            "$68,200"
+          ],
+          [
+            "+ Difference, on the Exceptions sheet",
+            "$750"
+          ],
+          [
+            "= A/R on the balance sheet",
+            "$68,950",
+            "total"
+          ]
+        ]
+      },
+      "after": "A likely cause is a journal entry that someone posted directly to A/R. I do not force the two figures to agree. So I call this a summary-to-detail reconciliation, not a reconciliation to the general ledger."
+    },
+    {
+      "role": "agent",
+      "text": "For DSO, I use credit sales, not total income. I take them from your invoices and credit memos for the quarter:",
+      "card": {
+        "type": "bridge",
+        "title": "Credit sales, July to September",
+        "rows": [
+          [
+            "Invoices dated in the quarter",
+            "$150,000"
+          ],
+          [
+            "− Credit memos dated in the quarter",
+            "$4,000"
+          ],
+          [
+            "= Credit sales",
+            "$146,000",
+            "total"
+          ]
+        ]
+      },
+      "after": "DSO is $68,200 ÷ $146,000 × 92 days = **43.0 days**. Total income also holds $44,000 of cash sales. On total income, DSO reads 33.0 days, which is 10 days too good."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the collection plan. I rank by age first, then by open balance. Two customers go to other people, not to collections:",
+      "card": {
+        "type": "table",
+        "title": "Collection plan",
+        "head": [
+          "Customer",
+          "Open",
+          "Next action"
+        ],
+        "rows": [
+          [
+            "1 · Crestline Foods, 102 days",
+            "$6,400",
+            "Escalation review under your policy"
+          ],
+          [
+            "2 · Harbor Retail, 60 days",
+            "$20,500",
+            "Formal follow-up, ask for a payment date"
+          ],
+          [
+            "Summit Hotels, insolvency notice",
+            "$15,000",
+            "No reminder. Professional review"
+          ],
+          [
+            "Acme Corp, disputed",
+            "$3,300",
+            "Dispute note to the dispute owner"
+          ],
+          [
+            "Pinnacle Clinics, current",
+            "$24,200",
+            "No action"
+          ],
+          [
+            "Lakeside Freight, credit balance",
+            "−$1,200",
+            "Exceptions: refund or reclassify"
+          ]
+        ]
+      },
+      "after": "I wrote two reminder drafts, for Crestline and Harbor. Each one is neutral, with no fees or threats. Each one says **REVIEW REQUIRED - NOT SENT**. A person reviews and sends them. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "Your report has seven sheets. They are the run context, the summary, the detail, the collection plan, the drafts, the exceptions and the coverage.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the report as an Excel file? And do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the seven sheets. I saved the Acme dispute, your collection policy and the DSO basis. I never save contact details, balances or drafts."
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, the October 2026 close, Day 1 on Monday 2 November. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "close-template.xlsx": "the name of the user's own close template with the task owners",
+    "september-close-pack.xlsx": "the name of the user's own September close pack"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you set up our October close and keep track of it?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload the data?",
+        "Which period do you close?",
+        "What is your close calendar, or your target close date?",
+        "Is this a soft close or a hard close?",
+        "Which reporting framework do you use?",
+        "Who owns each task? Roles are fine.",
+        "What materiality threshold applies?",
+        "Do you have a close template, and last month's close?",
+        "Do you report on a cash or an accrual basis?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. October 2026, in seven business days from Monday 2 November. Hard close, US GAAP, accrual. The owners are in our template. Materiality is $5,000. The September close pack is attached too.",
+      "attach": [
+        "close-template.xlsx",
+        "september-close-pack.xlsx"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        ["Workspace", "Northbrook Trading"],
+        ["Company file", "One company file, confirmed by name"],
+        ["get_company_info", "Professional services, US dollars"],
+        ["Tools", "Read-only tools only"]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I plan the **October 2026** close for **Northbrook Trading**, one entity in one currency, so there is no consolidation day. Day 1 is **Monday 2 November** and Day 7 is **Tuesday 10 November**. It is a hard close, US GAAP, accrual, with materiality of **$5,000**. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        ["search_accounts", "No inventory account"],
+        ["search_journal_entries", ""],
+        ["get_trial_balance", ""],
+        ["get_balance_sheet", ""],
+        ["get_profit_and_loss", ""],
+        ["get_general_ledger", ""],
+        ["search_classes", ""],
+        ["search_locations", ""]
+      ],
+      "summary": "8 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "My standard list has 48 tasks on Days 1 to 7. I fitted it to your books. Each change has its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Your October list",
+        "head": ["Evidence", "Tasks", "Change"],
+        "rows": [
+          ["Standard list, Days 1 to 7", "48", ""],
+          ["No inventory account in the chart", "−3", "Remove inventory cutoff, cycle count and write-downs"],
+          ["One company file", "−5", "Remove Day 6, consolidation"],
+          ["One currency, no foreign balances", "−1", "Remove FX revaluation"],
+          ["Professional services, with accounts behind them", "+2", "Add WIP unbilled and project profitability"],
+          ["Your list, Days 1 to 7", "41", ""]
+        ]
+      },
+      "after": "With the 5 pre-close tasks, you have 46. Each task has an owner from your template, a due day and its dependencies. You use the accrual basis, so the accruals stay on Day 1 and Day 3."
+    },
+    {
+      "role": "user",
+      "text": "It is Wednesday, Day 3. Where are we?"
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the October entries",
+      "tag": "read-only",
+      "rows": [
+        ["search_journal_entries", "3 close entries, $8,260 in all"],
+        ["Your close template", "Payroll cutoff accrual marked Complete"]
+      ],
+      "summary": "1 read, and your template. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Three close entries are in the books. I check each task against the books, not only against the template:",
+      "card": {
+        "type": "bridge",
+        "title": "Entries posted by Day 3",
+        "rows": [
+          ["Depreciation, JE-2611-004, Tue 3 Nov", "$4,210"],
+          ["+ Prepaid amortization, JE-2611-005, Tue 3 Nov", "$1,250"],
+          ["+ Utilities accrual, JE-2611-009, Wed 4 Nov", "$2,800"],
+          ["= Posted so far", "$8,260", "total"]
+        ]
+      },
+      "after": "Deferred revenue release is due today, and no entry exists yet. It is still open."
+    },
+    {
+      "role": "agent",
+      "text": "One line does not agree. Your template marks the **payroll cutoff accrual** as Complete, but no entry is posted. Please ask its owner before the books lock.",
+      "card": {
+        "type": "table",
+        "title": "What the books cannot show",
+        "head": ["Item", "Status", "Who moves it"],
+        "rows": [
+          ["Bank reconciliation, Day 2", "Manual", "The owner reconciles against the bank statement"],
+          ["Crestline Logistics' vendor statement", "Not yet received", "The owner chases it"]
+        ]
+      },
+      "after": "I show Crestline's statement in a separate group, because nobody inside the books can move it."
+    },
+    {
+      "role": "user",
+      "text": "Day 7 now. Can you run the tie-out?"
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the tie-out evidence",
+      "tag": "read-only",
+      "rows": [
+        ["get_trial_balance", "October, balanced"],
+        ["get_trial_balance", "30 September, read now"],
+        ["Your September close pack", "September as reported"],
+        ["search_journal_entries", "$500 entry dated 30 Sep, posted 20 Oct"]
+      ],
+      "summary": "3 reads, and your close pack. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Every balance sheet account must open October where September closed. Five of seven agree. Two do not:",
+      "card": {
+        "type": "table",
+        "title": "September, as reported and in the books now",
+        "head": ["Account", "Difference", "As reported", "In the books now"],
+        "rows": [
+          ["Accounts payable", "−500", "61,400", "60,900"],
+          ["Accrued liabilities", "+500", "18,200", "18,700"],
+          ["Other five accounts", "0", "", ""],
+          ["Sum of the differences", "0", "", ""]
+        ]
+      },
+      "after": "The sum is 0, so someone moved **$500** from AP to accrued liabilities. The entry is dated 30 September, and someone posted it on Tuesday 20 October, after you reported September. It may be proper. Someone must know about it before October's statements go out."
+    },
+    {
+      "role": "agent",
+      "text": "One task slips every month. **Deferred revenue release** is due on Day 3. In August and in September, someone entered it on Day 6. That is 3 days late, two months in a row. I measured it from the entry-created times.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [["Prepared by", ""], ["Reviewed by", ""]]
+      },
+      "after": "I never lock the books, post an entry or mark a task complete. Your workpaper has nine sheets. Do you want it as an Excel file? And do you want me to save your settings for November?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Done. The Excel file has the nine sheets. I saved the task list, the owners by role, the dependencies, the calendar and the materiality threshold. I never save statuses or balances. Next month, I read every status again."
+    }
+  ]
+}

@@ -1,0 +1,326 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, payroll for the quarter July to September 2026. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you check our third-quarter payroll against the books, the bank and the 941?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need nine answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which company? Does one payroll service run more than one company?",
+        "Which period: a month, a quarter or a year?",
+        "Please attach the payroll registers for the period, with any off-cycle runs.",
+        "Please attach the bank statement for net pay.",
+        "What did you pay to each tax authority and provider?",
+        "When is each liability due? I never assume a due date.",
+        "What are the wage base rules for each tax: pre-tax deductions and caps?",
+        "Does a payroll provider pay the taxes for you?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading, one company. July to September. Registers for all four runs, the bank statement and our filed Q3 941 are attached. Federal taxes are due the 15th of the next month, and 401(k) the 7th. The 401(k) is pre-tax for income tax. The caps are in the register. We pay the taxes ourselves.",
+      "attach": [
+        "payroll-register-q3.xlsx",
+        "bank-statement-q3.pdf",
+        "form-941-q3-filed.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Payroll platform",
+          "None connected"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile payroll for **Northbrook Trading** for the **quarter ended 30 September**. I read the GL through MosoFin, and use your registers and your filed Q3 Form 941. The payments to each authority come from your books. Net pay ties to your **bank statement**. I check each tax on its own wage base. In scope are 6000 Wages and salaries, 5100 Direct labour, and liabilities 2210, 2230 and 2240. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "6000, 5100, 2210, 2230 and 2240"
+        ],
+        [
+          "get_profit_and_loss",
+          "Payroll expense $150,300"
+        ],
+        [
+          "get_trial_balance",
+          "2210 at $27,000"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Includes JE-0912"
+        ],
+        [
+          "search_payments",
+          "Two payments of $600 to 2240"
+        ],
+        [
+          "search_checks",
+          "Includes check #2214"
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ],
+        [
+          "search_employees",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "10 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Your registers show **$150,000** of gross wages for four runs. Your books show **$150,300** of payroll expense. This bridge explains the difference:",
+      "card": {
+        "type": "bridge",
+        "title": "Register to the books",
+        "rows": [
+          [
+            "Register gross wages",
+            "$150,000"
+          ],
+          [
+            "− Capitalised labour, to 1700 Software in development",
+            "$4,000"
+          ],
+          [
+            "+ Accrued wages, closing $2,500 less opening $0",
+            "$2,500"
+          ],
+          [
+            "+ JE-0912, Thu 24 Sep, memo “reclass contractor”",
+            "$1,800"
+          ],
+          [
+            "= GL payroll expense, 6000 and 5100",
+            "$150,300",
+            "total"
+          ],
+          [
+            "Unexplained",
+            "$0",
+            "ok"
+          ]
+        ]
+      },
+      "after": "The books hold $98,300 in 6000 and $52,000 in 5100. JE-0912 has no payroll run behind it, so I list it as an exception."
+    },
+    {
+      "role": "agent",
+      "text": "Net pay is **$113,700** in the registers and in the books. The bank statement shows what left the account:",
+      "card": {
+        "type": "bridge",
+        "title": "Net pay to the bank",
+        "rows": [
+          [
+            "Net pay debits on the statement",
+            "$113,700"
+          ],
+          [
+            "− Direct deposit returned, Tue 4 Aug, EE-07",
+            "$1,250"
+          ],
+          [
+            "= Bank-verified net pay",
+            "$112,450",
+            "total"
+          ]
+        ]
+      },
+      "after": "You paid EE-07 again as check #2214 on Thu 6 Aug. Nobody cashed it by 30 September. It is a timing item, and I carry it to next quarter."
+    },
+    {
+      "role": "agent",
+      "text": "Each liability rolls forward to its GL balance. But a balance that ties does not prove that you paid on time:",
+      "card": {
+        "type": "table",
+        "title": "Liabilities at 30 Sep",
+        "head": [
+          "Liability",
+          "Closing",
+          "Opening + accrued − paid",
+          "Flag"
+        ],
+        "rows": [
+          [
+            "2210 Federal payroll taxes",
+            "$27,000",
+            "12,900 + 39,600 − 25,500",
+            "Overdue $12,600"
+          ],
+          [
+            "2230 401(k)",
+            "$3,700",
+            "3,500 + 10,500 − 10,300",
+            "Not overdue"
+          ],
+          [
+            "2240 State unemployment",
+            "−$150",
+            "600 + 450 − 1,200",
+            "Negative"
+          ]
+        ]
+      },
+      "after": "$12,600 of 2210 is the August deposit. It was due on Tue 15 Sep, so it is 15 days late. In 2240, you paid $600 twice, on Thu 30 Jul and Mon 3 Aug."
+    },
+    {
+      "role": "agent",
+      "text": "Your filed Q3 Form 941 ties to the registers and the books:",
+      "card": {
+        "type": "table",
+        "title": "Q3 Form 941",
+        "head": [
+          "Check",
+          "Records",
+          "Filing",
+          "Result"
+        ],
+        "rows": [
+          [
+            "Total taxes",
+            "$39,600",
+            "$39,600",
+            "Ties"
+          ],
+          [
+            "Federal income-tax wages, gross less pre-tax 401(k)",
+            "$142,500",
+            "$142,500",
+            "Ties"
+          ],
+          [
+            "Medicare wages",
+            "$150,000",
+            "$150,000",
+            "Ties"
+          ],
+          [
+            "Social security wages, 2 employees at the cap",
+            "$141,000",
+            "$141,000",
+            "Ties"
+          ]
+        ]
+      },
+      "after": "Two employees passed the social security cap, so gross times one rate does not land. I checked each tax on its own base. I report only totals and counts, never one employee's pay."
+    },
+    {
+      "role": "agent",
+      "text": "Five items are open. I put them in order of consequence, not of size:",
+      "card": {
+        "type": "table",
+        "title": "Exceptions",
+        "head": [
+          "Item",
+          "Amount",
+          "Type",
+          "Correction"
+        ],
+        "rows": [
+          [
+            "1 · August federal deposit, due Tue 15 Sep",
+            "$12,600",
+            "Missed payment",
+            "You pay it"
+          ],
+          [
+            "2 · JE-0912, entry to wages with no run",
+            "$1,800",
+            "Possible filing change",
+            "You and your accountant decide"
+          ],
+          [
+            "3 · 2240 State unemployment",
+            "−$150",
+            "Negative balance",
+            "Claim it or reclassify it"
+          ],
+          [
+            "4 · Check #2214, EE-07",
+            "$1,250",
+            "Timing",
+            "Carry it, follow it if stale"
+          ],
+          [
+            "5 · Capitalised labour and accrued wages",
+            "$6,500",
+            "Valid difference",
+            "Documented, no correction"
+          ]
+        ]
+      },
+      "after": "Pay the August deposit first. Part of it is tax that you withheld from your staff. If JE-0912 is wages, the register, the Q3 941 and the W-2s are short. I calculate no penalty, pay nothing and post nothing."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has eight sheets. Sheet 3 says that net pay is bank-verified, and Sheet 6 says that the wage base check ran.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next quarter?"
+    },
+    {
+      "role": "user",
+      "text": "Yes to both."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **Payroll_Reconciliation_2026-Q3_Northbrook Trading.xlsx**. I saved the account map, the due dates, the wage base rules and that you pay the taxes yourselves. I never save personal data, balances or exceptions."
+    }
+  ]
+}
