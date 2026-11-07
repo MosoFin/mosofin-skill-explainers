@@ -601,7 +601,7 @@ def landing(r):
   <h1>{e(t)}</h1>
   <p class="lede">{e(r["summary"])}</p>
 </header>
-{flow_section(s, t)}<section>
+{chat_section(s, t) or flow_section(s, t)}<section>
   <h2>Explainers</h2>
   <div class="cards">{"".join(cards)}</div>
 </section>
@@ -616,8 +616,12 @@ def landing(r):
     description = re.sub(r"\s+", " ", r["summary"]).strip()
     if len(description) > DESC_MAX:
         description = description[:DESC_MAX - 1].rsplit(" ", 1)[0].rstrip(".,;:") + "…"
-    head = ('<link rel="stylesheet" href="../../assets/flow.css">\n<script src="../../assets/flow.js" defer></script>\n'
-            if flow_of(s) else "")
+    if chat_of(s):
+        head = '<link rel="stylesheet" href="../../assets/chat.css">\n<script src="../../assets/chat.js" defer></script>\n'
+    elif flow_of(s):
+        head = '<link rel="stylesheet" href="../../assets/flow.css">\n<script src="../../assets/flow.js" defer></script>\n'
+    else:
+        head = ""
     return shell(title, body, description, seo_block(f"skills/{s}/", title, description, "landing", r["verified"], crumbs,
                                                       about=skill_source(r), index=pub), head)
 
