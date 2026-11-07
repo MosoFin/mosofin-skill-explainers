@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Check that every figure in a chat replay comes from the skill's worked examples.
+"""Check that every figure in a chat replay comes from the skill's published pages.
 
 usage: python3 .claude/skills/write-chat-replay/scripts/check_figures.py <skill>
        (run from the repository root)
 
 The chat may only use figures that the skill's learn page states: dollar amounts,
 cheque and payment numbers, masked account numbers, dates. This script lists every
-figure in chats/<skill>.json and looks for it in site/skills/<skill>/learn.html,
-including the page's script data. A figure that is not there is either a mistake
+figure in chats/<skill>.json and looks for it in site/skills/<skill>/learn.html
+(including the page's script data) and plain.html. A figure that is not there is either a mistake
 or a derived total (a sum of figures that are there). The script cannot tell the
 two apart, so it prints each one for you to explain or fix. Exit code 1 means at
 least one figure needs an explanation.
@@ -30,33 +30,10 @@ def figures(text):
     return out
 
 
-def variants(fig):
-    """Ways the learn page may write the same figure: 1,250 / 1250 / 1,250.00 / $1,250."""
-    v = {fig}
-    if fig.startswith("$"):
-        n = fig[1:].replace(",", "")
-        try:
-            x = float(n)
-        except ValueError:
-            return v
-        whole = f"{x:,.0f}" if x == int(x) else None
-        v |= {f"${x:,.2f}", f"{x:,.2f}", f"{x:.2f}"}
-        if whole:
-            v.add(f"${whole}")
-            # A bare whole number ("1860" in the page's data) counts only from 100 up.
-            # "10" or "25" alone is too common ("10 business days") to prove anything.
-            if abs(x) >= 100:
-                v |= {whole, whole.replace(",", "")}
-    if fig.startswith("#"):
-        v.add(fig[1:])
-    if fig.startswith("…") or fig.startswith("..."):
-        v.add(fig.lstrip("…."))
-    return v
-
-
 def main(skill):
     chat_path = os.path.join(ROOT, "chats", f"{skill}.json")
     learn_path = os.path.join(ROOT, "site", "skills", skill, "learn.html")
+    plain_path = os.path.join(ROOT, "site", "skills", skill, "plain.html")
     if not os.path.exists(chat_path):
         sys.exit(f"no {os.path.relpath(chat_path, ROOT)}")
     if not os.path.exists(learn_path):
@@ -65,27 +42,48 @@ def main(skill):
     chosen = data.get("chosen", {})   # values the user picks in the chat, each with a reason
     chat = json.dumps({k: v for k, v in data.items() if k != "chosen"}, ensure_ascii=False)
     chat = chat.replace("\\u2026", "…")
-    page = open(learn_path).read()
+    # The learn page is the main source. The plain page is published too, and it may show a total
+    # (a weekly balance, a summary table) that the learn page only computes in its script.
+    page = open(learn_path).read() + (open(plain_path).read() if os.path.exists(plain_path) else "")
     # Look only at what the page says: drop styles, meta tags and the generated SEO and citation blocks.
     page = re.sub(r"<style>.*?</style>|<meta[^>]*>|<link[^>]*>|<!-- seo:start.*?seo:end -->", " ", page, flags=re.S)
     page_flat = re.sub(r"\s+", " ", html.unescape(page))
 
-    def on_page(v):
-        # A whole figure only: "10" must not match inside "#0d1210" or "2010".
-        return re.search(r"(?<![\w.,#])" + re.escape(v) + r"(?![\d])(?!,\d)", page_flat) is not None
+    # Every number on the page, as a value. "12,480.00" is one number. "46200,31800" (a data array)
+    # is two. "#0d1210" (a colour) and "v2.4" are not numbers.
+    values = []
+    for m in re.finditer(r"(?<![\w.#])(\$)?(\d[\d,]*\d|\d)(\.\d+)?", page_flat):
+        dollar, body, cents = m.group(1), m.group(2), m.group(3) or ""
+        parts = body.split(",")
+        if len(parts) > 1 and len(parts[0]) <= 3 and all(len(x) == 3 for x in parts[1:]):
+            values.append((float(body.replace(",", "") + cents), bool(dollar or cents)))
+        else:
+            for i, x in enumerate(parts):
+                if x:
+                    values.append((float(x + (cents if i == len(parts) - 1 else "")), bool(dollar and i == 0)))
+
+    def on_page(fig):
+        if fig.startswith("$"):
+            x = float(fig[1:].replace(",", ""))
+            # A small bare number ("10", "25") is too common to prove anything. It counts only with "$" or cents.
+            return any(abs(v - x) < 0.005 and (marked or abs(x) >= 100) for v, marked in values)
+        if fig.startswith("#") or fig.startswith("…") or fig.startswith("..."):
+            core = fig.lstrip("#….")
+            return re.search(r"(?<![\w])#?" + re.escape(core) + r"(?![\d])", page_flat) is not None
+        return any(abs(v - float(fig)) < 0.005 for v, _ in values)
 
     missing = []
     for fig in sorted(figures(chat)):
         if fig in chosen:
             continue
-        if not any(on_page(v) for v in variants(fig)):
+        if not on_page(fig):
             missing.append(fig)
     for fig, why in sorted(chosen.items()):
         print(f"  chosen by the user in the chat, not from the page: {fig} ({why})")
     found = len(figures(chat)) - len(missing) - len(set(chosen) & figures(chat))
-    print(f"{skill}: {found} figure(s) found on the learn page")
+    print(f"{skill}: {found} figure(s) found on the learn or plain page")
     if missing:
-        print("Not on the learn page. Fix each one. If it is a derived total, show the sum in your report.")
+        print("Not on the learn or plain page. Fix each one. If it is a derived total, show the sum in your report.")
         print("If the user chooses it in the chat (a threshold, a file name), list it under \"chosen\" with a reason.")
         for m in missing:
             print(f"  {m}")
