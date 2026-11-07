@@ -1,0 +1,45 @@
+{
+  "intro": "Press play to watch one bank reconciliation, from your request to the sign-off.",
+  "end": "The run is complete. You hold the sign-off, and the agent changed nothing in your books. It can save your settings for next time, but only after you say yes.",
+  "paths": {"mosofin": "Connected to MosoFin", "upload": "Upload files"},
+  "when": {"mosofin": "yes", "upload": "no"},
+  "steps": [
+    {"lane": "you", "type": "act", "title": "Ask for a bank reconciliation",
+     "say": "You name the account and the month, or the agent asks for them."},
+    {"lane": "agent", "type": "work", "title": "Ask six questions in one message",
+     "say": "The agent asks about the source, the account, the period, the statement, the last reconciliation and the amount worth chasing.",
+     "guard": "The agent never assumes the period."},
+    {"lane": "you", "type": "act", "title": "Answer the questions",
+     "say": "One reply answers all six questions, so the run does not stop again for each one."},
+    {"lane": "agent", "type": "decide", "title": "Connected to MosoFin, and you chose it?",
+     "say": "Your answer sets how the agent gets your books: it reads them directly, or you upload files."},
+    [
+      {"lane": "data", "type": "read", "path": "mosofin", "title": "Check workspace, company file and tools",
+       "say": "The agent confirms the workspace and the company file by name. It checks for a bank feed.",
+       "guard": "The agent uses read-only tools. Tools that write to your books are out of scope."},
+      {"lane": "you", "type": "act", "path": "upload", "title": "Upload the statement and ledger",
+       "say": "You upload the bank statement, the ledger cash activity and the last reconciliation or its date."}
+    ],
+    {"lane": "you", "type": "approve", "title": "Approve the plan",
+     "say": "The agent reads the plan back to you and waits.",
+     "guard": "The agent reads nothing until you say yes."},
+    [
+      {"lane": "data", "type": "read", "path": "mosofin", "title": "Read the books in one batch",
+       "say": "The agent reads accounts, the trial balance, the general ledger, deposits, payments, transfers and journal entries."},
+      {"lane": "data", "type": "read", "path": "upload", "title": "Read your uploaded files",
+       "say": "The agent reads the statement and the ledger activity that you uploaded."}
+    ],
+    {"lane": "agent", "type": "work", "title": "Agree the opening balance",
+     "say": "The agent records both ending balances, agrees the opening balance and brings last period's open items forward.",
+     "guard": "With no statement balance, the agent prepares the book side only and builds no bridge."},
+    {"lane": "agent", "type": "work", "title": "Match transactions and build the bridge",
+     "say": "Open items from last period match first. Then the agent tries exact, fuzzy, reference and split matches, and finds duplicates in the books."},
+    {"lane": "agent", "type": "work", "title": "Sort what is left unmatched",
+     "say": "The agent sorts fees, interest, returned payments, loans, reserves and chargebacks. An unknown item stays unknown and gets an owner."},
+    {"lane": "agent", "type": "output", "title": "Propose entries with evidence",
+     "say": "Each proposed entry uses your account names and points to its evidence: a statement line or ledger rows.",
+     "guard": "The agent proposes entries only. It never posts them."},
+    {"lane": "you", "type": "approve", "title": "Review and sign off",
+     "say": "You get a summary, the open items, the exceptions, the proposed entries and a blank sign-off for two people."}
+  ]
+}

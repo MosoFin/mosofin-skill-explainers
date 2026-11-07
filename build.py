@@ -12,7 +12,7 @@ The tracker is the source of truth. Explainer pages themselves are hand-made and
 site/skills/<skill>/<kind>.html; this script writes only the index and the landing pages.
 Dependency-free on purpose.
 """
-import base64, csv, html, json, os, re, subprocess, sys
+import base64, csv, html, json, os, posixpath, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 TRACKER = os.path.join(ROOT, "tracker.tsv")
@@ -183,6 +183,12 @@ def problems(rows):
                 out.append(f"{s}: {k}.html has no meta description — write one (about 70-160 characters) under the <title>")
             elif st != "todo" and k in CITED and not cited(p):
                 out.append(f"{s}: {k}.html has no Sources section with outside links — every fact needs a cited authority")
+    for r in rows:
+        f = flow_of(r["skill"])
+        # A skill without a flow file gets no flow section yet. Once every skill has one, make a missing file an error.
+        if f is not None: out += flow_problems(r["skill"], f)
+    for fn in sorted(os.listdir(FLOWS)) if os.path.isdir(FLOWS) else []:
+        if fn.endswith(".json") and fn[:-5] not in seen: out.append(f"flows/{fn}: {fn[:-5]} is not in the tracker")
     # every explainer file on disk must be tracked
     base = os.path.join(SITE, "skills")
     for s in sorted(os.listdir(base)) if os.path.isdir(base) else []:
@@ -241,6 +247,14 @@ tbody tr:last-child td{border-bottom:none}
 td.c{text-align:center} .dash{color:var(--faint)}
 footer{border-top:1px solid var(--rule);padding-top:18px;color:var(--faint);font-size:13.5px}
 """
+
+def pretty(rel):
+    """Public URL path for a file under site/: index.html -> "", skills/x/plain.html -> skills/x/plain/.
+    The stage step publishes each explainer as a folder, so its address has no .html ending."""
+    if rel == "index.html": return ""
+    if rel.endswith("/index.html"): return rel[:-len("index.html")]
+    if rel.endswith(".html"): return rel[:-len(".html")] + "/"
+    return rel
 
 def published_kinds(r):
     return [k for k, *_ in KINDS if r[k] == "published"]
@@ -309,7 +323,7 @@ def seo_block(path, title, desc, typ, modified="", crumbs=(), items=(), about=No
     ]
     return SEO_START + "\n" + "\n".join(meta) + "\n" + SEO_END
 
-def shell(title, body, desc, seo=""):
+def shell(title, body, desc, seo="", head=""):
     canonical = re.search(r'<link rel="canonical" href="([^"]+)"', seo)
     relative = canonical.group(1).removeprefix(SITE_URL) if canonical else ""
     depth = len([part for part in relative.strip("/").split("/") if part])
@@ -328,7 +342,7 @@ def shell(title, body, desc, seo=""):
 <style>{STYLE}</style>
 <link rel="stylesheet" href="{'../' * depth}assets/brand.css">
 <script src="{'../' * depth}assets/theme.js" defer></script>
-</head>
+{head}</head>
 <body>
 <div class="wrap" role="main">
 <nav class="site-nav" aria-label="Main navigation"><a class="brand" href="{'../' * depth}"><img class="brand-mark" src="{'../' * depth}assets/mosofin-mark.png" alt="" width="30" height="30"><span class="brand-name">MosoFin-Skill-Explainer</span></a><div class="nav-links"><a href="{'../' * depth}#all-skills">Guides</a><a href="{'../' * depth}#how-it-works">How it works</a><a href="https://github.com/MosoFin/mosofin-finance-skills">Open source</a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch color theme"><span class="theme-glyph" aria-hidden="true">◐</span><span class="theme-name">Light</span></button><a class="nav-cta" href="{'../' * depth}#all-skills">Explore guides <span aria-hidden="true">→</span></a></div></nav>
@@ -340,7 +354,7 @@ def shell(title, body, desc, seo=""):
 
 def seo_page(r, kind, text):
     """Hand-made explainer page: regenerate its SEO block and make sure the document is well formed."""
-    path = f"skills/{r['skill']}/{kind}.html"
+    path = pretty(f"skills/{r['skill']}/{kind}.html")
     title = html.unescape(re.search(r"<title>(.*?)</title>", text, re.S).group(1).strip())
     desc = html.unescape(re.search(r'<meta name="description" content="(.*?)"', text, re.S).group(1).strip())
     h1 = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1))).strip()
@@ -374,6 +388,194 @@ def seo_page(r, kind, text):
 
 
 # --------------------------------------------------------------------------- pages
+# --- Flow movie. flows/<skill>.json describes one run of the skill as rows of steps in three lanes.
+# build.py renders the steps as plain HTML on the landing page; site/assets/flow.js plays them.
+FLOWS = os.path.join(ROOT, "flows")
+FLOW_LANES = {"you": "You", "agent": "Agent", "data": "Your data"}
+# type: (allowed lanes, card label)
+FLOW_TYPES = {"act": ({"you"}, "You"), "work": ({"agent"}, "Agent"), "read": ({"data"}, "Reads, read-only"),
+              "decide": ({"agent", "you"}, "Decision"), "approve": ({"you"}, "Your approval"),
+              "output": ({"agent"}, "Result"), "optional": ({"agent", "you"}, "Optional")}
+
+def flow_of(skill):
+    p = os.path.join(FLOWS, f"{skill}.json")
+    return json.load(open(p)) if os.path.exists(p) else None
+
+def flow_rows(f):
+    return [row if isinstance(row, list) else [row] for row in f.get("steps", [])]
+
+def flow_problems(skill, f):
+    """Shape and voice checks for one flow file. The text is public prose, so the house writing rules apply."""
+    out, where = [], f"flows/{skill}.json"
+    paths = f.get("paths") or {}
+    rows = flow_rows(f)
+    if not 5 <= len(rows) <= 12: out.append(f"{where}: {len(rows)} rows. Keep a run between 5 and 12 rows so it stays short")
+    if not f.get("end"): out.append(f"{where}: no 'end' line for the last subtitle")
+    if set(f.get("when") or {}) - set(paths): out.append(f"{where}: 'when' names a path that 'paths' does not list")
+    used = set()
+    texts = [("intro", f.get("intro", "")), ("end", f.get("end", ""))]
+    for i, row in enumerate(rows, 1):
+        lanes = [st.get("lane") for st in row]
+        if len(row) > 1 and len(set(lanes)) != len(lanes) and len({st.get("path") for st in row}) != len(row):
+            out.append(f"{where}: row {i} puts two steps in one lane. Steps side by side need different lanes or different paths")
+        for st in row:
+            lane, typ = st.get("lane"), st.get("type")
+            if lane not in FLOW_LANES: out.append(f"{where}: row {i}: lane must be one of {sorted(FLOW_LANES)}"); continue
+            if typ not in FLOW_TYPES: out.append(f"{where}: row {i}: type must be one of {sorted(FLOW_TYPES)}"); continue
+            if lane not in FLOW_TYPES[typ][0]: out.append(f"{where}: row {i}: a {typ} step goes in lane {sorted(FLOW_TYPES[typ][0])}, not {lane}")
+            if st.get("path"):
+                if st["path"] not in paths: out.append(f"{where}: row {i}: path {st['path']!r} is not in 'paths'")
+                used.add(st["path"])
+            t = st.get("title", "")
+            if not t or len(t) > 60: out.append(f"{where}: row {i}: title needs 1-60 characters, has {len(t)}")
+            if not st.get("say"): out.append(f"{where}: row {i}: no 'say' line for the subtitle")
+            texts += [(f"row {i} title", t), (f"row {i} say", st.get("say", "")), (f"row {i} guard", st.get("guard", ""))]
+    if paths and used != set(paths): out.append(f"{where}: paths {sorted(set(paths) - used)} have no steps")
+    for a, b in zip(rows, rows[1:]):
+        if len([x for x in a if not x.get("path")]) > 1 and len([x for x in b if not x.get("path")]) > 1:
+            out.append(f"{where}: two rows in a row have side-by-side steps. Put a single step between them so the wires stay readable")
+    for label, t in texts:
+        if not t: continue
+        if "—" in t or ";" in t: out.append(f"{where}: {label}: no em dash and no semicolon. Write two sentences")
+        for sent in re.split(r"(?<=[.!?])\s+", t):
+            if len(sent.split()) > 25: out.append(f"{where}: {label}: a sentence has {len(sent.split())} words, keep it to 25 or fewer")
+        bad = [w for w in BANNED if re.search(r"\b" + w, t, re.I)]
+        if bad: out.append(f"{where}: {label}: filler words {', '.join(bad)}")
+    return out
+
+def flow_section(skill, t):
+    f = flow_of(skill)
+    if not f: return ""
+    cells = []
+    for i, row in enumerate(flow_rows(f), 1):
+        cards = []
+        for st in row:
+            g = f'<span class="fg"><span aria-hidden="true">⛨</span> {e(st["guard"])}</span>' if st.get("guard") else ""
+            shield = '<span class="shield" title="Safeguard">⛨</span>' if st.get("guard") else ""
+            cards.append(f'<button type="button" class="fnode l-{st["lane"]} t-{st["type"]}" style="grid-row:{i}" data-row="{i}" data-lane="{st["lane"]}"'
+                         f'{" data-path=" + chr(34) + e(st["path"]) + chr(34) if st.get("path") else ""}>'
+                         f'<span class="fk"><span>{e(FLOW_TYPES[st["type"]][1])}</span>{shield}</span>'
+                         f'<span class="ft">{e(st["title"])}</span><span class="fs">{e(st["say"])}</span>{g}</button>')
+        cells.append(f'<div class="frow">{"".join(cards)}</div>')
+    data = json.dumps({k: f[k] for k in ("intro", "end", "paths", "when") if f.get(k)}, ensure_ascii=False).replace("</", "<\\/")
+    legend = "".join(f'<li><i style="--c:var(--fl-{c})' + (f';--b:var(--fl-{c}-soft)' if c == "gate" else "") + f'"></i>{l}</li>'
+                     for c, l in (("you", "You act"), ("agent", "Agent works"), ("data", "Agent reads your data"), ("gate", "Waits for your approval")))
+    legend += '<li><span style="color:var(--fl-warn)" aria-hidden="true">⛨</span>Safeguard</li>'
+    return f"""<section aria-labelledby="flow-h">
+  <h2 id="flow-h">Watch a run, step by step</h2>
+  <p class="flow-intro">Each card is one step. The column shows who does it: you, the agent, or the agent reading your data. Press play, or select a card.</p>
+  <div class="flow" data-flow id="flow-{e(skill)}">
+    <script type="application/json" class="flow-data">{data}</script>
+    <div class="flow-bar">
+      <div class="flow-btns">
+        <button type="button" class="flow-btn primary" data-act="play" aria-label="Play the run">▶ Play</button>
+        <button type="button" class="flow-btn" data-act="prev" aria-label="Previous step">◀</button>
+        <button type="button" class="flow-btn" data-act="next" aria-label="Next step">▶︎</button>
+        <button type="button" class="flow-btn" data-act="restart" aria-label="Start again from step 1">↺</button>
+      </div>
+      <div class="flow-paths" role="group" aria-label="Choose a path"></div>
+      <ul class="flow-legend">{legend}</ul>
+    </div>
+    <div class="flow-board">
+      <div class="flow-lanebg" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="flow-lanes" aria-hidden="true"><span style="--c:var(--fl-you)">You<small>asks, answers, approves</small></span><span style="--c:var(--fl-agent)">Agent<small>reads, checks, explains</small></span><span style="--c:var(--fl-data)">Your data<small>read-only</small></span></div>
+      <div class="flow-grid">{"".join(cells)}</div>
+    </div>
+    <div class="flow-sub" aria-live="off"><div class="flow-sub-k"></div><p class="flow-sub-t"></p><div class="flow-sub-g" hidden></div><div class="flow-time"></div></div>
+  </div>
+</section>
+"""
+
+# --- Chat replay. chats/<skill>.json is an example conversation in which a person uses the skill.
+# build.py renders the whole conversation as plain HTML; site/assets/chat.js replays it like a live chat.
+CHATS = os.path.join(ROOT, "chats")
+# Style preview: each button shows the same conversation in the look of another assistant. The skill runs in Claude.
+# key, name, composer placeholder. The logos are in site/assets/ai/ (see NOTICE.txt there).
+CHAT_AI = [("chatgpt", "ChatGPT", "Message ChatGPT"), ("claude", "Claude", "Reply to Claude"),
+           ("metaai", "Meta AI", "Ask Meta AI"), ("grok", "Grok", "Ask Grok")]
+CHAT_DEFAULT = "claude"
+
+def ai_symbol(key):
+    """One logo as an SVG <symbol>, so the page holds each logo once."""
+    svg = open(os.path.join(SITE, "assets", "ai", f"{key}.svg")).read().strip()
+    vb = re.search(r'viewBox="([^"]+)"', svg).group(1)
+    inner = re.sub(r"^<svg[^>]*>|</svg>$", "", svg)
+    return f'<symbol id="ai-{key}" viewBox="{vb}">{inner}</symbol>'
+
+def ai_logo(key):
+    return f'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-{key}"/></svg>'
+
+def ai_sprite():
+    # Not display:none, because some browsers then skip the gradients inside the symbols.
+    return ('<svg class="ai-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">'
+            + "".join(ai_symbol(k) for k, *_ in CHAT_AI) + "</svg>")
+
+def chat_of(skill):
+    p = os.path.join(CHATS, f"{skill}.json")
+    return json.load(open(p)) if os.path.exists(p) else None
+
+def chat_inline(t):
+    """Escape the text, then turn **bold** into <strong>."""
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", e(t))
+
+def chat_card(c):
+    title = f'<div class="cc-title">{e(c.get("title", ""))}</div>' if c.get("title") else ""
+    if c["type"] in ("bridge", "signoff"):
+        rows = "".join(f'<tr class="{e(r[2]) if len(r) > 2 else ""}"><th scope="row">{e(r[0])}</th><td>{e(r[1]) if r[1] else "<span class=cc-line></span>"}</td></tr>'
+                       for r in c["rows"])
+        return f'<div class="cc cc-{c["type"]}">{title}<table>{rows}</table></div>'
+    head = "".join(f"<th scope=col>{e(h)}</th>" for h in c.get("head", []))
+    rows = "".join("<tr>" + "".join(f"<td>{e(x)}</td>" for x in r) + "</tr>" for r in c["rows"])
+    return f'<div class="cc cc-table">{title}<div class="cc-scroll"><table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></div></div>'
+
+def chat_message(m):
+    guard = f'<p class="cm-guard"><span aria-hidden="true">⛨</span> {e(m["guard"])}</p>' if m.get("guard") else ""
+    if m["role"] == "user":
+        att = "".join(f'<span class="cm-file"><span aria-hidden="true">📄</span> {e(a)}</span>' for a in m.get("attach", []))
+        return f'<div class="cm cm-user"><p class="cm-bubble">{chat_inline(m["text"])}</p>{att}</div>'
+    if m["role"] == "tool":
+        calls = "".join(f"<li><code>{e(x)}</code></li>" for x in m.get("calls", []))
+        tag = f'<span class="cm-tag">{e(m["tag"])}</span>' if m.get("tag") else ""
+        return (f'<div class="cm cm-tool"><details><summary><span class="cm-ico" aria-hidden="true">✓</span>'
+                f'<span class="cm-label">{e(m["label"])}</span>{tag}</summary><ul>{calls}</ul></details></div>')
+    parts = [f'<p>{chat_inline(m["text"])}</p>'] if m.get("text") else []
+    if m.get("list"): parts.append("<ol>" + "".join(f"<li>{chat_inline(x)}</li>" for x in m["list"]) + "</ol>")
+    if m.get("card"): parts.append(chat_card(m["card"]))
+    if m.get("after"): parts.append(f'<p>{chat_inline(m["after"])}</p>')
+    name = dict((k, n) for k, n, _ in CHAT_AI)[CHAT_DEFAULT]
+    return (f'<div class="cm cm-agent"><span class="cm-av">{ai_logo(CHAT_DEFAULT)}</span><div class="cm-body">'
+            f'<span class="cm-name">{e(name)}</span>{"".join(parts)}{guard}</div></div>')
+
+def chat_section(skill, t):
+    c = chat_of(skill)
+    if not c: return ""
+    msgs = "".join(chat_message(m) for m in c["messages"])
+    ai = {k: (n, ph) for k, n, ph in CHAT_AI}
+    switch = "".join(f'<button type="button" class="ai-btn" data-ai="{k}" data-ph="{e(ph)}" aria-pressed="{str(k == CHAT_DEFAULT).lower()}" '
+                     f'title="Show the chat in the style of {e(n)}">{ai_logo(k)}<span>{e(n)}</span></button>' for k, n, ph in CHAT_AI)
+    return f"""<section aria-labelledby="chat-h">
+  <h2 id="chat-h">Watch someone use it</h2>
+  <p class="chat-intro">{e(c.get("example", ""))}</p>
+  <div class="chat" data-chat data-ai="{CHAT_DEFAULT}" id="chat-{e(skill)}">
+    {ai_sprite()}
+    <div class="chat-ai" role="group" aria-label="Show the chat in the style of an assistant">{switch}</div>
+    <div class="chat-head">
+      <span class="chat-who"><span class="cm-av">{ai_logo(CHAT_DEFAULT)}</span><span><b class="chat-name">{e(ai[CHAT_DEFAULT][0])}</b><small>with the MosoFin {e(t.lower())} skill</small></span></span>
+      <span class="chat-ctrl">
+        <button type="button" class="chat-btn primary" data-act="play" aria-label="Play the conversation">▶ Play</button>
+        <button type="button" class="chat-btn" data-act="restart" aria-label="Start again">↺</button>
+        <button type="button" class="chat-btn" data-act="speed" aria-label="Change speed">1×</button>
+        <button type="button" class="chat-btn" data-act="skip" aria-label="Show the whole conversation">Show all</button>
+      </span>
+      <span class="chat-prog" aria-hidden="true"><span></span></span>
+    </div>
+    <div class="chat-log" tabindex="0" aria-label="Example conversation">{msgs}</div>
+    <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">{e(ai[CHAT_DEFAULT][1])}</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
+  </div>
+  <p class="chat-note"><b>Style preview.</b> The skill runs in Claude. The other buttons show the same conversation in the style of another assistant. ChatGPT, Claude, Meta AI and Grok are trademarks of their owners. MosoFin is not affiliated with them, and they do not endorse MosoFin.</p>
+</section>
+"""
+
 def landing(r):
     s, t = r["skill"], title_of(r)
     cards = []
@@ -386,7 +588,7 @@ def landing(r):
         pt = page_h1(os.path.join(SITE, "skills", s, f"{k}.html"))
         if st == "internal":
             continue  # reviewers read it in the repository; the public site doesn't mention it
-        cards.append(f'<a class="card" href="{k}.html"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
+        cards.append(f'<a class="card" href="{k}/"><span class="label">{e(label)}</span><b>{e(pt)}</b>'
                      f'<span class="who">For {e(who.lower())}</span><p>{e(blurb)}</p><span class="go">Open →</span></a>')
     if r["skill_status"] == "shipped":
         use = f"""<p>Install just this skill, no clone needed:</p>
@@ -407,7 +609,7 @@ def landing(r):
   <h1>{e(t)}</h1>
   <p class="lede">{e(r["summary"])}</p>
 </header>
-<section>
+{chat_section(s, t) or flow_section(s, t)}<section>
   <h2>Explainers</h2>
   <div class="cards">{"".join(cards)}</div>
 </section>
@@ -422,14 +624,20 @@ def landing(r):
     description = re.sub(r"\s+", " ", r["summary"]).strip()
     if len(description) > DESC_MAX:
         description = description[:DESC_MAX - 1].rsplit(" ", 1)[0].rstrip(".,;:") + "…"
+    if chat_of(s):
+        head = '<link rel="stylesheet" href="../../assets/chat.css">\n<script src="../../assets/chat.js" defer></script>\n'
+    elif flow_of(s):
+        head = '<link rel="stylesheet" href="../../assets/flow.css">\n<script src="../../assets/flow.js" defer></script>\n'
+    else:
+        head = ""
     return shell(title, body, description, seo_block(f"skills/{s}/", title, description, "landing", r["verified"], crumbs,
-                                                      about=skill_source(r), index=pub))
+                                                      about=skill_source(r), index=pub), head)
 
 def chip(r, k):
     st = r[k]
     if st != "published": return '<td class="c"><span class="pill soon">Coming soon</span></td>'
     anchor = {"plain": "Read overview", "learn": "Step-by-step guide", "anatomy": "Review skill design"}[k]
-    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}.html"><span class="pill ok">{anchor}</span></a></td>'
+    return f'<td class="c"><a href="skills/{e(r["skill"])}/{k}/"><span class="pill ok">{anchor}</span></a></td>'
 
 # A kind gets a column on the public index once some skill has a published page of
 # that kind, so a kind that is only ever internal never shows up as a gap.
@@ -525,7 +733,7 @@ def sitemap(rows):
         ks = published_kinds(r)
         if not ks: continue
         urls.append((f"{SITE_URL}skills/{r['skill']}/", r["verified"]))
-        urls += [(f"{SITE_URL}skills/{r['skill']}/{k}.html", r["verified"]) for k in ks]
+        urls += [(SITE_URL + pretty(f"skills/{r['skill']}/{k}.html"), r["verified"]) for k in ks]
     body = "".join(f"  <url>\n    <loc>{e(u)}</loc>\n" + (f"    <lastmod>{e(d)}</lastmod>\n" if d else "") + "  </url>\n" for u, d in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + "</urlset>\n")
 
@@ -550,7 +758,7 @@ def llms_txt(rows, pages):
         desc = re.search(r'<meta name="description" content="(.*?)"', source, re.S)
         title = html.unescape(title.group(1).strip()) if title else relative
         desc = html.unescape(desc.group(1).strip()) if desc else ""
-        url_path = "" if relative == "index.html" else relative.removesuffix("index.html") if relative.endswith("/index.html") else relative
+        url_path = pretty(relative)
         return f"- [{title}]({SITE_URL}{url_path})" + (f": {desc}" if desc else "")
 
     landing_paths = [f"skills/{r['skill']}/index.html" for r in rows if published_kinds(r)]
@@ -644,7 +852,7 @@ def seo_problems(outs):
             if b > a + 1: bad.append(f"{rel}: heading jumps from h{a} to h{b}"); break
         if SEO_START not in h: continue   # an internal plain/learn page: title, description and headings are checked, the SEO block comes when it is published
         cano = re.search(r'<link rel="canonical" href="(.*?)"', h)
-        want = SITE_URL + rel.replace("index.html", "")
+        want = SITE_URL + pretty(rel)
         if not cano or html.unescape(cano.group(1)) != want: bad.append(f"{rel}: canonical should be {want}")
         for blk in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S):
             try: json.loads(blk)
@@ -683,6 +891,32 @@ def sync(path, ref):
 
 
 # --------------------------------------------------------------------------- stage
+def relocate(text):
+    """Rewrite the relative links of a page that moves from skills/x/plain.html to skills/x/plain/index.html:
+    one more "../" in front, and "name.html" becomes "name/"."""
+    def fix(m):
+        attr, url = m.group(1), m.group(2)
+        if re.match(r"(?:[a-z][a-z0-9+.-]*:|/|#|\$\{|\{)", url, re.I): return m.group(0)
+        path, rest = re.match(r"([^?#]*)(.*)", url, re.S).groups()
+        path = re.sub(r"(?:^|(?<=/))index\.html$", "", path)
+        path = re.sub(r"([^/]+)\.html$", r"\1/", path)
+        folder = path == "" or path.endswith("/") or path.endswith("/.") or path == "."
+        path = posixpath.normpath("../" + (path or "."))
+        if folder or path.endswith(".."): path += "/"
+        return f'{attr}="{path}{rest}"'
+    return re.sub(r'\b(href|src)="([^"]*)"', fix, text)
+
+def redirect_page(path):
+    """A small page at the old .html address. It sends the reader on to the address without .html."""
+    url, name = SITE_URL + path, path.rstrip("/").rsplit("/", 1)[-1] + "/"
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>This page moved</title>
+<link rel="canonical" href="{e(url)}"><meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="0; url={e(name)}">
+<script>location.replace("{e(name)}" + location.search + location.hash);</script>
+</head><body><p>This page moved to <a href="{e(name)}">{e(url)}</a>.</p></body></html>
+"""
+
 def stage(dest):
     import shutil
     rows = read_tracker()
@@ -695,6 +929,12 @@ def stage(dest):
             rel = os.path.relpath(os.path.join(d, fn), SITE)
             if rel in internal: dropped += 1; continue
             os.makedirs(os.path.join(dest, os.path.dirname(rel)), exist_ok=True)
+            if re.match(r"skills/[^/]+/(?:" + "|".join(k for k, *_ in KINDS) + r")\.html$", rel):   # explainers only, never index.html
+                folder = os.path.join(dest, rel[:-len(".html")])
+                os.makedirs(folder, exist_ok=True)
+                with open(os.path.join(folder, "index.html"), "w") as o: o.write(relocate(open(os.path.join(d, fn)).read()))
+                with open(os.path.join(dest, rel), "w") as o: o.write(redirect_page(pretty(rel)))
+                kept += 2; continue
             shutil.copy2(os.path.join(d, fn), os.path.join(dest, rel)); kept += 1
     print(f"staged {kept} file(s) to {dest}; left out {dropped} internal page(s)")
 

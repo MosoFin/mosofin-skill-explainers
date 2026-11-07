@@ -14,13 +14,13 @@ The tracker lists 32 shipped skills. Seven have public guide sets with a plain-l
 
 | Finance workflow | Guide | Plain-language overview | Step-by-step examples |
 |---|---|---|---|
-| Bank reconciliation | [Guide](https://skills.mosofin.com/skills/bank-reconciliation/) | [Overview](https://skills.mosofin.com/skills/bank-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/bank-reconciliation/learn.html) |
-| 13-week cash flow forecast | [Guide](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/) | [Overview](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/plain.html) | [Examples](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn.html) |
-| Credit card reconciliation | [Guide](https://skills.mosofin.com/skills/credit-card-reconciliation/) | [Overview](https://skills.mosofin.com/skills/credit-card-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/credit-card-reconciliation/learn.html) |
-| Duplicate invoice detection | [Guide](https://skills.mosofin.com/skills/duplicate-invoice-detection/) | [Overview](https://skills.mosofin.com/skills/duplicate-invoice-detection/plain.html) | [Examples](https://skills.mosofin.com/skills/duplicate-invoice-detection/learn.html) |
-| Payment processor reconciliation | [Guide](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/) | [Overview](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/plain.html) | [Examples](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/learn.html) |
-| Three-way match | [Guide](https://skills.mosofin.com/skills/three-way-match/) | [Overview](https://skills.mosofin.com/skills/three-way-match/plain.html) | [Examples](https://skills.mosofin.com/skills/three-way-match/learn.html) |
-| Vendor statement reconciliation | [Guide](https://skills.mosofin.com/skills/vendor-statement-reconciliation/) | [Overview](https://skills.mosofin.com/skills/vendor-statement-reconciliation/plain.html) | [Examples](https://skills.mosofin.com/skills/vendor-statement-reconciliation/learn.html) |
+| Bank reconciliation | [Guide](https://skills.mosofin.com/skills/bank-reconciliation/) | [Overview](https://skills.mosofin.com/skills/bank-reconciliation/plain/) | [Examples](https://skills.mosofin.com/skills/bank-reconciliation/learn/) |
+| 13-week cash flow forecast | [Guide](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/) | [Overview](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/plain/) | [Examples](https://skills.mosofin.com/skills/cash-flow-forecast-13-week/learn/) |
+| Credit card reconciliation | [Guide](https://skills.mosofin.com/skills/credit-card-reconciliation/) | [Overview](https://skills.mosofin.com/skills/credit-card-reconciliation/plain/) | [Examples](https://skills.mosofin.com/skills/credit-card-reconciliation/learn/) |
+| Duplicate invoice detection | [Guide](https://skills.mosofin.com/skills/duplicate-invoice-detection/) | [Overview](https://skills.mosofin.com/skills/duplicate-invoice-detection/plain/) | [Examples](https://skills.mosofin.com/skills/duplicate-invoice-detection/learn/) |
+| Payment processor reconciliation | [Guide](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/) | [Overview](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/plain/) | [Examples](https://skills.mosofin.com/skills/merchant-and-payment-processor-rec/learn/) |
+| Three-way match | [Guide](https://skills.mosofin.com/skills/three-way-match/) | [Overview](https://skills.mosofin.com/skills/three-way-match/plain/) | [Examples](https://skills.mosofin.com/skills/three-way-match/learn/) |
+| Vendor statement reconciliation | [Guide](https://skills.mosofin.com/skills/vendor-statement-reconciliation/) | [Overview](https://skills.mosofin.com/skills/vendor-statement-reconciliation/plain/) | [Examples](https://skills.mosofin.com/skills/vendor-statement-reconciliation/learn/) |
 
 Public pages separate skill rules from outside finance facts. Each page links skill rules to the source. It links factual claims to outside authorities. Worked examples use labeled figures. The pages explain the skills. They do not access a reader's books.
 
@@ -40,13 +40,14 @@ Python 3 is the only build requirement. The build script uses the standard libra
 python3 build.py --check
 python3 build.py
 python3 build.py --stage _site
-python3 -m http.server 8765 --directory site
+python3 -m http.server 8765 --directory _site
 ```
 
 - `--check` checks tracker statuses, required source citations, page metadata and headings, generated files, and selected prose rules.
 - `build.py` updates generated pages and crawler files. Do not hand-edit generated files. Edit the source page or tracker, then rebuild.
 - `--stage _site` copies the deployable site and leaves out pages marked `internal`. It includes `robots.txt`, `sitemap.xml`, and `llms.txt` at the site root.
-- The local server command serves the site at `http://127.0.0.1:8765/`. Stop it with Ctrl+C.
+- `--stage _site` also publishes each explainer as a folder, so its address has no `.html` ending: `site/skills/<skill>/plain.html` is served at `/skills/<skill>/plain/`. The old `.html` address stays as a small page that redirects to the new one.
+- The local server command serves the staged site at `http://127.0.0.1:8765/`. Run `--stage _site` first. Stop the server with Ctrl+C.
 
 ## Update and publish a guide
 

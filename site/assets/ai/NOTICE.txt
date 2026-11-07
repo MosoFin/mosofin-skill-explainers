@@ -1,0 +1,8 @@
+These four logos come from @lobehub/icons-static-svg 1.102.0 (MIT licence,
+https://github.com/lobehub/lobe-icons). The files are unchanged, except that
+build-time size and style attributes and the <title> element were removed.
+
+ChatGPT and OpenAI are trademarks of OpenAI. Claude is a trademark of Anthropic.
+Meta AI is a trademark of Meta Platforms. Grok is a trademark of xAI. The site
+uses the logos to name each assistant in a style preview. MosoFin is not
+affiliated with these companies, and they do not endorse MosoFin.

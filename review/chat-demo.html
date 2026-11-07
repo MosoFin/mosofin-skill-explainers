@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat Replay Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>:root {
+  --ground: #fff;
+  --panel: #fff;
+  --sunk: #f5f7f4;
+  --ink: #101310;
+  --muted: #5c625d;
+  --faint: #8b928c;
+  --rule: #e5e9e4;
+  --rule-strong: #d2d8d1;
+  --green: #16b84e;
+  --green-soft: #e8f8ed;
+  --blue: #3f6d96;
+  --blue-soft: #e7eff6;
+  --hold: #a06a12;
+  --hold-soft: #f7eedb;
+  --shadow: 0 14px 40px -28px rgba(16, 19, 16, .34);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0d1210;
+    --panel: #151c19;
+    --sunk: #111815;
+    --ink: #e8eeea;
+    --muted: #a5b0aa;
+    --faint: #829088;
+    --rule: #26312c;
+    --rule-strong: #3a4941;
+    --green: #43c78e;
+    --green-soft: #123024;
+    --blue: #8db3d8;
+    --blue-soft: #15202b;
+    --hold: #dba657;
+    --hold-soft: #2d2413;
+    --shadow: 0 14px 40px -28px rgba(0, 0, 0, .72);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0d1210;
+  --panel: #151c19;
+  --sunk: #111815;
+  --ink: #e8eeea;
+  --muted: #a5b0aa;
+  --faint: #829088;
+  --rule: #26312c;
+  --rule-strong: #3a4941;
+  --green: #43c78e;
+  --green-soft: #123024;
+  --blue: #8db3d8;
+  --blue-soft: #15202b;
+  --hold: #dba657;
+  --hold-soft: #2d2413;
+  --shadow: 0 14px 40px -28px rgba(0, 0, 0, .72);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  inset: 0 0 auto;
+  height: 6px;
+  background: #c5e4c9;
+}
+.wrap {
+  max-width: 1200px;
+  padding: 0 28px 96px;
+  gap: 76px;
+}
+.site-nav {
+  min-height: 66px;
+  margin: 0 -28px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -.025em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand-name { color: #111; }
+.brand-badge {
+  margin-left: 1px;
+  padding: 3px 8px;
+  border: 1px solid #e3e7e3;
+  border-radius: 999px;
+  color: var(--faint);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  object-fit: contain;
+}
+.nav-links { display: flex; align-items: center; gap: 26px; }
+.nav-links a {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links .nav-cta {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  border-radius: 7px;
+  background: #0c0d0e;
+  color: #fff;
+}
+.nav-links .nav-cta:hover { background: var(--green); color: #07190c; }
+.theme-toggle {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.theme-toggle:hover { border-color: var(--rule); background: var(--sunk); color: var(--ink); }
+.theme-glyph { font-size: 16px; line-height: 1; }
+header, section { gap: 19px; }
+header { padding: 26px 0 0; }
+.label {
+  color: #128735;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .16em;
+}
+h1 {
+  max-width: 940px;
+  font-size: clamp(42px, 8vw, 82px);
+  line-height: .99;
+  letter-spacing: -.065em;
+  font-weight: 800;
+}
+h2 {
+  font-size: clamp(25px, 3.6vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+  font-weight: 750;
+}
+h3 { letter-spacing: -.025em; }
+p { max-width: 70ch; }
+.lede { max-width: 66ch; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.6; color: var(--muted); }
+.accent { color: #13ad46; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.hero-primary, .hero-secondary {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+.hero-primary { border-color: #14b849; background: #14b849; color: #07190c; }
+.hero-primary:hover { background: #10a541; transform: translateY(-1px); }
+.hero-secondary:hover { border-color: var(--ink); background: var(--sunk); }
+.hero-note { color: var(--faint); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: .02em; }
+.proof-panel {
+  overflow: hidden;
+  border: 1px solid #202824;
+  border-radius: 16px;
+  background: #0c1110;
+  color: #f4f8f5;
+}
+.proof-top, .proof-foot { min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 22px; }
+.proof-top { border-bottom: 1px solid #252d29; color: #a8b4ad; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; font-weight: 600; letter-spacing: .1em; }
+.proof-state { margin-left: auto; color: #57d77e; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #3ad466; box-shadow: 0 0 12px rgba(58,212,102,.45); }
+.proof-body { display: grid; grid-template-columns: 1fr 1.15fr; gap: 36px; padding: clamp(24px,5vw,52px); }
+.proof-intro .label { color: #5de17f; }
+.proof-intro h2 { max-width: 420px; margin-top: 15px; color: #fff; font-size: clamp(26px,4vw,42px); }
+.proof-intro p { margin-top: 14px; color: #aab5ae; font-size: 15px; }
+.proof-steps { align-self: center; display: grid; gap: 10px; }
+.proof-steps div { min-height: 70px; display: grid; grid-template-columns: 46px 1fr; align-content: center; column-gap: 14px; padding: 12px 15px; border: 1px solid #26302a; border-radius: 9px; background: #111816; }
+.proof-steps div > span { grid-row: span 2; align-self: center; color: #5de17f; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; }
+.proof-steps b { font-size: 14px; font-weight: 650; }
+.proof-steps small { color: #9ba69f; font-size: 12px; }
+.proof-foot { min-height: 46px; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid #252d29; color: #96a29a; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; }
+.proof-foot span + span::before { content: "·"; margin-right: 10px; color: #48ce6d; }
+.library-section { scroll-margin-top: 28px; }
+.library-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+.library-heading h2 { margin-top: 8px; }
+.library-heading p { margin-top: 8px; color: var(--muted); }
+.library-total { padding: 7px 11px; border: 1px solid var(--rule); border-radius: 999px; color: var(--muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; white-space: nowrap; }
+.library-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 8px; }
+.search-box { min-height: 48px; flex: 1; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid var(--rule-strong); border-radius: 8px; background: var(--panel); color: var(--faint); }
+.search-box:focus-within { border-color: #16b84e; box-shadow: 0 0 0 3px rgba(22,184,78,.13); }
+.search-box > span { font-size: 23px; line-height: 1; }
+.search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 14px; }
+.search-box input::placeholder { color: var(--faint); }
+.genre-filters { display: flex; gap: 6px; padding: 4px; border: 1px solid var(--rule); border-radius: 9px; background: var(--sunk); }
+.filter-button, .pagination button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; }
+.filter-button.is-active { background: var(--panel); color: var(--ink); box-shadow: 0 1px 3px rgba(16,19,16,.12); }
+.result-count { color: var(--faint); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; }
+.tbl tr[hidden] { display: none; }
+.empty-state { padding: 28px; border: 1px dashed var(--rule-strong); border-radius: 10px; color: var(--muted); text-align: center; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.pagination button { border: 1px solid var(--rule); background: var(--panel); }
+.pagination button:hover:not(:disabled) { border-color: #16b84e; color: var(--ink); }
+.pagination button:disabled { cursor: not-allowed; opacity: .45; }
+.page-numbers { display: flex; gap: 5px; }
+.pagination .page-number { width: 36px; padding: 0; }
+.pagination .page-number.is-current { border-color: #16b84e; background: #e8f8ed; color: #12632d; }
+a { text-underline-offset: 3px; }
+.crumb { margin-bottom: -42px; }
+.cards { gap: 14px; }
+.card, .panel, .stat, .tbl {
+  border-color: var(--rule);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.card { border-top: 2px solid var(--green); padding: 24px; transition: transform .18s ease, border-color .18s ease; }
+.card:hover { transform: translateY(-3px); border-color: var(--green); box-shadow: var(--shadow); }
+.card.todo { border-top-color: var(--rule-strong); }
+.panel { padding: 24px; }
+.stats { gap: 14px; }
+.stat { padding: 20px; }
+.stat .v { font-size: 38px; }
+.tbl { overflow: hidden; }
+th { padding-top: 14px; padding-bottom: 14px; }
+td { padding-top: 13px; padding-bottom: 13px; }
+footer { padding-top: 22px; }
+button, input, select { font: inherit; }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .wrap { padding: 0 20px 64px; gap: 54px; }
+  .site-nav { margin: 0 -20px; padding: 0 20px; min-height: 66px; gap: 8px; }
+  .brand { gap: 6px; font-size: 12px; letter-spacing: -.04em; }
+  .brand-badge, .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 0; }
+  .nav-links .nav-cta { padding: 8px 8px; font-size: 11px; }
+  .theme-toggle { margin-right: 4px; padding: 0 5px; }
+  header { padding-top: 18px; }
+  h1 { font-size: clamp(40px, 12vw, 62px); }
+  .crumb { margin-bottom: -25px; }
+  .proof-body { grid-template-columns: 1fr; gap: 24px; }
+  .proof-foot { justify-content: flex-start; padding: 10px 18px; }
+  .library-controls { align-items: stretch; flex-direction: column; }
+  .genre-filters { width: fit-content; }
+}
+:root[data-theme="dark"] body { background: var(--ground); color: var(--ink); }
+:root[data-theme="dark"] .brand-name { color: var(--ink); }
+:root[data-theme="dark"] .accent { color: #55d98d; }
+:root[data-theme="dark"] .label { color: #68d995; }
+:root[data-theme="dark"] .nav-links .nav-cta { background: #e8eeea; color: #101310; }
+:root[data-theme="dark"] .nav-links .nav-cta:hover { background: #43c78e; color: #07190c; }
+:root[data-theme="dark"] .pagination .page-number.is-current { background: #123024; color: #75dfa8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body { background: var(--ground); color: var(--ink); }
+  :root:not([data-theme="light"]) .brand-name { color: var(--ink); }
+  :root:not([data-theme="light"]) .accent { color: #55d98d; }
+  :root:not([data-theme="light"]) .label { color: #68d995; }
+  :root:not([data-theme="light"]) .nav-links .nav-cta { background: #e8eeea; color: #101310; }
+  :root:not([data-theme="light"]) .nav-links .nav-cta:hover { background: #43c78e; color: #07190c; }
+  :root:not([data-theme="light"]) .pagination .page-number.is-current { background: #123024; color: #75dfa8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+</style>
+<style>body{margin:0;background:var(--ground);color:var(--ink);font-family:Archivo,system-ui,sans-serif}.wrap{max-width:920px;margin:0 auto;padding:36px 16px 64px}h2{font-size:clamp(24px,3.5vw,32px);margin:0 0 6px;letter-spacing:-.02em}.eyebrow{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}</style>
+<style>/* Chat replay: an example conversation in which a person uses the skill.
+   build.py renders every message as plain HTML. chat.js replays them: the person's message types into
+   the box and sends, the agent's reply streams in, tool calls finish, and result cards fill row by row. */
+:root {
+  --ch-agent: #0f7f39; --ch-user: var(--sunk, #f5f7f4); --ch-warn: #b42318; --ch-warn-soft: #fdecea;
+  --ch-tool: var(--hold, #a06a12); --ch-ok: #0f7f39;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --ch-agent: #5fd39c; --ch-user: #1d2622; --ch-warn: #f08a80; --ch-warn-soft: #331816; --ch-ok: #5fd39c; }
+}
+:root[data-theme="dark"] { --ch-agent: #5fd39c; --ch-user: #1d2622; --ch-warn: #f08a80; --ch-warn-soft: #331816; --ch-ok: #5fd39c; }
+
+.chat-intro { color: var(--muted); margin: 0 0 4px; max-width: 70ch; font-size: 15px; }
+.chat { --ch-bg: var(--panel); margin-top: 12px; border: 1px solid var(--rule); border-radius: 16px; background: var(--panel); overflow: hidden; display: flex; flex-direction: column; }
+
+/* Header */
+.chat-head { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
+.chat-who { display: flex; align-items: center; gap: 10px; }
+.chat-who b { display: block; font-size: 14.5px; }
+.chat-who small { display: block; font-size: 12.5px; color: var(--muted); }
+.chat-ctrl { display: none; gap: 6px; flex-wrap: wrap; }
+.chat.js .chat-ctrl { display: inline-flex; }
+.chat-btn { font: inherit; font-size: 13.5px; cursor: pointer; height: 34px; min-width: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--rule-strong, var(--rule)); background: var(--panel); color: var(--ink); }
+.chat-btn.primary { background: var(--ink); color: var(--ground, #fff); border-color: var(--ink); font-weight: 600; }
+.chat-btn:focus-visible, .chat-log:focus-visible, .cm-tool summary:focus-visible { outline: 3px solid var(--blue, #3f6d96); outline-offset: 2px; }
+.chat-prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+.chat-prog span { display: block; height: 100%; width: 0; background: var(--ch-agent); transition: width .3s; }
+
+/* Log */
+.chat-log { background: var(--ch-bg); display: flex; flex-direction: column; gap: 18px; padding: 20px 16px 12px; }
+.chat.js .chat-log { height: 560px; overflow-y: auto; scroll-behavior: smooth; overscroll-behavior: contain; }
+.cm { max-width: 760px; width: 100%; margin: 0 auto; }
+.chat.js .cm.wait { display: none; }
+.cm.in { animation: cmIn .3s ease-out; }
+@keyframes cmIn { from { opacity: 0; transform: translateY(6px); } }
+
+.cm-user { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cm-bubble { margin: 0; max-width: 80%; background: var(--ch-user); color: var(--ch-user-ink, var(--ink)); border-radius: 18px; padding: 10px 16px; font-size: 15px; line-height: 1.5; }
+.cm-file { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; border: 1px solid var(--rule); border-radius: 10px; padding: 6px 10px; color: var(--muted); }
+
+.cm-agent { display: flex; gap: 12px; align-items: flex-start; }
+.cm-av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: var(--ch-av-bg, transparent); border: 1px solid var(--ch-av-line, transparent); }
+.cm-av svg { width: 20px; height: 20px; }
+.cm-body { min-width: 0; flex: 1; font-size: 15px; line-height: 1.6; font-family: var(--ch-font, inherit); }
+.cm-name { display: block; font-weight: 650; font-size: 13.5px; margin: 3px 0 2px; }
+.cm-body p { margin: 0 0 8px; }
+.cm-body ol { margin: 0 0 8px; padding-left: 22px; }
+.cm-body li { margin: 2px 0; }
+.cm-guard { display: inline-flex; gap: 6px; align-items: baseline; font-size: 13px; line-height: 1.45; color: var(--ch-warn); background: var(--ch-warn-soft); border-radius: 8px; padding: 4px 10px; }
+.cm-body .cm-guard { margin: 2px 0 0; }
+
+.cm-tool { padding-left: 40px; }
+.cm-tool details { display: inline-block; max-width: 100%; }
+.cm-tool summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--muted); border: 1px solid var(--rule); border-radius: 999px; padding: 5px 12px; }
+.cm-tool summary::-webkit-details-marker { display: none; }
+.cm-tool summary::after { content: "▾"; font-size: 11px; }
+.cm-tool details[open] summary::after { content: "▴"; }
+.cm-ico { color: var(--ch-ok); font-weight: 700; }
+.cm-tool.busy .cm-ico { width: 12px; height: 12px; border: 2px solid var(--ch-tool); border-right-color: transparent; border-radius: 50%; animation: cmSpin .8s linear infinite; color: transparent; overflow: hidden; }
+@keyframes cmSpin { to { transform: rotate(360deg); } }
+.cm-tag { font: 500 10.5px "IBM Plex Mono", ui-monospace, monospace; text-transform: uppercase; letter-spacing: .05em; color: var(--ch-tool); }
+.cm-tool ul { margin: 8px 0 0; padding: 10px 14px 10px 30px; border-left: 2px solid var(--rule); font-size: 13px; color: var(--muted); columns: 2 220px; }
+.cm-tool code { font: 12.5px "IBM Plex Mono", ui-monospace, monospace; }
+
+/* Result cards */
+.cc { margin: 6px 0 10px; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-size: 14px; }
+.cc-title { font: 500 11px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 9px 14px; background: var(--sunk); border-bottom: 1px solid var(--rule); }
+.cc table { width: 100%; border-collapse: collapse; }
+.cc th, .cc td { padding: 7px 14px; text-align: left; border-top: 1px solid var(--rule); vertical-align: top; }
+.cc tr:first-child th, .cc tr:first-child td { border-top: 0; }
+.cc-bridge th, .cc-signoff th { font-weight: 400; }
+.cc-bridge td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cc tr.total th, .cc tr.total td { font-weight: 700; border-top: 2px solid var(--ink); }
+.cc tr.ok th, .cc tr.ok td { color: var(--ch-ok); font-weight: 600; }
+.cc-table thead th { font-size: 12.5px; color: var(--muted); font-weight: 600; background: var(--panel); }
+.cc-table td:nth-child(2) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cc-scroll { overflow-x: auto; }
+.cc-line { display: inline-block; width: 160px; border-bottom: 1px solid var(--ink); height: 1em; }
+.chat.js .cm-body > .wait, .chat.js .cm-body li.wait { display: none; }
+.chat.js .cc tr.wait { visibility: hidden; }
+
+/* Composer */
+.chat-compose { box-shadow: 0 0 0 14px var(--ch-bg); display: none; align-items: center; gap: 10px; margin: 0 14px 14px; padding: 8px 8px 8px 16px; border: 1px solid var(--rule-strong, var(--rule)); border-radius: 22px; background: var(--panel); }
+.chat.js .chat-compose { display: flex; }
+.chat-input { flex: 1; min-width: 0; font-size: 15px; min-height: 1.5em; }
+.chat-ph { color: var(--faint, var(--muted)); }
+.chat-input.typing .chat-ph { display: none; }
+.chat-typed::after { content: ""; display: inline-block; width: 1.5px; height: 1.1em; background: var(--ink); margin-left: 1px; vertical-align: -2px; animation: cmBlink 1s steps(1) infinite; }
+.chat-input:not(.typing) .chat-typed::after { display: none; }
+@keyframes cmBlink { 50% { opacity: 0; } }
+.chat-send { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--rule); color: var(--panel); font-weight: 700; transition: background .2s, transform .2s; }
+.chat-send.ready { background: var(--ink); }
+.chat-send.press { transform: scale(.88); }
+.cm-dots { display: inline-flex; gap: 4px; padding: 8px 0; }
+.cm-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: cmDot 1s infinite; }
+.cm-dots i:nth-child(2) { animation-delay: .15s; } .cm-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes cmDot { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+/* Assistant switcher */
+.chat-ai { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--rule); overflow-x: auto; }
+.ai-btn { flex: none; display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; height: 36px; padding: 0 12px 0 9px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); color: var(--muted); }
+.ai-btn svg { width: 20px; height: 20px; color: var(--ink); }
+.ai-btn[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.ai-btn:focus-visible { outline: 3px solid var(--blue, #3f6d96); outline-offset: 2px; }
+.chat-note { font-size: 12.5px; line-height: 1.5; color: var(--muted); margin: 8px 2px 0; max-width: 80ch; }
+.chat-name { transition: opacity .2s; }
+
+/* Four looks. Each one changes colours, bubble shape and response font only. */
+.chat[data-ai="chatgpt"] { --ch-user: #f4f4f4; --ch-av-line: var(--rule); }
+.chat[data-ai="claude"] { --ch-bg: #faf9f5; --ch-user: #f0eee6; --ch-agent: #c96442; --ch-font: "Iowan Old Style", "Palatino Linotype", Georgia, serif; }
+.chat[data-ai="claude"] .cm-name, .chat[data-ai="claude"] .cc, .chat[data-ai="claude"] .cm-guard { font-family: Archivo, system-ui, sans-serif; }
+.chat[data-ai="claude"] .cm-bubble { border-radius: 12px; }
+.chat[data-ai="metaai"] { --ch-user: #0866ff; --ch-user-ink: #fff; --ch-agent: #0866ff; }
+.chat[data-ai="metaai"] .cm-bubble { border-radius: 20px 20px 6px 20px; }
+.chat[data-ai="grok"] { --ch-user: #f0f0f0; --ch-agent: #111; --ch-av-line: var(--rule); }
+.chat[data-ai="grok"] .cm-bubble { border-radius: 22px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chat[data-ai="chatgpt"] { --ch-bg: #212121; --ch-user: #303030; }
+  :root:not([data-theme="light"]) .chat[data-ai="claude"] { --ch-bg: #262624; --ch-user: #141413; --ch-agent: #d97757; }
+  :root:not([data-theme="light"]) .chat[data-ai="metaai"] { --ch-bg: #18191a; }
+  :root:not([data-theme="light"]) .chat[data-ai="grok"] { --ch-bg: #000; --ch-user: #1f1f1f; --ch-agent: #fff; }
+}
+:root[data-theme="dark"] .chat[data-ai="chatgpt"] { --ch-bg: #212121; --ch-user: #303030; }
+:root[data-theme="dark"] .chat[data-ai="claude"] { --ch-bg: #262624; --ch-user: #141413; --ch-agent: #d97757; }
+:root[data-theme="dark"] .chat[data-ai="metaai"] { --ch-bg: #18191a; }
+:root[data-theme="dark"] .chat[data-ai="grok"] { --ch-bg: #000; --ch-user: #1f1f1f; --ch-agent: #fff; }
+
+@media (max-width: 640px) {
+  .ai-btn span { display: none; }
+  .ai-btn { padding: 0 10px; }
+  .chat.js .chat-log { height: 520px; }
+  .cm-bubble { max-width: 88%; }
+  .cm-tool { padding-left: 0; }
+  .cc th, .cc td { padding: 6px 10px; }
+  .chat-head { padding: 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cm.in, .cm-dots i, .cm-tool.busy .cm-ico, .chat-typed::after { animation: none; }
+  .chat.js .chat-log { scroll-behavior: auto; }
+}
+</style>
+</head><body><main class="wrap">
+<div class="eyebrow">Design review · Bank reconciliation</div>
+<section aria-labelledby="chat-h">
+  <h2 id="chat-h">Watch someone use it</h2>
+  <p class="chat-intro">Example run with fictional figures: Northbrook Trading, Operating account (…4471), September. The figures match the worked examples on the step-by-step page.</p>
+  <div class="chat" data-chat data-ai="claude" id="chat-bank-reconciliation">
+    <svg class="ai-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute"><symbol id="ai-chatgpt" viewBox="0 0 24 24"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></symbol><symbol id="ai-claude" viewBox="0 0 24 24"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill="#D97757" fill-rule="nonzero"></path></symbol><symbol id="ai-metaai" viewBox="0 0 24 24"><path d="M10.547.232c.776-.086 1.543.244 2.152.712.784.598 1.375 1.434 1.757 2.347.19.444.3.92.345 1.402.01.384.024.781-.108 1.148-.126.406-.362.795-.728 1.017-.352.236-.786.3-1.199.288-.84-.073-1.613-.52-2.212-1.106-.15-.1-.236-.263-.368-.38-.801-.97-1.394-2.203-1.324-3.496.048-.698.38-1.44 1.03-1.75.206-.1.428-.164.655-.182z" fill="url(#lobe-icons-meta-ai-0-_R_0_)"></path><path d="M18.595 3.077c.52-.045 1.032.186 1.4.551.402.434.625 1.006.736 1.584.096.605.09 1.233-.048 1.83a5.97 5.97 0 01-.907 2.19c-.198.25-.382.519-.633.719-.493.45-1.181.725-1.848.598-.42-.08-.819-.306-1.085-.646-.514-.591-.687-1.403-.714-2.17a6.11 6.11 0 011.03-3.285c.237-.314.49-.62.797-.867.375-.27.805-.486 1.272-.504z" fill="url(#lobe-icons-meta-ai-1-_R_0_)"></path><path d="M5.038 4.172c.618-.045 1.238.067 1.832.235.871.28 1.741.78 2.182 1.624.177.383.256.826.152 1.242-.097.442-.375.816-.71 1.105-.724.59-1.664.84-2.577.887a5.356 5.356 0 01-2.881-.675c-.39-.248-.765-.539-1.025-.93a1.9 1.9 0 01-.327-1.283c.067-.507.357-.968.741-1.289.723-.62 1.684-.873 2.613-.916z" fill="url(#lobe-icons-meta-ai-2-_R_0_)"></path><path d="M4.87 10.369c.69-.06 1.465.223 1.811.866.213.349.278.763.29 1.166.006.528-.136 1.046-.34 1.529-.34.793-.893 1.478-1.538 2.036-.64.538-1.42.951-2.26 1.015a2.031 2.031 0 01-1.467-.398c-.353-.281-.578-.707-.662-1.15-.156-.8.077-1.62.445-2.327.196-.377.444-.724.72-1.044.767-.886 1.814-1.608 3.001-1.693z" fill="url(#lobe-icons-meta-ai-3-_R_0_)"></path><path d="M20.391 11.05c.881-.087 1.872.116 2.477.822.473.58.534 1.425.239 2.102-.118.317-.32.59-.527.852-.877.962-2.11 1.553-3.379 1.744-.818.123-1.723.036-2.406-.477-.2-.161-.386-.346-.514-.573-.277-.436-.321-.994-.216-1.492.224-.904.92-1.594 1.676-2.073a5.874 5.874 0 012.65-.905z" fill="url(#lobe-icons-meta-ai-4-_R_0_)"></path><path d="M7.553 15.523c.381-.052.775.004 1.118.184.344.154.613.427.866.702.866 1.097 1.267 2.549 1.146 3.944a4.476 4.476 0 01-.497 1.61c-.273.469-.663.91-1.187 1.08-.35.103-.731.118-1.077-.005a2.53 2.53 0 01-.959-.612c-.798-.859-1.236-2.02-1.343-3.185-.055-.646-.006-1.31.21-1.923.146-.471.384-.92.738-1.265.261-.277.62-.452.985-.53z" fill="url(#lobe-icons-meta-ai-5-_R_0_)"></path><path d="M13.637 16.5a4.237 4.237 0 011.82.219c.795.286 1.542.724 2.148 1.323.535.504.963 1.162 1.099 1.899.055.379.038.785-.122 1.138-.19.465-.599.807-1.051.996-.883.364-1.887.253-2.76-.082a5.568 5.568 0 01-2.343-1.685c-.347-.445-.616-.968-.697-1.534-.042-.382-.036-.788.13-1.142.194-.418.55-.76.978-.925.25-.119.525-.174.798-.207z" fill="url(#lobe-icons-meta-ai-6-_R_0_)"></path><defs><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-0-_R_0_" x1="9.789" x2="13" y1="0" y2="7.5"><stop stop-color="#C65EFF"></stop><stop offset=".5" stop-color="#EA4FFF"></stop><stop offset="1" stop-color="#9553FF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-1-_R_0_" x1="19" x2="17" y1="3" y2="10.5"><stop stop-color="#CF72FF"></stop><stop offset=".5" stop-color="#E541FF"></stop><stop offset="1" stop-color="#944DFF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-2-_R_0_" x1="9" x2="2.5" y1="6.5" y2="8"><stop stop-color="#A555FF"></stop><stop offset=".5" stop-color="#DE67FF"></stop><stop offset="1" stop-color="#E581FF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-3-_R_0_" x1="1" x2="6" y1="12" y2="16"><stop stop-color="#6C48FF"></stop><stop offset=".309" stop-color="#AA5AFF"></stop><stop offset="1" stop-color="#5145FF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-4-_R_0_" x1="19" x2="21" y1="11.5" y2="16.5"><stop stop-color="#CA3EFF"></stop><stop offset=".5" stop-color="#AB5CFF"></stop><stop offset="1" stop-color="#5042FF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-5-_R_0_" x1="6" x2="11" y1="20.5" y2="19"><stop stop-color="#5041FF"></stop><stop offset=".26" stop-color="#734FFF"></stop><stop offset=".75" stop-color="#6A4CFF"></stop><stop offset="1" stop-color="#483FFF"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="lobe-icons-meta-ai-6-_R_0_" x1="12" x2="18.5" y1="17.5" y2="21.5"><stop stop-color="#7B51FF"></stop><stop offset=".475" stop-color="#6049FF"></stop><stop offset="1" stop-color="#8466FF"></stop></linearGradient></defs></symbol><symbol id="ai-grok" viewBox="0 0 24 24"><path d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></symbol></svg>
+    <div class="chat-ai" role="group" aria-label="Show the chat in the style of an assistant"><button type="button" class="ai-btn" data-ai="chatgpt" data-ph="Message ChatGPT" aria-pressed="false" title="Show the chat in the style of ChatGPT"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-chatgpt"/></svg><span>ChatGPT</span></button><button type="button" class="ai-btn" data-ai="claude" data-ph="Reply to Claude" aria-pressed="true" title="Show the chat in the style of Claude"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg><span>Claude</span></button><button type="button" class="ai-btn" data-ai="metaai" data-ph="Ask Meta AI" aria-pressed="false" title="Show the chat in the style of Meta AI"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-metaai"/></svg><span>Meta AI</span></button><button type="button" class="ai-btn" data-ai="grok" data-ph="Ask Grok" aria-pressed="false" title="Show the chat in the style of Grok"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-grok"/></svg><span>Grok</span></button></div>
+    <div class="chat-head">
+      <span class="chat-who"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><span><b class="chat-name">Claude</b><small>with the MosoFin bank reconciliation skill</small></span></span>
+      <span class="chat-ctrl">
+        <button type="button" class="chat-btn primary" data-act="play" aria-label="Play the conversation">▶ Play</button>
+        <button type="button" class="chat-btn" data-act="restart" aria-label="Start again">↺</button>
+        <button type="button" class="chat-btn" data-act="speed" aria-label="Change speed">1×</button>
+        <button type="button" class="chat-btn" data-act="skip" aria-label="Show the whole conversation">Show all</button>
+      </span>
+      <span class="chat-prog" aria-hidden="true"><span></span></span>
+    </div>
+    <div class="chat-log" tabindex="0" aria-label="Example conversation"><div class="cm cm-user"><p class="cm-bubble">Can you reconcile our operating account for September?</p></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>Yes. Before I read anything, I need six answers. I ask them all at once, so the run does not stop again for each one.</p><ol><li>Do you want me to use MosoFin, or will you upload files?</li><li>Which account? I show account numbers masked.</li><li>Which period? I never assume one.</li><li>Please attach the bank statement.</li><li>When did you last reconcile this account?</li><li>What size of difference is worth chasing?</li></ol><p class="cm-guard"><span aria-hidden="true">⛨</span> I read nothing until you answer.</p></div></div><div class="cm cm-user"><p class="cm-bubble">Use MosoFin. Operating account ending 4471, September. Statement attached. We reconciled August. Chase anything over $10.</p><span class="cm-file"><span aria-hidden="true">📄</span> operating-4471-september.pdf</span></div><div class="cm cm-tool"><details><summary><span class="cm-ico" aria-hidden="true">✓</span><span class="cm-label">Checked the workspace and the company file</span><span class="cm-tag">read-only</span></summary><ul><li><code>Workspace: Northbrook Trading</code></li><li><code>Company file: confirmed by name</code></li><li><code>Tools: read-only tools only</code></li></ul></details></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>Here is my plan for <strong>Operating (…4471), 1 to 30 September</strong>. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?</p><p class="cm-guard"><span aria-hidden="true">⛨</span> I propose entries only. I never post them.</p></div></div><div class="cm cm-user"><p class="cm-bubble">Yes, go ahead.</p></div><div class="cm cm-tool"><details><summary><span class="cm-ico" aria-hidden="true">✓</span><span class="cm-label">Read the books in one batch</span><span class="cm-tag">read-only</span></summary><ul><li><code>search_accounts</code></li><li><code>get_trial_balance</code></li><li><code>get_general_ledger</code></li><li><code>search_deposits</code></li><li><code>search_bill_payments</code></li><li><code>search_purchases</code></li><li><code>search_payments</code></li><li><code>search_transfers</code></li><li><code>search_journal_entries</code></li></ul></details></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>The statement ends at <strong>$12,480.00</strong>. Two items explain the bank side, and both are timing:</p><div class="cc cc-bridge"><div class="cc-title">Bank side</div><table><tr class=""><th scope="row">Statement ending balance</th><td>$12,480.00</td></tr><tr class=""><th scope="row">+ Deposit in transit, banked 30 Sep</th><td>$1,250.00</td></tr><tr class=""><th scope="row">− Cheque #1043, not yet cashed</th><td>$1,860.00</td></tr><tr class="total"><th scope="row">= Adjusted bank balance</th><td>$11,870.00</td></tr></table></div><p>Nothing in the books needs to change for these two items.</p></div></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>Your books say <strong>$12,155.50</strong>. Three statement lines are not in the books, and one payment is in the books twice:</p><div class="cc cc-bridge"><div class="cc-title">Book side</div><table><tr class=""><th scope="row">Book balance</th><td>$12,155.50</td></tr><tr class=""><th scope="row">− Bank fee, statement line 14 Sep</th><td>$15.00</td></tr><tr class=""><th scope="row">+ Interest, statement line 30 Sep</th><td>$4.50</td></tr><tr class=""><th scope="row">− Customer cheque returned, statement line 19 Sep</th><td>$300.00</td></tr><tr class=""><th scope="row">+ Duplicate payment #1031 reversed</th><td>$25.00</td></tr><tr class="total"><th scope="row">= Adjusted book balance</th><td>$11,870.00</td></tr><tr class="ok"><th scope="row">Difference to the adjusted bank balance</th><td>$0.00</td></tr></table></div><p>Cheque #1031 to Acme Supplies is in the books twice, with the same date, amount and reference.</p></div></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>I propose four entries. Each one points to its evidence:</p><div class="cc cc-table"><div class="cc-title">Proposed entries</div><div class="cc-scroll"><table><thead><tr><th scope=col>Entry</th><th scope=col>Amount</th><th scope=col>Evidence</th></tr></thead><tbody><tr><td>Record the bank fee</td><td>$15.00</td><td>Statement line, 14 Sep</td></tr><tr><td>Record the interest</td><td>$4.50</td><td>Statement line, 30 Sep</td></tr><tr><td>Reverse the returned cheque to what the customer owes</td><td>$300.00</td><td>Statement line, 19 Sep</td></tr><tr><td>Reverse the duplicate payment #1031</td><td>$25.00</td><td>The two book entries</td></tr></tbody></table></div></div><p>The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer.</p><p class="cm-guard"><span aria-hidden="true">⛨</span> A person posts these entries. I do not.</p></div></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>The reconciliation ties to the cent. Your report has the summary, the matched and open items, the exceptions, the proposed entries and the coverage.</p><div class="cc cc-signoff"><div class="cc-title">Sign-off</div><table><tr class=""><th scope="row">Prepared by</th><td><span class=cc-line></span></td></tr><tr class=""><th scope="row">Reviewed by</th><td><span class=cc-line></span></td></tr></table></div><p>Do you want me to save your settings for next month?</p></div></div><div class="cm cm-user"><p class="cm-bubble">Yes, save them.</p></div><div class="cm cm-agent"><span class="cm-av"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><use href="#ai-claude"/></svg></span><div class="cm-body"><span class="cm-name">Claude</span><p>Done. I saved your policy choices and names only. Next month, the run starts from them.</p><p class="cm-guard"><span aria-hidden="true">⛨</span> I save settings only after the results, and only when you say yes.</p></div></div></div>
+    <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">Reply to Claude</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
+  </div>
+  <p class="chat-note"><b>Style preview.</b> The skill runs in Claude. The other buttons show the same conversation in the style of another assistant. ChatGPT, Claude, Meta AI and Grok are trademarks of their owners. MosoFin is not affiliated with them, and they do not endorse MosoFin.</p>
+</section>
+
+</main>
+<script>// Chat replay. build.py renders the whole example conversation as HTML (.cm messages). This script hides it,
+// then replays it like a live chat: the person's message types into the box and sends, the agent "thinks",
+// its reply streams in word by word, tool calls spin and finish, and result cards fill one row at a time.
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ABORT = Symbol("abort");
+
+  function setup(root) {
+    const log = root.querySelector(".chat-log");
+    const msgs = [...log.querySelectorAll(".cm")];
+    const input = root.querySelector(".chat-input"), typed = root.querySelector(".chat-typed"), send = root.querySelector(".chat-send");
+    const prog = root.querySelector(".chat-prog span");
+    const btn = (a) => root.querySelector(`[data-act="${a}"]`);
+    const playBtn = btn("play"), speedBtn = btn("speed");
+    let token = 0, paused = true, speed = 1, running = false, done = false;
+
+    // Keep each streamed element's full HTML so the replay can rebuild it word by word.
+    const streamable = (m) => [...m.querySelectorAll(".cm-body > p:not(.cm-guard), .cm-body li")];
+    msgs.forEach((m) => streamable(m).forEach((el) => { el.dataset.html = el.innerHTML; }));
+    root.classList.add("js");
+
+    function hideAll() {
+      msgs.forEach((m) => {
+        m.classList.add("wait"); m.classList.remove("in", "busy");
+        m.querySelectorAll(".cm-body > :not(.cm-name), .cm-body li, .cc tr").forEach((x) => x.classList.add("wait"));
+        streamable(m).forEach((el) => { el.innerHTML = el.dataset.html; });
+        m.querySelectorAll("details").forEach((d) => { d.open = false; });
+      });
+      log.querySelectorAll(".cm-dots").forEach((d) => d.remove());
+      typed.textContent = ""; input.classList.remove("typing"); send.classList.remove("ready");
+      prog.style.width = "0";
+    }
+    function showAll() {
+      msgs.forEach((m) => {
+        m.classList.remove("wait", "busy");
+        m.querySelectorAll(".wait").forEach((x) => x.classList.remove("wait"));
+        streamable(m).forEach((el) => { el.innerHTML = el.dataset.html; });
+      });
+      log.querySelectorAll(".cm-dots").forEach((d) => d.remove());
+      typed.textContent = ""; input.classList.remove("typing"); send.classList.remove("ready");
+      prog.style.width = "100%";
+    }
+
+    // A sleep that stops while paused, runs faster at 2x, and throws when the run restarts.
+    function sleep(ms, tk) {
+      return new Promise((res, rej) => {
+        let left = ms, last = performance.now();
+        const f = (now) => {
+          if (tk !== token) return rej(ABORT);
+          if (!paused) left -= (now - last) * speed;
+          last = now;
+          left <= 0 ? res() : requestAnimationFrame(f);
+        };
+        requestAnimationFrame(f);
+      });
+    }
+    const near = () => log.scrollHeight - log.scrollTop - log.clientHeight < 120;
+    function follow(stick) { if (stick) log.scrollTop = log.scrollHeight; }
+
+    async function stream(el, tk) {
+      const html = el.dataset.html;
+      if (reduce) { el.innerHTML = html; return; }
+      const parts = html.split(/(<[^>]+>|\s+)/).filter(Boolean);
+      let acc = "";
+      el.innerHTML = "";
+      for (const p of parts) {
+        const stick = near();
+        acc += p; el.innerHTML = acc; follow(stick);
+        if (!p.startsWith("<") && p.trim()) await sleep(34, tk);
+      }
+    }
+
+    async function playUser(m, tk) {
+      const text = m.querySelector(".cm-bubble").textContent;
+      input.classList.add("typing");
+      for (let i = 1; i <= text.length; i++) {
+        typed.textContent = text.slice(0, i);
+        send.classList.toggle("ready", i > 0);
+        await sleep(reduce ? 0 : 22, tk);
+      }
+      await sleep(350, tk);
+      send.classList.add("press"); await sleep(140, tk); send.classList.remove("press");
+      typed.textContent = ""; input.classList.remove("typing"); send.classList.remove("ready");
+      const stick = near();
+      m.querySelectorAll(".wait").forEach((x) => x.classList.remove("wait"));
+      m.classList.remove("wait"); m.classList.add("in"); follow(stick);
+    }
+
+    async function playTool(m, tk) {
+      const stick = near();
+      m.classList.remove("wait"); m.classList.add("in", "busy"); follow(stick);
+      await sleep(1300, tk);
+      m.classList.remove("busy");
+    }
+
+    async function playAgent(m, tk) {
+      const body = m.querySelector(".cm-body");
+      let stick = near();
+      m.classList.remove("wait"); m.classList.add("in");
+      const dots = document.createElement("span");
+      dots.className = "cm-dots"; dots.setAttribute("aria-hidden", "true"); dots.innerHTML = "<i></i><i></i><i></i>";
+      body.append(dots); follow(stick);
+      await sleep(800, tk);
+      dots.remove();
+      for (const part of [...body.children]) {
+        if (!part.classList.contains("wait")) continue;
+        stick = near();
+        part.classList.remove("wait"); follow(stick);
+        if (part.tagName === "P" && !part.classList.contains("cm-guard")) await stream(part, tk);
+        else if (part.tagName === "OL") for (const li of part.children) { li.classList.remove("wait"); await stream(li, tk); }
+        else if (part.classList.contains("cc")) for (const tr of part.querySelectorAll("tr.wait")) { stick = near(); tr.classList.remove("wait"); follow(stick); await sleep(230, tk); }
+        await sleep(part.classList.contains("cm-guard") ? 500 : 250, tk);
+      }
+    }
+
+    async function run() {
+      const tk = ++token;
+      running = true; done = false;
+      hideAll(); log.scrollTop = 0;
+      try {
+        await sleep(400, tk);
+        for (let i = 0; i < msgs.length; i++) {
+          const m = msgs[i];
+          if (m.classList.contains("cm-user")) await playUser(m, tk);
+          else if (m.classList.contains("cm-tool")) await playTool(m, tk);
+          else await playAgent(m, tk);
+          prog.style.width = `${(100 * (i + 1)) / msgs.length}%`;
+          await sleep(m.classList.contains("cm-user") ? 300 : 900, tk);
+        }
+        running = false; done = true; paused = true; label();
+      } catch (err) { if (err !== ABORT) throw err; }
+    }
+
+    function label() {
+      playBtn.textContent = done ? "↺ Replay" : paused ? "▶ Play" : "❚❚ Pause";
+      playBtn.setAttribute("aria-label", done ? "Replay the conversation" : paused ? "Play the conversation" : "Pause the conversation");
+    }
+    function play() { paused = false; if (!running) run(); label(); }
+    function pause() { paused = true; label(); }
+
+    playBtn.addEventListener("click", () => { user = true; paused ? play() : pause(); });
+    btn("restart").addEventListener("click", () => { user = true; running = false; paused = false; run(); label(); });
+    speedBtn.addEventListener("click", () => { speed = speed === 1 ? 2 : 1; speedBtn.textContent = speed + "×"; });
+    btn("skip").addEventListener("click", () => { user = true; token++; running = false; done = true; paused = true; showAll(); label(); });
+
+    // Assistant style switcher. It changes only the look; the replay keeps going. The choice is remembered per browser.
+    const ph = root.querySelector(".chat-ph"), nameEl = root.querySelector(".chat-name");
+    function style(key) {
+      const b = root.querySelector(`.ai-btn[data-ai="${key}"]`); if (!b) return;
+      root.dataset.ai = key;
+      root.querySelectorAll(".ai-btn").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      const name = b.querySelector("span").textContent;
+      root.querySelectorAll(".cm-av use").forEach((u) => u.setAttribute("href", `#ai-${key}`));
+      root.querySelectorAll(".cm-name").forEach((n) => { n.textContent = name; });
+      nameEl.textContent = name; ph.textContent = b.dataset.ph;
+    }
+    root.querySelectorAll(".ai-btn").forEach((b) => b.addEventListener("click", () => {
+      style(b.dataset.ai);
+      try { localStorage.setItem("mosofin-chat-ai", b.dataset.ai); } catch {}
+    }));
+    try { const saved = localStorage.getItem("mosofin-chat-ai"); if (saved) style(saved); } catch {}
+
+    hideAll(); label();
+    // Before the first play, show the opening message so the panel is not empty.
+    msgs[0]?.classList.remove("wait"); msgs[0]?.querySelectorAll(".wait").forEach((x) => x.classList.remove("wait"));
+    let user = false, seen = false, autoPaused = false;
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        if (!seen && !reduce) { seen = true; play(); }
+        else if (autoPaused) { autoPaused = false; play(); }
+      } else if (!paused && running) { autoPaused = true; pause(); }
+    }, { threshold: 0.4 }).observe(log);
+  }
+
+  document.querySelectorAll(".chat[data-chat]").forEach(setup);
+})();
+</script>
+</body></html>
