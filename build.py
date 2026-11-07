@@ -492,7 +492,7 @@ CHATS = os.path.join(ROOT, "chats")
 # Style preview: each button shows the same conversation in the look of another assistant. The skill runs in Claude.
 # key, name, composer placeholder. The logos are in site/assets/ai/ (see NOTICE.txt there).
 CHAT_AI = [("chatgpt", "ChatGPT", "Message ChatGPT"), ("claude", "Claude", "Reply to Claude"),
-           ("metaai", "Meta AI", "Ask Meta AI"), ("grok", "Grok", "Ask Grok")]
+           ("muse", "Muse", "Ask Muse"), ("grok", "Grok", "Ask Grok")]
 CHAT_DEFAULT = "claude"
 
 def ai_symbol(key):
@@ -584,7 +584,7 @@ def chat_section(skill, t):
     <div class="chat-log" tabindex="0" aria-label="Example conversation">{msgs}</div>
     <div class="chat-compose" aria-hidden="true"><span class="chat-input"><span class="chat-ph">{e(ai[CHAT_DEFAULT][1])}</span><span class="chat-typed"></span></span><span class="chat-send">↑</span></div>
   </div>
-  <p class="chat-note"><b>Style preview.</b> The skill runs in Claude. The other buttons show the same conversation in the style of another assistant. ChatGPT, Claude, Meta AI and Grok are trademarks of their owners. MosoFin is not affiliated with them, and they do not endorse MosoFin.</p>
+  <p class="chat-note"><b>Style preview.</b> The skill runs in Claude. The other buttons show the same conversation in the style of another assistant. ChatGPT, Claude, Muse and Grok are trademarks of their owners. MosoFin is not affiliated with them, and they do not endorse MosoFin.</p>
 </section>
 """
 
