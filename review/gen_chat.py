@@ -16,7 +16,7 @@ page = f"""<!doctype html>
 <style>{rd("site/assets/chat.css")}</style>
 </head><body><main class="wrap">
 <div class="eyebrow">Design review · {build.e(title)}</div>
-{build.chat_section(skill, title)}
+{build.chat_section(skill, title).replace('src="../../assets/', 'src="../site/assets/')}
 </main>
 <script>{rd("site/assets/chat.js")}</script>
 </body></html>

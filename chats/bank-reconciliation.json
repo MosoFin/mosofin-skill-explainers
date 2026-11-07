@@ -1,65 +1,237 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, Operating account (…4471), September. The figures match the worked examples on the step-by-step page.",
   "messages": [
-    {"role": "user", "text": "Can you reconcile our operating account for September?"},
-    {"role": "agent",
-     "text": "Yes. Before I read anything, I need six answers. I ask them all at once, so the run does not stop again for each one.",
-     "list": [
-       "Do you want me to use MosoFin, or will you upload files?",
-       "Which account? I show account numbers masked.",
-       "Which period? I never assume one.",
-       "Please attach the bank statement.",
-       "When did you last reconcile this account?",
-       "What size of difference is worth chasing?"
-     ],
-     "guard": "I read nothing until you answer."},
-    {"role": "user", "text": "Use MosoFin. Operating account ending 4471, September. Statement attached. We reconciled August. Chase anything over $10.",
-     "attach": ["operating-4471-september.pdf"]},
-    {"role": "tool", "label": "Checked the workspace and the company file", "tag": "read-only",
-     "calls": ["Workspace: Northbrook Trading", "Company file: confirmed by name", "Tools: read-only tools only"]},
-    {"role": "agent",
-     "text": "Here is my plan for **Operating (…4471), 1 to 30 September**. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?",
-     "guard": "I propose entries only. I never post them."},
-    {"role": "user", "text": "Yes, go ahead."},
-    {"role": "tool", "label": "Read the books in one batch", "tag": "read-only",
-     "calls": ["search_accounts", "get_trial_balance", "get_general_ledger", "search_deposits", "search_bill_payments", "search_purchases", "search_payments", "search_transfers", "search_journal_entries"]},
-    {"role": "agent",
-     "text": "The statement ends at **$12,480.00**. Two items explain the bank side, and both are timing:",
-     "card": {"type": "bridge", "title": "Bank side", "rows": [
-       ["Statement ending balance", "$12,480.00"],
-       ["+ Deposit in transit, banked 30 Sep", "$1,250.00"],
-       ["− Cheque #1043, not yet cashed", "$1,860.00"],
-       ["= Adjusted bank balance", "$11,870.00", "total"]
-     ]},
-     "after": "Nothing in the books needs to change for these two items."},
-    {"role": "agent",
-     "text": "Your books say **$12,155.50**. Three statement lines are not in the books, and one payment is in the books twice:",
-     "card": {"type": "bridge", "title": "Book side", "rows": [
-       ["Book balance", "$12,155.50"],
-       ["− Bank fee, statement line 14 Sep", "$15.00"],
-       ["+ Interest, statement line 30 Sep", "$4.50"],
-       ["− Customer cheque returned, statement line 19 Sep", "$300.00"],
-       ["+ Duplicate payment #1031 reversed", "$25.00"],
-       ["= Adjusted book balance", "$11,870.00", "total"],
-       ["Difference to the adjusted bank balance", "$0.00", "ok"]
-     ]},
-     "after": "Cheque #1031 to Acme Supplies is in the books twice, with the same date, amount and reference."},
-    {"role": "agent",
-     "text": "I propose four entries. Each one points to its evidence:",
-     "card": {"type": "table", "title": "Proposed entries", "head": ["Entry", "Amount", "Evidence"], "rows": [
-       ["Record the bank fee", "$15.00", "Statement line, 14 Sep"],
-       ["Record the interest", "$4.50", "Statement line, 30 Sep"],
-       ["Reverse the returned cheque to what the customer owes", "$300.00", "Statement line, 19 Sep"],
-       ["Reverse the duplicate payment #1031", "$25.00", "The two book entries"]
-     ]},
-     "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer.",
-     "guard": "A person posts these entries. I do not."},
-    {"role": "agent",
-     "text": "The reconciliation ties to the cent. Your report has the summary, the matched and open items, the exceptions, the proposed entries and the coverage.",
-     "card": {"type": "signoff", "title": "Sign-off", "rows": [["Prepared by", ""], ["Reviewed by", ""]]},
-     "after": "Do you want me to save your settings for next month?"},
-    {"role": "user", "text": "Yes, save them."},
-    {"role": "agent", "text": "Done. I saved your policy choices and names only. Next month, the run starts from them.",
-     "guard": "I save settings only after the results, and only when you say yes."}
+    {
+      "role": "user",
+      "text": "Can you reconcile our operating account for September?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need six answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which account? I show account numbers masked.",
+        "Which period? I never assume one.",
+        "Please attach the bank statement.",
+        "When did you last reconcile this account?",
+        "What size of difference is worth chasing?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Operating account ending 4471, September. Statement attached. We reconciled August. Chase anything over $10.",
+      "attach": [
+        "operating-4471-september.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan for **Operating (…4471), 1 to 30 September**. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?",
+      "guard": "I propose entries only. I never post them."
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "Operating (…4471)"
+        ],
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Book balance $12,155.50"
+        ],
+        [
+          "search_deposits",
+          "Includes $1,250.00 banked 30 Sep"
+        ],
+        [
+          "search_bill_payments",
+          "Includes #1031 to Acme Supplies"
+        ],
+        [
+          "search_purchases",
+          ""
+        ],
+        [
+          "search_payments",
+          ""
+        ],
+        [
+          "search_transfers",
+          ""
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ]
+      ],
+      "summary": "9 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "The statement ends at **$12,480.00**. Two items explain the bank side, and both are timing:",
+      "card": {
+        "type": "bridge",
+        "title": "Bank side",
+        "rows": [
+          [
+            "Statement ending balance",
+            "$12,480.00"
+          ],
+          [
+            "+ Deposit in transit, banked 30 Sep",
+            "$1,250.00"
+          ],
+          [
+            "− Cheque #1043, not yet cashed",
+            "$1,860.00"
+          ],
+          [
+            "= Adjusted bank balance",
+            "$11,870.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "Nothing in the books needs to change for these two items."
+    },
+    {
+      "role": "agent",
+      "text": "Your books say **$12,155.50**. Three statement lines are not in the books, and one payment is in the books twice:",
+      "card": {
+        "type": "bridge",
+        "title": "Book side",
+        "rows": [
+          [
+            "Book balance",
+            "$12,155.50"
+          ],
+          [
+            "− Bank fee, statement line 14 Sep",
+            "$15.00"
+          ],
+          [
+            "+ Interest, statement line 30 Sep",
+            "$4.50"
+          ],
+          [
+            "− Customer cheque returned, statement line 19 Sep",
+            "$300.00"
+          ],
+          [
+            "+ Duplicate payment #1031 reversed",
+            "$25.00"
+          ],
+          [
+            "= Adjusted book balance",
+            "$11,870.00",
+            "total"
+          ],
+          [
+            "Difference to the adjusted bank balance",
+            "$0.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "Cheque #1031 to Acme Supplies is in the books twice, with the same date, amount and reference."
+    },
+    {
+      "role": "agent",
+      "text": "I propose four entries. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries",
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Record the bank fee",
+            "$15.00",
+            "Statement line, 14 Sep"
+          ],
+          [
+            "Record the interest",
+            "$4.50",
+            "Statement line, 30 Sep"
+          ],
+          [
+            "Reverse the returned cheque to what the customer owes",
+            "$300.00",
+            "Statement line, 19 Sep"
+          ],
+          [
+            "Reverse the duplicate payment #1031",
+            "$25.00",
+            "The two book entries"
+          ]
+        ]
+      },
+      "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer.",
+      "guard": "A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "The reconciliation ties to the cent. Your report has the summary, the matched and open items, the exceptions, the proposed entries and the coverage.",
+      "card": {
+        "type": "signoff",
+        "title": "Sign-off",
+        "rows": [
+          [
+            "Prepared by",
+            ""
+          ],
+          [
+            "Reviewed by",
+            ""
+          ]
+        ]
+      },
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved your policy choices and names only. Next month, the run starts from them.",
+      "guard": "I save settings only after the results, and only when you say yes."
+    }
   ]
 }

@@ -24,7 +24,9 @@
         m.classList.add("wait"); m.classList.remove("in", "busy");
         m.querySelectorAll(".cm-body > :not(.cm-name), .cm-body li, .cc tr").forEach((x) => x.classList.add("wait"));
         streamable(m).forEach((el) => { el.innerHTML = el.dataset.html; });
-        m.querySelectorAll("details").forEach((d) => { d.open = false; });
+        m.querySelectorAll("details").forEach((d) => { d.open = m.classList.contains("cm-mf"); });
+        m.querySelectorAll(".mf-rows li").forEach((li) => { li.classList.remove("run"); li.classList.add("pend"); });
+        m.querySelectorAll(".mf-sum").forEach((x) => x.classList.add("wait"));
       });
       log.querySelectorAll(".cm-dots").forEach((d) => d.remove());
       typed.textContent = ""; input.classList.remove("typing"); send.classList.remove("ready");
@@ -35,6 +37,7 @@
         m.classList.remove("wait", "busy");
         m.querySelectorAll(".wait").forEach((x) => x.classList.remove("wait"));
         streamable(m).forEach((el) => { el.innerHTML = el.dataset.html; });
+        m.querySelectorAll(".mf-rows li").forEach((li) => li.classList.remove("pend", "run"));
       });
       log.querySelectorAll(".cm-dots").forEach((d) => d.remove());
       typed.textContent = ""; input.classList.remove("typing"); send.classList.remove("ready");
@@ -87,10 +90,21 @@
     }
 
     async function playTool(m, tk) {
-      const stick = near();
+      let stick = near();
       m.classList.remove("wait"); m.classList.add("in", "busy"); follow(stick);
-      await sleep(1300, tk);
+      const rows = [...m.querySelectorAll(".mf-rows li")];
+      if (!rows.length) { await sleep(1300, tk); m.classList.remove("busy"); return; }
+      // MosoFin card: each call spins, then ticks and shows what it found.
+      await sleep(400, tk);
+      for (const li of rows) {
+        li.classList.replace("pend", "run");
+        await sleep(rows.length > 4 ? 380 : 600, tk);
+        li.classList.remove("run");
+      }
       m.classList.remove("busy");
+      stick = near();
+      m.querySelectorAll(".mf-sum").forEach((x) => x.classList.remove("wait")); follow(stick);
+      await sleep(500, tk);
     }
 
     async function playAgent(m, tk) {
