@@ -1,0 +1,371 @@
+{
+  "example": "Example run with fictional figures: Northbrook Trading, 13 weeks from Monday 6 October, cash floor $150,000. The figures match the worked examples on the step-by-step page.",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Can you build our 13-week cash forecast? I need to know if we stay above our loan covenant."
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which horizon, from which start date? I propose 13 weeks.",
+        "Which accounts count as cash you can spend, and is any cash restricted? Please give me the bank balance of each on the start date.",
+        "What is your payroll calendar? I need the pay dates, net pay, tax deposit dates and benefit dates.",
+        "Which loan payments, tax due dates and other large one-off payments fall in the window?",
+        "Which open bills do you plan to pay, and when?",
+        "What is your cash floor? Is it a covenant or your own minimum, and how does it define cash?",
+        "Do you have a credit line? I need its limit, borrowing base and clean-down rules.",
+        "Is this one company? Do you expect new sales or hold other currencies?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. 13 weeks from Monday 6 October. On 6 October the bank shows $151,900 in Operating and $30,500 in Savings. The Tax Reserve is restricted. Payroll, loan and tax dates are attached. We pay bills when due, but software and marketing can wait. The floor is a $150,000 covenant, cash net of restricted. One company, US dollars, no new sales to add.",
+      "attach": [
+        "payroll-calendar.xlsx",
+        "loan-and-tax-schedule.pdf",
+        "credit-line-terms.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Workspace",
+          "Northbrook Trading"
+        ],
+        [
+          "Company file",
+          "Confirmed by name"
+        ],
+        [
+          "Entities",
+          "One company"
+        ],
+        [
+          "Tools",
+          "Read-only tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I forecast **Northbrook Trading** for 13 weeks from **Monday 6 October**. Opening cash is Operating and Savings, without the Tax Reserve. I time each receipt from the customer's own payment history. Payroll, loans, taxes and the credit line come from your files. The floor is a **$150,000 covenant**, cash net of restricted. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_accounts",
+          "Operating, Savings, Tax Reserve"
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "get_aged_receivables",
+          "Includes Harbor Retail and Meridian Foods"
+        ],
+        [
+          "get_aged_payables",
+          ""
+        ],
+        [
+          "search_invoices",
+          ""
+        ],
+        [
+          "search_payments",
+          "Harbor Retail, last 9 invoices"
+        ],
+        [
+          "search_bills",
+          ""
+        ],
+        [
+          "search_bill_payments",
+          ""
+        ],
+        [
+          "get_vendor_expenses",
+          ""
+        ],
+        [
+          "get_general_ledger",
+          "Insurance $21,000, paid one year ago"
+        ],
+        [
+          "get_cash_flow",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "13 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "Week 1 opens with **$182,400** of cash you can spend. These are your bank balances on 6 October:",
+      "card": {
+        "type": "bridge",
+        "title": "Opening cash, week 1",
+        "rows": [
+          [
+            "Operating account",
+            "$151,900"
+          ],
+          [
+            "+ Savings account",
+            "$30,500"
+          ],
+          [
+            "= Week 1 opens at",
+            "$182,400",
+            "total"
+          ]
+        ]
+      },
+      "after": "I agreed both balances to the books through your latest bank reconciliation. The Tax Reserve holds $24,000 more. It is restricted, so I left it out."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the chain. Each week opens at the close of the week before. Each amount sits in the week the bank shows it.",
+      "card": {
+        "type": "table",
+        "title": "13-week forecast",
+        "head": [
+          "Week",
+          "Cash in",
+          "Cash out",
+          "Closes with"
+        ],
+        "rows": [
+          [
+            "1",
+            "$46,200",
+            "$38,500",
+            "$190,100"
+          ],
+          [
+            "2",
+            "$31,800",
+            "$61,300",
+            "$160,600"
+          ],
+          [
+            "3",
+            "$52,900",
+            "$33,200",
+            "$180,300"
+          ],
+          [
+            "4",
+            "$38,400",
+            "$28,900",
+            "$189,800"
+          ],
+          [
+            "5",
+            "$47,100",
+            "$61,300",
+            "$175,600"
+          ],
+          [
+            "6",
+            "$44,800",
+            "$33,200",
+            "$187,200"
+          ],
+          [
+            "7",
+            "$40,200",
+            "$96,400",
+            "$131,000"
+          ],
+          [
+            "8",
+            "$71,500",
+            "$28,900",
+            "$173,600"
+          ],
+          [
+            "9",
+            "$39,600",
+            "$61,300",
+            "$151,900"
+          ],
+          [
+            "10",
+            "$52,300",
+            "$33,200",
+            "$171,000"
+          ],
+          [
+            "11",
+            "$41,900",
+            "$28,900",
+            "$184,000"
+          ],
+          [
+            "12",
+            "$38,700",
+            "$61,300",
+            "$161,400"
+          ],
+          [
+            "13",
+            "$49,800",
+            "$33,200",
+            "$178,000"
+          ]
+        ]
+      },
+      "after": "Only week 7 closes below your $150,000 floor. Cash stays above zero in all 13 weeks."
+    },
+    {
+      "role": "agent",
+      "text": "Week 7 is your lowest point. It closes at **$131,000**, which is $19,000 below the covenant. Four payments land in the same week:",
+      "card": {
+        "type": "bridge",
+        "title": "Week 7",
+        "rows": [
+          [
+            "Week 7 opens at",
+            "$187,200"
+          ],
+          [
+            "+ Customer receipts",
+            "$40,200"
+          ],
+          [
+            "− Net pay",
+            "$28,900"
+          ],
+          [
+            "− Payroll tax deposit",
+            "$9,300"
+          ],
+          [
+            "− Insurance renewal",
+            "$21,000"
+          ],
+          [
+            "− Other bills",
+            "$37,200"
+          ],
+          [
+            "= Week 7 closes at",
+            "$131,000",
+            "total"
+          ]
+        ]
+      },
+      "after": "I found the insurance renewal in last year's cash. No open bill covers it, so I count it once. You can still pay payroll. But a covenant breach can make the loan repayable at once."
+    },
+    {
+      "role": "agent",
+      "text": "Two timing choices move cash between weeks. I place each amount in the week it reaches the bank, not on its due date:",
+      "card": {
+        "type": "table",
+        "title": "Timing",
+        "head": [
+          "Item",
+          "Amount",
+          "Due",
+          "Week I use"
+        ],
+        "rows": [
+          [
+            "Harbor Retail invoice",
+            "$24,000",
+            "17 Oct, week 2",
+            "3 Nov, week 5"
+          ],
+          [
+            "Payroll taxes for the 31 Oct payday",
+            "$9,300",
+            "Wed 5 Nov",
+            "Week 5, not week 4"
+          ]
+        ]
+      },
+      "after": "Harbor paid its last 9 invoices 16 days after the due date on average, weighted by amount. The spread is 4 days."
+    },
+    {
+      "role": "agent",
+      "text": "I also tested collections that arrive one week late. Then week 7 closes at **$135,600** and week 8 at **$146,900**. Two weeks break the floor instead of one."
+    },
+    {
+      "role": "agent",
+      "text": "These levers could fix week 7. Each one is a proposal for you. I do none of them.",
+      "card": {
+        "type": "table",
+        "title": "Levers for week 7",
+        "head": [
+          "Lever",
+          "Week 7 closes at",
+          "Floor"
+        ],
+        "rows": [
+          [
+            "Ask Meridian Foods to pay its $71,500 five days early",
+            "$202,500",
+            "Above"
+          ],
+          [
+            "Draw $19,000 on the credit line for one week",
+            "$150,000",
+            "At the floor"
+          ],
+          [
+            "Defer software $6,400 and marketing $8,200",
+            "$145,600",
+            "$4,400 below"
+          ]
+        ]
+      },
+      "after": "The deferral alone is not enough. Payroll and the tax deposit never go on this list."
+    },
+    {
+      "role": "agent",
+      "text": "Your forecast has seven sheets. They are the 13 weeks, collections, payments, alerts, what-ifs, forecast against actual and coverage. The coverage sheet marks payroll, loan, tax and floor lines as supplied by you. Do you want the sheets as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, Excel please."
+    },
+    {
+      "role": "agent",
+      "text": "Here is **northbrook-cash-forecast.xlsx**. Next week, give me the actual bank balances. I compare them with this forecast, drop week 1 and add week 14.",
+      "after": "Do you want me to save your settings for next week?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the payroll calendar, the floor and its definition, the credit line terms and the lever list. I never save balances or the forecast."
+    }
+  ]
+}
