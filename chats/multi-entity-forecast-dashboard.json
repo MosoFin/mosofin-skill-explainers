@@ -29,10 +29,6 @@
         [
           "get_agent_datasources",
           "Three QuickBooks files"
-        ],
-        [
-          "Tools",
-          "Read-only tools only"
         ]
       ],
       "summary": "The agent can read your books. It cannot change them."
@@ -187,7 +183,7 @@
           [
             "Upside (P90), August and September averaged",
             "$48,850",
-            "$441,700"
+            "$441,700, same as base"
           ]
         ]
       },
@@ -212,7 +208,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **northbrook-trading-group-forecast-dashboard.html**, with Overview, Accounts, Forecast and Report tabs. I checked it first. It shows no script errors, four headline figures, all four tabs, and the group and both files in the switcher.",
+      "text": "Here is **northbrook-trading-group-forecast-dashboard.html**, with Overview, Accounts, Forecast and Report tabs. I checked it first. It shows no script errors and four headline figures. The first one equals the $129,100 that I computed. All four tabs work, and the switcher shows the group and both files.",
       "after": "The Sync and Ask buttons work only when the file runs inside Claude with MosoFin attached. Elsewhere they show an amber strip. **Data sources:** get_cash_flow, get_aged_receivables and get_balance_sheet through MosoFin, read on 1 October 2026."
     }
   ]

@@ -22,7 +22,7 @@
     },
     {
       "role": "user",
-      "text": "Use MosoFin. Prepare one invoice from Northbrook Trading Ltd to Harbor Retail Ltd. 10 storage racking units at £180 and 6 hours of installation at £65. Invoice date 31 October. We delivered and installed on 28 October. UK VAT, full VAT invoice. 20% on both lines, prices exclude VAT, rounded on each line. NT- with the year, then a number. Net 30, pounds, no PO."
+      "text": "Use MosoFin. Prepare one invoice from Northbrook Trading Ltd to Harbor Retail Ltd. 10 storage racking units at £180 and 6 hours of installation at £65. Invoice date 31 October. We delivered and installed on 28 October. UK VAT, full VAT invoice. 20% on both lines, prices exclude VAT, rounded on each line. NT- with the year, then a number. Net 30, pounds, no PO. I add the bank details myself, from our bank's letter."
     },
     {
       "role": "tool",
@@ -51,7 +51,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I prepare **one invoice** from **Northbrook Trading Ltd** to **Harbor Retail Ltd**, dated **31 October**, under **UK VAT** with the full VAT invoice fields. I read the books from your MosoFin connection. I cannot create the invoice in your accounting system. You get a draft and a proposed entry. Shall I start?"
+      "text": "Here is my plan. I prepare **one invoice** from **Northbrook Trading Ltd** to **Harbor Retail Ltd**, dated **31 October**, under **UK VAT** with the full VAT invoice fields. I read the books from your MosoFin connection. I leave the bank details for you to add from your bank's letter. I cannot create the invoice in your accounting system. You get a draft and a proposed entry. Shall I start?"
     },
     {
       "role": "user",
@@ -227,22 +227,42 @@
     },
     {
       "role": "agent",
-      "text": "The draft is marked as a draft. Before you send it, check two things. Check that Harbor's VAT number is still current. Check the bank details on the draft against a trusted source, such as your bank's letter. I do not send the invoice.",
+      "text": "I also checked your recent numbers, **NT-2026-0390 to NT-2026-0417**, with the voided invoices. Two numbers need a look:",
       "card": {
-        "type": "signoff",
-        "title": "Sign-off",
+        "type": "table",
+        "title": "Number check",
+        "head": [
+          "Finding",
+          "Number",
+          "What it means"
+        ],
         "rows": [
           [
-            "Prepared by",
-            ""
+            "Missing number",
+            "NT-2026-0402",
+            "Not in the books, not voided"
           ],
           [
-            "Approved by",
-            ""
+            "Number on two documents",
+            "NT-2026-0409",
+            "Two invoices share it"
           ]
         ]
       },
-      "after": "Do you want me to save your settings for the next invoice?"
+      "after": "A missing number usually means that someone deleted an invoice. Only your system's audit log can show that. I cannot read it."
+    },
+    {
+      "role": "agent",
+      "text": "The invoice is marked as a draft for review. The payment block is empty, for your bank details. Before you send it, check that Harbor's VAT number is still current. I do not create or send the invoice.",
+      "after": "Do you want the draft as a PDF? If so, which file name do you want?"
+    },
+    {
+      "role": "user",
+      "text": "Yes. Call it NT-2026-0418 Harbor Retail.pdf"
+    },
+    {
+      "role": "agent",
+      "text": "Here is **NT-2026-0418 Harbor Retail.pdf**, marked as a draft. Do you want me to save your settings for the next invoice?"
     },
     {
       "role": "user",
@@ -250,7 +270,10 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved the UK field list, your numbering scheme and your account map. I never save tax IDs, bank details or invoice contents. I read the next number again on every run."
+      "text": "Done. For Northbrook Trading Ltd, I saved the UK field list, your numbering scheme and your account map. I never save tax IDs, bank details or invoice contents. I read the next number again on every run."
     }
-  ]
+  ],
+  "chosen": {
+    "NT-2026-0418 Harbor Retail.pdf": "the file name that the user gives for the PDF draft, when the agent asks for it"
+  }
 }

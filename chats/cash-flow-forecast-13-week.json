@@ -11,18 +11,19 @@
       "list": [
         "Do you want me to use MosoFin, or will you upload files?",
         "Which horizon, from which start date? I propose 13 weeks.",
-        "Which accounts count as cash you can spend, and is any cash restricted? Please give me the bank balance of each on the start date.",
+        "Which accounts count as cash you can spend, and is any cash restricted? Please give me the bank balance of each on the start date, and the date of your last bank reconciliation.",
         "What is your payroll calendar? I need the pay dates, net pay, tax deposit dates and benefit dates.",
         "Which loan payments, tax due dates and other large one-off payments fall in the window?",
         "Which open bills do you plan to pay, and when?",
         "What is your cash floor? Is it a covenant or your own minimum, and how does it define cash?",
         "Do you have a credit line? I need its limit, borrowing base and clean-down rules.",
-        "Is this one company? Do you expect new sales or hold other currencies?"
+        "Is this one company, or several? If several, do you pool the cash?",
+        "Do you expect new sales in the window, or hold other currencies?"
       ]
     },
     {
       "role": "user",
-      "text": "Use MosoFin. 13 weeks from Monday 6 October. On 6 October the bank shows $151,900 in Operating and $30,500 in Savings. The Tax Reserve is restricted. Payroll, loan and tax dates are attached. We pay bills when due, but software and marketing can wait. The floor is a $150,000 covenant, cash net of restricted. One company, US dollars, no new sales to add.",
+      "text": "Use MosoFin. 13 weeks from Monday 6 October. On 6 October the bank shows $151,900 in Operating and $30,500 in Savings. We reconciled both at 30 September. The Tax Reserve is restricted. Payroll, loan and tax dates are attached. We pay bills when due, but software and marketing can wait. The floor is a $150,000 covenant, cash net of restricted. One company, US dollars, no new sales to add.",
       "attach": [
         "payroll-calendar.xlsx",
         "loan-and-tax-schedule.pdf",
@@ -145,7 +146,7 @@
           ]
         ]
       },
-      "after": "I agreed both balances to the books through your latest bank reconciliation. The Tax Reserve holds $24,000 more. It is restricted, so I left it out."
+      "after": "I agreed both balances to the books through your 30 September bank reconciliation. The Tax Reserve holds $24,000 more. It is restricted, so I left it out."
     },
     {
       "role": "agent",
@@ -356,7 +357,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **northbrook-cash-forecast.xlsx**. Next week, give me the actual bank balances. I compare them with this forecast, drop week 1 and add week 14.",
+      "text": "Here is the workbook. It uses live formulas, so the chain changes when you change an input. Next week, give me the actual bank balances. I compare them with this forecast, drop week 1 and add a new week 13.",
       "after": "Do you want me to save your settings for next week?"
     },
     {
@@ -365,7 +366,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved the payroll calendar, the floor and its definition, the credit line terms and the lever list. I never save balances or the forecast."
+      "text": "Done. For Northbrook Trading, I saved the payroll calendar, the floor and its definition, the credit line terms and the lever list. I never save balances or the forecast."
     }
   ]
 }

@@ -98,7 +98,7 @@
         ],
         [
           "get_balance_sheet",
-          ""
+          "Employee Reimbursement Payable $2,155.00"
         ],
         [
           "get_company_info",
@@ -207,7 +207,7 @@
         "**P4**, the client dinner, is $70.00 a head against your $60 cap. I allow 3 × $60.00 = $180.00 and disallow the $30.00 over the cap.",
         "**P5**, the taxi, is $38.00 with no receipt. Your policy asks for a receipt above $25, so I mark it **Review**."
       ],
-      "after": "I cannot see receipt images, so receipt status is per the report. I code the dinner to Meals 6450. Under your US rule, the 50% limit sits with the company, not with Priya."
+      "after": "I cannot see receipt images, so receipt status is per the report. Under your US rule, the 50% limit sits with the company, not with Priya. Your chart has one Meals account, 6450, so I cannot split off the non-deductible half. I suggest a sub-account for it."
     },
     {
       "role": "agent",
@@ -257,7 +257,29 @@
     },
     {
       "role": "agent",
-      "text": "I also tested Corporate Card Clearing. It should come to zero, but it holds **$1,264.00**. The oldest item is a card charge of $118.00 from 11 July, with no claim. It is 108 days old, so it is a break, not timing. Someone must find the claim for it."
+      "text": "I also tested two accounts in your books. Neither one agrees:",
+      "card": {
+        "type": "table",
+        "title": "Ledger checks",
+        "head": [
+          "Account",
+          "Balance",
+          "What I found"
+        ],
+        "rows": [
+          [
+            "Corporate Card Clearing, should be zero",
+            "$1,264.00",
+            "Oldest item: a $118.00 card charge from 11 July with no claim. It is 108 days old, so it is a break, not timing"
+          ],
+          [
+            "Employee Reimbursement Payable",
+            "$2,155.00",
+            "Approved reports not yet paid total $1,850.00. I cannot explain $305.00: a claim paid twice, or one never paid"
+          ]
+        ]
+      },
+      "after": "Someone must find the claim for the $118.00 charge and trace the $305.00."
     },
     {
       "role": "agent",
@@ -298,29 +320,23 @@
     {
       "role": "agent",
       "text": "Your workpaper has six sheets: the summary, the line detail, the exceptions, the posting inputs, the ledger checks and the coverage. The summary says that her manager approved the report.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Approved by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next month?"
+      "after": "Do you want the sheets as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the six sheets. I saved policy v3, the $0.45 rate with its date, your account map and the clearing account. I never save names, claims or amounts."
+      "text": "Here is **PriyaNair_ExpenseReport_2026-09.xlsx**. Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved policy v3, the $0.45 rate with its date, your account map and the clearing account. I never save names, claims or amounts."
     }
   ]
 }
