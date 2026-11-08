@@ -13,9 +13,9 @@
         "Which transactions do you want coded? With MosoFin, I can find the ones in your uncategorized and suspense accounts.",
         "Which company are they for?",
         "Do you want tax codes? If yes, for which country, and which tax codes do you use?",
-        "Above what amount do you record a purchase as an asset, not as an expense? Ask your accountant if you are not sure.",
-        "Do you have house rules that override what you did in the past?",
-        "What are the names of the owners, their family on the books and their other businesses? I use them only for a flag."
+        "Above what amount do you record a purchase as an asset, not as an expense? Ask your accountant if you are not sure. If you leave it blank, I flag large equipment purchases for you.",
+        "Optional: do you have house rules that override what you did in the past?",
+        "Optional: what are the names of the owners, their family on the books and their other businesses? I use them only for a flag."
       ]
     },
     {
@@ -25,27 +25,27 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "Confirmed by name"
-        ],
-        [
-          "Country and currency",
-          "US, US dollars"
-        ],
-        [
-          "Tools",
-          "Read-only tools only"
+          "get_agent_datasources",
+          "One company file, Northbrook Trading"
         ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Is that the right one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
     },
     {
       "role": "agent",
@@ -62,9 +62,17 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the books in one batch",
+      "label": "Checked the tools, then read the books",
       "tag": "read-only",
       "rows": [
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
         [
           "search_accounts",
           "8999 Uncategorized Expense, 38 items"
@@ -98,42 +106,15 @@
           ""
         ],
         [
-          "get_company_info",
-          ""
-        ],
-        [
           "Your bank file",
           "Stripe, +$3,862.40"
         ]
       ],
-      "summary": "9 reads in one batch, and your file. Nothing in your books changed."
+      "summary": "10 calls and your file. Nothing in your books changed."
     },
     {
       "role": "agent",
-      "text": "Most rows are clear. 26 of the 39 have a consistent history and no flag. Here is the first one:",
-      "card": {
-        "type": "table",
-        "title": "Row 1, Tue 1 Sep",
-        "head": [
-          "Bank text",
-          "Amount",
-          "History",
-          "Suggested"
-        ],
-        "rows": [
-          [
-            "SQ *HARBOR OFFICE SUPPLY",
-            "−$312.40",
-            "6520 in 23 of 24, latest Thu 20 Aug",
-            "6520 Office Supplies, High"
-          ]
-        ]
-      },
-      "after": "I strip the Square prefix and find the vendor in your list. The evidence is the count and the date, not a guess."
-    },
-    {
-      "role": "agent",
-      "text": "A history shows your habit. It does not prove that the habit is correct. Two vendors show this:",
+      "text": "Most rows are clear. 26 of the 39 have a consistent history and no flag. For example, I strip the Square prefix from \"SQ *HARBOR OFFICE SUPPLY\". Your history puts that vendor in 6520 in 23 of 24 payments. But a history shows your habit. It does not prove that the habit is correct:",
       "card": {
         "type": "table",
         "title": "History is practice, not proof",
@@ -158,31 +139,7 @@
           ]
         ]
       },
-      "after": "Brightwave is a split, so I do not pick a side. Your rule picks 6340, and I report that the history disagrees. TechDepot is consistent, but this row is a laptop and a monitor."
-    },
-    {
-      "role": "agent",
-      "text": "Row 5 is above your limit. It is also 21.7 times the usual TechDepot payment of $145.00.",
-      "card": {
-        "type": "bridge",
-        "title": "Row 5, TechDepot",
-        "rows": [
-          [
-            "Laptop and monitor",
-            "$3,150.00"
-          ],
-          [
-            "− Your limit for an asset",
-            "$2,500.00"
-          ],
-          [
-            "= Above the limit",
-            "$650.00",
-            "total"
-          ]
-        ]
-      },
-      "after": "I flag it as a possible asset and keep it at Medium. You and your accountant decide."
+      "after": "Brightwave is a split, so I do not pick a side. Your rule picks 6340, and I report that the history disagrees. TechDepot is consistent, but this row is a laptop and a monitor. It is $650 above your $2,500 limit, so I flag it as a possible asset. You and your accountant decide."
     },
     {
       "role": "agent",
@@ -291,15 +248,24 @@
     {
       "role": "agent",
       "text": "I cannot do that. I never write to your books. The coded list is a draft, and a person posts it in your accounting system.",
-      "after": "Do you want the list as **Northbrook Trading_Coded_Transactions_2026-10-05.xlsx**? It also has the Uncoded Population and Coverage sheets. And do you want me to save your house rule for next month?"
+      "after": "Do you want the list as an Excel file? It also has the Uncoded Population and Coverage sheets."
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the coded list, the Uncoded Population and the Coverage sheets. I saved your house rule: phone and internet go to 6340. I never save the transactions, the amounts or the Lindqvist flag."
+      "text": "Done. Here is **Northbrook Trading_Coded_Transactions_2026-10-05.xlsx**. Its header says that I read your chart from the books.",
+      "after": "Do you want me to save your coding rules for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved your phone and internet rule, the $2,500 limit, the tax code mapping and the vendor rules you confirmed. I never save the transactions, the amounts or the Lindqvist flag."
     }
   ]
 }

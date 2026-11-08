@@ -42,15 +42,11 @@
         ],
         [
           "Company file",
-          "QuickBooks Online, confirmed by name"
+          "Northbrook Trading, QuickBooks Online"
         ],
         [
           "Payroll platform",
           "Not connected"
-        ],
-        [
-          "Clearing account",
-          "2200 Payroll clearing, with payroll movement"
         ],
         [
           "Tools",
@@ -62,7 +58,7 @@
     {
       "role": "agent",
       "text": "No payroll platform is connected, so every amount comes from your register. I label it as supplied by you. It covers September and **12 employees** paid. I show totals only, never one person's pay.",
-      "after": "Here is my plan. I build the journal for **Northbrook Trading**'s **monthly run for September**, paid **25 September**, against the chart in your books. Net pay goes through **2200 Payroll clearing**. I split wages and employer costs by **headcount**, with **no capitalised labour**. Shall I start?"
+      "after": "Here is my plan. I build the journal for **Northbrook Trading**'s **monthly run for September**, pay period **1 to 30 September**, paid **25 September**. I use your register and the chart in your books. Net pay goes through **2200 Payroll clearing**. I split wages and employer costs by **headcount**, with **no capitalised labour**. Shall I start?"
     },
     {
       "role": "user",
@@ -96,7 +92,7 @@
         ],
         [
           "get_general_ledger",
-          "2250 Accrued payroll, nil since 1 April"
+          "2200 has payroll movement, 2250 nil since 1 April"
         ],
         [
           "get_profit_and_loss",
@@ -143,7 +139,7 @@
           ]
         ]
       },
-      "after": "On top of that, Northbrook owes **$4,600** of its own costs. The run costs you $52,600 in total."
+      "after": "On top of that, Northbrook owes **$4,600** of its own costs. The run costs you $52,600 in total. Every amount maps to an account in your chart."
     },
     {
       "role": "agent",
@@ -288,7 +284,7 @@
       "text": "Staff earn overtime from 21 to 30 September, and the October run pays it. On the accrual basis, September carries that cost. This is my one estimate:",
       "card": {
         "type": "bridge",
-        "title": "Entry 3, Wed 30 Sep, ESTIMATE",
+        "title": "Entry 3, Wed 30 Sep, ESTIMATE, from the September run",
         "rows": [
           [
             "Overtime, 8 days at $312.50, 5100 Warehouse",
@@ -305,14 +301,14 @@
           ]
         ]
       },
-      "after": "A wages-only accrual would be $179.69 too low. Last March's accrual reversed on 1 April, so nothing counts twice. On 25 September, PayrollCo takes the $36,600 net pay from the operating account, and 2200 clears for this run."
+      "after": "A wages-only accrual would be $179.69 too low. Last March's accrual reversed on 1 April, so nothing counts twice. I also propose the funding entry. On 25 September, PayrollCo takes the $36,600 net pay from your operating account, so 2200 clears for this run."
     },
     {
       "role": "agent",
       "text": "I compared the run with June, July and August. Gross pay and headcount did not change. Two movements need a word from you before anyone posts:",
       "card": {
         "type": "table",
-        "title": "Against August",
+        "title": "Against June, July and August",
         "head": [
           "Line",
           "Change",
@@ -328,10 +324,15 @@
             "Office expense",
             "+$2,000.00",
             "Flagged. The software project stopped, so no pay goes to 1700"
+          ],
+          [
+            "Bonus run, Tue 15 Sep",
+            "$6,000",
+            "Flagged. A separate run with its own entries"
           ]
         ]
       },
-      "after": "Your answer about the project explains the second one. All eleven checks ran."
+      "after": "Your answer about the project explains the office change. The bonus run is not hidden in this one. All eleven checks ran."
     },
     {
       "role": "agent",
@@ -345,7 +346,7 @@
             ""
           ],
           [
-            "Approved by",
+            "Reviewed by",
             ""
           ]
         ]
@@ -358,7 +359,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **Payroll_JE_2026-09-25_Northbrook Trading.xlsx**. I saved the account map, the two-entry layout, the headcount basis, the clearing account, the pay calendar and your 5% limit.",
+      "text": "Here is **Payroll_JE_2026-09-25_Northbrook Trading.xlsx**. I saved the account map, the two-entry layout, the headcount basis, the clearing account and the funding by PayrollCo. I also saved the pay calendar, the rule for capitalised labour and your 5% limit.",
       "after": "I never save an amount or anyone's pay. Next month, the run starts from these settings."
     }
   ]

@@ -18,7 +18,7 @@
         "How many days after month end do I search for late bills? I propose the day that the books close.",
         "Which account holds accrued liabilities?",
         "Can you recover input tax, and in which country?",
-        "Which materiality threshold applies to accruals? Is it tighter at year end?"
+        "Optional: which materiality threshold applies to accruals? Is it tighter at year end? Without one, I accrue everything that I find."
       ]
     },
     {
@@ -31,16 +31,27 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and what your books hold",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
-        ["Workspace", "Northbrook Trading"],
-        ["Company file", "Confirmed by name"],
-        ["Purchase orders", "In the books"],
-        ["Goods receipts", "Not in the books"],
-        ["Tools", "Read-only tools only"]
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "One company file, Northbrook Trading"
+        ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Is that the right one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
     },
     {
       "role": "agent",
@@ -58,20 +69,55 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the books in one batch",
+      "label": "Checked the tools, then read the books",
       "tag": "read-only",
       "rows": [
-        ["search_purchase_orders", "Open from 14 Jul: PO-2033, PO-2041, PO-2044"],
-        ["get_purchase_order", ""],
-        ["search_bills", "Includes RW-8812, with no order number"],
-        ["search_bills", "Bills dated 1 to 10 Oct"],
-        ["get_vendor_expenses", "Includes Summit Cleaning and Crestline Logistics"],
-        ["search_accounts", "Accrued Expenses"],
-        ["get_trial_balance", "Accrued Expenses $1,950 at 31 Aug"],
-        ["search_journal_entries", "August reversals posted 1 Sep"],
-        ["Your warehouse log", "Includes GRN-0917"]
+        [
+          "get_datasource_tools",
+          "Purchase orders, no goods receipts"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
+        [
+          "search_purchase_orders",
+          "PO-2033, PO-2041, PO-2044 open"
+        ],
+        [
+          "get_purchase_order",
+          ""
+        ],
+        [
+          "search_bills",
+          "Includes RW-8812, with no order number"
+        ],
+        [
+          "search_bills",
+          "Bills dated 1 to 10 Oct"
+        ],
+        [
+          "get_vendor_expenses",
+          "Includes Summit Cleaning and Crestline Logistics"
+        ],
+        [
+          "search_accounts",
+          "Accrued Expenses"
+        ],
+        [
+          "get_trial_balance",
+          "Accrued Expenses $1,950 at 31 Aug"
+        ],
+        [
+          "search_journal_entries",
+          "August reversals posted 1 Sep"
+        ],
+        [
+          "Your warehouse log",
+          "Includes GRN-0917"
+        ]
       ],
-      "summary": "8 reads in one batch, and your log. Nothing in your books changed."
+      "summary": "10 calls and your log. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -79,14 +125,42 @@
       "card": {
         "type": "table",
         "title": "Regular suppliers, September",
-        "head": ["Supplier", "Expected", "Basis"],
+        "head": [
+          "Supplier",
+          "Expected",
+          "Basis"
+        ],
         "rows": [
-          ["Summit Cleaning", "$950.00", "Last bill"],
-          ["Crestline Logistics", "$1,500.00", "Contract letter, up 50%"],
-          ["Metro Shred", "$120.00", "Last bill"],
-          ["Keystone Pest Control", "$350.00", "Last bill"],
-          ["Lakeside Freight", "", "Bill in the late window"],
-          ["Power Co", "", "Bills each month"]
+          [
+            "Summit Cleaning",
+            "$950.00",
+            "Last bill"
+          ],
+          [
+            "Crestline Logistics",
+            "$1,500.00",
+            "Contract letter, up 50%"
+          ],
+          [
+            "Metro Shred",
+            "$120.00",
+            "Last bill"
+          ],
+          [
+            "Keystone Pest Control",
+            "$350.00",
+            "Last bill"
+          ],
+          [
+            "Lakeside Freight",
+            "",
+            "Bill in the late window"
+          ],
+          [
+            "Power Co",
+            "",
+            "Bills each month"
+          ]
         ]
       },
       "after": "Crestline billed $1,000 in each of June, July and August. Its contract letter says $1,500. Which amount do I use?"
@@ -97,19 +171,35 @@
     },
     {
       "role": "agent",
-      "text": "First, the goods. Your log shows what arrived, and the orders give the price:",
+      "text": "First, the goods. Your books hold orders but no goods receipts, so the quantities come from your log. I searched every open order, back to PO-2033 from 14 July:",
       "card": {
         "type": "bridge",
         "title": "Goods received, not invoiced",
         "rows": [
-          ["PO-2041 line 1, 400 × $12.00, GRN-0917 on 29 Sep", "$4,800.00"],
-          ["+ PO-2033 line 2, 90 received × $20.00", "$1,800.00"],
-          ["+ PO-2033 line 1, received and billed on RW-8812", "$0.00"],
-          ["+ PO-2044, nothing received", "$0.00"],
-          ["= Goods received, not invoiced", "$6,600.00", "total"]
+          [
+            "PO-2041 line 1, 400 × $12.00, GRN-0917 on 29 Sep",
+            "$4,800.00"
+          ],
+          [
+            "+ PO-2033 line 2, 90 received × $20.00",
+            "$1,800.00"
+          ],
+          [
+            "+ PO-2033 line 1, received and billed on RW-8812",
+            "$0.00"
+          ],
+          [
+            "+ PO-2044, nothing received",
+            "$0.00"
+          ],
+          [
+            "= Goods received, not invoiced",
+            "$6,600.00",
+            "total"
+          ]
         ]
       },
-      "after": "RW-8812 has no order number. I matched it by supplier, date, amount and description, and I mark the match as **inferred**. The other **$4,200** of open orders did not arrive, so I do not accrue it."
+      "after": "RW-8812 has no order number. I matched it by supplier, date, amount and description, and I mark the match as **inferred**. The other **$4,200** of open orders did not arrive. That is an order, not a debt, so I do not accrue it."
     },
     {
       "role": "agent",
@@ -117,14 +207,42 @@
       "card": {
         "type": "table",
         "title": "Bills dated 1 to 10 October",
-        "head": ["Bill", "Accrued", "Why"],
+        "head": [
+          "Bill",
+          "Accrued",
+          "Why"
+        ],
         "rows": [
-          ["LF-7781, Lakeside Freight", "$2,600.00", "All work in September"],
-          ["WC-118, Westfield Consulting", "$3,000.00", "15 of 30 days in September"],
-          ["BS-5521, Brightline Software", "$0.00", "All work in October"],
-          ["RW-8840, Ridgeway Wholesale", "$0.00", "Already in goods received"],
-          ["PD-305, Pinnacle Design", "$0.00", "No service dates"],
-          ["Late bills accrued", "$5,600.00", ""]
+          [
+            "LF-7781, Lakeside Freight",
+            "$2,600.00",
+            "All work in September"
+          ],
+          [
+            "WC-118, Westfield Consulting",
+            "$3,000.00",
+            "15 of 30 days in September"
+          ],
+          [
+            "BS-5521, Brightline Software",
+            "$0.00",
+            "All work in October"
+          ],
+          [
+            "RW-8840, Ridgeway Wholesale",
+            "$0.00",
+            "Already in goods received"
+          ],
+          [
+            "PD-305, Pinnacle Design",
+            "$0.00",
+            "No service dates"
+          ],
+          [
+            "Late bills accrued",
+            "$5,600.00",
+            ""
+          ]
         ]
       },
       "after": "PD-305 for $2,400 goes to Exceptions. If that work was all in September, September misses up to $2,400. HOS-4410 for $640 is dated 30 September. Please enter it as a September bill. I do not accrue it."
@@ -136,9 +254,19 @@
         "type": "bridge",
         "title": "Regular suppliers",
         "rows": [
-          ["Summit Cleaning, last bill", "$950.00"],
-          ["+ Crestline Logistics, contract letter", "$1,500.00"],
-          ["= Regular suppliers accrued", "$2,450.00", "total"]
+          [
+            "Summit Cleaning, last bill",
+            "$950.00"
+          ],
+          [
+            "+ Crestline Logistics, contract letter",
+            "$1,500.00"
+          ],
+          [
+            "= Regular suppliers accrued",
+            "$2,450.00",
+            "total"
+          ]
         ]
       },
       "after": "Metro Shred at $120 and Keystone at $350 are each below $500. I list them with their total of **$470**. Lakeside and Power Co each appear once, in another place."
@@ -149,42 +277,76 @@
       "card": {
         "type": "table",
         "title": "Proposed entries",
-        "head": ["Debit", "Amount", "Evidence"],
+        "head": [
+          "Debit",
+          "Amount",
+          "Evidence"
+        ],
         "rows": [
-          ["Inventory", "$6,600.00", "PO-2041, PO-2033 and your log"],
-          ["Freight and Delivery", "$2,600.00", "LF-7781"],
-          ["IT Services", "$3,000.00", "WC-118"],
-          ["Cleaning", "$950.00", "Summit's last bill"],
-          ["Warehouse Storage", "$1,500.00", "Crestline's contract letter"],
-          ["Total accrued", "$14,650.00", ""]
+          [
+            "Inventory",
+            "$6,600.00",
+            "PO-2041, PO-2033 and your log"
+          ],
+          [
+            "Freight and Delivery",
+            "$2,600.00",
+            "LF-7781"
+          ],
+          [
+            "IT Services",
+            "$3,000.00",
+            "WC-118"
+          ],
+          [
+            "Cleaning",
+            "$950.00",
+            "Summit's last bill"
+          ],
+          [
+            "Warehouse Storage",
+            "$1,500.00",
+            "Crestline's contract letter"
+          ],
+          [
+            "Total accrued",
+            "$14,650.00",
+            ""
+          ]
         ]
       },
-      "after": "Stock rises by **$6,600** and September cost rises by **$8,050**. Accrued Expenses opened at $1,950, and both August reversals posted. So it closes at **$14,650**."
+      "after": "Stock rises by **$6,600** and September cost rises by **$8,050**. Accrued Expenses opened at $1,950, and both August reversals posted. So it closes at **$14,650**. A person posts these entries. I do not. Do you want the workpaper as an Excel file?"
     },
     {
       "role": "user",
-      "text": "To be safe, can you also accrue all the open purchase orders?"
+      "text": "Looks right. Yes, please."
     },
     {
       "role": "agent",
-      "text": "No. PO-2044 and 60 units on PO-2033 never arrived. That **$4,200** is an order, not a debt. I list it only as open orders, not received.",
+      "text": "Done. **AP_Accruals_2026-09_Cutoff.xlsx** has seven sheets. Five items are on the Exceptions sheet, each with an owner and a due date of Friday 9 October. The summary sheet ends with a sign-off:",
       "card": {
         "type": "signoff",
         "title": "Sign-off",
         "rows": [
-          ["Prepared by", ""],
-          ["Reviewed by", ""]
+          [
+            "Prepared by / date",
+            ""
+          ],
+          [
+            "Reviewed by / date",
+            ""
+          ]
         ]
       },
-      "after": "Five items go to Exceptions, each with an owner and a due date of Friday 9 October. A person posts the entries. I do not. Do you want the seven sheets as an Excel file? And shall I save your settings for next month?"
+      "after": "Do you want me to save your settings for next month?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, save them."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the seven sheets. I saved your answers, the regular suppliers with their expected amounts, the accounts and your warehouse log as the receipt record. Power Co stays out next month too."
+      "text": "Done. I saved your answers for Northbrook Trading, the regular suppliers with their expected amounts, the accounts and your warehouse log as the receipt record. Power Co stays out next month too. I did not save your connection or tool settings."
     }
   ]
 }

@@ -13,18 +13,18 @@
       "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
       "list": [
         "Do you want me to use MosoFin, or will you upload the documents?",
-        "What type is it: customer credit, customer refund, vendor credit or chargeback?",
+        "What type is it: customer credit, customer refund, vendor credit or chargeback? For a chargeback, is it still disputed, accepted or a fraud loss?",
         "Which original invoice? I need its number, date and amount.",
         "What is the credit amount?",
         "What is the reason? I never guess it.",
-        "Did the original carry tax? If so, in which jurisdiction?",
+        "Did the original carry tax? If so, in which tax jurisdiction?",
         "Which period's credits do you want me to check?",
         "Who approves a credit that is more than its original invoice?"
       ]
     },
     {
       "role": "user",
-      "text": "Use MosoFin. A customer credit, CM-0418, $1,200 before tax, against invoice 1042. The reason is a pricing error. Tax as on the invoice. Check all of September. Our finance director approves over-credits."
+      "text": "Use MosoFin. A customer credit, CM-0418, $1,200 before tax, against invoice 1042. The reason is a pricing error. US sales tax, as on the invoice. Check all of September. Our finance director approves over-credits."
     },
     {
       "role": "tool",
@@ -49,7 +49,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I process **credit memo CM-0418** for **Northbrook Trading**: a **customer credit** of **$1,200** against **invoice 1042**, reason **pricing error**. Tax follows the invoice. I also check every credit in **September** and list unapplied credits in both directions. Shall I start?"
+      "text": "Here is my plan. I process **credit memo CM-0418** for **Northbrook Trading**: a **customer credit** of **$1,200** against **invoice 1042**, reason **pricing error**. Tax follows the invoice, under US sales tax. I read the books from your MosoFin connection. I also check every credit in **September** and list unapplied credits in both directions. Shall I start?"
     },
     {
       "role": "user",
@@ -247,7 +247,7 @@
             "Hold for the reason"
           ],
           [
-            "Cedar Point Cafe, paid twice",
+            "Cedar Point Cafe, overpaid",
             "$300.00",
             "Refund of an overpayment"
           ]
@@ -268,50 +268,44 @@
         ],
         "rows": [
           [
-            "E1 · CM-0418 pricing credit, with tax on its own line",
+            "CM-0418 pricing credit, with tax on its own line",
             "$1,290.00",
             "Invoice 1042 and its tax code"
           ],
           [
-            "E3 · Move Delta's credit from Other Income to Packaging Supplies",
+            "Move Delta's credit from Other Income to Packaging Supplies",
             "$400.00",
             "VC-0077 and bill B-5530"
           ],
           [
-            "E4 · Debit Sales Tax Payable, credit Sales Returns & Allowances",
+            "Debit Sales Tax Payable, credit Sales Returns & Allowances",
             "$60.00",
             "Invoice 1019 and its tax code"
           ]
         ]
       },
-      "after": "E3 and E4 correct entries already in your books. I never edit or delete the originals. A person posts these drafts. I do not post entries or send refunds."
+      "after": "The second and third entries correct entries already in your books. I never edit or delete the originals. A person posts these drafts. I do not post entries or send refunds."
     },
     {
       "role": "agent",
       "text": "Your workpaper has six sheets. They are the register, the posting inputs, the application tracking, the unapplied credits, the validation exceptions and the coverage.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next month?"
+      "after": "Do you want the sheets as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. Here is **CreditMemos_2026-09.xlsx**. I saved your account map, the reason treatments and your approver. I never save a customer's name with an amount, or the open credit balance."
+      "text": "Here is **CreditMemos_2026-09.xlsx**. Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved your account map, the treatment for each reason and your approval rule for over-credits. I never save a customer's name with an amount, or the open credit balance."
     }
   ]
 }

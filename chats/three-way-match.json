@@ -1,7 +1,8 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, open bills from Ashford Seating, September. The figures match the worked examples on the step-by-step page.",
   "chosen": {
-    "warehouse-receipts-september.xlsx": "the name of the user's own receipt sheet"
+    "warehouse-receipts-september.xlsx": "the name of the user's own receipt sheet",
+    "Match_Population_2026-09_NorthbrookTrading.xlsx": "the file name that the skill gives a population run, for September of the example year 2026"
   },
   "messages": [
     {
@@ -31,31 +32,23 @@
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "QuickBooks Online Plus, confirmed by name"
+          "get_agent_datasources",
+          "Northbrook Trading"
         ],
         [
-          "Purchase orders",
-          "In the books"
-        ],
-        [
-          "Approval status",
-          "In the books"
-        ],
-        [
-          "Goods receipts",
-          "Not in the books"
+          "get_datasource_tools",
+          "Bills, orders and approvals. No receipts"
         ]
       ],
       "summary": "The agent can read your books. It cannot change them."
     },
     {
       "role": "agent",
-      "text": "Your books hold the bills, the purchase orders and their approvals. They do not hold the goods receipts. Without receipts, I can only do a **two-way match**, and tests 4, 7, 8 and 15 cannot run. Can you attach your delivery records?"
+      "text": "Your books hold the bills, the purchase orders and their approvals. They do not hold the goods receipts. Without receipts, I can only do a **two-way match**. Then I cannot test for short deliveries or damaged goods. Can you attach your delivery records?"
     },
     {
       "role": "user",
@@ -66,7 +59,8 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I match **September's open bills** for **Northbrook Trading** against their purchase orders and your receipts. I use **exact match**, because you gave no tolerance. Your approval matrix applies. This is a **three-way match**. Shall I start?"
+      "text": "Here is my plan. I match **September's open bills** for **Northbrook Trading** against their purchase orders and your receipts. I read the bills and orders through MosoFin.",
+      "after": "I use **exact match**, because you gave no tolerance. Your approval matrix applies. This is a **three-way match**. Shall I start?"
     },
     {
       "role": "user",
@@ -79,23 +73,27 @@
       "tag": "read-only",
       "rows": [
         [
-          "search_bills",
+          "Open bills",
           "Includes the Ashford Seating bill on PO-1041"
         ],
         [
-          "search_purchase_orders",
+          "Purchase orders",
           "Includes PO-1041"
         ],
         [
-          "get_purchase_order",
+          "Approvals",
           "PO-1041, approved by a director"
         ],
         [
-          "Your receipt sheet",
-          "Includes GRN-2207, GRN-2211 and GRN-2215"
+          "Vendor master",
+          ""
+        ],
+        [
+          "Bills and payments on these orders",
+          ""
         ]
       ],
-      "summary": "3 reads in one batch, and your sheet. Nothing in your books changed."
+      "summary": "5 reads in one batch. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -130,7 +128,7 @@
     },
     {
       "role": "agent",
-      "text": "That line has three High exceptions. Ashford charged **$1.50 a chair** over the order. Ashford also billed the full 100 chairs, but the warehouse rejected 4 as damaged.",
+      "text": "That line has three problems, each of high severity. Ashford charged **$1.50 a chair** over the order. Ashford also billed the full 100 chairs, but the warehouse rejected 4 as damaged.",
       "card": {
         "type": "bridge",
         "title": "What you owe on this bill",
@@ -140,11 +138,11 @@
             "$4,350.00"
           ],
           [
-            "− Price overbilling, 100 × $1.50 (exception 1)",
+            "− Price over the order, 100 × $1.50",
             "$150.00"
           ],
           [
-            "− 4 damaged chairs billed in full, 4 × $42.00 (exceptions 4 and 15)",
+            "− 4 damaged chairs billed in full, 4 × $42.00",
             "$168.00"
           ],
           [
@@ -154,7 +152,7 @@
           ]
         ]
       },
-      "after": "My recommendation is **Hold**. The line is outside your tolerance, so the matched amount is $0 and the disputed amount is the full $4,350. AP owns all three exceptions."
+      "after": "My recommendation is **Hold**. The line is outside your tolerance, so the matched amount is $0 and the disputed amount is the full $4,350. AP owns all three problems."
     },
     {
       "role": "agent",
@@ -212,30 +210,25 @@
     },
     {
       "role": "agent",
-      "text": "Your report says which match I ran. It has the summary, every line with its match basis, the exceptions with their owners, the month's findings and the coverage.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want the report as an Excel file? And do you want me to save your settings for next month?"
+      "text": "Your report says which match I ran. It has the summary, every line with its match basis, the problems with their owners, the document references, the month's findings and the coverage.",
+      "after": "Do you want the report as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the six sheets. I saved which documents your books hold, the exact-match policy, your approval matrix and the exception owner. Next month, the run starts from them."
+      "text": "Here it is: **Match_Population_2026-09_NorthbrookTrading.xlsx**.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved which documents your books hold, the exact-match policy, your approval matrix and the $3,500 received but not billed. Next month, the run starts from them."
     }
   ]
 }

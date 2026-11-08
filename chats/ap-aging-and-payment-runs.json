@@ -20,7 +20,7 @@
     },
     {
       "role": "user",
-      "text": "Use MosoFin. As of Friday 6 November, standard buckets. A run too, with $40,000. We keep $10,000 back. Power Co and PayrollCo are critical, Brightline Software is discretionary. Acme Corp is on hold. We dispute its bill. Nothing is on its way. An email on 3 November asked to change Lakeside Freight's bank details. All ACH, all US dollars."
+      "text": "Use MosoFin. As of Friday 6 November, standard buckets. A run too, with $40,000. We keep $10,000 back. Power Co and PayrollCo are critical, Brightline Software is discretionary. Acme Corp is on hold. We dispute its bill. Nothing is on its way. Lakeside Freight sent a final notice, and an email on 3 November asked to change its bank details. All ACH, all US dollars."
     },
     {
       "role": "tool",
@@ -138,7 +138,7 @@
           ]
         ]
       },
-      "after": "Crestline is 45 days late. Acme is 96 days late, but you hold it."
+      "after": "The total agrees with the accounts payable balance on your balance sheet. Crestline is 45 days late. Acme is 96 days late, but you hold it."
     },
     {
       "role": "agent",
@@ -281,15 +281,23 @@
           ]
         ]
       },
-      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next week?"
+      "after": "Do you want the sheets as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the aging, the run, the held bills, the discounts, the exceptions and the coverage. I saved your vendor tiers, payment methods, the Acme hold and the ranking order. I never save bank details or the cash available. Next week, I ask for the cash again."
+      "text": "Here it is: **AP_Aging_and_PaymentRun_2026-11-06.xlsx**. It has the aging, the proposed run, the held and disputed bills, the discounts, the exceptions and the coverage. Do you want me to save your settings for next week?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved your vendor tiers, payment methods and the Acme hold with its reason. I never save bank details or the cash available. Next week, I ask for the cash again."
     }
   ]
 }

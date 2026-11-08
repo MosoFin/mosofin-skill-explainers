@@ -81,10 +81,6 @@
           "July to September, $4,000"
         ],
         [
-          "search_customers",
-          ""
-        ],
-        [
           "get_balance_sheet",
           "A/R $68,950"
         ],
@@ -93,7 +89,7 @@
           ""
         ]
       ],
-      "summary": "7 reads in one batch. Nothing in your books changed."
+      "summary": "6 reads in one batch. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -190,7 +186,7 @@
           ]
         ]
       },
-      "after": "DSO is $68,200 ÷ $146,000 × 92 days = **43.0 days**. Total income also holds $44,000 of cash sales. On total income, DSO reads 33.0 days, which is 10 days too good."
+      "after": "DSO is $68,200 ÷ $146,000 × 92 days = **43.0 days**. I do not use total income. It holds cash sales that were never owed to you, so DSO would look better than it is."
     },
     {
       "role": "agent",
@@ -247,23 +243,35 @@
         "rows": [
           [
             "Prepared by",
-            ""
+            "This agent run"
           ],
           [
             "Reviewed by",
             ""
+          ],
+          [
+            "Date",
+            ""
           ]
         ]
       },
-      "after": "Do you want the report as an Excel file? And do you want me to save your settings for next month?"
+      "after": "Do you want the report as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the seven sheets. I saved the Acme dispute, your collection policy and the DSO basis. I never save contact details, balances or drafts."
+      "text": "Here it is, with the seven sheets. Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved the Acme dispute, your collection policy and the DSO basis. I never save contact details, balances or drafts."
     }
   ]
 }

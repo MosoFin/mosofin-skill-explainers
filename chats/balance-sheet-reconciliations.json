@@ -20,7 +20,8 @@
         "What size of difference must you resolve at once? I can suggest a basis, but you choose the threshold.",
         "Do you have last period's reconciliation?",
         "Who prepares, and who reviews?"
-      ]
+      ],
+      "after": "The last two are optional, but they make the work stronger."
     },
     {
       "role": "user",
@@ -43,7 +44,7 @@
         ],
         [
           "Company file",
-          "Confirmed by name"
+          "Northbrook Trading"
         ],
         [
           "Tools",
@@ -54,19 +55,12 @@
     },
     {
       "role": "agent",
-      "text": "One more question. A small residual can get a write-off, but only below a limit that you approve. What is that limit, and which P&L account takes it?"
+      "text": "Here is my plan for the **Northbrook Trading** workspace and company file. I reconcile **seven accounts** at **30 September**, with your general ledger (GL) read through MosoFin. I tie A/R and A/P to their agings and test them against receipts and payments after the date. Payroll clearing must be zero. Your schedules support prepaid, accrued expenses and the loan. The fixed asset register is missing, so fixed assets show as **not reconciled**. Materiality is **$500**.",
+      "after": "One question before I start. A small residual can get a write-off, but only below a limit that you approve. What is that limit, and which P&L account takes it?"
     },
     {
       "role": "user",
-      "text": "Up to $100. Use Miscellaneous expense."
-    },
-    {
-      "role": "agent",
-      "text": "Here is my plan. I reconcile **seven accounts** of **Northbrook Trading** at **30 September**, with the GL read through MosoFin. I tie A/R and A/P to their agings and test them against receipts and payments after the date. Payroll clearing must be zero. Your schedules support prepaid, accrued expenses and the loan. The fixed asset register is missing, so fixed assets show as **not reconciled**. Materiality is **$500**. Shall I start?"
-    },
-    {
-      "role": "user",
-      "text": "Yes, go ahead."
+      "text": "Up to $100, to Miscellaneous expense. Then go ahead."
     },
     {
       "role": "tool",
@@ -186,7 +180,7 @@
           ]
         ]
       },
-      "after": "The aging comes from the same books, so this tie is only a mechanical check. The independent test is the receipts after the date. They paid $31,400 of the 30 September invoices. I found no late entries, no foreign currency and no rounding. A journal entry to A/R without a customer is the likely cause. The $750 is above $500, so it needs resolution now. The bookkeeper owns it, with a target date of Fri 9 Oct."
+      "after": "The aging comes from the same books, so this tie is only a mechanical check. The independent test is the receipts after the date. Customers paid $31,400 of the 30 September invoices from 1 to 9 October. I found no late entries, no foreign currency and no rounding. A journal entry to A/R without a customer is the likely cause. The $750 is above $500, so it needs resolution now. The bookkeeper owns it, with a target date of Fri 9 Oct."
     },
     {
       "role": "user",
@@ -289,7 +283,7 @@
             "Prepaid schedule"
           ],
           [
-            "Dr 2110 Accrued expenses, Cr 6310 Utilities",
+            "Reverse the August accrual: Dr 2110 Accrued expenses, Cr 6310 Utilities",
             "$2,040.00",
             "Roll-forward of 2110"
           ]
@@ -381,7 +375,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **BS_Recs_2026-09_Northbrook Trading.xlsx**. I saved the source for each account, the $500 threshold, the 3-month escalation, the people and the $100 limit. I never save balances, item detail or the workpaper."
+      "text": "Here is **BS_Recs_2026-09_Northbrook Trading.xlsx**. I saved the source for each account, the $500 threshold and the 3-month escalation. I also saved the people, the $100 limit with Miscellaneous expense, and payroll clearing as an account that must be zero. I never save balances, item detail or the workpaper."
     }
   ]
 }

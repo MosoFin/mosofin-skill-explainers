@@ -3,115 +3,326 @@
   "chosen": {
     "deposit-listing-1-9-october.csv": "the name of the user's own deposit listing file",
     "crestline-remittance.pdf": "the name of the remittance file that Crestline Foods sent",
-    "lakeside-remittance-email.pdf": "the name of the remittance email that Lakeside Freight sent"
+    "lakeside-remittance-email.pdf": "the name of the remittance email that Lakeside Freight sent",
+    "Cash_Application_2026-10-09.xlsx": "the file name that the skill gives the workpaper, dated 9 October of the example year 2026"
   },
   "messages": [
-    {"role": "user", "text": "Can you apply this week's customer payments to our open invoices?"},
-    {"role": "agent",
-     "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
-     "list": [
-       "Do you want me to use MosoFin, or will you upload files?",
-       "Which payments: ones already in the books, or a file not yet entered? As of what date do I take the open invoices?",
-       "Do you have remittance advices? Where are they?",
-       "What difference do you accept on a short or extra payment? I never invent one.",
-       "Do I apply the oldest invoice first, or another order?",
-       "Is any payment in a different currency from its invoice? If so, which rate do I use, and from what source?",
-       "Does any customer withhold tax at source?"
-     ]},
-    {"role": "user",
-     "text": "Use MosoFin. It's the bank's deposit listing for 1 to 9 October, not in the books yet. Open invoices as of today, 9 October. Two remittances attached. $5 for each payment. Oldest first. All US dollars, no withholding.",
-     "attach": ["deposit-listing-1-9-october.csv", "crestline-remittance.pdf", "lakeside-remittance-email.pdf"]},
-    {"role": "tool", "source": "mosofin", "label": "Checked the workspace and the company file", "tag": "read-only",
-     "rows": [
-       ["Workspace", "Northbrook Trading"],
-       ["Company file", "Confirmed by name"],
-       ["Open invoices", "Readable invoice by invoice"],
-       ["Tools", "Read-only tools only"]
-     ],
-     "summary": "The agent can read your books. It cannot change them."},
-    {"role": "agent",
-     "text": "Here is my plan. I apply the **1 to 9 October deposit listing**, **6 payments for $58,997.00**, to **Northbrook Trading**'s open invoices **as of 9 October**. I use **$5 for each payment**, oldest invoice first, and remittances for 2 of the payments. I read the full aging, with no date limit. Shall I start?"},
-    {"role": "user", "text": "Yes, go ahead."},
-    {"role": "tool", "source": "mosofin", "label": "Read the books in one batch", "tag": "read-only",
-     "rows": [
-       ["get_aged_receivables", "Net open A/R $52,300.00"],
-       ["search_invoices", "Includes INV-1032 and INV-1035, new since 30 Sep"],
-       ["search_customers", ""],
-       ["search_payments", "INV-1010 paid by Pinnacle Clinics, 8 Oct"],
-       ["search_deposits", ""],
-       ["search_credit_memos", "CM-0044 for Lakeside, not applied"],
-       ["search_terms", "INV-0901 on 2/10, n/30"],
-       ["search_accounts", ""],
-       ["get_company_info", "US dollars"]
-     ],
-     "summary": "9 reads in one batch. Nothing in your books changed."},
-    {"role": "agent",
-     "text": "One row of your file is already in the books. Pinnacle Clinics paid **INV-1010** on 8 October, and the books hold that payment. I removed the row, so it gets no second entry.",
-     "card": {"type": "bridge", "title": "Payments to apply",
-       "rows": [
-         ["Deposit listing, 6 payments", "$58,997.00"],
-         ["− Pinnacle Clinics, already recorded", "$24,200.00"],
-         ["= Payments to apply, 5 payments", "$34,797.00", "total"]
-       ]}},
-    {"role": "agent",
-     "text": "Here is how I matched the five payments:",
-     "card": {"type": "table", "title": "Payment to invoice",
-       "head": ["Payment", "Amount", "Invoices", "How I matched it"],
-       "rows": [
-         ["HARBOR RETAIL GRP, 2 Oct", "$20,500.00", "INV-0950 and INV-1001", "Harbor's name and the sum of its two invoices"],
-         ["CRESTLINE FOODS LLC, 5 Oct", "$6,272.00", "INV-0901", "Invoice number in the remittance"],
-         ["LAKESIDE FRT INC, 6 Oct", "$3,775.00", "INV-1032", "Invoice number in the wire reference"],
-         ["ACH CREDIT 4471, 7 Oct", "$3,300.00", "Acme INV-0990 or Crestline INV-1035", "Two customers fit. I do not choose."],
-         ["J MORALES, 9 Oct", "$950.00", "None", "No name, reference or amount fits"]
-       ]},
-     "after": "Two matches need your yes. Harbor sent no remittance, so I matched its name at 0.867 and found one combination of invoices. LAKESIDE FRT INC scores only 0.750 against Lakeside Freight. I matched it by its reference. Do you approve both?"},
-    {"role": "user", "text": "Yes, both are right."},
-    {"role": "agent",
-     "text": "Crestline paid **$128** less than INV-0901. Its remittance calls this a 2% prompt-payment discount. But the discount window closed on 31 May, and Crestline paid on 5 October.",
-     "card": {"type": "bridge", "title": "Crestline Foods, INV-0901",
-       "rows": [
-         ["Open balance", "$6,400.00"],
-         ["− Payment received", "$6,272.00"],
-         ["= Short pay", "$128.00", "total"]
-       ]},
-     "after": "$128 is more than your $5, and the reason is not valid. So the $128 stays open for collections. I do not write it off or book it as a discount."},
-    {"role": "agent",
-     "text": "Lakeside paid **$1,225** less than INV-1032. Credit memo CM-0044 explains $1,200 of it. The remittance says Lakeside sent $3,800, so the last $25 is a bank fee on the wire.",
-     "card": {"type": "bridge", "title": "Lakeside Freight, INV-1032",
-       "rows": [
-         ["Open balance", "$5,000.00"],
-         ["− Credit memo CM-0044", "$1,200.00"],
-         ["− Wire received", "$3,775.00"],
-         ["= Bank fee", "$25.00", "total"]
-       ]},
-     "after": "INV-1032 is now paid in full. The fee gets its own line in the entry, so you can see it."},
-    {"role": "agent",
-     "text": "Two payments wait as **unapplied cash**. They are not revenue.",
-     "card": {"type": "bridge", "title": "Unapplied cash",
-       "rows": [
-         ["ACH CREDIT 4471, 7 Oct", "$3,300.00"],
-         ["+ J MORALES, 9 Oct", "$950.00"],
-         ["= Unapplied cash", "$4,250.00", "total"]
-       ]},
-     "after": "$3,300 fits Acme INV-0990 and Crestline INV-1035 exactly. Please ask both customers for a remittance. No customer record fits J MORALES, so that payment needs research."},
-    {"role": "agent",
-     "text": "Here is the proposed entry in your account names, summed by account:",
-     "card": {"type": "table", "title": "Proposed entry",
-       "head": ["Account", "Debit", "Credit"],
-       "rows": [
-         ["Business Checking", "$34,797.00", ""],
-         ["Bank Service Charges", "$25.00", ""],
-         ["Accounts Receivable (A/R)", "", "$30,572.00"],
-         ["Unapplied Cash", "", "$4,250.00"],
-         ["Total", "$34,822.00", "$34,822.00"]
-       ]},
-     "after": "The entry balances. The tie-out to the $34,797.00 that I applied shows a difference of $0.00. A person posts this entry. I do not."},
-    {"role": "agent",
-     "text": "Your workpaper has five sheets: the summary, the payment-to-invoice map, the exceptions, the posting and the coverage.",
-     "card": {"type": "signoff", "title": "Sign-off", "rows": [["Prepared by", ""], ["Reviewed by", ""]]},
-     "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next time?"},
-    {"role": "user", "text": "Yes to both."},
-    {"role": "agent",
-     "text": "Done. Here is the Excel file. For Northbrook Trading, I saved the two payer names, the $5 tolerance and the oldest-first order. I never save amounts, remittances or bank details."}
+    {
+      "role": "user",
+      "text": "Can you apply this week's customer payments to our open invoices?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which payments: ones already in the books, or a file not yet entered? As of what date do I take the open invoices?",
+        "Do you have remittance advices? Where are they?",
+        "What difference do you accept on a short or extra payment? I never invent one.",
+        "Do I apply the oldest invoice first, or another order?",
+        "Is any payment in a different currency from its invoice? If so, which rate do I use, and from what source?",
+        "Does any customer withhold tax at source?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. It's the bank's deposit listing for 1 to 9 October, not in the books yet. Open invoices as of today, 9 October. Two remittances attached. $5 for each payment. Oldest first. All US dollars, no withholding.",
+      "attach": [
+        "deposit-listing-1-9-october.csv",
+        "crestline-remittance.pdf",
+        "lakeside-remittance-email.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "Northbrook Trading"
+        ],
+        [
+          "get_datasource_tools",
+          "Open invoices readable one by one"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I apply the **1 to 9 October deposit listing**, **6 payments for $58,997.00**, to **Northbrook Trading**'s open invoices **as of 9 October**. I read the books through MosoFin.",
+      "after": "I use **$5 for each payment**, oldest invoice first, and remittances for 2 of the payments. I read the full aging, with no date limit. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_aged_receivables",
+          "Full aging, no date limit"
+        ],
+        [
+          "search_invoices",
+          "Includes INV-1032 and INV-1035, new since 30 Sep"
+        ],
+        [
+          "search_customers",
+          ""
+        ],
+        [
+          "search_payments",
+          "INV-1010 paid by Pinnacle Clinics, 8 Oct"
+        ],
+        [
+          "search_deposits",
+          ""
+        ],
+        [
+          "search_sales_receipts",
+          ""
+        ],
+        [
+          "search_credit_memos",
+          "CM-0044 for Lakeside, not applied"
+        ],
+        [
+          "search_terms",
+          "INV-0901 on 2/10, n/30"
+        ],
+        [
+          "search_accounts",
+          ""
+        ],
+        [
+          "search_payment_methods",
+          ""
+        ],
+        [
+          "get_company_info",
+          "US dollars"
+        ]
+      ],
+      "summary": "11 reads in one batch. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "One row of your file is already in the books. Pinnacle Clinics paid **INV-1010** on 8 October, and the books hold that payment. I removed the row, so it gets no second entry.",
+      "card": {
+        "type": "bridge",
+        "title": "Payments to apply",
+        "rows": [
+          [
+            "Deposit listing, 6 payments",
+            "$58,997.00"
+          ],
+          [
+            "− Pinnacle Clinics, already recorded",
+            "$24,200.00"
+          ],
+          [
+            "= Payments to apply, 5 payments",
+            "$34,797.00",
+            "total"
+          ]
+        ]
+      }
+    },
+    {
+      "role": "agent",
+      "text": "Here is how I matched the five payments:",
+      "card": {
+        "type": "table",
+        "title": "Payment to invoice",
+        "head": [
+          "Payment",
+          "Amount",
+          "Invoices",
+          "How I matched it"
+        ],
+        "rows": [
+          [
+            "HARBOR RETAIL GRP, 2 Oct",
+            "$20,500.00",
+            "INV-0950 and INV-1001",
+            "Harbor's name and the sum of its two invoices"
+          ],
+          [
+            "CRESTLINE FOODS LLC, 5 Oct",
+            "$6,272.00",
+            "INV-0901",
+            "Invoice number in the remittance"
+          ],
+          [
+            "LAKESIDE FRT INC, 6 Oct",
+            "$3,775.00",
+            "INV-1032",
+            "Invoice number in the wire reference"
+          ],
+          [
+            "ACH CREDIT 4471, 7 Oct",
+            "$3,300.00",
+            "Acme INV-0990 or Crestline INV-1035",
+            "Two customers fit. I do not choose."
+          ],
+          [
+            "J MORALES, 9 Oct",
+            "$950.00",
+            "None",
+            "No name, reference or amount fits"
+          ]
+        ]
+      },
+      "after": "Two matches need your yes. Harbor sent no remittance, so I matched its name at 0.867 and found one combination of invoices. LAKESIDE FRT INC scores only 0.750 against Lakeside Freight. I matched it by its reference. Do you approve both?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, both are right."
+    },
+    {
+      "role": "agent",
+      "text": "Crestline paid **$128** less than INV-0901. Its remittance calls this a 2% prompt-payment discount. But the discount window closed on 31 May, and Crestline paid on 5 October.",
+      "card": {
+        "type": "bridge",
+        "title": "Crestline Foods, INV-0901",
+        "rows": [
+          [
+            "Open balance",
+            "$6,400.00"
+          ],
+          [
+            "− Payment received",
+            "$6,272.00"
+          ],
+          [
+            "= Short pay",
+            "$128.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "$128 is more than your $5, and the reason is not valid. So the $128 stays open for collections. I do not write it off or book it as a discount."
+    },
+    {
+      "role": "agent",
+      "text": "Lakeside paid **$1,225** less than INV-1032. Credit memo CM-0044 explains $1,200 of it. The remittance says Lakeside sent $3,800, so the last $25 is a bank fee on the wire.",
+      "card": {
+        "type": "bridge",
+        "title": "Lakeside Freight, INV-1032",
+        "rows": [
+          [
+            "Open balance",
+            "$5,000.00"
+          ],
+          [
+            "− Credit memo CM-0044",
+            "$1,200.00"
+          ],
+          [
+            "− Wire received",
+            "$3,775.00"
+          ],
+          [
+            "= Bank fee",
+            "$25.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "INV-1032 is now paid in full. The fee gets its own line in the entry, so you can see it."
+    },
+    {
+      "role": "agent",
+      "text": "Two payments wait as **unapplied cash**. They are not revenue.",
+      "card": {
+        "type": "bridge",
+        "title": "Unapplied cash",
+        "rows": [
+          [
+            "ACH CREDIT 4471, 7 Oct",
+            "$3,300.00"
+          ],
+          [
+            "+ J MORALES, 9 Oct",
+            "$950.00"
+          ],
+          [
+            "= Unapplied cash",
+            "$4,250.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "$3,300 fits Acme INV-0990 and Crestline INV-1035 exactly. Please ask both customers for a remittance. No customer record fits J MORALES, so that payment needs research."
+    },
+    {
+      "role": "agent",
+      "text": "Here is the proposed entry in your account names, summed by account:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entry",
+        "head": [
+          "Account",
+          "Debit",
+          "Credit"
+        ],
+        "rows": [
+          [
+            "Business Checking",
+            "$34,797.00",
+            ""
+          ],
+          [
+            "Bank Service Charges",
+            "$25.00",
+            ""
+          ],
+          [
+            "Accounts Receivable (A/R)",
+            "",
+            "$30,572.00"
+          ],
+          [
+            "Unapplied Cash",
+            "",
+            "$4,250.00"
+          ],
+          [
+            "Total",
+            "$34,822.00",
+            "$34,822.00"
+          ]
+        ]
+      },
+      "after": "The entry balances. The tie-out to the $34,797.00 that I processed shows a difference of $0.00. A person posts this entry. I do not. Do you want the workpaper as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here it is: **Cash_Application_2026-10-09.xlsx**. It has five sheets: the summary, the payment-to-invoice map, the exceptions, the posting and the coverage.",
+      "after": "Do you want me to save your settings for next time?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved the two payer names, the $5 tolerance and the oldest-first order. I never save amounts, remittances or bank details."
+    }
   ]
 }

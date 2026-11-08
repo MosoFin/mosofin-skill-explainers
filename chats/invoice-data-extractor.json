@@ -31,28 +31,24 @@
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "QuickBooks, confirmed by name"
-        ],
-        [
-          "Legal name",
+          "get_agent_datasources",
           "Northbrook Trading"
         ],
         [
-          "Tools",
-          "Read-only tools only"
+          "get_datasource_tools",
+          "Read tools only"
         ]
       ],
       "summary": "The agent can read your books. It cannot change them."
     },
     {
       "role": "agent",
-      "text": "I found 13 documents in your two PDFs. The last two pages of bills_b.pdf are a Harbor Office Supply statement, which is usually not posted.",
-      "after": "Here is my plan. I extract **12 documents** for **Northbrook Trading**. I check each one against your supplier list and your posted bills, **paid and open, for the last 12 months**. Output as Excel. Shall I set the statement aside and go ahead?"
+      "text": "I found 13 documents in your two PDFs. The last two pages of bills_b.pdf are a Harbor Office Supply statement. Oakfield's PF-0007 is a pro forma, a quote for a sign. Neither is usually posted.",
+      "after": "Here is my plan. I extract **12 documents** for **Northbrook Trading**, and I leave the pro forma out of the totals. Through MosoFin, I check each bill against your supplier list and your posted bills, **paid and open, for the last 12 months**. Output as Excel. Shall I set the statement aside and go ahead?"
     },
     {
       "role": "user",
@@ -129,7 +125,7 @@
           ]
         ]
       },
-      "after": "A list of unpaid bills does not show this match. I hold the $4,860.00 from payment. The bill was also paid twice already. That needs a separate look. Here I only stop the third copy."
+      "after": "A list of unpaid bills does not show this match. Do not pay the $4,860.00. The bill was also paid twice already. That needs a separate look. Here I only stop the third copy."
     },
     {
       "role": "agent",
@@ -179,7 +175,7 @@
     {
       "role": "agent",
       "text": "I write null for what I cannot see. Maple Ridge's currency and date are null until you tell me. I do not take \"$\" to mean US dollars.",
-      "after": "Metro Shred's MS-2209 does not add up. Its line and tax come to $129.90, but the printed total is $139.90. I record the figures as printed and flag the 10 dollars. Oakfield's PF-0007 is a pro forma, a quote for a sign, so I leave it out."
+      "after": "Metro Shred's MS-2209 does not add up. Its line and tax come to $129.90, but the printed total is $139.90. I record the figures as printed and flag the 10 dollars."
     },
     {
       "role": "agent",

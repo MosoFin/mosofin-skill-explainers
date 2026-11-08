@@ -13,7 +13,7 @@
         "Which company?",
         "Which account or accounts hold your prepaids?",
         "What are the cover start and end dates of each open item? Please also send your current schedule, if you have one.",
-        "What is your materiality threshold? Below it, a payment goes straight to expense. I never set it for you.",
+        "What is your materiality threshold, if you have one? Below it, a payment goes straight to expense. I never set it for you.",
         "Do you spread each cost by whole months or by days?",
         "Do you recover sales tax such as VAT when you pay, and in which country?",
         "Which currency do you use, and what is your policy for prepaids in a foreign currency?"
@@ -29,16 +29,27 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
-        ["Workspace", "Northbrook Trading"],
-        ["Company file", "Confirmed by name"],
-        ["Saved profile", "None yet"],
-        ["Currency", "US dollars"],
-        ["Tools", "Read-only tools only"]
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "One company file, Northbrook Trading"
+        ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Is that the right one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
     },
     {
       "role": "agent",
@@ -52,15 +63,39 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the books in one batch",
+      "label": "Checked the tools, then read the books",
       "tag": "read-only",
       "rows": [
-        ["Chart of accounts", "No non-current prepaid account"],
-        ["Prepaid Expenses, every entry", "$22,100 at 30 Sep"],
-        ["Expense accounts, 12 months", "Software subscriptions $3,000 in April"],
-        ["Bills and payments behind each item", "Midwest Trade Expo, memo \"spring expo\""]
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "get_skills",
+          ""
+        ],
+        [
+          "Company record",
+          "US dollars"
+        ],
+        [
+          "Chart of accounts",
+          "No non-current prepaid account"
+        ],
+        [
+          "Prepaid Expenses, every entry",
+          "$22,100 at 30 Sep"
+        ],
+        [
+          "Expense accounts, 12 months",
+          "Software subscriptions $3,000 in April"
+        ],
+        [
+          "Bills and payments behind each item",
+          "Midwest Trade Expo, memo \"spring expo\""
+        ]
       ],
-      "summary": "One batch of reads. Nothing in your books changed."
+      "summary": "Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -68,11 +103,27 @@
       "card": {
         "type": "table",
         "title": "What the ledger shows",
-        "head": ["Finding", "Amount", "What it means"],
+        "head": [
+          "Finding",
+          "Amount",
+          "What it means"
+        ],
         "rows": [
-          ["No amortization entry in August", "$1,100", "The monthly entry stopped"],
-          ["Pixelform Studio, a year of software, all expensed in April", "$3,000", "5.6 times the monthly average"],
-          ["Round sum to Riverside Properties, the landlord", "$5,000", "Probably a refundable deposit"]
+          [
+            "No amortization entry in August",
+            "$1,100",
+            "The monthly entry stopped"
+          ],
+          [
+            "Pixelform Studio, a year of software, all expensed in April",
+            "$3,000",
+            "5.6 times the monthly average"
+          ],
+          [
+            "Round sum to Riverside Properties, the landlord",
+            "$5,000",
+            "Probably a refundable deposit"
+          ]
         ]
       },
       "after": "Your file shows that Pixelform covers 1 April 2026 to 31 March 2027. Does the lease say that the landlord pays the $5,000 back?"
@@ -87,17 +138,52 @@
       "card": {
         "type": "table",
         "title": "Prepaid schedule at 30 Sep",
-        "head": ["Item", "Left", "A month", "Cover"],
+        "head": [
+          "Item",
+          "Left",
+          "A month",
+          "Cover"
+        ],
         "rows": [
-          ["P1 Ridgeway Mutual, insurance 2026-27", "$6,600", "$600", "1 Sep 2026 to 31 Aug 2027"],
-          ["P2 Cobalt Analytics, software", "$3,600", "$400", "1 Jul 2026 to 30 Jun 2027"],
-          ["P3 Delta Packaging Machines, maintenance", "$2,250", "$150", "1 Jan 2026 to 31 Dec 2027"],
-          ["P5 Midwest Trade Expo, booth", "$2,400", "", "Unknown, flagged"],
-          ["P0 Ridgeway Mutual, insurance 2025-26", "$0", "$550", "Ended 31 Aug 2026"],
-          ["Schedule total", "$14,850", "", ""]
+          [
+            "Ridgeway Mutual, insurance 2026-27",
+            "$6,600",
+            "$600",
+            "1 Sep 2026 to 31 Aug 2027"
+          ],
+          [
+            "Cobalt Analytics, software",
+            "$3,600",
+            "$400",
+            "1 Jul 2026 to 30 Jun 2027"
+          ],
+          [
+            "Delta Packaging Machines, maintenance",
+            "$2,250",
+            "$150",
+            "1 Jan 2026 to 31 Dec 2027"
+          ],
+          [
+            "Midwest Trade Expo, booth",
+            "$2,400",
+            "",
+            "Unknown, flagged"
+          ],
+          [
+            "Ridgeway Mutual, insurance 2025-26",
+            "$0",
+            "$550",
+            "Ended 31 Aug 2026"
+          ],
+          [
+            "Schedule total",
+            "$14,850",
+            "",
+            ""
+          ]
         ]
       },
-      "after": "Cobalt was paid on 15 June, but its cover starts on 1 July. A June start puts $400 too much in expense by 30 September. A membership of $600 and hosting of $480 are each below $1,000. They go to expense, and the coverage sheet shows their total of **$1,080**."
+      "after": "Cobalt was paid on 15 June, but its cover starts on 1 July. A June start puts $400 too much in expense by 30 September. The expo memo says only \"spring expo\", so its dates stay blank. A membership of $600 and hosting of $480 are each below $1,000. They go to expense, and the coverage sheet shows their total of **$1,080**."
     },
     {
       "role": "agent",
@@ -106,12 +192,32 @@
         "type": "bridge",
         "title": "Tie-out to the schedule",
         "rows": [
-          ["Prepaid Expenses, as booked", "$22,100"],
-          ["− September's cost, not yet booked", "$1,150"],
-          ["− August, the missed month", "$1,100"],
-          ["− Riverside deposit, not a prepaid", "$5,000"],
-          ["= Schedule total", "$14,850", "total"],
-          ["Unexplained", "$0", "ok"]
+          [
+            "Prepaid Expenses, as booked",
+            "$22,100"
+          ],
+          [
+            "− September's cost, not yet booked",
+            "$1,150"
+          ],
+          [
+            "− August, the missed month",
+            "$1,100"
+          ],
+          [
+            "− Riverside deposit, not a prepaid",
+            "$5,000"
+          ],
+          [
+            "= Schedule total",
+            "$14,850",
+            "total"
+          ],
+          [
+            "Unexplained",
+            "$0",
+            "ok"
+          ]
         ]
       },
       "after": "The account is **$7,250** too high, and each part of that has a name."
@@ -122,15 +228,35 @@
       "card": {
         "type": "table",
         "title": "Proposed, not posted",
-        "head": ["Entry", "Amount", "Evidence"],
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
         "rows": [
-          ["E1 September: insurance 600, software 400, maintenance 150", "$1,150", "Policy schedule and contracts"],
-          ["E2 August catch-up: insurance 550, software 400, maintenance 150", "$1,100", "No August entry in the ledger"],
-          ["E3 Pixelform: move October to March back to the asset, 6 × 250", "$1,500", "Pixelform's order form"],
-          ["Move the Riverside payment to Deposits", "$5,000", "The lease"]
+          [
+            "September: insurance 600, software 400, maintenance 150",
+            "$1,150",
+            "Policy schedule and contracts"
+          ],
+          [
+            "August catch-up: insurance 550, software 400, maintenance 150",
+            "$1,100",
+            "No August entry in the ledger"
+          ],
+          [
+            "Pixelform: move October to March back to the asset, 6 × 250",
+            "$1,500",
+            "Pixelform's order form"
+          ],
+          [
+            "Move the Riverside payment to Deposits",
+            "$5,000",
+            "The lease"
+          ]
         ]
       },
-      "after": "E2 also clears the $550 left on last year's policy. You choose its posting date. After all four, the account and the schedule both show **$16,350**."
+      "after": "The August catch-up also clears the $550 left on last year's policy. After all four, the account and the schedule both show **$16,350**. A person posts these entries. I do not."
     },
     {
       "role": "agent",
@@ -139,38 +265,43 @@
         "type": "bridge",
         "title": "Prepaid Expenses after the entries",
         "rows": [
-          ["Current, October 2026 to September 2027", "$13,500"],
-          ["+ Non-current, Delta, October to December 2027", "$450"],
-          ["+ Expo booth, not split until you give its dates", "$2,400"],
-          ["= Prepaid total", "$16,350", "total"]
+          [
+            "Current, October 2026 to September 2027",
+            "$13,500"
+          ],
+          [
+            "+ Non-current, Delta, October to December 2027",
+            "$450"
+          ],
+          [
+            "+ Expo booth, not split until you give its dates",
+            "$2,400"
+          ],
+          [
+            "= Prepaid total",
+            "$16,350",
+            "total"
+          ]
         ]
       },
-      "after": "Your chart has no non-current prepaid account, so the $450 shows as current. Please also set up the monthly entry in QuickBooks again. Next month, I check that it ran."
+      "after": "Your chart has no non-current prepaid account, so the $450 shows as current. Please set up the monthly entry in QuickBooks again. Next month, I check that it ran. Do you want the workpaper as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Can we deduct the whole insurance premium on this year's tax return?"
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "I calculate the cost for your books only. US tax has a 12-month rule that can sometimes allow it. Please ask your accountant. Your books still show $600 a month.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          ["Prepared by", ""],
-          ["Reviewed by", ""]
-        ]
-      },
-      "after": "A person posts these entries. I do not. Do you want the seven sheets as an Excel file? And shall I save your settings for next month?"
+      "text": "Done. **Prepaid_Schedule_2026-09.xlsx** has seven sheets. The entries sheet says \"proposed, not posted\". The last sheet shows what came from your books, what came from you and what is still unknown.",
+      "after": "Do you want me to save your settings for next month?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, save them."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the seven sheets. I saved the account, whole-month, your $1,000 threshold, the cover dates, the renewal months and the errors found. The expo booth stays flagged until you give its dates."
+      "text": "Done. I saved the account, whole-month, your $1,000 threshold, the cover dates, the renewal months and the errors found. The expo booth stays flagged until you give its dates. I did not save your connection or tool settings."
     }
   ]
 }

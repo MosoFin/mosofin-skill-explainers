@@ -22,7 +22,8 @@
         "What materiality threshold applies?",
         "Do you have a close template, and last month's close?",
         "Do you report on a cash or an accrual basis?"
-      ]
+      ],
+      "after": "Owners, materiality and the template are optional, but they make the list much better."
     },
     {
       "role": "user",
@@ -39,7 +40,7 @@
       "tag": "read-only",
       "rows": [
         ["Workspace", "Northbrook Trading"],
-        ["Company file", "One company file, confirmed by name"],
+        ["Company file", "Northbrook Trading, the only company file"],
         ["get_company_info", "Professional services, US dollars"],
         ["Tools", "Read-only tools only"]
       ],
@@ -181,7 +182,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the nine sheets. I saved the task list, the owners by role, the dependencies, the calendar and the materiality threshold. I never save statuses or balances. Next month, I read every status again."
+      "text": "Here is **MonthEndClose_2026-10_Northbrook Trading.xlsx**, with the nine sheets. I saved the task list, the owners by role, the dependencies, the calendar, the materiality threshold and the recurring open items. I never save statuses or balances. Next month, I read every status again."
     }
   ]
 }

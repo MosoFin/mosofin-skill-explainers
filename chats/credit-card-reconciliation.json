@@ -1,5 +1,8 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, the operations manager's corporate card, September statement. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "CC_Recon_OperationsManager_2026-09.xlsx": "the file name that the skill gives the workpaper, with the cardholder by role, for September of the example year 2026"
+  },
   "messages": [
     {
       "role": "user",
@@ -11,10 +14,10 @@
       "list": [
         "Do you want me to use MosoFin, or will you upload files?",
         "Which card is it, and who holds it? I record the holder by role, never by card number.",
-        "Which statement period is it, and does it match your accounting month?",
-        "Please attach the card statement.",
-        "Please attach the receipts, or an export from your receipt tool.",
-        "Below what amount is no receipt necessary? Above what amount is a purchase an asset?",
+        "Which statement period is it? Does it match your accounting month?",
+        "Please attach the card statement. I always need it, because MosoFin cannot read it.",
+        "Please attach the receipts, or an export from your receipt tool. Without them, I cannot match receipts.",
+        "Below what amount is no receipt necessary? Above what amount is a purchase an asset? I never assume either amount.",
         "Can you reclaim tax on card spend, and where?"
       ]
     },
@@ -33,23 +36,23 @@
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "Confirmed by name"
+          "get_agent_datasources",
+          "Northbrook Trading, no card platform"
         ],
         [
-          "Tools",
-          "Read-only tools only"
+          "get_datasource_tools",
+          "Read tools only"
         ]
       ],
       "summary": "The agent can read your books. It cannot change them."
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I will reconcile the **corporate card held by the operations manager** at Northbrook Trading for **1 to 30 September**. I use your statement and receipts, and I read the books through MosoFin.",
+      "text": "Here is my plan. I reconcile the **corporate card held by the operations manager** at **Northbrook Trading** for **1 to 30 September**. I read the books through MosoFin. No card platform is connected, so I use your statement and receipts.",
       "after": "Your receipt threshold is **$75** and your capitalisation threshold is **$2,500**. I do not assess tax recovery. Shall I start?"
     },
     {
@@ -63,8 +66,16 @@
       "tag": "read-only",
       "rows": [
         [
+          "search_accounts",
+          ""
+        ],
+        [
           "search_purchases",
           "Includes $2,900.00 to an electronics retailer"
+        ],
+        [
+          "search_purchases",
+          "July and August, for the monthly tests"
         ],
         [
           "get_general_ledger",
@@ -87,6 +98,10 @@
           ""
         ],
         [
+          "search_vendors",
+          ""
+        ],
+        [
           "search_attachables",
           ""
         ],
@@ -95,15 +110,19 @@
           ""
         ],
         [
+          "search_employees",
+          ""
+        ],
+        [
           "get_company_info",
           ""
         ]
       ],
-      "summary": "9 reads in one batch. Nothing in your books changed."
+      "summary": "13 reads in one batch. Nothing in your books changed."
     },
     {
       "role": "agent",
-      "text": "The statement closes at **$8,432.10**, with 42 charges and one payment. Your books show **$8,623.60** for the card on 30 September. Two items explain the difference:",
+      "text": "The statement closes at **$8,432.10**. Your books show **$8,623.60** for the card on 30 September. Two items explain the difference:",
       "card": {
         "type": "bridge",
         "title": "Statement to books",
@@ -138,6 +157,32 @@
       "role": "agent",
       "text": "The **$148.50** needs a person. It is a Saturday grocery-store purchase that nobody submitted. It has no receipt and no business purpose.",
       "after": "I list it as a possible personal charge, and the cardholder owns the follow-up. I do not call it more than that."
+    },
+    {
+      "role": "agent",
+      "text": "I matched your receipts to the charges. More charges above **$75** lack a matching receipt:",
+      "card": {
+        "type": "table",
+        "title": "Receipt exceptions",
+        "head": [
+          "Charges",
+          "Amount",
+          "What I found"
+        ],
+        "rows": [
+          [
+            "Hotel",
+            "$412.00",
+            "Nothing attached"
+          ],
+          [
+            "Four other charges",
+            "",
+            "A file is attached, but its amount does not match"
+          ]
+        ]
+      },
+      "after": "An attached file is not a matched receipt. The cardholder owns each follow-up."
     },
     {
       "role": "agent",
@@ -176,6 +221,32 @@
     },
     {
       "role": "agent",
+      "text": "Seven merchants charged the same amount each month from July to September. Here is what they cost in a year:",
+      "card": {
+        "type": "table",
+        "title": "Subscriptions, a year",
+        "head": [
+          "Subscription",
+          "A year",
+          "Note"
+        ],
+        "rows": [
+          [
+            "Design tool, $99 a month",
+            "$1,188.00",
+            "Does your team still use it?"
+          ],
+          [
+            "All seven",
+            "$9,648.00",
+            "Includes the design tool"
+          ]
+        ]
+      },
+      "after": "You decide which ones to keep. I found no charge that is in the books twice."
+    },
+    {
+      "role": "agent",
       "text": "I propose two entries. Each one points to its evidence:",
       "card": {
         "type": "table",
@@ -198,25 +269,20 @@
           ]
         ]
       },
-      "after": "If a person decides that the grocery charge is personal, it goes to Due from Employee. The $340 needs no entry. A person posts these entries. I do not."
+      "after": "Your books record each charge on its own, so I only propose corrections. If a person decides that the grocery charge is personal, it goes to Due from Employee. The $340 needs no entry. A person posts these entries. I do not."
     },
     {
       "role": "agent",
       "text": "The card ties to the cent. Your workpaper has six sheets. The first sheet says that this is a reconciliation, not a review. The last sheet shows what I could not check.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
+      "after": "Do you want the workpaper as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here it is: **CC_Recon_OperationsManager_2026-09.xlsx**.",
       "after": "Do you want me to save your settings for next month?"
     },
     {
@@ -225,7 +291,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved the card by its holder's role and your two thresholds. I saved no card numbers and no spending."
+      "text": "Done. I saved the card by its holder's role, your two thresholds and the account for each regular merchant. I saved no card numbers and no spending."
     }
   ]
 }

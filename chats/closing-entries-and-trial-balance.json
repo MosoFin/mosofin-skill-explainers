@@ -104,16 +104,7 @@
     },
     {
       "role": "agent",
-      "text": "Before I go on, one account needs your answer. **Customer Deposits** has the type Other Income and a credit of $4,000. The name says money that customers paid in advance. That is a liability, not income.",
-      "after": "Net income agrees with the P&L at 212,900, because the P&L follows the same type. So only a check of names against types finds this. Which is right, the name or the type?"
-    },
-    {
-      "role": "user",
-      "text": "The name. Customers paid that money in advance."
-    },
-    {
-      "role": "agent",
-      "text": "Then the trial balance is not final yet. A type correction is an adjusting entry, so I stop here. Please post this in QuickBooks, dated 31 December 2025:",
+      "text": "Before I go on, one account needs your answer. **Customer Deposits** has the type Other Income and a credit of $4,000. The name says money that customers paid in advance. That is a liability, not income. If the name is right, this correction is needed first:",
       "card": {
         "type": "table",
         "title": "Correction for you to post",
@@ -135,11 +126,11 @@
           ]
         ]
       },
-      "after": "Net income then falls to **$208,900**. Tell me when it is posted, and I read everything again."
+      "after": "Net income agrees with the P&L at 212,900, because the P&L follows the same type. So only a check of names against types finds this. Which is right, the name or the type? If it is the name, the trial balance is not final. Please post the correction in QuickBooks, dated 31 December 2025, and tell me. Net income then falls to **$208,900**."
     },
     {
       "role": "user",
-      "text": "Posted. Please run it again."
+      "text": "The name. Customers paid that money in advance. I posted the correction. Please run it again."
     },
     {
       "role": "tool",
@@ -177,11 +168,7 @@
     {
       "role": "agent",
       "text": "You were right. **QuickBooks already closed the year.** On 1 January 2026, every income and expense account is at 0. No closing entry exists, and Retained Earnings holds the year's $208,900.",
-      "after": "So I propose no entry that closes revenue or expenses. A second close would count the profit twice and overstate equity by $208,900."
-    },
-    {
-      "role": "agent",
-      "text": "The final trial balance balances at **1,724,000** on each side. Opening capital is $350,000: $210,000 for Lena and $140,000 for Omar. That agrees with the ending capital on your 2024 K-1s."
+      "after": "So I propose no entry that closes revenue or expenses. A second close would count the profit twice and overstate equity by $208,900. The final trial balance balances at **1,724,000** on each side. Opening capital of $350,000 agrees with the ending capital on your 2024 K-1s."
     },
     {
       "role": "agent",
@@ -269,23 +256,15 @@
           ]
         ]
       },
-      "after": "Do you want the workpaper as an Excel file?"
+      "after": "I cannot lock a period. Who locks 2025 in QuickBooks, and when? And do you want the workpaper as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes. And please post P1 and P2, then lock 2025 for me."
+      "text": "Lena locks it, after the audit. Yes to Excel. Can you post P1 and P2 for me?"
     },
     {
       "role": "agent",
-      "text": "Here is **Closing_Entries_TB_FY2025_Northbrook Trading.xlsx**. I cannot post or lock anything. A person posts P1 and P2 in QuickBooks. Who locks 2025, and when?"
-    },
-    {
-      "role": "user",
-      "text": "Lena does, after the audit."
-    },
-    {
-      "role": "agent",
-      "text": "Thank you. The coverage sheet names the lock as a manual step for Lena Hart, after the audit.",
+      "text": "Here is **Closing_Entries_TB_FY2025_Northbrook Trading.xlsx**. I cannot post anything. A person posts P1 and P2 in QuickBooks. The coverage sheet names the lock as a manual step for Lena Hart, after the audit.",
       "after": "Do you want me to save your settings for next year?"
     },
     {
@@ -294,7 +273,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved the entity type, the profit shares, the two-step method, that QuickBooks closes the year, the Customer Deposits exception and who locks the period. I never save balances. Next year, I test the closed state again."
+      "text": "Done. I saved the entity type, the profit shares, the equity accounts and the two-step method. I also saved that QuickBooks closes the year, the Customer Deposits exception and who locks the period. I never save balances. Next year, I test the closed state again."
     }
   ]
 }

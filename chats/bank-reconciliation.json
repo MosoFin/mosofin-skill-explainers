@@ -1,7 +1,8 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, Operating account (…4471), September. The figures match the worked examples on the step-by-step page.",
   "chosen": {
-    "$10": "the user's own threshold for which differences to chase"
+    "$10": "the user's own threshold for which differences to chase",
+    "Bank_Rec_Operating_2026-09.xlsx": "the file name that the skill gives the workpaper, for September of the example year 2026"
   },
   "messages": [
     {
@@ -15,7 +16,7 @@
         "Do you want me to use MosoFin, or will you upload files?",
         "Which account? I show account numbers masked.",
         "Which period? I never assume one.",
-        "Please attach the bank statement.",
+        "Please attach the bank statement. I always need it, because MosoFin cannot read it.",
         "When did you last reconcile this account?",
         "What size of difference is worth chasing?"
       ]
@@ -34,23 +35,24 @@
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "Confirmed by name"
+          "get_agent_datasources",
+          "Northbrook Trading, no bank feed"
         ],
         [
-          "Tools",
-          "Read-only tools only"
+          "get_datasource_tools",
+          "Read tools only"
         ]
       ],
       "summary": "The agent can read your books. It cannot change them."
     },
     {
       "role": "agent",
-      "text": "Here is my plan for **Operating (…4471), 1 to 30 September**. I will read the books, agree the opening balance, match every statement line and propose entries for what is left. Shall I start?"
+      "text": "Here is my plan. I reconcile **Operating (…4471)** at **Northbrook Trading** for **1 to 30 September**. I read the books through MosoFin. No bank feed is connected, so I use your statement. You last reconciled on **31 August**.",
+      "after": "I agree the opening balance, match every statement line and propose entries for what is left. Shall I start?"
     },
     {
       "role": "user",
@@ -97,9 +99,13 @@
         [
           "search_journal_entries",
           ""
+        ],
+        [
+          "get_company_info",
+          ""
         ]
       ],
-      "summary": "9 reads in one batch. Nothing in your books changed."
+      "summary": "10 reads in one batch. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -127,7 +133,7 @@
           ]
         ]
       },
-      "after": "Nothing in the books needs to change for these two items."
+      "after": "The bank had not yet credited the deposit or cashed the cheque. Nothing in the books needs to change for them."
     },
     {
       "role": "agent",
@@ -204,7 +210,7 @@
           ]
         ]
       },
-      "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer."
+      "after": "The $300 goes back to what the customer owes. It is not an expense. Please also chase the customer. A person posts these entries. I do not."
     },
     {
       "role": "agent",
@@ -223,6 +229,15 @@
           ]
         ]
       },
+      "after": "Two different people sign it. I sign nothing. Do you want the report as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here it is: **Bank_Rec_Operating_2026-09.xlsx**.",
       "after": "Do you want me to save your settings for next month?"
     },
     {
@@ -231,7 +246,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved your policy choices and names only. Next month, the run starts from them."
+      "text": "Done. I saved the account name, your $10 threshold and the monthly bank fee as a regular item. I saved no balances, no item lists and no account numbers."
     }
   ]
 }
