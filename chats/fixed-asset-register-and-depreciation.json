@@ -20,7 +20,7 @@
         "What is your capitalization threshold? I never assume one.",
         "Which rule do you use for the first month: full month, half-month or pro-rata?",
         "Do you report under US GAAP, IFRS or local GAAP?",
-        "Which tax jurisdiction?",
+        "Optional: which tax jurisdiction?",
         "Did anything happen that can reduce an asset's value? When did someone last count the assets, and who?"
       ]
     },
@@ -34,32 +34,32 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "QuickBooks Online, confirmed by name"
-        ],
-        [
-          "Fixed-asset module",
-          "Not connected"
-        ],
-        [
-          "Tools",
-          "Read-only tools only"
+          "get_agent_datasources",
+          "Northbrook Trading, no fixed-asset module"
         ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
     },
     {
       "role": "agent",
-      "text": "No fixed-asset module is connected, so the register comes from your spreadsheet. It has six assets and the land at 31 August.",
-      "after": "Here is my plan. I run the register for **Northbrook Trading** for **September** under **US GAAP**. Every class is straight-line, with a **$2,500** threshold and the **full-month** rule. I calculate book depreciation only. Tax goes to your tax preparer. Shall I start?"
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. No fixed-asset module is connected, so the register comes from your spreadsheet. Is that the right company file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I run the register for **Northbrook Trading** for **September** under **US GAAP**. Your spreadsheet has six assets and the land at 31 August. Every class is straight-line, with a **$2,500** threshold and the **full-month** rule.",
+      "after": "The last physical count was **December 2023, by the operations manager**. I calculate book depreciation only. Tax goes to your tax preparer. Shall I start?"
     },
     {
       "role": "user",
@@ -68,9 +68,17 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the books in one batch",
+      "label": "Checked the tools, then read the books",
       "tag": "read-only",
       "rows": [
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
         [
           "search_accounts",
           "Land has no accumulated depreciation"
@@ -94,13 +102,9 @@
         [
           "get_profit_and_loss",
           ""
-        ],
-        [
-          "get_company_info",
-          ""
         ]
       ],
-      "summary": "7 reads in one batch. Nothing in your books changed."
+      "summary": "8 calls. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -117,7 +121,7 @@
           [
             "On the register, not in the books",
             "$6,000",
-            "C-02 server"
+            "Server"
           ],
           [
             "In the books, not on the register",
@@ -126,14 +130,14 @@
           ]
         ]
       },
-      "after": "An asset that is not on the register never gets depreciation. I remove the server only if you agree."
+      "after": "An asset that is not on the register never gets depreciation. I remove the server only if you agree. Land has no accumulated depreciation, which is correct."
     },
     {
       "role": "agent",
       "text": "The machine went into service on 14 September. Its invoice from Delta Packaging Machines has three lines, but only one went to Machinery:",
       "card": {
         "type": "bridge",
-        "title": "Shrink-wrap machine, M-03",
+        "title": "Shrink-wrap machine",
         "rows": [
           [
             "Machine, posted to Machinery",
@@ -184,14 +188,14 @@
     },
     {
       "role": "user",
-      "text": "The forklift is a repair. The air conditioner is capital, machinery, in service 22 September. And yes, remove C-02."
+      "text": "The forklift is a repair. The air conditioner is capital, machinery, in service 22 September. And yes, remove the server."
     },
     {
       "role": "agent",
-      "text": "Thank you. One more problem. On 15 September you sold the old van V-02 for $4,000. The books removed its $30,000 cost, but not its $30,000 of depreciation:",
+      "text": "Thank you. One more problem. On 15 September you sold the old van for $4,000. The books removed its $30,000 cost, but not its $30,000 of depreciation:",
       "card": {
         "type": "bridge",
-        "title": "Sale of V-02",
+        "title": "Sale of the old van",
         "rows": [
           [
             "Cash received",
@@ -212,35 +216,7 @@
     },
     {
       "role": "agent",
-      "text": "Your monthly entry posted $1,550 on 30 September, but it was out of date. Machinery showed an implied life of 12.1 years against your 10-year policy. That pointed at the missing machine:",
-      "card": {
-        "type": "bridge",
-        "title": "September book depreciation",
-        "rows": [
-          [
-            "Posted on 30 Sep",
-            "$1,550"
-          ],
-          [
-            "+ Shrink-wrap machine, M-03",
-            "$160"
-          ],
-          [
-            "+ Office air conditioner, M-04, $4,200 ÷ 120",
-            "$35"
-          ],
-          [
-            "= September book depreciation",
-            "$1,745",
-            "total"
-          ]
-        ]
-      },
-      "after": "After the drafts, the implied life of machinery is 10.0 years. You own seven assets with a book value of **$161,705**. No asset has more depreciation than its cost less salvage."
-    },
-    {
-      "role": "agent",
-      "text": "I propose four draft entries. Each one points to its evidence:",
+      "text": "Your monthly entry posted $1,550 on 30 September, but it was out of date. Machinery showed an implied life of 12.1 years against your 10-year policy. I propose four draft entries:",
       "card": {
         "type": "table",
         "title": "Draft entries, not posted",
@@ -268,39 +244,28 @@
           [
             "Remove the van's depreciation. Clear the $26,000 loss and record the $4,000 gain",
             "$30,000",
-            "Sale of V-02, 15 Sep"
+            "Sale of the van, 15 Sep"
           ]
         ]
       },
-      "after": "The air conditioner entry credits Repairs. It never credits cash or accounts payable a second time. A person posts these entries. I do not."
-    },
-    {
-      "role": "agent",
-      "text": "Two things stay with people. Your tax preparer works out tax depreciation, such as section 179. The last count was December 2023, about 2 years and 9 months ago. A clean tie-out does not prove that the assets exist, so the count is overdue.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"
+      "after": "September book depreciation becomes $1,550 + $160 + $35 = **$1,745**, and the implied life is 10.0 years. You own seven assets with a book value of **$161,705**. A person posts these entries. I do not. Do you want the workpaper as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the eleven sheets. I saved your class policies, the $2,500 threshold, the full-month rule, the account map and US GAAP.",
-      "after": "I never save the register, costs or book values. Next month, the run starts from your policies."
+      "text": "Done. **FA_Register_and_Depreciation_2026-09.xlsx** has eleven sheets. They include both tie-out lists and the threshold scan. A clean tie-out does not prove that the assets exist. Your last count was December 2023, about 2 years and 9 months ago, so it is overdue.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved your class policies, the $2,500 threshold, the full-month rule, the account map, US GAAP and the count owner. I never save the register, costs or book values, or your connection and tool settings."
     }
   ]
 }

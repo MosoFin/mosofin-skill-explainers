@@ -14,8 +14,8 @@
         "What is the posting date?",
         "Which company do the entries belong to?",
         "Do they have a tax effect, and in which jurisdiction?",
-        "Above what amount do you want a review flag? I never pick one.",
-        "What are the source documents, and should any entry reverse?",
+        "Above what amount do you want a review flag? I never pick one. Without one, I do not run that check.",
+        "Optional: what are the source documents, and should any entry reverse?",
         "Through what date are the books closed, and did you report any later period?"
       ]
     },
@@ -29,27 +29,27 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "QuickBooks Online, confirmed by name"
-        ],
-        [
-          "Currency and year",
-          "US dollars, calendar year"
-        ],
-        [
-          "Tools",
-          "Read-only tools only"
+          "get_agent_datasources",
+          "One company file, Northbrook Trading"
         ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Is that the right one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
     },
     {
       "role": "agent",
@@ -63,9 +63,17 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the books in one batch",
+      "label": "Checked the tools, then read the books",
       "tag": "read-only",
       "rows": [
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
         [
           "search_accounts",
           "Includes 6410, 2110, 6520 and 6150"
@@ -87,22 +95,18 @@
           ""
         ],
         [
-          "get_company_info",
-          ""
-        ],
-        [
           "Lock date",
           "None in the books"
         ]
       ],
-      "summary": "6 reads in one batch. Nothing in your books changed."
+      "summary": "7 calls. Nothing in your books changed."
     },
     {
       "role": "agent",
-      "text": "J1 accrues 75% of the $12,000 fee, which is **$9,000.00**. This is a **proposed entry, not posted**:",
+      "text": "The audit accrual is 75% of the $12,000 fee, which is **$9,000.00**. This is a **proposed entry, not posted**:",
       "card": {
         "type": "table",
-        "title": "J1 · JE-202609-022 · Accrual · Wed 30 Sep 2026",
+        "title": "JE-202609-022 · Accrual · Wed 30 Sep 2026",
         "head": [
           "Account",
           "Debit",
@@ -201,7 +205,7 @@
       "text": "Here are the other two proposed entries. Each one balances to the penny:",
       "card": {
         "type": "table",
-        "title": "J3 · JE-202609-024 · Correcting, and J5 · JE-202609-026 · Reclass",
+        "title": "JE-202609-024 · Correction, and JE-202609-026 · Reclass",
         "head": [
           "Account",
           "Debit",
@@ -209,32 +213,32 @@
         ],
         "rows": [
           [
-            "J3: 2110 Accrued expenses",
+            "Correction: 2110 Accrued expenses",
             "$2,040.00",
             "—"
           ],
           [
-            "J3: 6310 Utilities",
+            "Correction: 6310 Utilities",
             "—",
             "$2,040.00"
           ],
           [
-            "J5: 6150 Shipping and Delivery",
+            "Reclass: 6150 Shipping and Delivery",
             "$640.00",
             "—"
           ],
           [
-            "J5: 6520 Office Supplies",
+            "Reclass: 6520 Office Supplies",
             "—",
             "$640.00"
           ]
         ]
       },
-      "after": "August is closed and reported, so J3 goes into September, and its memo names JE-202608-014. I do not change the August entry."
+      "after": "August is closed and reported, so the correction goes into September, and its memo names JE-202608-014. I do not change the August entry."
     },
     {
       "role": "agent",
-      "text": "Every check ran with its evidence. No entry is above your threshold, so nothing has a flag:",
+      "text": "I ran each of the 15 checks that applies to an entry, with its evidence. The others, such as a loan split, do not apply. Nothing has a flag:",
       "card": {
         "type": "table",
         "title": "Validation results",
@@ -246,53 +250,43 @@
         ],
         "rows": [
           [
-            "J1",
+            "Audit accrual",
             "11",
             "11",
             "0"
           ],
           [
-            "J3",
+            "Utilities correction",
             "11",
             "11",
             "0"
           ],
           [
-            "J5",
+            "Courier reclass",
             "10",
             "10",
             "0"
           ]
         ]
       },
-      "after": "The open period rests on your date of 31 August, because your books show no lock date. A person posts these entries. I do not."
-    },
-    {
-      "role": "agent",
-      "text": "The file has the entries in QuickBooks Online import columns, with a Validation Results sheet and a Coverage sheet.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want me to make the file? And do you want me to save your settings for next month?"
+      "after": "The open period rests on your date of 31 August, because your books show no lock date. A person posts these entries. I do not. Do you want them as an import file?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Done. Here is **Northbrook Trading_JE_September adjustments_2026-09-30.xlsx**. I saved the account map, the import format, the numbering, the $25,000 threshold and the reversal policy. I never save amounts or entries."
+      "text": "Done. Here is **Northbrook Trading_JE_September adjustments_2026-09-30.xlsx**. It has the entries in QuickBooks Online import columns, headed \"proposed entry, not posted\", with a Validation Results sheet and a Coverage sheet.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. For Northbrook Trading, I saved the account map, the import format, the numbering, the $25,000 threshold and the reversal policy. I never save amounts or entries, or your connection and tool settings."
     }
   ]
 }

@@ -7,7 +7,7 @@
     },
     {
       "role": "agent",
-      "text": "Yes. Before I read anything, I need nine answers. I ask them all at once, so the run does not stop again for each one.",
+      "text": "Yes. Before I read anything, I need nine answers. I ask them all at once, so the run does not stop again for each one. The last two are optional.",
       "list": [
         "Do you want me to use MosoFin, or will you upload the data?",
         "Which company?",
@@ -16,8 +16,8 @@
         "What supports each category? I need the facts that the books cannot show, such as the bonus estimate, loan terms, contract periods and fee letters.",
         "Do accruals reverse on day one of the next month, or does the next bill post against the accrual?",
         "Do you keep the books on the accrual basis or the cash basis?",
-        "Which materiality threshold do you use? I never choose one for you.",
-        "Which reporting framework and which tax country apply?"
+        "Optional: which materiality threshold do you use? I never choose one for you.",
+        "Optional: which reporting framework and which tax country apply?"
       ]
     },
     {
@@ -32,20 +32,53 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
-        ["Workspace", "Northbrook Trading"],
-        ["Company file", "Confirmed by name"],
-        ["Tools", "Read-only tools only"],
-        ["get_company_info", "Calendar year, US dollars"]
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "One company file, Northbrook Trading"
+        ]
+      ],
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Is that the right one?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the tools, the profile and the chart",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "get_company_info",
+          "Calendar year, US dollars"
+        ],
+        [
+          "search_accounts",
+          "Accrued expenses, Accrued liabilities – other, Deferred revenue"
+        ]
       ],
       "summary": "The agent can read your books. It cannot change them."
     },
     {
       "role": "agent",
-      "text": "Here is my plan for **Northbrook Trading, 1 to 30 September**, on the accrual basis. In scope are the **bonus**, **interest** on the term loan, **utilities**, **audit fees** and **deferred revenue**. Electricity and audit fees reverse on 1 October. The bonus, its payroll tax and the interest are cumulative, so they do not reverse. Materiality is **$500**.",
-      "after": "Your chart has two accounts for accruals: **Accrued expenses** and **Accrued liabilities – other**. Which one do I use? And shall I start?"
+      "text": "Here is my plan for **Northbrook Trading, 1 to 30 September**, on the accrual basis. Your books are in US dollars with a calendar year, so September is month 9 of the bonus year. In scope are the **bonus**, **interest** on the term loan, **utilities**, **audit fees** and **deferred revenue**. Materiality is **$500**.",
+      "after": "Electricity and audit fees reverse on 1 October. The bonus, its payroll tax and the interest build up month by month, so they do not reverse. Deferred items go to your **Deferred revenue** account. For accruals, your chart has two accounts: **Accrued expenses** and **Accrued liabilities – other**. Which one do I use? And shall I start?"
     },
     {
       "role": "user",
@@ -57,16 +90,36 @@
       "label": "Read the books in one batch",
       "tag": "read-only",
       "rows": [
-        ["search_accounts", "Accrued expenses, Deferred revenue"],
-        ["get_trial_balance", ""],
-        ["get_balance_sheet", "Term loan $300,000"],
-        ["get_general_ledger", "Bonus accrued to 31 Aug $160,000"],
-        ["search_journal_entries", "No reversal of the August accrual"],
-        ["search_bills", "August electricity $2,170, 31 days"],
-        ["search_sales_receipts", "Pinnacle Clinics $36,000, to Revenue"],
-        ["get_profit_and_loss", ""]
+        [
+          "get_trial_balance",
+          ""
+        ],
+        [
+          "get_balance_sheet",
+          "Term loan $300,000"
+        ],
+        [
+          "get_general_ledger",
+          "Bonus accrued to 31 Aug $160,000"
+        ],
+        [
+          "search_journal_entries",
+          "No reversal of the August accrual"
+        ],
+        [
+          "search_bills",
+          "August electricity $2,170, 31 days"
+        ],
+        [
+          "search_sales_receipts",
+          "Pinnacle Clinics $36,000, to Revenue"
+        ],
+        [
+          "get_profit_and_loss",
+          ""
+        ]
       ],
-      "summary": "8 reads in one batch. Nothing in your books changed."
+      "summary": "7 reads in one batch. Nothing in your books changed."
     },
     {
       "role": "agent",
@@ -75,15 +128,34 @@
         "type": "bridge",
         "title": "September accruals",
         "rows": [
-          ["Bonus, 240,000 × 9 ÷ 12, less $160,000 already accrued", "$20,000.00"],
-          ["+ Employer payroll tax on the bonus, 8%", "$1,600.00"],
-          ["+ Interest, 15 days at 6.5%, actual/365", "$801.37"],
-          ["+ Electricity, 30 days at $70.00 a day", "$2,100.00"],
-          ["+ Audit fees, 75% of $12,000", "$9,000.00"],
-          ["= Accruals for September", "$33,501.37", "total"]
+          [
+            "Bonus, 240,000 × 9 ÷ 12, less $160,000 already accrued",
+            "$20,000.00"
+          ],
+          [
+            "+ Employer payroll tax on the bonus, 8%",
+            "$1,600.00"
+          ],
+          [
+            "+ Interest on the $300,000 loan, 15 days at 6.5%",
+            "$801.37"
+          ],
+          [
+            "+ Electricity, 30 days at $70.00 a day (2,170 ÷ 31)",
+            "$2,100.00"
+          ],
+          [
+            "+ Audit fees, 75% of $12,000",
+            "$9,000.00"
+          ],
+          [
+            "= Accruals for September",
+            "$33,501.37",
+            "total"
+          ]
         ]
       },
-      "after": "I used the loan's own day count, actual/365. Actual/360 gives $812.50. Electricity and audit fees reverse on 1 October, a total of **$11,100**."
+      "after": "For interest, I used the loan's own day count, actual/365. Actual/360 gives $812.50. Electricity and audit fees reverse on 1 October, a total of **$11,100**."
     },
     {
       "role": "agent",
@@ -92,13 +164,37 @@
         "type": "bridge",
         "title": "Accrued expenses, electricity",
         "rows": [
-          ["Opening balance, 31 Aug", "$2,040.00"],
-          ["+ September accrual", "$2,100.00"],
-          ["− Reversal of August, not posted", "$0.00"],
-          ["= Closing balance", "$4,140.00", "total"],
-          ["− Proposed correction", "$2,040.00"],
-          ["= Closing after the correction", "$2,100.00", "total"],
-          ["Expected: this month's accrual", "$2,100.00", "ok"]
+          [
+            "Opening balance, 31 Aug",
+            "$2,040.00"
+          ],
+          [
+            "+ September accrual",
+            "$2,100.00"
+          ],
+          [
+            "− Reversal of August, not posted",
+            "$0.00"
+          ],
+          [
+            "= Closing balance",
+            "$4,140.00",
+            "total"
+          ],
+          [
+            "− Proposed correction",
+            "$2,040.00"
+          ],
+          [
+            "= Closing after the correction",
+            "$2,100.00",
+            "total"
+          ],
+          [
+            "Expected: this month's accrual",
+            "$2,100.00",
+            "ok"
+          ]
         ]
       },
       "after": "The real August bill of $2,170 went straight to Utilities expense on 9 September. Without the correction, September carries **$4,270** of electricity. With it, September carries $2,230."
@@ -109,11 +205,31 @@
       "card": {
         "type": "table",
         "title": "Deferred revenue at 30 Sep",
-        "head": ["Contract", "Unearned", "Current", "Non-current"],
+        "head": [
+          "Contract",
+          "Unearned",
+          "Current",
+          "Non-current"
+        ],
         "rows": [
-          ["Pinnacle Clinics, 12 months", "$33,000", "$33,000", "$0"],
-          ["Lakeside Freight, 24 months", "$42,000", "$24,000", "$18,000"],
-          ["Total", "$75,000", "$57,000", "$18,000"]
+          [
+            "Pinnacle Clinics, 12 months",
+            "$33,000",
+            "$33,000",
+            "$0"
+          ],
+          [
+            "Lakeside Freight, 24 months",
+            "$42,000",
+            "$24,000",
+            "$18,000"
+          ],
+          [
+            "Total",
+            "$75,000",
+            "$57,000",
+            "$18,000"
+          ]
         ]
       },
       "after": "I also release $2,000 of Lakeside's payment for September. Together, the two contracts reduce September revenue by **$31,000**. Pinnacle's receipt has no sales tax."
@@ -124,11 +240,27 @@
       "card": {
         "type": "table",
         "title": "Not in this run",
-        "head": ["Item", "Amount", "Where it goes"],
+        "head": [
+          "Item",
+          "Amount",
+          "Where it goes"
+        ],
         "rows": [
-          ["Water and courier, each below $500", "$440", "Small items list, with the total"],
-          ["Stock received 29 Sep, no invoice", "$4,800", "ap-accrual-cutoff"],
-          ["Insurance paid 1 Sep for 12 months", "$7,200", "prepaid-amortization-schedule"]
+          [
+            "Water and courier, each below $500",
+            "$440",
+            "Small items list, with the total"
+          ],
+          [
+            "Stock received 29 Sep, no invoice",
+            "$4,800",
+            "The AP accrual cutoff skill"
+          ],
+          [
+            "Insurance paid 1 Sep for 12 months",
+            "$7,200",
+            "The prepaid schedule skill"
+          ]
         ]
       },
       "after": "Water is $180 and the courier is $260. They get no entry, but the list keeps their total for your auditor."
@@ -139,45 +271,77 @@
       "card": {
         "type": "table",
         "title": "Proposed entries",
-        "head": ["Entry", "Amount", "Evidence"],
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
         "rows": [
-          ["Accrue the bonus", "$20,000.00", "Managing director's estimate, ledger"],
-          ["Accrue payroll tax on the bonus", "$1,600.00", "Your 8% rate"],
-          ["Accrue interest on the term loan", "$801.37", "Loan agreement"],
-          ["Accrue September electricity", "$2,100.00", "August bill"],
-          ["Accrue audit fees", "$9,000.00", "Engagement letter, auditor"],
-          ["Correct the missed August reversal", "$2,040.00", "Journal entries from 1 Sep"],
-          ["Move Pinnacle's unearned part to Deferred revenue", "$33,000.00", "Contract and receipt"],
-          ["Release Lakeside's September part", "$2,000.00", "Contract"],
-          ["Reverse electricity and audit fees on 1 Oct", "$11,100.00", "Your reversal policy"]
+          [
+            "Accrue the bonus",
+            "$20,000.00",
+            "Managing director's estimate, ledger"
+          ],
+          [
+            "Accrue payroll tax on the bonus",
+            "$1,600.00",
+            "Your 8% rate"
+          ],
+          [
+            "Accrue interest on the term loan",
+            "$801.37",
+            "Loan agreement"
+          ],
+          [
+            "Accrue September electricity",
+            "$2,100.00",
+            "August bill"
+          ],
+          [
+            "Accrue audit fees",
+            "$9,000.00",
+            "Engagement letter, auditor"
+          ],
+          [
+            "Correct the missed August reversal",
+            "$2,040.00",
+            "Journal entries from 1 Sep"
+          ],
+          [
+            "Move Pinnacle's unearned part to Deferred revenue",
+            "$33,000.00",
+            "Contract and receipt"
+          ],
+          [
+            "Release Lakeside's September part",
+            "$2,000.00",
+            "Contract"
+          ],
+          [
+            "Reverse electricity and audit fees on 1 Oct",
+            "$11,100.00",
+            "Your reversal policy"
+          ]
         ]
       },
-      "after": "After the correction, the net September expense is **$31,461.37**. Closing accrued liabilities are **$206,301.37**."
+      "after": "After the correction, the net September expense is **$31,461.37**. Closing accrued liabilities are **$206,301.37**. I do not post these entries. A person on your team posts them. Do you want the workpaper as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Looks good. Can you just post these in QuickBooks?"
+      "text": "Looks right. Yes, please."
     },
     {
       "role": "agent",
-      "text": "No. I never write to your books. A person posts these entries, and a reviewer signs them off.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          ["Prepared by", ""],
-          ["Reviewed by", ""]
-        ]
-      },
-      "after": "Do you want the eight sheets as an Excel file? And do you want me to save your settings for next month?"
+      "text": "Done. **Accruals_Deferrals_2026-09.xlsx** has eight sheets, from the summary to the coverage sheet. The coverage sheet shows what came from your books and what came from you.",
+      "after": "Do you want me to save your settings for next month?"
     },
     {
       "role": "user",
-      "text": "Yes to both."
+      "text": "Yes, save them."
     },
     {
       "role": "agent",
-      "text": "Done. The Excel file has the eight sheets, from the summary to the coverage. I saved the categories, the threshold, the reversal policy, your accounts and the basis for each category. Next month, the run starts from them."
+      "text": "Done. I saved your choices for Northbrook Trading: the categories, the threshold, the reversal policy, your accounts and the basis for each item. I did not save your connection or tool settings. I check those again at each run."
     }
   ]
 }

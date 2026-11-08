@@ -12,12 +12,12 @@
         "Do you want me to use MosoFin, or will you upload the data?",
         "Which period do I review?",
         "What are your approval limits? I never assume one.",
-        "What size of amount is material for you?",
+        "Optional: what size of amount is material for you?",
         "Does anyone make adjustments outside the books, for example your accountant at year end, in tax software or in a spreadsheet?",
         "Who may see the output? It names logins and entries.",
         "Must someone approve a hand-typed entry? If yes, can you export who approved each one?",
         "Through which date are the books closed, and when was the close done?",
-        "Which accounts are sensitive, and do you know of any risk areas?"
+        "Optional: which accounts are sensitive, and do you know of any risk areas?"
       ]
     },
     {
@@ -27,36 +27,32 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Checked the workspace and the company file",
+      "label": "Found your workspace and company file",
       "tag": "read-only",
       "rows": [
         [
-          "Workspace",
+          "list_workspaces",
           "Northbrook Trading"
         ],
         [
-          "Company file",
-          "QuickBooks Online, confirmed by name"
-        ],
-        [
-          "Consolidation workbook",
-          "Not connected"
-        ],
-        [
-          "Entry fields",
-          "Transaction date, create date, login, description"
-        ],
-        [
-          "Tools",
-          "Read-only tools only"
+          "get_agent_datasources",
+          "Northbrook Trading. No consolidation workbook connected"
         ]
       ],
-      "summary": "The agent can read your books. It cannot change them."
+      "summary": "No business data read yet."
+    },
+    {
+      "role": "agent",
+      "text": "I found one workspace, **Northbrook Trading**, with one company file of the same name. Your consolidation workbook is not connected. Is that the right company file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, that's us."
     },
     {
       "role": "agent",
       "text": "Here is my plan. I review **every journal entry** that **Northbrook Trading** posted from **1 July to 30 September**, against a baseline from **the six prior quarters**. The approval limit is **$10,000** and materiality is **$25,000**.",
-      "after": "The consolidation workbook is not connected, so the adjustments in it are **not in this population**. You keep no approval log, so I report the four approval tests as not run. Shall I start?"
+      "after": "The adjustments in the consolidation workbook are **not in this population**. You keep no approval log, so I report the four approval tests as not run. The output is for the CFO and the audit committee. Shall I start?"
     },
     {
       "role": "user",
@@ -65,9 +61,17 @@
     {
       "role": "tool",
       "source": "mosofin",
-      "label": "Read the population in one batch",
+      "label": "Checked the tools, then read the population",
       "tag": "read-only",
       "rows": [
+        [
+          "get_datasource_tools",
+          "Entry fields: transaction date, create date, login, description"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
         [
           "search_journal_entries",
           "1,284 transactions, all types"
@@ -93,10 +97,6 @@
           "Movement $2,486,310.45"
         ],
         [
-          "get_company_info",
-          ""
-        ],
-        [
           "get_profit_and_loss",
           ""
         ],
@@ -105,11 +105,11 @@
           ""
         ]
       ],
-      "summary": "9 reads in one batch. Nothing in your books changed."
+      "summary": "10 calls. Nothing in your books changed."
     },
     {
       "role": "agent",
-      "text": "I read **1,284** transactions of all types. A person typed **48** of them by hand, which is 3.7%. Before I screen them, I prove that I read them all:",
+      "text": "I read **1,284** transactions of all types. A person typed **48** of them by hand, which is 3.7%. Each one has a transaction date, a create date, a login and a description. Before I screen them, I prove that I read them all:",
       "card": {
         "type": "bridge",
         "title": "Tie-out",
@@ -187,11 +187,7 @@
           ]
         ]
       },
-      "after": "A sign gets 3, 2 or 1 points, and the report states each weight. The other four flags score 2 or less. JE-202609-022 is a routine round accrual. JE-202609-024 already corrects JE-202608-014."
-    },
-    {
-      "role": "agent",
-      "text": "I cannot answer these three from the books. A person must give the support and the reason. I ask roles, not people. Can the bookkeeper explain JE-202609-027 and JE-202609-023?"
+      "after": "The other four flags score 2 or less, and the report states each weight. The books cannot explain these three. I ask roles, not people. Can the bookkeeper explain JE-202609-027 and JE-202609-023?"
     },
     {
       "role": "user",
@@ -269,34 +265,24 @@
           ]
         ]
       },
-      "after": "To run the four tests next quarter, ask for an export from whoever keeps the approval emails."
-    },
-    {
-      "role": "agent",
-      "text": "Your review has nine sheets, with the patterns first. The header gives the population, the tie-out and that the workbook adjustments are not in it.",
-      "card": {
-        "type": "signoff",
-        "title": "Sign-off",
-        "rows": [
-          [
-            "Prepared by",
-            ""
-          ],
-          [
-            "Reviewed by",
-            ""
-          ]
-        ]
-      },
-      "after": "Do you want the sheets as an Excel file? And do you want me to save your settings for next quarter?"
+      "after": "To run them next quarter, ask for an export from whoever keeps the approval emails. Do you want the review as an Excel file?"
     },
     {
       "role": "user",
-      "text": "Yes to both. Please save this quarter's flags too, so we can compare."
+      "text": "Yes, please."
     },
     {
       "role": "agent",
-      "text": "Here is **JE_Review_2026-Q3_Northbrook Trading.xlsx**. I saved the method only. These are your sensitive accounts, the $10,000 limit, the weights, the six-quarter baseline and one rule: quarter-end accruals to 2110 are routine.",
+      "text": "Here is **JE_Review_2026-Q3_Northbrook Trading.xlsx**. It has nine sheets, with the patterns first. The header gives the population, the tie-out and that the workbook adjustments are not in it.",
+      "after": "Do you want me to save your settings for next quarter?"
+    },
+    {
+      "role": "user",
+      "text": "Yes. Please save this quarter's flags too, so we can compare."
+    },
+    {
+      "role": "agent",
+      "text": "I saved the method only: your sensitive accounts, the $10,000 limit, the weights, the six-quarter baseline and one rule. Quarter-end accruals to 2110 are routine.",
       "after": "I do not save flags, scores, logins or explanations. Next quarter, I screen every entry again from the start."
     }
   ]
