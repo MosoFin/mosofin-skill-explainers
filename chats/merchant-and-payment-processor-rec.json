@@ -1,98 +1,281 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, Stripe, Square and PayPal into one bank account, August. The figures match the worked examples on the step-by-step page.",
   "chosen": {
-    "operating-august-statement.pdf": "the name of the user's own bank statement file"
+    "operating-august-statement.pdf": "the name of the user's own bank statement file",
+    "Processor_Recon_Stripe_2026-08.xlsx": "the file name that the skill gives each workpaper, one per payment app, for August of the example year 2026"
   },
   "messages": [
-    {"role": "user", "text": "Can you check Stripe, Square and PayPal against our books for August?"},
-    {"role": "agent",
-     "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
-     "list": [
-       "Do you want me to use MosoFin, or will you upload files?",
-       "Which payment apps? I check each one on its own.",
-       "Which period? I never assume one.",
-       "Does your bookkeeper record each sale, or one entry for each payout?",
-       "Does any app hold a reserve or delay payouts?",
-       "Optional: what fee rate does your contract set? Then I check the fees against it."
-     ]},
-    {"role": "user", "text": "Use MosoFin. Stripe, Square and PayPal, all into one bank account. August. One entry for each payout. No reserves. We pay the published rates."},
-    {"role": "tool", "source": "mosofin", "label": "Checked the workspace and the company file", "tag": "read-only",
-     "rows": [
-       ["Workspace", "Northbrook Trading"],
-       ["Company file", "Confirmed by name"],
-       ["Payment apps", "Stripe, Square and PayPal connected"],
-       ["Tools", "Read-only tools only"]
-     ],
-     "summary": "The agent can read your books and the three apps. It cannot change them."},
-    {"role": "agent",
-     "text": "Your three apps are connected, so I can read both sides. Your chart of accounts has one clearing account for each app: **Stripe Clearing**, **Square Clearing** and **PayPal Clearing**. Are those the right ones?",
-     "after": "The bank statement never comes through MosoFin. Please attach it, so I can show that the payouts reached the bank."},
-    {"role": "user", "text": "Yes, those are right. Here is the statement.", "attach": ["operating-august-statement.pdf"]},
-    {"role": "agent",
-     "text": "Here is my plan. I reconcile **Stripe, Square and PayPal** to **Northbrook Trading** for **1 to 31 August**. Sales are recorded **one entry for each payout**. I check each app in its own clearing account, and I compare the fees with the published rates. Shall I start?"},
-    {"role": "user", "text": "Yes, go ahead."},
-    {"role": "tool", "source": "mosofin", "label": "Read both sides in one batch", "tag": "read-only",
-     "rows": [
-       ["search_accounts", "Stripe, Square and PayPal Clearing"],
-       ["get_general_ledger", "Stripe sales $45,078.00, Stripe fees $0.00"],
-       ["get_balance_sheet", ""],
-       ["get_profit_and_loss", ""],
-       ["search_deposits", "Includes a $1,800 Square payout"],
-       ["get_company_info", ""],
-       ["Stripe report", "100 charges, $48,000 gross"],
-       ["Square report", "400 charges, $22,000 gross"],
-       ["PayPal report", "50 charges, $9,500 gross"],
-       ["Your bank statement", ""]
-     ],
-     "summary": "6 reads of your books, the three app reports and your statement. Nothing changed."},
-    {"role": "agent",
-     "text": "The three apps charged **$79,500** in August. Each fee matches the published price to the cent:",
-     "card": {"type": "table", "title": "August, gross to net",
-       "head": ["Payment app", "Gross", "Refunds and chargebacks", "Fees", "Fee rate", "Net settled"],
-       "rows": [
-         ["Stripe", "$48,000", "$1,500", "$1,422.00", "2.96%", "$45,078.00"],
-         ["Square", "$22,000", "$400", "$632.00", "2.87%", "$20,968.00"],
-         ["PayPal", "$9,500", "$150", "$356.05", "3.75%", "$8,993.95"],
-         ["All three", "$79,500", "$2,050", "$2,410.05", "3.03%", "$75,039.95"]
-       ]},
-     "after": "The apps paid **$75,039.95** into your bank. The statement shows the same deposits, so all the money arrived."},
-    {"role": "agent",
-     "text": "But one payout is in the wrong clearing account. Your books record a **$1,800 Square payout** against Stripe:",
-     "card": {"type": "bridge", "title": "Stripe Clearing, 31 August",
-       "rows": [
-         ["Payouts recorded against Stripe", "$46,878.00"],
-         ["− Net that Stripe owed you", "$45,078.00"],
-         ["= Recorded beyond what Stripe owed", "$1,800.00", "total"]
-       ]},
-     "after": "Square Clearing has the same $1,800 the other way. Square owed you $20,968.00, but the books record $19,168.00 of Square payouts. In one combined account, the two errors cancel and you see nothing."},
-    {"role": "agent",
-     "text": "Stripe sales are recorded **net of fees**. Your books show Stripe sales of **$45,078** and no Stripe fees. That is exactly what Stripe paid out.",
-     "card": {"type": "bridge", "title": "Stripe sales, August",
-       "rows": [
-         ["Gross Stripe charges", "$48,000.00"],
-         ["− Refunds", "$1,200.00"],
-         ["− Chargebacks", "$300.00"],
-         ["= Net sales should be", "$46,500.00", "total"],
-         ["− Stripe sales in your books", "$45,078.00"],
-         ["= Sales too low by", "$1,422.00", "total"],
-         ["Stripe's fees for August", "$1,422.00", "ok"]
-       ]},
-     "after": "Profit is the same either way, so nobody noticed. But your sales and your fees are both $1,422 too low. Square and PayPal record their fees, so their sales are right."},
-    {"role": "agent",
-     "text": "I propose two entries. Each one points to its evidence:",
-     "card": {"type": "table", "title": "Proposed entries",
-       "head": ["Entry", "Amount", "Evidence"],
-       "rows": [
-         ["Move the Square payout from Stripe Clearing to Square Clearing", "$1,800.00", "Square payout report and the bank deposit"],
-         ["Debit processing fees, credit sales", "$1,422.00", "Stripe's fees for August"]
-       ]},
-     "after": "Stripe refunds and chargebacks, $1,500, are also inside Stripe sales. If you keep a refunds account, I can propose a third entry. A person posts these entries. I do not."},
-    {"role": "agent",
-     "text": "After the first entry, all three clearing accounts close August at $0. Your workpaper has the summary, the transaction detail, the payout tie-out to your bank statement and the coverage sheet.",
-     "card": {"type": "signoff", "title": "Sign-off", "rows": [["Prepared by", ""], ["Reviewed by", ""]]},
-     "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"},
-    {"role": "user", "text": "Yes to both."},
-    {"role": "agent",
-     "text": "Done. Here is the Excel file. I saved the clearing account for each app, the posting approach, the payout bank account and the published rates. I never save balances, payouts or customer details."}
+    {
+      "role": "user",
+      "text": "Can you check Stripe, Square and PayPal against our books for August?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which payment apps? I check each one on its own.",
+        "Which period? I never assume one.",
+        "Does your bookkeeper record each sale, or one entry for each payout?",
+        "Does any app hold a reserve or delay payouts?",
+        "Optional: what fee rate does your contract set? Then I check the fees against it."
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Stripe, Square and PayPal, all into one bank account. August. One entry for each payout. No reserves. We pay the published rates."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and found the clearing accounts",
+      "tag": "read-only",
+      "rows": [
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "Stripe, Square and PayPal connected"
+        ],
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ],
+        [
+          "search_accounts",
+          "Stripe, Square and PayPal Clearing"
+        ]
+      ],
+      "summary": "The agent can read your books and the three apps. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Your three apps are connected, so I can read both sides. Your chart of accounts has one clearing account for each app: **Stripe Clearing**, **Square Clearing** and **PayPal Clearing**. Are those the right ones?",
+      "after": "The bank statement never comes through MosoFin. Please attach it, so I can show that the payouts reached the bank."
+    },
+    {
+      "role": "user",
+      "text": "Yes, those are right. Here is the statement.",
+      "attach": [
+        "operating-august-statement.pdf"
+      ]
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile **Stripe, Square and PayPal** to **Northbrook Trading** for **1 to 31 August**, with the numbers from your MosoFin connection. Sales are recorded **one entry for each payout**.",
+      "after": "I check each app in its own clearing account, and I compare the fees with the published rates. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read both sides in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "get_general_ledger",
+          ""
+        ],
+        [
+          "get_balance_sheet",
+          ""
+        ],
+        [
+          "get_profit_and_loss",
+          "Stripe sales $45,078.00, Stripe fees $0.00"
+        ],
+        [
+          "search_deposits",
+          "Includes a $1,800 Square payout"
+        ],
+        [
+          "get_company_info",
+          ""
+        ],
+        [
+          "Stripe report",
+          "$48,000 gross"
+        ],
+        [
+          "Square report",
+          "$22,000 gross"
+        ],
+        [
+          "PayPal report",
+          "$9,500 gross"
+        ]
+      ],
+      "summary": "5 reads of your books and the three app reports. Nothing changed."
+    },
+    {
+      "role": "agent",
+      "text": "The three apps charged **$79,500** in August. Each fee matches the published price to the cent:",
+      "card": {
+        "type": "table",
+        "title": "August, gross to net",
+        "head": [
+          "Payment app",
+          "Gross",
+          "Refunds and chargebacks",
+          "Fees",
+          "Fee rate",
+          "Net settled"
+        ],
+        "rows": [
+          [
+            "Stripe",
+            "$48,000",
+            "$1,500",
+            "$1,422.00",
+            "2.96%",
+            "$45,078.00"
+          ],
+          [
+            "Square",
+            "$22,000",
+            "$400",
+            "$632.00",
+            "2.87%",
+            "$20,968.00"
+          ],
+          [
+            "PayPal",
+            "$9,500",
+            "$150",
+            "$356.05",
+            "3.75%",
+            "$8,993.95"
+          ],
+          [
+            "All three",
+            "$79,500",
+            "$2,050",
+            "$2,410.05",
+            "3.03%",
+            "$75,039.95"
+          ]
+        ]
+      },
+      "after": "The apps paid **$75,039.95** into your bank. The statement shows the same deposits, so all the money arrived."
+    },
+    {
+      "role": "agent",
+      "text": "But one payout is in the wrong clearing account. Your books record a **$1,800 Square payout** against Stripe:",
+      "card": {
+        "type": "bridge",
+        "title": "Stripe Clearing, 31 August",
+        "rows": [
+          [
+            "Payouts recorded against Stripe",
+            "$46,878.00"
+          ],
+          [
+            "− Net that Stripe owed you",
+            "$45,078.00"
+          ],
+          [
+            "= Recorded beyond what Stripe owed",
+            "$1,800.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "Square Clearing has the same $1,800 the other way. Square owed you $20,968.00, but the books record $19,168.00 of Square payouts. In one combined account, the two errors cancel and you see nothing."
+    },
+    {
+      "role": "agent",
+      "text": "Stripe sales are recorded **net of fees**. Your books show Stripe sales of **$45,078** and no Stripe fees. That is exactly what Stripe paid out.",
+      "card": {
+        "type": "bridge",
+        "title": "Stripe sales, August",
+        "rows": [
+          [
+            "Gross Stripe charges",
+            "$48,000.00"
+          ],
+          [
+            "− Refunds",
+            "$1,200.00"
+          ],
+          [
+            "− Chargebacks",
+            "$300.00"
+          ],
+          [
+            "= Net sales should be",
+            "$46,500.00",
+            "total"
+          ],
+          [
+            "− Stripe sales in your books",
+            "$45,078.00"
+          ],
+          [
+            "= Sales too low by",
+            "$1,422.00",
+            "total"
+          ],
+          [
+            "Stripe's fees for August",
+            "$1,422.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "Profit is the same either way, so nobody noticed. But your sales and your fees are both $1,422 too low. Square and PayPal record their fees, so their sales are right. Sales tax is due on the full sale, so please check your sales-tax returns too."
+    },
+    {
+      "role": "agent",
+      "text": "I propose two entries. Each one points to its evidence:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entries",
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Move the Square payout from Stripe Clearing to Square Clearing",
+            "$1,800.00",
+            "Square payout report and the bank deposit"
+          ],
+          [
+            "Debit processing fees, credit sales",
+            "$1,422.00",
+            "Stripe's fees for August"
+          ]
+        ]
+      },
+      "after": "Stripe refunds and chargebacks, $1,500, are also inside Stripe sales. If you keep a refunds account, I can propose a third entry. I propose no tax entry without your filed returns. A person posts these entries. I do not."
+    },
+    {
+      "role": "agent",
+      "text": "After the first entry, all three clearing accounts close August at $0. Your workpaper has the summary, the transaction detail, the payout tie-out to your bank statement, the exceptions and the coverage sheet.",
+      "after": "Do you want the workpaper as Excel files, one for each app?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here they are: **Processor_Recon_Stripe_2026-08.xlsx**, and the same for Square and PayPal.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved the clearing account for each app, the posting approach, the payout bank account and the published rates. I never save balances, payouts or customer details."
+    }
   ]
 }

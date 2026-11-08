@@ -1,86 +1,248 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading, September under review, scan window 1 July to 31 October. The figures match the worked examples on the step-by-step page.",
+  "chosen": {
+    "Duplicate_Invoice_Scan_2026-11-02.xlsx": "the file name that the skill gives the workpaper, dated on the day of the run, after the scan window closes"
+  },
   "messages": [
-    {"role": "user", "text": "Can you check our supplier bills for duplicates? September is the month I care about."},
-    {"role": "agent",
-     "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
-     "list": [
-       "Do you want me to use MosoFin, or will you upload files?",
-       "Which company? If you have a group, do I also scan across the companies?",
-       "Which period do I scan, and how far back before it? Duplicates often cross a month end.",
-       "Which suppliers bill the same amount on purpose, such as rent, insurance or software?",
-       "Which sensitivity do you want: Strict, Standard or Permissive? If you do not say, I use Standard and a 7-day window.",
-       "Do you have results from an earlier scan?"
-     ]},
-    {"role": "user",
-     "text": "Use MosoFin. Northbrook Trading only. Scan 1 July to 31 October around September. Our landlord, our insurer and three software suppliers bill the same every month. Standard is fine. No earlier scan."},
-    {"role": "tool", "source": "mosofin", "label": "Checked the workspace and the company file", "tag": "read-only",
-     "rows": [
-       ["Workspace", "Northbrook Trading"],
-       ["Company file", "Confirmed by name"],
-       ["Bill-level search", "Available"],
-       ["Supplier bank details", "Not available through MosoFin"],
-       ["Tools", "Read-only tools only"]
-     ],
-     "summary": "The agent can read your books. It cannot change them."},
-    {"role": "agent",
-     "text": "Here is my plan. I scan **every bill and payment** at **Northbrook Trading** from **1 July to 31 October**. I use **Standard** sensitivity and a **7-day** window. Your landlord, insurer and three software suppliers count as normal repeat billers.",
-     "after": "**Rule 7 cannot run here.** It finds two suppliers that share one bank account, and MosoFin cannot see bank details. Who can check that in your banking system? Shall I start?"},
-    {"role": "user", "text": "The bank's payments team can check it. Yes, go ahead."},
-    {"role": "tool", "source": "mosofin", "label": "Read the whole population in one batch", "tag": "read-only",
-     "rows": [
-       ["search_bills", "1,284 of 1,284 bills"],
-       ["search_bill_payments", "1,197 bill payments"],
-       ["search_purchases", ""],
-       ["search_journal_entries", ""],
-       ["search_vendors", "212 vendors, inactive ones included"],
-       ["search_vendor_credits", "14 open vendor credits"],
-       ["get_aged_payables", ""],
-       ["search_payment_methods", ""],
-       ["get_company_info", ""]
-     ],
-     "summary": "9 reads, each one to its last page. Nothing in your books changed."},
-    {"role": "agent",
-     "text": "I scanned all **1,284 bills**. Five clusters look like duplicates. The exposure leaves out the one bill in each cluster that is real.",
-     "card": {"type": "table", "title": "Flagged clusters",
-       "head": ["Cluster", "Exposure", "What I found", "Confidence"],
-       "rows": [
-         ["A", "$1,250.00", "Harbor Office Supply INV-0442, entered and paid twice", "Very High"],
-         ["B", "$4,860.00", "Crestline Logistics INV-7731, paid by cheque and again by ACH", "High"],
-         ["C", "$3,200.00", "Pinnacle Design INV-2210, under two supplier records, one bill still open", "High"],
-         ["D", "$980.00", "Acme Corp and Acme Corporation, two days apart, name score 0.91", "Medium"],
-         ["E", "$950.00", "Summit Cleaning, 1 Sep and 6 Sep", "Medium"]
-       ]},
-     "after": "Summit also bills $950 on the 1st of each month. That is a pattern, so only the 6 Sep bill is a suspect."},
-    {"role": "agent",
-     "text": "Under **Standard**, the headline counts High and Very High only:",
-     "card": {"type": "bridge", "title": "Headline exposure, Standard",
-       "rows": [
-         ["Cluster A, Very High", "$1,250.00"],
-         ["+ Cluster B, High", "$4,860.00"],
-         ["+ Cluster C, High", "$3,200.00"],
-         ["= Headline exposure", "$9,310.00", "total"]
-       ]},
-     "after": "D and E are Medium, $1,930 together. They stay on the list, below the headline. Under Strict, the headline is $11,240."},
-    {"role": "agent",
-     "text": "Most duplicates are honest errors, not fraud. Here is what I propose, unpaid first:",
-     "card": {"type": "table", "title": "Recovery plan",
-       "head": ["Action", "Amount", "Cluster"],
-       "rows": [
-         ["Void the open Pinnacle bill before you pay it", "$3,200.00", "C"],
-         ["Ask Crestline for a credit, a refund or a set-off", "$4,860.00", "B"],
-         ["Ask Harbor for a credit on its next invoice", "$1,250.00", "A"],
-         ["Merge the two Pinnacle records and the two Acme records", "", "C and D"]
-       ]},
-     "after": "That is $3,200.00 caught before payment and $6,110.00 paid out to recover. A merge is not reversible in most systems, so check each pair first. I void nothing, merge nothing and ask no supplier for money."},
-    {"role": "agent",
-     "text": "Harbor also owes **you** money. Credit note CN-0011 for **$410.00** is still open, and you paid three later Harbor bills in full. It is not a duplicate, so it is not in the exposure."},
-    {"role": "agent",
-     "text": "I ran 9 of the 10 rules. Rule 7 did not run, and the bank's payments team owns it. So this scan found the duplicate errors. It does not show that the fraud test passed.",
-     "card": {"type": "signoff", "title": "Sign-off", "rows": [["Prepared by", ""], ["Reviewed by", ""]]},
-     "after": "Your workpaper has seven sheets, with a column for your decision on each cluster. Do you want it as an Excel file? And do you want me to save your settings for next month?"},
-    {"role": "user", "text": "Yes to both."},
-    {"role": "agent",
-     "text": "Done. Here is the Excel file. I saved your repeat billers, the Standard setting, the 7-day window, the recovery steps and who runs Rule 7. I never save bank details, invoice data or any suspicion about a person."}
+    {
+      "role": "user",
+      "text": "Can you check our supplier bills for duplicates? September is the month I care about."
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Which company? If you have a group, do I also scan across the companies?",
+        "Which period do I scan, and how far back before it? Duplicates often cross a month end.",
+        "Which suppliers bill the same amount on purpose, such as rent, insurance or software?",
+        "I use Standard sensitivity and a 7-day window for near dates. Do you want Strict or Permissive instead?",
+        "Do you have results from an earlier scan?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Northbrook Trading only. Scan 1 July to 31 October around September. Our landlord, our insurer and three software suppliers bill the same every month. Standard is fine. No earlier scan."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "Northbrook Trading"
+        ],
+        [
+          "get_datasource_tools",
+          "Bill search readable, no bank details"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I scan **every bill and payment** at **Northbrook Trading** from **1 July to 31 October**, read through MosoFin. I use **Standard** sensitivity and a **7-day** window. Your landlord, insurer and three software suppliers count as normal repeat billers.",
+      "after": "**Rule 7 cannot run here.** It finds two suppliers that share one bank account, and MosoFin cannot see bank details. Who can check that in your banking system? Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "The bank's payments team can check it. Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the whole population in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "search_bills",
+          "1,284 of 1,284 bills"
+        ],
+        [
+          "search_bill_payments",
+          "1,197 bill payments"
+        ],
+        [
+          "search_purchases",
+          ""
+        ],
+        [
+          "search_journal_entries",
+          ""
+        ],
+        [
+          "search_vendors",
+          "212 suppliers, inactive ones included"
+        ],
+        [
+          "search_vendor_credits",
+          "Includes CN-0011 from Harbor"
+        ],
+        [
+          "get_vendor_expenses",
+          ""
+        ],
+        [
+          "get_aged_payables",
+          ""
+        ],
+        [
+          "search_payment_methods",
+          ""
+        ],
+        [
+          "search_purchase_orders",
+          ""
+        ],
+        [
+          "get_company_info",
+          ""
+        ]
+      ],
+      "summary": "11 reads, each one to its last page. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "I scanned all **1,284 bills** from 212 suppliers, and 1,197 payments. Five clusters look like duplicates. The exposure leaves out the one bill in each cluster that is real.",
+      "card": {
+        "type": "table",
+        "title": "Flagged clusters",
+        "head": [
+          "Cluster",
+          "Exposure",
+          "What I found",
+          "Confidence"
+        ],
+        "rows": [
+          [
+            "A",
+            "$1,250.00",
+            "Harbor Office Supply INV-0442, entered and paid twice",
+            "Very High"
+          ],
+          [
+            "B",
+            "$4,860.00",
+            "Crestline Logistics INV-7731, paid by cheque and again by ACH",
+            "High"
+          ],
+          [
+            "C",
+            "$3,200.00",
+            "Pinnacle Design INV-2210, under two supplier records, one bill still open",
+            "High"
+          ],
+          [
+            "D",
+            "$980.00",
+            "Acme Corp and Acme Corporation, two days apart, name score 0.91",
+            "Medium"
+          ],
+          [
+            "E",
+            "$950.00",
+            "Summit Cleaning, 1 Sep and 6 Sep",
+            "Medium"
+          ]
+        ]
+      },
+      "after": "Summit also bills $950 on the 1st of each month. That is a pattern, so only the 6 Sep bill is a suspect."
+    },
+    {
+      "role": "agent",
+      "text": "Under **Standard**, the headline counts High and Very High only:",
+      "card": {
+        "type": "bridge",
+        "title": "Headline exposure, Standard",
+        "rows": [
+          [
+            "Cluster A, Very High",
+            "$1,250.00"
+          ],
+          [
+            "+ Cluster B, High",
+            "$4,860.00"
+          ],
+          [
+            "+ Cluster C, High",
+            "$3,200.00"
+          ],
+          [
+            "= Headline exposure",
+            "$9,310.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "D and E are Medium, $1,930 together. They stay on the list, below the headline. Under Strict, the headline is $11,240."
+    },
+    {
+      "role": "agent",
+      "text": "Most duplicates are honest errors, not fraud. Here is what I propose, unpaid first:",
+      "card": {
+        "type": "table",
+        "title": "Recovery plan",
+        "head": [
+          "Action",
+          "Amount",
+          "Cluster"
+        ],
+        "rows": [
+          [
+            "Void the open Pinnacle bill before you pay it",
+            "$3,200.00",
+            "C"
+          ],
+          [
+            "Ask Crestline for a credit, a refund or a set-off",
+            "$4,860.00",
+            "B"
+          ],
+          [
+            "Ask Harbor for a credit on its next invoice",
+            "$1,250.00",
+            "A"
+          ],
+          [
+            "Merge the two Pinnacle records and the two Acme records",
+            "",
+            "C and D"
+          ]
+        ]
+      },
+      "after": "That is $3,200.00 caught before payment and $6,110.00 paid out to recover. For the two paid duplicates, I draft an entry for a person to post. A merge is not reversible in most systems, so check each pair first. I void nothing, merge nothing and ask no supplier for money."
+    },
+    {
+      "role": "agent",
+      "text": "Harbor also owes **you** money. Credit note CN-0011 for **$410.00** is still open, and you paid three later Harbor bills in full. It is not a duplicate, so it is not in the exposure."
+    },
+    {
+      "role": "agent",
+      "text": "I ran 9 of the 10 rules. Rule 7 did not run, and the bank's payments team owns it. So this scan found the duplicate errors. It does not show that the fraud test passed.",
+      "after": "Your workpaper has seven sheets, with a column for your decision on each cluster. Do you want it as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here it is: **Duplicate_Invoice_Scan_2026-11-02.xlsx**.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved your repeat billers, the Standard setting, the 7-day window, the recovery steps and who runs Rule 7. I never save bank details, invoice data or any suspicion about a person."
+    }
   ]
 }

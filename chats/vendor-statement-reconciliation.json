@@ -1,93 +1,246 @@
 {
   "example": "Example run with fictional figures: Northbrook Trading and Harbor Office Supply, account NB-2210, statement dated 25 September. The figures match the worked examples on the step-by-step page.",
   "chosen": {
-    "harbor-statement-25-september.pdf": "the name of the statement file that Harbor sent"
+    "harbor-statement-25-september.pdf": "the name of the statement file that Harbor sent",
+    "Vendor_Statement_Recon_HarborOfficeSupply_2026-09-25.xlsx": "the file name that the skill gives the workpaper, with the statement date in the example year 2026"
   },
   "messages": [
-    {"role": "user", "text": "Harbor Office Supply sent us a statement. Can you check it against our books?"},
-    {"role": "agent",
-     "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
-     "list": [
-       "Do you want me to use MosoFin, or will you upload files?",
-       "Please attach Harbor's statement, as a PDF or CSV.",
-       "Which company is the statement addressed to, and what account reference does it show?",
-       "What is your cutoff date? What date is on the statement?",
-       "Does the statement list every open item, only overdue items, or a balance brought forward?",
-       "Do you keep a dispute log? Are you holding back any invoices on purpose?",
-       "Which suppliers do you reconcile, how often, and who owns the exceptions?"
-     ]},
-    {"role": "user",
-     "text": "Use MosoFin. Statement attached. It's addressed to Northbrook Trading, account NB-2210. Our books are at 30 September, the statement is dated 25 September. It lists every open item. No disputes. We do Harbor monthly, and AP owns the exceptions.",
-     "attach": ["harbor-statement-25-september.pdf"]},
-    {"role": "tool", "source": "mosofin", "label": "Checked the workspace and the company file", "tag": "read-only",
-     "rows": [
-       ["Workspace", "Northbrook Trading"],
-       ["Company file", "Northbrook Trading, the statement's addressee"],
-       ["Tools", "Read-only tools only"]
-     ],
-     "summary": "The agent can read your books. It cannot change them."},
-    {"role": "agent",
-     "text": "Here is my plan. I reconcile **Harbor Office Supply**'s statement to **Northbrook Trading**'s supplier ledger, account reference **NB-2210**. Your cutoff is **30 September** and the statement is dated **25 September**. So I reconcile at 25 September, and I list each ledger item from 26 to 30 September on its own. Shall I start?"},
-    {"role": "user", "text": "Yes, go ahead."},
-    {"role": "tool", "source": "mosofin", "label": "Read the books in one batch", "tag": "read-only",
-     "rows": [
-       ["Supplier ranking", ""],
-       ["Harbor's ledger, to today", "$21,115.00 at 30 Sep"],
-       ["Payments to Harbor", "Includes a payment on 29 Sep"],
-       ["Vendor master", "One record for Harbor"],
-       ["Bill search, all suppliers", "No INV-0049"],
-       ["Sibling company files", "No INV-0049"]
-     ],
-     "summary": "6 reads in one batch, past your cutoff. Nothing in your books changed."},
-    {"role": "agent",
-     "text": "I matched Harbor's lines to your ledger, document number first. INV-0042 on the statement is document 42 in your books. Then I took your ledger back to the statement date:",
-     "card": {"type": "bridge", "title": "Your ledger at the statement date",
-       "rows": [
-         ["Your ledger at 30 Sep", "$21,115.00"],
-         ["− Invoice 0057, dated 27 Sep", "$3,100.00"],
-         ["+ Your payment of 29 Sep", "$625.00"],
-         ["= Your ledger at 25 Sep", "$18,640.00", "total"]
-       ]},
-     "after": "Both items are timing. Harbor shows them on its next statement."},
-    {"role": "agent",
-     "text": "Harbor's statement says **$20,710.00**. Two of its lines are not in your books:",
-     "card": {"type": "bridge", "title": "Your ledger to Harbor's statement, 25 Sep",
-       "rows": [
-         ["Your ledger at 25 Sep", "$18,640.00"],
-         ["+ INV-0049, 18 Sep, not in your books", "$2,480.00"],
-         ["− Credit note CN-0011, 12 Sep, not in your books", "$410.00"],
-         ["= Expected statement balance", "$20,710.00", "total"],
-         ["Harbor's statement at 25 Sep", "$20,710.00", "ok"],
-         ["Unexplained", "$0.00", "ok"]
-       ]},
-     "after": "INV-0049 matches nothing in your books at any tier. It is not under a second Harbor record or in a sibling company. So it is a **possible bill you never recorded**. Please ask Harbor for a copy."},
-    {"role": "agent",
-     "text": "Harbor also owes **you** money. CN-0011 is a credit for returned chairs. It relates to INV-0031, which you paid in full on 5 September.",
-     "card": {"type": "bridge", "title": "Money owed to you",
-       "rows": [
-         ["INV-0031", "$410.00"],
-         ["− Paid on 5 Sep", "$410.00"],
-         ["= Still owed on INV-0031", "$0.00", "total"],
-         ["+ CN-0011, not taken", "$410.00"],
-         ["= Cash Harbor owes you", "$410.00", "total"]
-       ]},
-     "after": "You have no open Harbor bill, so the credit has nothing to go against. Ask Harbor for a refund, or take it off the next bill. Did you receive the INV-0049 goods and return those chairs?"},
-    {"role": "user", "text": "Yes. We got the goods, and we returned the chairs. Both are real."},
-    {"role": "agent",
-     "text": "Thank you. I propose two entries. Each one points to its evidence:",
-     "card": {"type": "table", "title": "Proposed entries",
-       "head": ["Entry", "Amount", "Evidence"],
-       "rows": [
-         ["Accrual at 30 Sep: debit expense or inventory, credit accrued liabilities", "$2,480.00", "INV-0049 on Harbor's statement, and your yes"],
-         ["Record CN-0011 as a vendor credit", "$410.00", "CN-0011 on Harbor's statement, and your yes"]
-       ]},
-     "after": "The accrual reverses on 1 October. When the invoice copy arrives, the invoice takes its place. A person posts these entries and contacts Harbor. I do neither."},
-    {"role": "agent",
-     "text": "Your workpaper has six sheets: the summary, the matched items with their tier, the exceptions, the proposed entries, the supplier ranking and the coverage. AP owns both exceptions. Please give each one a target date.",
-     "card": {"type": "signoff", "title": "Sign-off", "rows": [["Prepared by", ""], ["Reviewed by", ""]]},
-     "after": "Do you want the workpaper as an Excel file? And do you want me to save your settings for next month?"},
-    {"role": "user", "text": "Yes to both."},
-    {"role": "agent",
-     "text": "Done. Here is the Excel file. I saved Harbor's account reference, its statement style, your monthly programme and the two open exceptions with their owner. Next month, the run starts from them."}
+    {
+      "role": "user",
+      "text": "Harbor Office Supply sent us a statement. Can you check it against our books?"
+    },
+    {
+      "role": "agent",
+      "text": "Yes. Before I read anything, I need some answers. I ask them all at once, so the run does not stop again for each one.",
+      "list": [
+        "Do you want me to use MosoFin, or will you upload files?",
+        "Please attach Harbor's statement, as a PDF or CSV. I always need it, because MosoFin cannot read it.",
+        "Which company is the statement addressed to, and what account reference does it show?",
+        "What is your cutoff date? What date is on the statement?",
+        "Does the statement list every open item, only overdue items, or a balance brought forward?",
+        "Do you keep a dispute log? Are you holding back any invoices on purpose?",
+        "Which suppliers do you reconcile, how often, and who owns the exceptions?"
+      ]
+    },
+    {
+      "role": "user",
+      "text": "Use MosoFin. Statement attached. It's addressed to Northbrook Trading, account NB-2210. Our books are at 30 September, the statement is dated 25 September. It lists every open item. No disputes. We do Harbor monthly, and AP owns the exceptions.",
+      "attach": [
+        "harbor-statement-25-september.pdf"
+      ]
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Checked the workspace and the company file",
+      "tag": "read-only",
+      "rows": [
+        [
+          "list_workspaces",
+          "Northbrook Trading"
+        ],
+        [
+          "get_agent_datasources",
+          "Northbrook Trading, the statement's addressee"
+        ],
+        [
+          "get_datasource_tools",
+          "Read tools only"
+        ]
+      ],
+      "summary": "The agent can read your books. It cannot change them."
+    },
+    {
+      "role": "agent",
+      "text": "Here is my plan. I reconcile **Harbor Office Supply**'s open-item statement to **Northbrook Trading**'s supplier ledger, account reference **NB-2210**. I read the ledger and payments through MosoFin.",
+      "after": "Your cutoff is **30 September** and the statement is dated **25 September**. So I reconcile at 25 September, and I list each ledger item from 26 to 30 September on its own. Shall I start?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, go ahead."
+    },
+    {
+      "role": "tool",
+      "source": "mosofin",
+      "label": "Read the books in one batch",
+      "tag": "read-only",
+      "rows": [
+        [
+          "Supplier ranking",
+          ""
+        ],
+        [
+          "Harbor's ledger, to today",
+          "$21,115.00 at 30 Sep"
+        ],
+        [
+          "Payments to Harbor",
+          "Includes a payment on 29 Sep"
+        ],
+        [
+          "Payables aging and trial balance",
+          ""
+        ],
+        [
+          "Vendor master",
+          "One record for Harbor"
+        ],
+        [
+          "Bill search, all suppliers",
+          "No INV-0049"
+        ],
+        [
+          "Sibling company files",
+          "No INV-0049"
+        ]
+      ],
+      "summary": "7 reads in one batch, past your cutoff. Nothing in your books changed."
+    },
+    {
+      "role": "agent",
+      "text": "I matched Harbor's lines to your ledger, document number first. INV-0042 on the statement is document 42 in your books. Then I took your ledger back to the statement date:",
+      "card": {
+        "type": "bridge",
+        "title": "Your ledger at the statement date",
+        "rows": [
+          [
+            "Your ledger at 30 Sep",
+            "$21,115.00"
+          ],
+          [
+            "− Invoice 0057, dated 27 Sep",
+            "$3,100.00"
+          ],
+          [
+            "+ Your payment of 29 Sep",
+            "$625.00"
+          ],
+          [
+            "= Your ledger at 25 Sep",
+            "$18,640.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "Both items are timing. Harbor shows them on its next statement."
+    },
+    {
+      "role": "agent",
+      "text": "Harbor's statement says **$20,710.00**. Two of its lines are not in your books:",
+      "card": {
+        "type": "bridge",
+        "title": "Your ledger to Harbor's statement, 25 Sep",
+        "rows": [
+          [
+            "Your ledger at 25 Sep",
+            "$18,640.00"
+          ],
+          [
+            "+ INV-0049, 18 Sep, not in your books",
+            "$2,480.00"
+          ],
+          [
+            "− Credit note CN-0011, 12 Sep, not in your books",
+            "$410.00"
+          ],
+          [
+            "= Expected statement balance",
+            "$20,710.00",
+            "total"
+          ],
+          [
+            "Harbor's statement at 25 Sep",
+            "$20,710.00",
+            "ok"
+          ],
+          [
+            "Unexplained",
+            "$0.00",
+            "ok"
+          ]
+        ]
+      },
+      "after": "INV-0049 matches nothing in your books at any tier. It is not under a second Harbor record or in a sibling company. So it is a **possible bill you never recorded**. Please ask Harbor for a copy."
+    },
+    {
+      "role": "agent",
+      "text": "Harbor also owes **you** money. CN-0011 is a credit for returned chairs. It relates to INV-0031, which you paid in full on 5 September.",
+      "card": {
+        "type": "bridge",
+        "title": "Money owed to you",
+        "rows": [
+          [
+            "INV-0031",
+            "$410.00"
+          ],
+          [
+            "− Paid on 5 Sep",
+            "$410.00"
+          ],
+          [
+            "= Still owed on INV-0031",
+            "$0.00",
+            "total"
+          ],
+          [
+            "+ CN-0011, not taken",
+            "$410.00"
+          ],
+          [
+            "= Cash Harbor owes you",
+            "$410.00",
+            "total"
+          ]
+        ]
+      },
+      "after": "You have no open Harbor bill, so the credit has nothing to go against. Ask Harbor for a refund, or take it off the next bill. Did you receive the INV-0049 goods and return those chairs?"
+    },
+    {
+      "role": "user",
+      "text": "Yes. We got the goods, and we returned the chairs. Both are real."
+    },
+    {
+      "role": "agent",
+      "text": "Thank you. I propose one entry now:",
+      "card": {
+        "type": "table",
+        "title": "Proposed entry, not posted",
+        "head": [
+          "Entry",
+          "Amount",
+          "Evidence"
+        ],
+        "rows": [
+          [
+            "Accrual at 30 Sep: debit expense or inventory, credit accrued liabilities",
+            "$2,480.00",
+            "INV-0049 on Harbor's statement, and your yes"
+          ]
+        ]
+      },
+      "after": "The accrual reverses on 1 October. When the invoice copy arrives, the invoice takes its place. A statement line does not support a credit entry, so please ask Harbor for the CN-0011 document too. A person posts entries and contacts Harbor. I do neither."
+    },
+    {
+      "role": "agent",
+      "text": "Your workpaper has six sheets: the summary, the matched items with their tier, the exceptions, the proposed entry, the supplier ranking and the coverage. AP owns both exceptions. Please give each one a target date.",
+      "after": "Do you want the workpaper as an Excel file?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, please."
+    },
+    {
+      "role": "agent",
+      "text": "Here it is: **Vendor_Statement_Recon_HarborOfficeSupply_2026-09-25.xlsx**.",
+      "after": "Do you want me to save your settings for next month?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, save them."
+    },
+    {
+      "role": "agent",
+      "text": "Done. I saved Harbor's account reference, its statement style, your monthly programme and the two open exceptions with their owner. Next month, the run starts from them."
+    }
   ]
 }
