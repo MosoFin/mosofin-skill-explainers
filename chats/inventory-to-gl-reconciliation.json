@@ -11,18 +11,19 @@
       "list": [
         "Do you want me to use MosoFin, or will you upload the data?",
         "Which period?",
-        "Is your stock in a separate system, such as a warehouse system or a 3PL platform? Or is it the item module of your accounting platform?",
+        "Is your stock in a separate system, such as a warehouse system or a 3PL (an outside warehouse company)? Or is it the item module of your accounting platform?",
         "Please attach the count results: the items, the quantities and the locations.",
         "When was the last count? Do you count once a year, in cycles, or not at all?",
         "Is any stock in transit or on consignment? What are the title terms?",
         "Does a 3PL hold stock for you? Please attach its statement for the period.",
-        "What is your policy for reserves and write-downs?",
+        "What is your policy for reserves and write-downs? If you use standard cost, how do you absorb cost variances?",
         "Above what amount do I investigate a count difference, for one item and in total?"
-      ]
+      ],
+      "after": "The questions on transit, policies and amounts are optional, but they make the work stronger."
     },
     {
       "role": "user",
-      "text": "Use MosoFin. Period end 30 September. We use the item module. We counted the A items on 26 September. Last full count was 31 December, and we cycle count since then. The Midlands 3PL holds our mugs. Damaged goods go to net realizable value, and the three damaged A-140 machines can sell for $60 each. Investigate over $500 per item or $2,000 in total.",
+      "text": "Use MosoFin. Period end 30 September. We use the item module. We counted the A items on 26 September. Last full count was 31 December, and we cycle count since then. Nothing is on consignment, and I know of no stock in transit. The Midlands 3PL holds our mugs. Damaged goods go to net realizable value, and the three damaged A-140 machines can sell for $60 each. Investigate over $500 per item or $2,000 in total.",
       "attach": [
         "a-item-count-26-september.xlsx",
         "midlands-3pl-september.pdf"
@@ -40,7 +41,7 @@
         ],
         [
           "Company file",
-          "Confirmed by name"
+          "Northbrook Trading"
         ],
         [
           "Stock platform",
@@ -55,7 +56,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I reconcile the inventory of **Northbrook Trading** at **30 September**, with the GL and the items read through MosoFin. The items are the **same platform's item module**. So a zero difference proves nothing, and I investigate any difference that is not zero. The count is your **A-item cycle count of 26 September**. I check the Midlands 3PL against its September statement. Shall I start?"
+      "text": "Here is my plan. I reconcile the inventory of **Northbrook Trading** at **30 September**, with your general ledger (GL) and the items read through MosoFin. The items are the **same platform's item module**. So a zero difference proves nothing, and I investigate any difference that is not zero. The count is your **A-item cycle count of 26 September**. Your last full count was **31 December**. I check the Midlands 3PL against its September statement. Shall I start?"
     },
     {
       "role": "user",
@@ -69,7 +70,7 @@
       "rows": [
         [
           "search_accounts",
-          "1300 Inventory, 1310 Inventory Reserve, 5150"
+          "1300 Inventory, 1310 Inventory Reserve, 5150 Inventory Shrinkage and Adjustments"
         ],
         [
           "get_trial_balance",
@@ -262,7 +263,7 @@
         ],
         "rows": [
           [
-            "A-100: quantity to 114, to account 5150",
+            "A-100: quantity to 114, to account 5150, count date 26 Sep",
             "−$510.00",
             "Item module"
           ],
@@ -297,7 +298,7 @@
     },
     {
       "role": "agent",
-      "text": "Your workpaper has eight sheets, from the summary to the coverage sheet. It marks the count as manual, with its owner and date.",
+      "text": "Your workpaper has eight sheets, from the summary to the coverage sheet. The ledger checks list every quantity below zero, consignment stock and the structure of your accounts. The coverage sheet marks the count as manual, with its owner and date.",
       "card": {
         "type": "signoff",
         "title": "Sign-off",
@@ -320,7 +321,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **Inventory_Recon_2026-09.xlsx**. I saved that you use the item module, your account map, the locations, the 3PL, the count cadence and the thresholds. I never save quantities, balances or count results."
+      "text": "Here is **Inventory_Recon_2026-09.xlsx**. I saved that you use the item module, your account map, the locations, the 3PL, the count cadence and the thresholds. I never save quantities, balances, count results or item costs."
     }
   ]
 }

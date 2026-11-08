@@ -21,7 +21,7 @@
     },
     {
       "role": "user",
-      "text": "Use MosoFin. Northbrook Trading, September. We pay federal taxes and 401(k) monthly. Register and bank statement attached. Write-offs under $50, and I approve them. No statements of account.",
+      "text": "Use MosoFin. Northbrook Trading, September. Federal taxes monthly by the 15th, 401(k) monthly by the 7th, state unemployment quarterly. Register and bank statement attached. Write-offs under $50, and I approve them. No statements of account.",
       "attach": [
         "payroll-register-september.xlsx",
         "bank-statement-september.pdf"
@@ -39,7 +39,7 @@
         ],
         [
           "Company file",
-          "Confirmed by name"
+          "Northbrook Trading"
         ],
         [
           "Payroll platform",
@@ -47,7 +47,7 @@
         ],
         [
           "Payroll accounts in the chart",
-          "2200, 2210 and 2230"
+          "2200, 2210, 2230 and 2240"
         ],
         [
           "Tools",
@@ -58,7 +58,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I reconcile **2200 Payroll clearing**, **2210 Federal payroll taxes** and **2230 401(k)** for **September**. No payroll platform is connected, so your register gives the accrued side. Both liabilities are paid **monthly**. I read twelve months of detail, from 1 October 2025, and tie net pay to your **bank statement**. Shall I start?"
+      "text": "Here is my plan. I reconcile **2200 Payroll clearing**, **2210 Federal payroll taxes**, **2230 401(k)** and **2240 State unemployment** for **September**. No payroll platform is connected, so your register gives the accrued side. Federal taxes and 401(k) are paid **monthly**, and state unemployment **quarterly**. I read twelve months of detail, from 1 October 2025, and tie net pay to your **bank statement**. Shall I start?"
     },
     {
       "role": "user",
@@ -72,7 +72,7 @@
       "rows": [
         [
           "search_accounts",
-          "2200, 2210 and 2230"
+          "2200, 2210, 2230, 2240 and 2250"
         ],
         [
           "get_trial_balance",
@@ -115,7 +115,15 @@
     },
     {
       "role": "agent",
-      "text": "September's two pay runs each net to nil in 2200. So 2200 should hold nil, but it holds **$4,023.40**. Five items are stuck in it:",
+      "text": "One check on scope first. **2250 Accrued payroll** also has payroll entries, **$2,500** at 30 September. It is not on your list. Do you want me to include it?"
+    },
+    {
+      "role": "user",
+      "text": "No. I review 2250 with the month-end accruals."
+    },
+    {
+      "role": "agent",
+      "text": "I list 2250 as excluded, with your reason. Now 2200. September's two pay runs each net to nil in 2200. So 2200 should hold nil, but it holds **$4,023.40**. Five items are stuck in it:",
       "card": {
         "type": "table",
         "title": "2200 Payroll clearing at 30 Sep",
@@ -158,11 +166,11 @@
           ]
         ]
       },
-      "after": "Four items, **$2,223.40**, are more than 60 days old. The oldest is from before October 2025. JE-0912 debits 6000 Wages, but no pay run is behind it. I show staff by reference only, never by name."
+      "after": "Four items, **$2,223.40**, are more than 60 days old. The oldest is from before October 2025. Only **$23.40** never cleared at any time in the twelve months. JE-0912 debits 6000 Wages, but no pay run is behind it. I show staff by reference only, never by name."
     },
     {
       "role": "agent",
-      "text": "2210 looks fine at first. Its roll-forward ties to the GL. But you pay monthly, so at a month end it should hold one month of taxes:",
+      "text": "2210 looks fine at first. Its roll-forward ties to the books. But you pay monthly, so at a month end it should hold one month of taxes:",
       "card": {
         "type": "bridge",
         "title": "2210 Federal payroll taxes",
@@ -260,6 +268,11 @@
             "2210 · September",
             "$14,400.00",
             "Timing, due Thu 15 Oct, no entry"
+          ],
+          [
+            "2240 · below zero",
+            "−$150.00",
+            "A refund to claim. Get the state's statement first"
           ]
         ]
       },
@@ -290,7 +303,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is **Payroll_Recs_2026-09_Northbrook Trading.xlsx**. I saved the account list, the cadences and your write-off limit. I never save personal data, balances or ageings."
+      "text": "Here is **Payroll_Recs_2026-09_Northbrook Trading.xlsx**. I saved the account list, the cadences, the pay calendar, the payees and your write-off limit. I never save personal data, balances or ageings."
     }
   ]
 }

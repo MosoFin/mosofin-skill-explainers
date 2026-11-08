@@ -22,7 +22,8 @@
         "Do you want whole dollars, thousands or millions?",
         "Do you want the income statement by function or by nature?",
         "Is there anything special, such as discontinued operations, segments or earnings per share?"
-      ]
+      ],
+      "after": "The questions on last year's statements, the loans and the rounding are optional. Without them, I name what is missing and never guess."
     },
     {
       "role": "user",
@@ -166,15 +167,15 @@
         "title": "Sign-off",
         "rows": [["Prepared by", ""], ["Reviewed by", ""]]
       },
-      "after": "These are management's own statements. They are not audited, reviewed or compiled, and I write no notes. Ask the bank which level it needs. Do you want an Excel file?"
+      "after": "These are management's own statements. They are not audited, reviewed or compiled, and I write no notes. Ask the bank which level it needs. Do you want an Excel file, and a PDF copy too?"
     },
     {
       "role": "user",
-      "text": "Yes, Excel please. Can you also post the supplier deposit entry?"
+      "text": "Excel only, please. Can you also post the supplier deposit entry?"
     },
     {
       "role": "agent",
-      "text": "Here is **Financial_Statements_2026-06_Northbrook Trading.xlsx**. I do not post entries. Sheet 8 has the draft: debit Prepayments 2, credit Ask My Accountant 2. Your bookkeeper posts it.",
+      "text": "Here is **Financial_Statements_2026-06_Northbrook Trading.xlsx**. I do not post entries. The reclassifications sheet has the draft: debit Prepayments 2, credit Ask My Accountant 2. Your bookkeeper posts it.",
       "after": "Do you want me to save your settings for next year?"
     },
     {
@@ -183,7 +184,7 @@
     },
     {
       "role": "agent",
-      "text": "Done. I saved the framework, the presentation choices, the account-to-line mapping, the rounding and the comparative policy. I never save balances, statement figures or the trial balance."
+      "text": "Done. I saved the framework, the presentation choices, the account-to-line mapping, the loan split rule, the rounding, the accrual basis and the comparative policy. I never save balances, statement figures or the trial balance."
     }
   ]
 }

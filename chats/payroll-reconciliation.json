@@ -41,7 +41,7 @@
         ],
         [
           "Company file",
-          "Confirmed by name"
+          "Northbrook Trading"
         ],
         [
           "Payroll platform",
@@ -56,7 +56,7 @@
     },
     {
       "role": "agent",
-      "text": "Here is my plan. I reconcile payroll for **Northbrook Trading** for the **quarter ended 30 September**. I read the GL through MosoFin, and use your registers and your filed Q3 Form 941. The payments to each authority come from your books. Net pay ties to your **bank statement**. I check each tax on its own wage base. In scope are 6000 Wages and salaries, 5100 Direct labour, and liabilities 2210, 2230 and 2240. Shall I start?"
+      "text": "Here is my plan. I reconcile payroll for **Northbrook Trading** for the **quarter ended 30 September**. I read your general ledger (GL) through MosoFin, and use your registers and your filed Q3 Form 941. The payments to each authority come from your books. Net pay ties to your **bank statement**. Federal taxes are due on the 15th and 401(k) on the 7th. I check each tax on its own wage base. In scope are 6000 Wages and salaries, 5100 Direct labour, and liabilities 2210, 2230 and 2240. Shall I start?"
     },
     {
       "role": "user",
@@ -146,7 +146,7 @@
           ]
         ]
       },
-      "after": "The books hold $98,300 in 6000 and $52,000 in 5100. JE-0912 has no payroll run behind it, so I list it as an exception."
+      "after": "The books hold $98,300 in 6000 and $52,000 in 5100. Employer costs agree at **$14,250** in both. JE-0912 has no payroll run behind it, so I list it as an exception."
     },
     {
       "role": "agent",
@@ -297,7 +297,7 @@
     },
     {
       "role": "agent",
-      "text": "Your workpaper has eight sheets. Sheet 3 says that net pay is bank-verified, and Sheet 6 says that the wage base check ran.",
+      "text": "Your workpaper has eight sheets. The summary names the sources that I read and the ones that you supplied. It says that net pay is bank-verified, and that the wage base check ran.",
       "card": {
         "type": "signoff",
         "title": "Sign-off",
