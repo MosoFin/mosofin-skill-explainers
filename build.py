@@ -45,8 +45,8 @@ ICON_PNG = SITE_URL + "assets/mosofin-mark.png"
 # Share card for link previews (Open Graph, X, LinkedIn, Slack). 1200x630 is the size these services expect.
 # A new file name when the card changes: link previews cache the image by its URL.
 OG_IMAGE = SITE_URL + "assets/og-card-v2.png"
-OG_IMAGE_ALT = ("MosoFin finance skills: learn 32 finance skills and watch each one at work. Plain-English guides with cited sources, "
-                "worked examples, and a replay of each skill used in a chat.")
+OG_IMAGE_ALT = ("MosoFin finance skills: automate your finance workflows and do less by hand. Learn each skill in plain English, "
+                "follow worked examples, and watch each skill used in a chat.")
 
 
 # --- Citations. Every public page gets the same generated block: each source shows when it was checked and where
