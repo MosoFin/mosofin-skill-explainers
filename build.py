@@ -43,8 +43,10 @@ TITLE_MIN, TITLE_MAX, DESC_MIN, DESC_MAX = 25, 65, 70, 160
 ICON = SITE_URL + "assets/favicon.svg"
 ICON_PNG = SITE_URL + "assets/mosofin-mark.png"
 # Share card for link previews (Open Graph, X, LinkedIn, Slack). 1200x630 is the size these services expect.
-OG_IMAGE = SITE_URL + "assets/og-card.png"
-OG_IMAGE_ALT = "MosoFin finance workflow guides: plain-English guides to the checks behind every number."
+# A new file name when the card changes: link previews cache the image by its URL.
+OG_IMAGE = SITE_URL + "assets/og-card-v2.png"
+OG_IMAGE_ALT = ("MosoFin finance skills: automate your finance workflows and do less by hand. Learn each skill in plain English, "
+                "follow worked examples, and watch each skill used in a chat.")
 
 
 # --- Citations. Every public page gets the same generated block: each source shows when it was checked and where
