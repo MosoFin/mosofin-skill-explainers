@@ -990,12 +990,23 @@ def relocate(text):
         return f'{attr}="{path}{rest}"'
     return re.sub(r'\b(href|src)="([^"]*)"', fix, text)
 
-def redirect_page(path):
-    """A small page at the old .html address. It sends the reader on to the address without .html."""
+def redirect_page(path, page=""):
+    """A small page at the old .html address. It sends the reader on to the address without .html.
+    Link previews (Threads, Slack, LinkedIn, X) read this page without following the redirect, so it
+    carries the target page's title, description and share card. Search engines still skip it (noindex)."""
     url, name = SITE_URL + path, path.rstrip("/").rsplit("/", 1)[-1] + "/"
+    title = re.search(r"<title>(.*?)</title>", page, re.S)
+    desc = re.search(r'<meta name="description" content="[^"]*">', page)
+    seo = re.search(re.escape(SEO_START) + r".*?" + re.escape(SEO_END), page, re.S)
+    meta = seo.group(0) if seo else f'<link rel="canonical" href="{e(url)}">'
+    meta = re.sub(r'<script type="application/ld\+json">.*?</script>\n?', "", meta, flags=re.S)   # the target page holds the structured data
+    meta = re.sub(r'<meta name="robots" content="[^"]*">', '<meta name="robots" content="noindex, follow">', meta)
+    if 'name="robots"' not in meta: meta += '\n<meta name="robots" content="noindex, follow">'
     return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>This page moved</title>
-<link rel="canonical" href="{e(url)}"><meta name="robots" content="noindex, follow">
+<html lang="en"><head><meta charset="utf-8">
+<title>{title.group(1).strip() if title else "This page moved"}</title>
+{desc.group(0) if desc else ""}
+{meta}
 <meta http-equiv="refresh" content="0; url={e(name)}">
 <script>location.replace("{e(name)}" + location.search + location.hash);</script>
 </head><body><p>This page moved to <a href="{e(name)}">{e(url)}</a>.</p></body></html>
@@ -1017,7 +1028,7 @@ def stage(dest):
                 folder = os.path.join(dest, rel[:-len(".html")])
                 os.makedirs(folder, exist_ok=True)
                 with open(os.path.join(folder, "index.html"), "w") as o: o.write(relocate(open(os.path.join(d, fn)).read()))
-                with open(os.path.join(dest, rel), "w") as o: o.write(redirect_page(pretty(rel)))
+                with open(os.path.join(dest, rel), "w") as o: o.write(redirect_page(pretty(rel), open(os.path.join(d, fn)).read()))
                 kept += 2; continue
             shutil.copy2(os.path.join(d, fn), os.path.join(dest, rel)); kept += 1
     print(f"staged {kept} file(s) to {dest}; left out {dropped} internal page(s)")
