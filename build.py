@@ -1031,6 +1031,16 @@ def stage(dest):
                 with open(os.path.join(dest, rel), "w") as o: o.write(redirect_page(pretty(rel), open(os.path.join(d, fn)).read()))
                 kept += 2; continue
             shutil.copy2(os.path.join(d, fn), os.path.join(dest, rel)); kept += 1
+    # Public analytics beacon: added to the staged copy only, so site/ and "build.py --check" are unaffected.
+    beacon = "<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{\"token\": \"0d76e8d571d84645891a67d657ab563f\"}'></script><!-- End Cloudflare Web Analytics -->\n"
+    for d, _, files in os.walk(dest):
+        for fn in files:
+            if not fn.endswith(".html"): continue
+            p = os.path.join(d, fn)
+            s = open(p).read()
+            if "cloudflareinsights" in s or "</body>" not in s or 'http-equiv="refresh"' in s.lower(): continue
+            i = s.rfind("</body>")
+            with open(p, "w") as o: o.write(s[:i] + beacon + s[i:])
     print(f"staged {kept} file(s) to {dest}; left out {dropped} internal page(s)")
 
 
